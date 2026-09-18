@@ -1,0 +1,88 @@
+/* Tailwind v4: ein einziger Import zieht Preflight (CSS-Reset) + alle Utilities rein. */
+@import "tailwindcss";
+
+/* Dark Mode über eine CSS-Klasse statt über die System-Einstellung.
+   Damit kann unser ThemeContext die Klasse "dark" auf <html> setzen und
+   alle "dark:"-Utilities schalten mit. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design-Tokens. Alles unter @theme wird zu CSS-Variablen UND zu Utilities,
+   z.B. --color-brand-500 -> bg-brand-500 / text-brand-500 / border-brand-500 */
+@theme {
+  --color-brand-50: oklch(0.97 0.02 255);
+  --color-brand-100: oklch(0.93 0.04 255);
+  --color-brand-200: oklch(0.87 0.07 255);
+  --color-brand-300: oklch(0.79 0.11 255);
+  --color-brand-400: oklch(0.68 0.16 255);
+  --color-brand-500: oklch(0.6 0.19 255);
+  --color-brand-600: oklch(0.52 0.19 255);
+  --color-brand-700: oklch(0.44 0.16 255);
+  --color-brand-900: oklch(0.3 0.1 255);
+  --color-brand-950: oklch(0.22 0.07 255);
+}
+
+/* Basis-Styles für die ganze Seite. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+}
+
+/* Grundstyles für die React-Vorschau in den "Probier's selbst"-Editoren.
+   Preflight entfernt alle Browser-Styles - ohne diese Regeln sähen <button>,
+   <h1> oder <ul> im Editor aus wie normaler Text.
+   :where() hat Spezifität 0, deshalb gewinnen Tailwind-Klassen und style={{}}. */
+@layer components {
+  .vorschau {
+    @apply text-sm leading-relaxed;
+  }
+  .vorschau :where(h1) {
+    @apply my-2 text-2xl font-bold;
+  }
+  .vorschau :where(h2) {
+    @apply my-2 text-xl font-semibold;
+  }
+  .vorschau :where(h3) {
+    @apply my-1.5 text-base font-semibold;
+  }
+  .vorschau :where(p, ul, ol) {
+    @apply my-2;
+  }
+  .vorschau :where(ul) {
+    @apply list-disc pl-5;
+  }
+  .vorschau :where(ol) {
+    @apply list-decimal pl-5;
+  }
+  .vorschau :where(button) {
+    @apply m-0.5 cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1 font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700;
+  }
+  .vorschau :where(input:not([type="checkbox"], [type="radio"], [type="range"]), select, textarea) {
+    @apply m-0.5 rounded-lg border border-slate-300 bg-white px-2 py-1 dark:border-slate-600 dark:bg-slate-800;
+  }
+  .vorschau :where(input[type="checkbox"], input[type="radio"]) {
+    @apply mr-1 accent-brand-600;
+  }
+  .vorschau :where(code) {
+    @apply rounded bg-slate-100 px-1 font-mono text-[0.9em] dark:bg-slate-800;
+  }
+  .vorschau :where(hr) {
+    @apply my-3 border-slate-200 dark:border-slate-700;
+  }
+  /* Konvention aus dem ToDo-Projekt: erledigte Einträge durchgestrichen. */
+  .vorschau :where(.done) {
+    @apply text-slate-400 line-through;
+  }
+  .vorschau :where([aria-pressed="true"]) {
+    @apply border-brand-500 bg-brand-50 dark:bg-brand-950;
+  }
+  .vorschau :where([role="alert"]) {
+    @apply text-rose-600 dark:text-rose-400;
+  }
+}
