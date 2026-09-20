@@ -7,7 +7,8 @@ import { useSprache, useTexte, type Zweisprachig } from '../i18n/SpracheContext'
 import { CodeEditor } from './CodeEditor'
 import { hash } from './quelltext'
 import { formatieren, kompilierenProjekt, type Protokoll } from './reactKompilieren'
-import { Fehlerkasten, Konsole, type Zeile } from './TryIt'
+import { typenPruefenProjekt, type Typfehler } from './typpruefung'
+import { Fehlerkasten, Konsole, Typfehlerliste, type Zeile } from './TryIt'
 
 /**
  * Werkstatt: ein ganzes React-Projekt aus mehreren Dateien.
@@ -35,11 +36,13 @@ type Props = {
   dateien: WerkstattDatei[]
   /** Datei mit dem default-Export App. */
   einstieg: string
+  /** TypeScript-Projekt: zusätzlich echte Typprüfung für die gerade offene Datei. */
+  typen?: boolean
 }
 
 const PAUSE_MS = 700
 
-export function Werkstatt({ id, titel, dateien, einstieg }: Props) {
+export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
   const t = useTexte()
   const { sprache } = useSprache()
 
@@ -154,6 +157,19 @@ export function Werkstatt({ id, titel, dateien, einstieg }: Props) {
     const timer = setTimeout(() => void rendern(code), PAUSE_MS)
     return () => clearTimeout(timer)
   }, [code, rendern])
+
+  // Typprüfung der offenen Datei - kurz nach dem letzten Tastendruck, wie in VS Code.
+  const [typpruefung, setTyppruefung] = useState<{ pfad: string; code: string; fehler: Typfehler[] } | null>(null)
+  useEffect(() => {
+    if (!typen) return
+    const timer = setTimeout(() => {
+      const projekt = Object.entries(code).map(([pfad, quelltext]) => ({ pfad, code: quelltext }))
+      void typenPruefenProjekt(projekt, aktiv).then((fehler) => setTyppruefung({ pfad: aktiv, code: code[aktiv], fehler }))
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [code, aktiv, typen])
+  // Veraltete Markierungen nicht anzeigen: Sie gelten nur für genau diesen Stand der Datei.
+  const typfehler = typpruefung?.pfad === aktiv && typpruefung.code === code[aktiv] ? typpruefung.fehler : null
 
   // Im Vollbild soll die Lernseite dahinter nicht mitscrollen.
   useEffect(() => {
@@ -292,8 +308,10 @@ export function Werkstatt({ id, titel, dateien, einstieg }: Props) {
               label={`${t.codeEditor}: ${aktiveDatei.pfad}`}
               sprache="react"
               maxZeilen={vollbild ? 1000 : 26}
+              markierungen={typfehler ?? undefined}
             />
           </div>
+          {typen && <Typfehlerliste fehler={typfehler} />}
           <p className="border-t border-slate-200 px-4 py-1.5 text-xs text-slate-400 dark:border-slate-800">
             {t.werkstattHinweis}
           </p>

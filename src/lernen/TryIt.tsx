@@ -605,7 +605,7 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
 }
 
 /** Ergebnis der Typprüfung unter dem Editor. `null` = Prüfung läuft noch. */
-function Typfehlerliste({ fehler }: { fehler: Typfehler[] | null }) {
+export function Typfehlerliste({ fehler }: { fehler: Typfehler[] | null }) {
   const t = useTexte()
   if (!fehler) {
     return <p className="border-b border-slate-200 px-4 py-2 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">⏳ {t.typpruefungLaeuft}</p>

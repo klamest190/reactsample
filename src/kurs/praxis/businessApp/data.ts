@@ -1,8 +1,30 @@
-// Start data. In a real app this would come from a server via fetch.
+// Start data and the data model. In a real app the data would come from a server via fetch.
 
-export const ORDER_STATUSES = ['open', 'shipped', 'paid']
+// "as const" makes the values literal types - so OrderStatus grows automatically
+// as soon as you add a status here.
+export const ORDER_STATUSES = ['open', 'shipped', 'paid'] as const
 
-export const initialCustomers = [
+export type OrderStatus = (typeof ORDER_STATUSES)[number]
+
+export type Customer = {
+  id: number
+  name: string
+  company: string
+  email: string
+  city: string
+}
+
+export type Order = {
+  id: number
+  customerId: number
+  title: string
+  amount: number
+  /** ISO date, e.g. "2026-05-04" */
+  date: string
+  status: OrderStatus
+}
+
+export const initialCustomers: Customer[] = [
   { id: 1, name: 'Ada Lovelace', company: 'Analytical Engines Ltd', email: 'ada@engines.example', city: 'London' },
   { id: 2, name: 'Grace Hopper', company: 'Compiler Works', email: 'grace@compiler.example', city: 'New York' },
   { id: 3, name: 'Alan Turing', company: 'Codebreakers & Co', email: 'alan@codebreakers.example', city: 'Manchester' },
@@ -11,7 +33,7 @@ export const initialCustomers = [
   { id: 6, name: 'Konrad Zuse', company: 'Relay Computing', email: 'konrad@relay.example', city: 'Berlin' },
 ]
 
-export const initialOrders = [
+export const initialOrders: Order[] = [
   { id: 101, customerId: 1, title: 'Engine maintenance', amount: 1200, date: '2026-05-04', status: 'paid' },
   { id: 102, customerId: 2, title: 'Compiler license', amount: 3400, date: '2026-05-18', status: 'paid' },
   { id: 103, customerId: 3, title: 'Security audit', amount: 5600, date: '2026-06-02', status: 'paid' },

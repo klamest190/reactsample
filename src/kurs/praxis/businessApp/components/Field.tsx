@@ -1,8 +1,12 @@
-import { useId } from 'react'
+import { useId, type ComponentProps } from 'react'
+
+// Everything an <input> accepts, plus a label and an optional error.
+// `false` is allowed so callers can write error={submitted && errors.name}.
+type FieldProps = ComponentProps<'input'> & { label: string; error?: string | false }
 
 // Label + input + error message. useId connects label and input,
 // even if the component is used several times on the same page.
-export function Field({ label, error, ...inputProps }) {
+export function Field({ label, error, ...inputProps }: FieldProps) {
   const id = useId()
 
   return (

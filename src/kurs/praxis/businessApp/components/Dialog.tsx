@@ -1,11 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
+
+type DialogProps = { title: string; onClose: () => void; children: ReactNode }
 
 // A modal dialog. The content comes in as children - the dialog
 // does not know whether it shows a customer form or something else.
-export function Dialog({ title, onClose, children }) {
+export function Dialog({ title, onClose, children }: DialogProps) {
   // Close with Escape. The cleanup removes the listener again.
   useEffect(() => {
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKeyDown)

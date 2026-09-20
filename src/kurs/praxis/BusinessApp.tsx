@@ -5,9 +5,10 @@ import { Werkstatt } from '../../lernen/Werkstatt'
 import { codeBloecke, dateien } from './BusinessApp.code'
 
 const aufbau: [string, string][] = [
-  ['App.jsx', 'Einstieg: Store, Layout und die Seite zum gewählten Menüpunkt'],
-  ['store.jsx', 'Alle Daten: useReducer + Context + eigener Hook useStore'],
-  ['data.js, format.js', 'Reines JavaScript ohne React: Startdaten und Formatierung'],
+  ['App.tsx', 'Einstieg: Store, Layout und die Seite zum gewählten Menüpunkt'],
+  ['store.tsx', 'Alle Daten: useReducer + Context + eigener Hook useStore'],
+  ['data.ts', 'Das Datenmodell als Typen (Customer, Order, OrderStatus) und die Startdaten'],
+  ['format.ts', 'Hilfsfunktionen ohne React: Geld- und Datumsformat'],
   ['hooks/', 'Eigene Hooks, die mehrere Komponenten nutzen können'],
   ['pages/', 'Eine Komponente pro Seite - sie holen sich ihre Daten aus dem Store'],
   ['components/', 'Wiederverwendbare Bausteine, die nur über Props gesteuert werden'],
@@ -26,10 +27,11 @@ export function BusinessApp() {
           Auftragsverwaltung mit Dashboard, Kundentabelle und Auftragsliste.
         </P>
         <P>
-          Die App besteht aus {dateien.length} Dateien, aufgeteilt wie in einem echten Projekt. Wähle
-          links eine Datei aus und ändere sie - die laufende App darunter übernimmt deine Änderung nach
-          einer kurzen Pause. Mit <strong>⛶ Vollbild</strong> liegen Dateien, Editor und App
-          nebeneinander.
+          Die App besteht aus {dateien.length} Dateien in TypeScript, aufgeteilt wie in einem echten
+          Projekt. Wähle links eine Datei aus und ändere sie - die laufende App darunter übernimmt deine
+          Änderung nach einer kurzen Pause, und die Typprüfung meldet Fehler über alle Dateien hinweg
+          (<Verweis id="praxis-typescript" />). Mit <strong>⛶ Vollbild</strong> liegen Dateien, Editor und
+          App nebeneinander.
         </P>
         <Hinweis variante="tipp">
           Benutze die App erst einmal: Kunden suchen und sortieren, einen Kunden anklicken und bearbeiten,
@@ -38,7 +40,7 @@ export function BusinessApp() {
       </Abschnitt>
 
       <Abschnitt titel="Die Werkstatt">
-        <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.jsx" />
+        <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.tsx" typen />
       </Abschnitt>
 
       <Abschnitt titel="So ist die App aufgebaut">
@@ -72,7 +74,7 @@ export function BusinessApp() {
             Ein Klick schickt eine Action, z. B. <Code>{"dispatch({ type: 'order/statusChanged', … })"}</Code>.
           </li>
           <li>
-            Der Reducer in <Code>store.jsx</Code> baut daraus einen <strong>neuen</strong> State, ohne den
+            Der Reducer in <Code>store.tsx</Code> baut daraus einen <strong>neuen</strong> State, ohne den
             alten zu verändern (<Verweis id="hooks-usereducer" />, <Verweis id="js-referenzen" />).
           </li>
           <li>
@@ -90,38 +92,43 @@ export function BusinessApp() {
       <Abschnitt titel="Aufgaben zum Ausprobieren">
         <Liste>
           <li>
-            <strong>Neuer Status:</strong> Füge in <Code>data.js</Code> den Status{' '}
+            <strong>Neuer Status:</strong> Füge in <Code>data.ts</Code> den Status{' '}
             <Code>'cancelled'</Code> zu <Code>ORDER_STATUSES</Code> hinzu. Filter, Auswahlliste und Etikett
             passen sich von selbst an - warum eigentlich?
           </li>
           <li>
-            <strong>Neue Kennzahl:</strong> Ergänze in <Code>pages/Dashboard.jsx</Code> eine{' '}
+            <strong>Neue Kennzahl:</strong> Ergänze in <Code>pages/Dashboard.tsx</Code> eine{' '}
             <Code>StatCard</Code> „Average order“ mit dem Durchschnittswert aller Aufträge.
           </li>
           <li>
-            <strong>Neue Spalte:</strong> Zeige in <Code>pages/Customers.jsx</Code> die Anzahl der
+            <strong>Neue Spalte:</strong> Zeige in <Code>pages/Customers.tsx</Code> die Anzahl der
             Aufträge pro Kunde - sortierbar, also als Eintrag in <Code>COLUMNS</Code>.
           </li>
           <li>
-            <strong>Andere Formatierung:</strong> Stelle in <Code>format.js</Code> auf{' '}
+            <strong>Andere Formatierung:</strong> Stelle in <Code>format.ts</Code> auf{' '}
             <Code>'de-DE'</Code> um. Alle Beträge und Daten der App ändern sich - weil es nur diese eine
             Stelle gibt.
           </li>
           <li>
-            <strong>Kunden löschen:</strong> Baue in <Code>store.jsx</Code> eine Action{' '}
+            <strong>Kunden löschen:</strong> Baue in <Code>store.tsx</Code> eine Action{' '}
             <Code>'customer/deleted'</Code> und im Kundendialog einen Knopf dafür. Überlege, was mit den
             Aufträgen dieses Kunden passieren soll.
           </li>
           <li>
-            <strong>Neue Seite:</strong> Schreibe in <Code>App.jsx</Code> eine kleine Komponente{' '}
+            <strong>Neue Seite:</strong> Schreibe in <Code>App.tsx</Code> eine kleine Komponente{' '}
             <Code>Settings</Code>, trage sie in <Code>PAGES</Code> ein und ergänze den Menüpunkt in{' '}
-            <Code>components/Layout.jsx</Code>.
+            <Code>components/Layout.tsx</Code>.
           </li>
         </Liste>
         <Hinweis>
           Nach jeder Code-Änderung startet die App neu - angelegte Kunden oder geänderte Status sind dann
           wieder weg, deine Code-Änderungen aber nicht: Sie bleiben in deinem Browser gespeichert.{' '}
           <strong>↺ Alles zurücksetzen</strong> holt den Originalzustand zurück.
+        </Hinweis>
+        <Hinweis variante="tipp">
+          Probier die Typen aus: Schreib in <Code>store.tsx</Code> eine Action falsch (z. B.{' '}
+          <Code>'order/statusChangd'</Code>) - der <Code>never</Code>-Zweig im Reducer meldet sofort, dass ein
+          Fall fehlt. Die App läuft trotzdem weiter, denn im Browser werden die Typen nur entfernt.
         </Hinweis>
         <Hinweis variante="warnung">
           Die Vorschau nutzt das Tailwind-CSS dieser Lernseite. Klassen, die nirgends im Kurs vorkommen,
@@ -134,10 +141,10 @@ export function BusinessApp() {
         <P>
           Die Dateien sind genau so geschrieben wie in einem Vite-Projekt (<Verweis id="praxis-lokal" />).
           Leg ein Projekt an, kopiere die Dateien nach <Code>src/</Code> - es fehlt nur noch{' '}
-          <Code>main.jsx</Code>, das die App in die Seite hängt:
+          <Code>main.tsx</Code>, das die App in die Seite hängt:
         </P>
         <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
-        <CodeBlock titel="src/main.jsx" code={codeBloecke.main} />
+        <CodeBlock titel="src/main.tsx" code={codeBloecke.main} />
         <P>
           In <Code>index.css</Code> steht dann <Code>@import "tailwindcss";</Code> und die Farben{' '}
           <Code>brand-…</Code> als <Code>@theme</Code>, oder du ersetzt sie durch eine Tailwind-Farbe wie{' '}
@@ -147,7 +154,7 @@ export function BusinessApp() {
 
       <Merke
         punkte={[
-          'Echte Apps teilen sich in Seiten (pages), Bausteine (components), eigene Hooks und reines JavaScript auf.',
+          'Echte Apps teilen sich in Seiten (pages), Bausteine (components), eigene Hooks und Module ohne React auf.',
           <>
             Globale Daten: <Code>useReducer</Code> + Context + ein eigener Hook wie <Code>useStore</Code>.
           </>,
@@ -157,6 +164,7 @@ export function BusinessApp() {
             Mit <Code>import</Code>/<Code>export</Code> hängen die Dateien zusammen - der Bundler (hier ein
             Mini-Bundler im Browser) fügt sie zu einer App zusammen.
           </>,
+          'Das Datenmodell steht an einer Stelle - alle anderen Dateien bekommen ihre Typen von dort.',
         ]}
       />
     </>

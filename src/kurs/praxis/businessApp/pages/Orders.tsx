@@ -1,27 +1,30 @@
 import { useState } from 'react'
-import { useStore } from '../store'
-import { ORDER_STATUSES } from '../data'
+import { useStore, type OrderDraft } from '../store'
+import { ORDER_STATUSES, type OrderStatus } from '../data'
 import { Button } from '../components/Button'
 import { Dialog } from '../components/Dialog'
 import { OrderForm } from '../components/OrderForm'
 import { StatusBadge } from '../components/StatusBadge'
 import { formatCurrency, formatDate } from '../format'
 
-const FILTERS = ['all', ...ORDER_STATUSES]
+type FilterValue = 'all' | OrderStatus
+
+const FILTERS: FilterValue[] = ['all', ...ORDER_STATUSES]
 
 export function Orders() {
   const { orders, customers, dispatch } = useStore()
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState<FilterValue>('all')
   const [creating, setCreating] = useState(false)
 
-  const countFor = (status) => (status === 'all' ? orders.length : orders.filter((o) => o.status === status).length)
+  const countFor = (status: FilterValue) =>
+    status === 'all' ? orders.length : orders.filter((o) => o.status === status).length
   const visible = orders
     .filter((o) => filter === 'all' || o.status === filter)
     .toSorted((a, b) => b.date.localeCompare(a.date))
   const total = visible.reduce((sum, o) => sum + o.amount, 0)
-  const customerName = (id) => customers.find((c) => c.id === id)?.name ?? 'Unknown'
+  const customerName = (id: number) => customers.find((c) => c.id === id)?.name ?? 'Unknown'
 
-  function handleCreate(order) {
+  function handleCreate(order: OrderDraft) {
     dispatch({ type: 'order/added', order })
     setCreating(false)
     setFilter('all')
@@ -77,7 +80,8 @@ export function Orders() {
                     <StatusBadge status={o.status} />
                     <select
                       value={o.status}
-                      onChange={(e) => dispatch({ type: 'order/statusChanged', id: o.id, status: e.target.value })}
+                      // The value of a <select> is a string - here we know it is a status.
+                      onChange={(e) => dispatch({ type: 'order/statusChanged', id: o.id, status: e.target.value as OrderStatus })}
                       aria-label={`Status of order ${o.id}`}
                       className="rounded-md border border-slate-300 bg-transparent px-1 py-0.5 text-xs dark:border-slate-600"
                     >

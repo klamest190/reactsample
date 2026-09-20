@@ -82,14 +82,17 @@ function auftraegeSammeln(): Auftrag[] {
     if (!s) continue
     const start = s.start ?? vorherige
     vorherige = s.loesung
-    auftraege.push({ id: meta.id, ort: 'projekt/schritte.ts', pruefen: () => uebungPruefen(s.modus, start, s.loesung, s.tests) })
+    const beispiel = { code: start, loesung: s.loesung, tests: s.modus === 'test' ? undefined : s.tests }
+    const modus = { modus: s.modus, typen: s.modus === 'react' && Boolean(s.typen), vorschau: s.modus === 'js' && Boolean(s.vorschau) }
+    const extra = s.modus === 'test' ? { dateien: s.dateien, varianten: s.varianten } : {}
+    auftraege.push({ id: meta.id, ort: 'projekt/schritte.ts', pruefen: () => beispielPruefen(beispiel, modus, extra) })
   }
 
   // 4. Die Business-App der Werkstatt
   auftraege.push({
     id: 'praxis-business',
     ort: 'praxis/businessApp/',
-    pruefen: async () => (await projektRendern(businessDateien, 'App.jsx'))[0] ?? null,
+    pruefen: async () => (await projektRendern(businessDateien, 'App.tsx'))[0] ?? null,
   })
 
   return auftraege

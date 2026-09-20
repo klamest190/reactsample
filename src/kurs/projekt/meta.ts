@@ -153,6 +153,42 @@ export const projektSchritte: SchrittMeta[] = [
     stichworte: ['fetch', 'AbortController', 'loading', 'retry', 'api'],
   },
   {
+    id: 'projekt-12-typescript',
+    titel: { de: 'Umzug nach TypeScript', en: 'Moving to TypeScript' },
+    kurz: { de: 'Dieselbe App mit Typen: Datenmodell, Actions, Context, Props und Refs.', en: 'The same app with types: data model, actions, context, props and refs.' },
+    dauer: 40,
+    grundlagen: ['praxis-typescript', 'projekt-11-laden'],
+    lernziele: {
+      de: ['Ein Datenmodell als Typen festhalten', 'Actions als Discriminated Union prüfen lassen', 'Context und Hooks typisieren', 'Eine JavaScript-App schrittweise migrieren'],
+      en: ['Capture a data model as types', 'Have actions checked as a discriminated union', 'Type context and hooks', 'Migrate a JavaScript app step by step'],
+    },
+    stichworte: ['typescript', 'types', 'Typen', 'discriminated union', 'never', 'generics', 'migration'],
+  },
+  {
+    id: 'projekt-13-routing',
+    titel: { de: 'Seiten & Adressen mit Routing', en: 'Pages & addresses with routing' },
+    kurz: { de: 'Filter und Detailseiten bekommen eigene Adressen - mit React Router.', en: 'Filters and detail pages get their own addresses - with React Router.' },
+    dauer: 35,
+    grundlagen: ['praxis-routing', 'projekt-12-typescript'],
+    lernziele: {
+      de: ['Routen und verschachtelte Layouts anlegen', 'Filter aus der Adresse statt aus dem State', 'Detailseiten mit useParams', 'Unbekannte Adressen abfangen'],
+      en: ['Create routes and nested layouts', 'Take the filter from the address instead of state', 'Detail pages with useParams', 'Catch unknown addresses'],
+    },
+    stichworte: ['routing', 'react router', 'NavLink', 'Outlet', 'useParams', 'aria-current', '404'],
+  },
+  {
+    id: 'projekt-14-testen',
+    titel: { de: 'Tests für die ToDo-App', en: 'Tests for the todo app' },
+    kurz: { de: 'Diesmal schreibst du die Tests - fünf eingebaute Fehler müssen auffliegen.', en: 'This time you write the tests - five built-in bugs have to be caught.' },
+    dauer: 40,
+    grundlagen: ['praxis-testen', 'projekt-13-routing'],
+    lernziele: {
+      de: ['Eine komplette App mit Testing Library prüfen', 'Ausgangslage mit beforeEach herstellen', 'Grenzfälle und beide Richtungen testen', 'Die eigenen Tests am Mutationstest messen'],
+      en: ['Check a complete app with Testing Library', 'Set up the starting point with beforeEach', 'Test edge cases and both directions', 'Measure your own tests with a mutation test'],
+    },
+    stichworte: ['test', 'vitest', 'testing library', 'userEvent', 'beforeEach', 'mutation', 'Mutationstest'],
+  },
+  {
     id: 'projekt-12-challenge',
     titel: { de: 'Challenge: ToDo-App von null', en: 'Challenge: todo app from scratch' },
     kurz: { de: 'Ein leerer Editor, eine Anforderungsliste und Tests - zeig, was du kannst.', en: 'An empty editor, a list of requirements and tests - show what you can do.' },

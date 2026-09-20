@@ -4,8 +4,9 @@ import { Panel } from '../components/Panel'
 import { StatCard } from '../components/StatCard'
 import { StatusBadge } from '../components/StatusBadge'
 import { formatCurrency, formatDate } from '../format'
+import type { PageProps } from '../components/Layout'
 
-export function Dashboard({ onNavigate }) {
+export function Dashboard({ onNavigate }: PageProps) {
   const { customers, orders } = useStore()
 
   // Key figures are derived from the orders - never stored separately.
@@ -31,7 +32,7 @@ export function Dashboard({ onNavigate }) {
 
   const latestOrders = orders.toSorted((a, b) => b.date.localeCompare(a.date)).slice(0, 5)
   const biggest = topCustomers[0]?.total || 1
-  const customerName = (id) => customers.find((c) => c.id === id)?.name ?? 'Unknown'
+  const customerName = (id: number) => customers.find((c) => c.id === id)?.name ?? 'Unknown'
 
   return (
     <div className="space-y-6">

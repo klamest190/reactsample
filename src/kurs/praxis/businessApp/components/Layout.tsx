@@ -1,12 +1,21 @@
-const NAV = [
+import type { ReactNode } from 'react'
+
+export type PageId = 'dashboard' | 'customers' | 'orders'
+
+/** Every page gets this - pages that do not navigate may simply ignore it. */
+export type PageProps = { onNavigate: (page: PageId) => void }
+
+const NAV: { id: PageId; label: string; icon: string }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'customers', label: 'Customers', icon: '👥' },
   { id: 'orders', label: 'Orders', icon: '📦' },
 ]
 
+type LayoutProps = PageProps & { page: PageId; children: ReactNode }
+
 // @container: the layout reacts to its OWN width, not the window width -
 // so it also works in a narrow column or preview. @2xl: = container at least 42rem wide.
-export function Layout({ page, onNavigate, children }) {
+export function Layout({ page, onNavigate, children }: LayoutProps) {
   const current = NAV.find((item) => item.id === page)
 
   return (

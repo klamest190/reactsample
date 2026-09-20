@@ -22,6 +22,9 @@ const TYPEN = import.meta.glob(
     '/node_modules/@types/react-dom/{index,client}.d.ts',
     '/node_modules/@types/{react,react-dom}/package.json',
     '/node_modules/csstype/{index.d.ts,package.json}',
+    // React Router für das Routing im ToDo-Projekt
+    '/node_modules/react-router/package.json',
+    '/node_modules/react-router/dist/production/**/*.d.ts',
   ],
   { query: '?raw', import: 'default', eager: true },
 ) as Record<string, string>
@@ -69,6 +72,12 @@ for (const [pfad, inhalt] of Object.entries(LIB)) {
   dateien.set(LIB_ORDNER + pfad.split('/').pop(), inhalt)
 }
 
+/** Inhalt einer Datei: Editor, Projekt oder mitgeliefertes Typ-Paket. */
+function lesen(pfad: string): string | undefined {
+  if (pfad === DATEI) return editorCode
+  return projekt.get(pfad)?.code ?? dateien.get(pfad)
+}
+
 const OPTIONEN: ts.CompilerOptions = {
   strict: true,
   noEmit: true,
@@ -87,21 +96,41 @@ const OPTIONEN: ts.CompilerOptions = {
 let editorCode = ''
 let version = 0
 
+// Mehrere Dateien (Werkstatt): Pfad -> Inhalt + Version. Die Version sagt dem
+// Language Service, welche Datei sich geändert hat - alles andere bleibt geparst.
+const PROJEKT_ORDNER = '/projekt/'
+const projekt = new Map<string, { code: string; version: number }>()
+
+function projektSetzen(dateien: { pfad: string; code: string }[]) {
+  const aktuelle = new Set<string>()
+  for (const datei of dateien) {
+    const pfad = PROJEKT_ORDNER + datei.pfad
+    aktuelle.add(pfad)
+    const vorhanden = projekt.get(pfad)
+    if (!vorhanden) projekt.set(pfad, { code: datei.code, version: 1 })
+    else if (vorhanden.code !== datei.code) projekt.set(pfad, { code: datei.code, version: vorhanden.version + 1 })
+  }
+  for (const pfad of projekt.keys()) if (!aktuelle.has(pfad)) projekt.delete(pfad)
+}
+
 const host: ts.LanguageServiceHost = {
-  getScriptFileNames: () => [DATEI, '/globale.d.ts'],
-  getScriptVersion: (pfad) => (pfad === DATEI ? String(version) : '1'),
+  getScriptFileNames: () => [DATEI, '/globale.d.ts', ...projekt.keys()],
+  getScriptVersion: (pfad) => {
+    if (pfad === DATEI) return String(version)
+    return String(projekt.get(pfad)?.version ?? 1)
+  },
   getScriptSnapshot: (pfad) => {
-    const inhalt = pfad === DATEI ? editorCode : dateien.get(pfad)
+    const inhalt = lesen(pfad)
     return inhalt === undefined ? undefined : ts.ScriptSnapshot.fromString(inhalt)
   },
   getCurrentDirectory: () => '/',
   getCompilationSettings: () => OPTIONEN,
   getDefaultLibFileName: () => LIB_ORDNER + 'lib.es2023.d.ts',
-  fileExists: (pfad) => pfad === DATEI || dateien.has(pfad),
-  readFile: (pfad) => (pfad === DATEI ? editorCode : dateien.get(pfad)),
+  fileExists: (pfad) => lesen(pfad) !== undefined,
+  readFile: lesen,
   directoryExists: (ordner) => {
     const praefix = ordner.endsWith('/') ? ordner : ordner + '/'
-    return [...dateien.keys()].some((pfad) => pfad.startsWith(praefix))
+    return [...dateien.keys(), ...projekt.keys()].some((pfad) => pfad.startsWith(praefix))
   },
   getDirectories: () => [],
 }
@@ -109,11 +138,11 @@ const host: ts.LanguageServiceHost = {
 // Der Language Service merkt sich die geparsten Bibliotheken - nur der erste Lauf ist langsam.
 const dienst = ts.createLanguageService(host, ts.createDocumentRegistry())
 
-function pruefen(code: string): Typfehler[] {
-  editorCode = code
-  version++
-  const diagnosen = [...dienst.getSyntacticDiagnostics(DATEI), ...dienst.getSemanticDiagnostics(DATEI)]
-  const quelle = dienst.getProgram()?.getSourceFile(DATEI)
+/** Eine einzelne Datei prüfen - der Editor-Code oder eine Datei des Projekts. */
+function pruefen(datei: string): Typfehler[] {
+  const code = lesen(datei) ?? ''
+  const diagnosen = [...dienst.getSyntacticDiagnostics(datei), ...dienst.getSemanticDiagnostics(datei)]
+  const quelle = dienst.getProgram()?.getSourceFile(datei)
 
   return diagnosen.map((d) => {
     const start = d.start ?? 0
@@ -133,14 +162,21 @@ function pruefen(code: string): Typfehler[] {
 
 // Im Worker ist self der Worker-Scope. Die Projekt-Typen kennen nur das DOM, deshalb diese schmale Beschreibung.
 const scope = self as unknown as {
-  onmessage: (e: MessageEvent<{ id: number; code: string }>) => void
+  onmessage: (e: MessageEvent<{ id: number; code?: string; dateien?: { pfad: string; code: string }[]; aktiv?: string }>) => void
   postMessage: (nachricht: unknown) => void
 }
 
 scope.onmessage = (e) => {
-  const { id, code } = e.data
+  const { id, code, dateien: projektDateien, aktiv } = e.data
   try {
-    scope.postMessage({ id, fehler: pruefen(code) })
+    if (projektDateien) {
+      projektSetzen(projektDateien)
+      scope.postMessage({ id, fehler: pruefen(PROJEKT_ORDNER + aktiv) })
+    } else {
+      editorCode = code ?? ''
+      version++
+      scope.postMessage({ id, fehler: pruefen(DATEI) })
+    }
   } catch (fehler) {
     scope.postMessage({ id, fehler: [], absturz: String(fehler) })
   }

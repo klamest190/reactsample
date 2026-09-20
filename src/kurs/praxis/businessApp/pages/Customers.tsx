@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
-import { useStore } from '../store'
+import { useStore, type CustomerDraft } from '../store'
 import { useSort } from '../hooks/useSort'
 import { Button } from '../components/Button'
 import { CustomerForm } from '../components/CustomerForm'
 import { Dialog } from '../components/Dialog'
 import { formatCurrency } from '../format'
+import type { Customer } from '../data'
 
-const COLUMNS = [
+/** A customer plus the revenue calculated for the table. */
+type Row = Customer & { revenue: number }
+
+const COLUMNS: { key: keyof Row & string; label: string; numeric?: boolean }[] = [
   { key: 'name', label: 'Name' },
   { key: 'company', label: 'Company' },
   { key: 'city', label: 'City' },
@@ -17,10 +21,10 @@ export function Customers() {
   const { customers, orders, dispatch } = useStore()
   const [query, setQuery] = useState('')
   // null = dialog closed, 'new' = new customer, otherwise the customer being edited
-  const [editing, setEditing] = useState(null)
+  const [editing, setEditing] = useState<Customer | 'new' | null>(null)
 
   // Add the revenue per customer and apply the search.
-  const rows = useMemo(() => {
+  const rows = useMemo<Row[]>(() => {
     const search = query.trim().toLowerCase()
     return customers
       .map((c) => ({
@@ -30,9 +34,10 @@ export function Customers() {
       .filter((c) => `${c.name} ${c.company} ${c.city}`.toLowerCase().includes(search))
   }, [customers, orders, query])
 
+  // The hook is generic: here T is Row, so sortBy only accepts keys of Row.
   const { sorted, sort, sortBy } = useSort(rows, 'name')
 
-  function handleSave(customer) {
+  function handleSave(customer: CustomerDraft) {
     dispatch({ type: 'customer/saved', customer })
     setEditing(null)
   }
@@ -69,7 +74,7 @@ export function Customers() {
             {sorted.map((c) => (
               <tr
                 key={c.id}
-                onClick={() => setEditing(customers.find((x) => x.id === c.id))}
+                onClick={() => setEditing(customers.find((x) => x.id === c.id) ?? null)}
                 className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50"
               >
                 <td className="px-4 py-2">

@@ -9,14 +9,26 @@ import { chromium } from 'playwright-core'
 import { createLogger, createServer } from 'vite'
 
 const nur = process.argv[2] ?? ''
-// Konsolenausgaben aus dem Browser nicht durchreichen - viele Beispiele zeigen absichtlich Fehler.
+
+// Viele Beispiele zeigen absichtlich Fehler. Vite reicht sie aus dem Browser durch -
+// hier werden diese Zeilen ausgeblendet, damit nur der Testbericht übrig bleibt.
 const logger = createLogger('warn')
-for (const stufe of ['warn', 'error']) {
-  const original = logger[stufe]
-  logger[stufe] = (text, optionen) => {
-    if (!String(text).includes('(client)')) original(text, optionen)
+let inBrowserMeldung = false
+const filter = (schreiben) => (text, ...rest) => {
+  const zeile = String(text)
+  if (zeile.includes('[vite]') && zeile.includes('(client)')) {
+    inBrowserMeldung = true
+    return true
   }
+  if (inBrowserMeldung) {
+    // Folgezeilen einer Browser-Meldung: Stacktrace, Leerzeilen, Hinweise von React.
+    if (/^\s*(at |$)/.test(zeile) || /^(The above error|React will try)/.test(zeile)) return true
+    inBrowserMeldung = false
+  }
+  return schreiben(zeile, ...rest)
 }
+process.stdout.write = filter(process.stdout.write.bind(process.stdout))
+process.stderr.write = filter(process.stderr.write.bind(process.stderr))
 const server = await createServer({ server: { port: 5197, strictPort: false }, customLogger: logger })
 await server.listen()
 const adresse = server.resolvedUrls.local[0]

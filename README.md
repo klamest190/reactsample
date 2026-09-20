@@ -22,7 +22,20 @@ npm run dev     # Entwicklungsserver auf http://localhost:5173
 npm run build   # Produktionsbuild nach dist/
 npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
+npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
 ```
+
+### Selbsttest der Inhalte
+
+`npm run test:inhalte` startet den Dev-Server, öffnet `selbsttest.html` im installierten Chrome
+(oder Edge) und prüft mit denselben Funktionen wie die Editoren der App:
+
+- jedes Beispiel läuft ohne Fehler,
+- jede Musterlösung besteht alle ihre Tests - und der Startcode besteht sie **nicht**,
+- TypeScript-Beispiele haben keine Typfehler,
+- selbst geschriebene Tests erkennen jede eingebaute Fehler-Variante (Mutationstest).
+
+Einzelne Teile prüfen: `npm run test:inhalte -- praxis-` (alles, dessen ID so beginnt).
 
 ## Aufbau eines Kapitels
 

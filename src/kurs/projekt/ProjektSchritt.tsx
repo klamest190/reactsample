@@ -54,8 +54,10 @@ export function ProjektSchritt({ id }: { id: string }) {
           </ul>
         </div>
 
-        {inhalt.modus === 'react' ? (
-          <TryIt modus="react" titel={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} />
+        {inhalt.modus === 'test' ? (
+          <TryIt modus="test" titel={t.schrittAufgabe} {...gemeinsam} dateien={inhalt.dateien} varianten={inhalt.varianten} />
+        ) : inhalt.modus === 'react' ? (
+          <TryIt modus="react" titel={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} typen={inhalt.typen} />
         ) : (
           <TryIt titel={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} vorschau={inhalt.vorschau} />
         )}

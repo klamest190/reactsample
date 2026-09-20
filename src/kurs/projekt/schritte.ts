@@ -1,6 +1,8 @@
 import type { Zweisprachig } from '../../i18n/SpracheContext'
 import type { ReactTest, Test } from '../../lernen/jsSandbox'
+import type { ProjektDatei } from '../../lernen/reactKompilieren'
 import { js } from '../../lernen/quelltext'
+import { schritteFortgeschritten } from './schritteFortgeschritten'
 
 /**
  * Inhalte der Projektschritte (Metadaten siehe meta.ts).
@@ -27,7 +29,14 @@ type Basis = {
 
 export type SchrittInhalt =
   | (Basis & { modus: 'js'; vorschau?: boolean; tests: Test[] })
-  | (Basis & { modus: 'react'; tests: ReactTest[] })
+  /** `typen`: zusätzlich echte Typprüfung im Editor (TypeScript-Schritt). */
+  | (Basis & { modus: 'react'; typen?: boolean; tests: ReactTest[] })
+  /** Die Lernenden schreiben die Tests selbst - geprüft per Mutationstest gegen `varianten`. */
+  | (Basis & {
+      modus: 'test'
+      dateien: ProjektDatei[]
+      varianten: { name: Zweisprachig; dateien: ProjektDatei[] }[]
+    })
 
 // --- Schritt 1: reine Funktionen ------------------------------------------------------
 
@@ -968,6 +977,8 @@ const TEST_ALLES_GEHT_NOCH: ReactTest = {
 // --- Die Schritte -----------------------------------------------------------------------
 
 export const schrittInhalte: Record<string, SchrittInhalt> = {
+  ...schritteFortgeschritten,
+
   'projekt-1-daten': {
     modus: 'js',
     einleitung: {

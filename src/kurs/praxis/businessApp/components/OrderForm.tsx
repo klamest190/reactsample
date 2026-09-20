@@ -1,16 +1,25 @@
-import { useId, useState } from 'react'
+import { useId, useState, type SubmitEvent } from 'react'
 import { Button } from './Button'
 import { Field } from './Field'
 import { today } from '../format'
+import type { Customer } from '../data'
+import type { OrderDraft } from '../store'
 
-export function OrderForm({ customers, onSave, onCancel }) {
-  const [customerId, setCustomerId] = useState(customers[0]?.id ?? '')
+type OrderFormProps = {
+  customers: Customer[]
+  onSave: (order: OrderDraft) => void
+  onCancel: () => void
+}
+
+export function OrderForm({ customers, onSave, onCancel }: OrderFormProps) {
+  // Form fields are always strings - the conversion happens when saving.
+  const [customerId, setCustomerId] = useState(String(customers[0]?.id ?? ''))
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const selectId = useId()
 
-  function handleSubmit(e) {
+  function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const value = Number(amount)
     if (!title.trim() || !(value > 0)) {
