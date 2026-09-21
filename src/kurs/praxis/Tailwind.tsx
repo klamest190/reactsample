@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './Tailwind.code'
 import { TailwindDemo } from '../demos/TailwindDemo'
 
 /**
- * KAPITEL 4.5 - Tailwind CSS in React
+ * KAPITEL 5.5 - Tailwind CSS in React
  */
 export function Tailwind() {
   return (
@@ -53,12 +53,10 @@ export function Tailwind() {
           {...beispiele['praxis-tailwind-karte']}
           modus="react"
         />
-        <Hinweis variante="warnung">
-          <strong>Einschränkung im Editor:</strong> Tailwind erzeugt nur Klassen, die beim Bauen im
-          Quelltext des Projekts vorkommen. Klassen aus den Beispielen hier funktionieren deshalb - ganz
-          neue, die du selbst tippst, eventuell nicht. Im echten Projekt mit laufendem Vite-Server gibt
-          es diese Einschränkung nicht. Zum freien Experimentieren eignet sich{' '}
-          <Code>{'style={{ … }}'}</Code>.
+        <Hinweis variante="tipp">
+          <strong>Autovervollständigung wie in VS Code:</strong> Tippe in <Code>className="…"</Code> los,
+          z. B. <Code>bg-</Code> oder <Code>hover:text-</Code> - der Editor schlägt alle Klassen vor, mit
+          Farbfeld und dem CSS, das Tailwind daraus erzeugt. Jede Klasse wirkt sofort in der Vorschau.
         </Hinweis>
       </Abschnitt>
 

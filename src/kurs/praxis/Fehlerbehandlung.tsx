@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './Fehlerbehandlung.code'
 import { FehlerDemo } from '../demos/FehlerDemo'
 
 /**
- * KAPITEL 4.4 - Fehlerbehandlung
+ * KAPITEL 5.4 - Fehlerbehandlung
  */
 export function Fehlerbehandlung() {
   return (

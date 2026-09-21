@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Vergleich.code'
 
 /**
- * KAPITEL 6.10 - Java, JavaScript & React im Vergleich
+ * KAPITEL 7.10 - Java, JavaScript & React im Vergleich
  *
  * Das Abschlusskapitel des Java-Teils. Als einziges Kapitel benutzt es alle
  * drei Editoren nebeneinander - und zeigt, wo im Projekt welche Sprache liegt.
@@ -24,7 +24,7 @@ export function Vergleich() {
         <P>
           Zwei Dinge fallen auf: Java braucht deutlich mehr Rahmen - und der Cast{' '}
           <Code>(double)</Code> ist Pflicht, weil <Code>int / int</Code> sonst abschneiden würde (
-          <Verweis nr="6.2" />).
+          <Verweis nr="7.2" />).
         </P>
       </Abschnitt>
 
@@ -63,7 +63,7 @@ export function Vergleich() {
           </table>
         </div>
         <Hinweis variante="info">
-          TypeScript (<Verweis nr="4.8" />) liegt genau dazwischen: Typen wie in Java, Laufzeit wie
+          TypeScript (<Verweis nr="5.8" />) liegt genau dazwischen: Typen wie in Java, Laufzeit wie
           in JavaScript. Beim Bauen werden die Typen wieder entfernt - geprüft wird trotzdem vorher.
         </Hinweis>
       </Abschnitt>
@@ -80,7 +80,7 @@ export function Vergleich() {
           Die Kette <Code>stream().filter(…).toList()</Code> und{' '}
           <Code>{'tasks.filter(t => !t.done)'}</Code> sagen dasselbe. React fügt nur eines hinzu:
           Aus der gefilterten Liste wird automatisch das, was man sieht - ändert sich der State,
-          zeichnet React neu (<Verweis nr="2.3" />).
+          zeichnet React neu (<Verweis nr="3.3" />).
         </P>
         <Hinweis variante="tipp">
           Genau deshalb steht in diesem Kurs zuerst JavaScript: React ist keine eigene Sprache,
@@ -159,7 +159,7 @@ export function Vergleich() {
         </P>
         <CodeBlock code={codeBloecke.echtesProjekt} />
         <P>
-          Der Weg dorthin ist derselbe wie in <Verweis nr="4.11" /> für React: raus aus dem
+          Der Weg dorthin ist derselbe wie in <Verweis nr="5.11" /> für React: raus aus dem
           Browser-Editor, rein in ein echtes Projekt.
         </P>
       </Abschnitt>
@@ -177,7 +177,7 @@ export function Vergleich() {
           </li>
           <li>
             <strong>Beides zusammen</strong> ist der Normalfall in Unternehmen: ein Java-Backend, das
-            JSON liefert, und ein React-Frontend, das es anzeigt (<Verweis nr="4.2" />).
+            JSON liefert, und ein React-Frontend, das es anzeigt (<Verweis nr="5.2" />).
           </li>
         </Liste>
       </Abschnitt>

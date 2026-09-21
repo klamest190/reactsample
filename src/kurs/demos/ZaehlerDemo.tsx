@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Demo, Wert } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.1): falsche vs. richtige Mehrfach-Updates. */
+/** Live-Demo (Kapitel 4.1): falsche vs. richtige Mehrfach-Updates. */
 
 const TEXTE = {
   de: {

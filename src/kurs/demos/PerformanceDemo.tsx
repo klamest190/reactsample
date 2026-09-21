@@ -1,10 +1,10 @@
 /* oxlint-disable react/refs -- Render-Zähler als Anschauungsmaterial: die Ref wird bewusst
-   beim Rendern gelesen und geschrieben (siehe Kapitel 3.3, warum man das sonst nicht tut). */
+   beim Rendern gelesen und geschrieben (siehe Kapitel 4.3, warum man das sonst nicht tut). */
 import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { Button, Demo, Wert } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.4): useMemo, useCallback & memo. */
+/** Live-Demo (Kapitel 4.4): useMemo, useCallback & memo. */
 
 const TEXTE = {
   de: {

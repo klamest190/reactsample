@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Klassen.code'
 
 /**
- * KAPITEL 6.6 - Klassen & Objekte
+ * KAPITEL 7.6 - Klassen & Objekte
  * Das Herzstück von Java: Bauplan, Konstruktor, Kapselung.
  */
 export function Klassen() {
@@ -74,7 +74,7 @@ export function Klassen() {
             sollen.
           </li>
           <li>
-            <Code>protected</Code> - zusätzlich für erbende Klassen (<Verweis nr="6.7" />).
+            <Code>protected</Code> - zusätzlich für erbende Klassen (<Verweis nr="7.7" />).
           </li>
           <li>ohne Angabe - sichtbar im selben Paket. Fürs Lernen völlig in Ordnung.</li>
         </Liste>

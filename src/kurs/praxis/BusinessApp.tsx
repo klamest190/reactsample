@@ -15,7 +15,7 @@ const aufbau: [string, string][] = [
 ]
 
 /**
- * KAPITEL 4.12 - Eine komplette Business-App
+ * KAPITEL 5.12 - Eine komplette Business-App
  */
 export function BusinessApp() {
   return (

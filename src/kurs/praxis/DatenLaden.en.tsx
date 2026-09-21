@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './DatenLaden.code'
 import { LadeDemo } from '../demos/LadeDemo'
 
 /**
- * KAPITEL 4.2 (English) - Fetching Data
+ * KAPITEL 5.2 (English) - Fetching Data
  */
 export function DatenLaden() {
   return (
@@ -23,7 +23,7 @@ export function DatenLaden() {
 
       <Abschnitt titel="The basic pattern">
         <P>
-          Loading data from a server combines everything from <Verweis nr="1.7" /> (async/await) and <Verweis nr="3.2" /> (useEffect).
+          Loading data from a server combines everything from <Verweis nr="1.7" /> (async/await) and <Verweis nr="4.2" /> (useEffect).
           Every request has three possible states - and each needs its own display:
         </P>
         <Liste>
@@ -85,7 +85,7 @@ export function DatenLaden() {
             server.
           </li>
           <li>
-            React 19: <Code>use(promise)</Code> with <Code>Suspense</Code> (<Verweis nr="3.9" />), when the promise comes
+            React 19: <Code>use(promise)</Code> with <Code>Suspense</Code> (<Verweis nr="4.9" />), when the promise comes
             from a cache.
           </li>
         </Liste>

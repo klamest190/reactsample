@@ -549,7 +549,7 @@ export const glossar: GlossarEintrag[] = [
       en: 'JavaScript with **types**. The editor and `tsc` check during development whether values, props and function calls fit together. Compiling only strips the types - plain JavaScript runs in the browser.',
     },
     code: js`function Greeting({ name }: { name: string }) { … }`,
-    kapitel: ['praxis-typescript'],
+    kapitel: ['ts-start', 'praxis-typescript'],
   },
   {
     id: 'union-type',
@@ -560,7 +560,7 @@ export const glossar: GlossarEintrag[] = [
       en: 'A type that may be **one of several**, written with `|`. Especially useful with fixed values such as `\'open\' | \'done\'`. After a check TypeScript knows which case applies (narrowing).',
     },
     code: js`type Filter = 'all' | 'open' | 'done'`,
-    kapitel: ['praxis-typescript'],
+    kapitel: ['ts-unions', 'praxis-typescript'],
   },
   {
     id: 'discriminated-union',
@@ -570,7 +570,7 @@ export const glossar: GlossarEintrag[] = [
       en: 'A union of object types that share a field with a fixed value (usually `type`). In a `switch` over that field TypeScript knows the matching fields in every case - ideal for reducer actions.',
     },
     code: js`type Action = { type: 'added'; text: string } | { type: 'removed'; id: number }`,
-    kapitel: ['praxis-typescript', 'hooks-usereducer'],
+    kapitel: ['ts-unions', 'praxis-typescript', 'hooks-usereducer'],
   },
   {
     id: 'generics',
@@ -581,7 +581,102 @@ export const glossar: GlossarEintrag[] = [
       en: 'A placeholder for a type, e.g. `<T>`, that is only fixed when used. That keeps a function or component type-safe for any data - `useState<User | null>` uses exactly this.',
     },
     code: js`function first<T>(items: T[]): T | undefined { return items[0] }`,
-    kapitel: ['praxis-typescript'],
+    kapitel: ['ts-generics', 'praxis-typescript'],
+  },
+  {
+    id: 'type-annotation',
+    begriff: 'Type annotation',
+    deutsch: 'Typannotation',
+    erklaerung: {
+      de: 'Der Typ, den du ausdrücklich hinter einen Namen schreibst: `name: string`. Fehlt er, leitet TypeScript den Typ meist selbst aus dem Wert ab (**Inferenz**). Parameter von Funktionen brauchen immer eine Annotation.',
+      en: 'The type you write explicitly after a name: `name: string`. Without it, TypeScript usually derives the type from the value itself (**inference**). Function parameters always need an annotation.',
+    },
+    code: js`let city: string = 'Berlin'   // annotation
+let count = 3                  // inference: number`,
+    kapitel: ['ts-start'],
+  },
+  {
+    id: 'unknown',
+    begriff: 'unknown / any',
+    erklaerung: {
+      de: 'Beide stehen für „irgendein Wert“. `any` schaltet die Typprüfung ab, `unknown` ist die sichere Variante: Du musst den Wert erst eingrenzen, bevor du ihn benutzen darfst. Für Daten von außen ist `unknown` richtig.',
+      en: 'Both stand for "some value". `any` switches the type check off, `unknown` is the safe variant: you have to narrow the value before you may use it. `unknown` is right for data from outside.',
+    },
+    code: js`const data: unknown = JSON.parse(text)
+if (typeof data === 'string') data.toUpperCase()`,
+    kapitel: ['ts-start', 'ts-fortgeschritten'],
+  },
+  {
+    id: 'interface-ts',
+    begriff: 'interface (TypeScript)',
+    erklaerung: {
+      de: 'Beschreibt die Form eines Objekts - fast wie ein `type`. Interfaces werden mit `extends` erweitert und können von Klassen mit `implements` erfüllt werden.',
+      en: 'Describes the shape of an object - almost like a `type`. Interfaces are extended with `extends` and can be fulfilled by classes with `implements`.',
+    },
+    code: js`interface Dog extends Animal { breed: string }`,
+    kapitel: ['ts-objekte', 'ts-klassen'],
+  },
+  {
+    id: 'narrowing',
+    begriff: 'Narrowing',
+    deutsch: 'Eingrenzen',
+    erklaerung: {
+      de: 'Nach einer Prüfung mit `typeof`, `in`, `instanceof`, einem Vergleich oder einem Type Guard weiß TypeScript, welcher Typ aus einer Union übrig ist - und erlaubt die passenden Felder und Methoden.',
+      en: 'After a check with `typeof`, `in`, `instanceof`, a comparison or a type guard, TypeScript knows which type of a union is left - and allows the matching fields and methods.',
+    },
+    code: js`if (typeof value === 'number') value.toFixed(2)   // value is a number here`,
+    kapitel: ['ts-unions'],
+  },
+  {
+    id: 'type-guard',
+    begriff: 'Type guard',
+    erklaerung: {
+      de: 'Eine eigene Prüffunktion mit dem Rückgabetyp `value is Typ`. Gibt sie `true` zurück, behandelt TypeScript den Wert danach als diesen Typ.',
+      en: 'A check function of your own with the return type `value is Type`. If it returns `true`, TypeScript treats the value as that type afterwards.',
+    },
+    code: js`function isUser(value: unknown): value is User { … }`,
+    kapitel: ['ts-unions', 'ts-fortgeschritten'],
+  },
+  {
+    id: 'utility-types',
+    begriff: 'Utility types',
+    erklaerung: {
+      de: 'Eingebaute Typ-Werkzeuge, die neue Typen aus vorhandenen ableiten: `Partial`, `Pick`, `Omit`, `Record`, `Readonly`, `ReturnType` und weitere.',
+      en: 'Built-in type tools that derive new types from existing ones: `Partial`, `Pick`, `Omit`, `Record`, `Readonly`, `ReturnType` and more.',
+    },
+    code: js`type TodoPatch = Partial<Omit<Todo, 'id'>>`,
+    kapitel: ['ts-utility'],
+  },
+  {
+    id: 'as-const',
+    begriff: 'as const',
+    erklaerung: {
+      de: 'Typisiert einen Wert so genau wie möglich: Jeder Wert behält seinen Literal-Typ, und alles wird `readonly`. So wird eine Werteliste zur Quelle für einen Union-Typ.',
+      en: 'Types a value as precisely as possible: every value keeps its literal type, and everything becomes `readonly`. That way a list of values becomes the source of a union type.',
+    },
+    code: js`const SIZES = ['s', 'm', 'l'] as const
+type Size = (typeof SIZES)[number]   // 's' | 'm' | 'l'`,
+    kapitel: ['ts-utility'],
+  },
+  {
+    id: 'mapped-type',
+    begriff: 'Mapped type',
+    erklaerung: {
+      de: 'Ein Typ, der über alle Schlüssel eines anderen Typs läuft und daraus einen neuen baut - wie `map` für Typen. `Partial` und `Readonly` sind so gebaut.',
+      en: 'A type that goes over all keys of another type and builds a new one from them - like `map` for types. `Partial` and `Readonly` are built this way.',
+    },
+    code: js`type Flags<T> = { [K in keyof T]: boolean }`,
+    kapitel: ['ts-fortgeschritten'],
+  },
+  {
+    id: 'type-assertion',
+    begriff: 'Type assertion',
+    erklaerung: {
+      de: '`wert as Typ` behauptet einen Typ, ohne ihn zu prüfen. Stimmt die Behauptung nicht, gibt es keinen Fehler, sondern einen falschen Typ - deshalb lieber eingrenzen.',
+      en: '`value as Type` claims a type without checking it. If the claim is wrong, there is no error but a wrong type - so prefer narrowing.',
+    },
+    code: js`const input = document.querySelector('#name') as HTMLInputElement`,
+    kapitel: ['ts-fortgeschritten'],
   },
   {
     id: 'routing',
@@ -707,7 +802,7 @@ export const glossar: GlossarEintrag[] = [
     kapitel: ['hooks-usememo'],
   },
 
-  // --- Teil 6: Java ---------------------------------------------------------
+  // --- Teil 7: Java ---------------------------------------------------------
   {
     id: 'jvm',
     begriff: 'JVM',
@@ -736,7 +831,7 @@ export const glossar: GlossarEintrag[] = [
       en: 'The type of every variable is settled **before** the program starts and is checked by the compiler. Java does this, JavaScript does not - TypeScript adds it.',
     },
     code: js`int age = 36;   // in Java kann age nie ein String werden`,
-    kapitel: ['java-variablen', 'praxis-typescript'],
+    kapitel: ['java-variablen', 'ts-start', 'praxis-typescript'],
   },
   {
     id: 'primitiver-typ',

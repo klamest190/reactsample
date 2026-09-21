@@ -6,6 +6,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte, type Zweisprachig } from '../i18n/SpracheContext'
 import { CodeEditor } from './CodeEditor'
 import { hash } from './quelltext'
+import { tailwindFuerVorschau } from './tailwind'
 import { formatieren, kompilierenProjekt, type Protokoll } from './reactKompilieren'
 import { typenPruefenProjekt, type Typfehler } from './typpruefung'
 import { Fehlerkasten, Konsole, Typfehlerliste, type Zeile } from './TryIt'
@@ -100,6 +101,7 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
 
       try {
         const projekt = Object.entries(quellen).map(([pfad, code]) => ({ pfad, code }))
+        tailwindFuerVorschau(Object.values(quellen).join('\n'))
         const { App, aufraeumen } = await kompilierenProjekt(projekt, einstieg, protokoll, sprache)
         if (nummer !== laufRef.current || rootRef.current !== root) return aufraeumen()
         aufraeumenRef.current()
@@ -165,11 +167,11 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
     const timer = setTimeout(() => {
       const projekt = Object.entries(code).map(([pfad, quelltext]) => ({ pfad, code: quelltext }))
       void typenPruefenProjekt(projekt, aktiv).then((fehler) => setTyppruefung({ pfad: aktiv, code: code[aktiv], fehler }))
-    }, 400)
+    }, 700)
     return () => clearTimeout(timer)
   }, [code, aktiv, typen])
-  // Veraltete Markierungen nicht anzeigen: Sie gelten nur für genau diesen Stand der Datei.
-  const typfehler = typpruefung?.pfad === aktiv && typpruefung.code === code[aktiv] ? typpruefung.fehler : null
+  // Bis das neue Ergebnis da ist, bleibt das letzte der offenen Datei stehen - sonst flackert die Anzeige beim Tippen.
+  const typfehler = typpruefung?.pfad === aktiv ? typpruefung.fehler : null
 
   // Im Vollbild soll die Lernseite dahinter nicht mitscrollen.
   useEffect(() => {

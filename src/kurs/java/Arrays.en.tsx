@@ -32,7 +32,7 @@ export function Arrays() {
       <Abschnitt titel="The length is fixed">
         <P>
           There is no <Code>push</Code>. If you need more room you create a new array and copy - or
-          use an <Code>ArrayList</Code> right away (<Verweis nr="6.8" />).
+          use an <Code>ArrayList</Code> right away (<Verweis nr="7.8" />).
         </P>
         <TryIt modus="java" id="java-arrays-laenge" {...beispiele['java-arrays-laenge']} />
         <Hinweis variante="tipp">
@@ -51,7 +51,7 @@ export function Arrays() {
         <TryIt modus="java" id="java-arrays-npe" {...beispiele['java-arrays-npe']} />
         <P>
           The <Code>NullPointerException</Code> is the most common runtime error in Java. Its
-          inventor Tony Hoare calls it “my billion-dollar mistake” today. In <Verweis nr="6.9" /> you
+          inventor Tony Hoare calls it “my billion-dollar mistake” today. In <Verweis nr="7.9" /> you
           will learn how to deal with it.
         </P>
       </Abschnitt>

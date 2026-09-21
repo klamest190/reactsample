@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Start.code'
 
 /**
- * KAPITEL 6.1 - Hallo Java
+ * KAPITEL 7.1 - Hallo Java
  * Der Einstieg in den Java-Teil: das Gerüst, die Ausgabe und der Compiler.
  */
 export function Start() {
@@ -44,7 +44,7 @@ export function Start() {
         <Hinweis variante="info">
           Dieser Teil ist <strong>eigenständig</strong>: Er setzt keinen der Teile 1 bis 5 voraus und
           benutzt auch nichts davon. Wo es sich lohnt, gibt es Vergleiche - gesammelt in{' '}
-          <Verweis nr="6.10" />.
+          <Verweis nr="7.10" />.
         </Hinweis>
       </Abschnitt>
 

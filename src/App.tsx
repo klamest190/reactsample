@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
 import { Seitenleiste } from './components/Seitenleiste'
 import { Suche } from './components/Suche'
 import { useTheme } from './context/ThemeContext'
@@ -10,6 +10,9 @@ import { KapitelSeite } from './seiten/KapitelSeite'
 import { Glossar } from './seiten/Glossar'
 import { ProjektUebersicht } from './seiten/ProjektUebersicht'
 import { Startseite } from './seiten/Startseite'
+
+// Der Playground bringt viele Bausteine mit - er wird erst geladen, wenn man ihn öffnet.
+const Playground = lazy(() => import('./seiten/Playground').then((modul) => ({ default: modul.Playground })))
 
 /**
  * App = Layout + Navigation + Lernfortschritt.
@@ -39,7 +42,8 @@ export default function App() {
   const kapitel = alleKapitel.find((k) => k.id === route)
   const prozent = Math.round((erledigt.length / alleKapitel.length) * 100)
 
-  const [seite, glossarZiel] = route.split('/')
+  const [seite, unterseite] = route.split('/')
+  const glossarZiel = seite === 'glossar' ? unterseite : undefined
 
   // Bei jedem Seitenwechsel nach oben scrollen (Sprünge ins Glossar scrollen selbst).
   useEffect(() => {
@@ -54,7 +58,9 @@ export default function App() {
         ? t.glossar
         : seite === 'projekt'
           ? t.projekt
-          : ''
+          : seite === 'playground'
+            ? t.playground
+            : ''
     document.title = titel ? `${titel} · ${t.appTitel}` : t.appTitel
   }, [kapitel, seite, sprache, t])
 
@@ -167,6 +173,10 @@ export default function App() {
             <Glossar ziel={glossarZiel} />
           ) : seite === 'projekt' ? (
             <ProjektUebersicht erledigt={erledigt} />
+          ) : seite === 'playground' ? (
+            <Suspense fallback={null}>
+              <Playground teil={unterseite} />
+            </Suspense>
           ) : (
             <Startseite erledigt={erledigt} navigieren={navigieren} sucheOeffnen={sucheOeffnen} />
           )}

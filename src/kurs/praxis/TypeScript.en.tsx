@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './TypeScript.code'
 
 /**
- * KAPITEL 4.6 (English) - TypeScript with React
+ * KAPITEL 5.6 (English) - TypeScript with React
  */
 
 const ereignisse: [string, string][] = [
@@ -61,6 +61,10 @@ export function TypeScriptKapitel() {
           below the editor reports the error before anyone uses the app.
         </P>
         <TryIt id="praxis-typescript-einstieg" {...beispiele['praxis-typescript-einstieg']} modus="react" typen />
+        <Hinweis variante="tipp">
+          This chapter shows TypeScript <strong>in React</strong>. You learn the language itself - object types,
+          unions, generics, utility types - in depth in part 2, starting with <Verweis id="ts-start" />.
+        </Hinweis>
       </Abschnitt>
 
       <Abschnitt titel="Why TypeScript?">

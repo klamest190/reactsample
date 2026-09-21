@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.3 - Bedingungen & Schleifen. */
+/** Codebeispiele für Kapitel 7.3 - Bedingungen & Schleifen. */
 
 export const beispiele = {
   'java-kontrollfluss-einstieg': {

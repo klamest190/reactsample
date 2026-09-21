@@ -73,7 +73,7 @@ export function Vererbung() {
         <P>
           Two special forms that save a lot of typing. An <Code>enum</Code> is a class with a fixed,
           countable set of objects - Java’s answer to the union type in TypeScript (
-          <Verweis nr="4.8" />).
+          <Verweis nr="5.8" />).
         </P>
         <TryIt modus="java" id="java-vererbung-enum" {...beispiele['java-vererbung-enum']} />
         <P>
@@ -87,7 +87,7 @@ export function Vererbung() {
       <Abschnitt titel="And why does React do it differently?">
         <P>
           React has no inheritance between components. Instead of extending a base component, you nest
-          small components - that is <strong>composition</strong> (<Verweis nr="4.3" />).
+          small components - that is <strong>composition</strong> (<Verweis nr="5.3" />).
         </P>
         <CodeBlock code={codeBloecke.reactVergleich} />
         <P>

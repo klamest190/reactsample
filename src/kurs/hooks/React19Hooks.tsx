@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './React19Hooks.code'
 
 /**
- * KAPITEL 3.9 - use, useActionState, useOptimistic & useFormStatus
+ * KAPITEL 4.9 - use, useActionState, useOptimistic & useFormStatus
  * Die Hooks aus React 19 für asynchrone Daten und Formulare.
  */
 export function React19Hooks() {

@@ -40,7 +40,7 @@ export function Start() {
         <Hinweis variante="info">
           This part is <strong>self-contained</strong>: it requires none of parts 1 to 5 and uses
           nothing from them. Where it is worth it, there are comparisons - collected in{' '}
-          <Verweis nr="6.10" />.
+          <Verweis nr="7.10" />.
         </Hinweis>
       </Abschnitt>
 

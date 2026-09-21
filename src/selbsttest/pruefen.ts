@@ -7,6 +7,7 @@ import { formatieren, kompilieren, kompilierenProjekt, type ProjektDatei } from 
 import { reactTestsAusfuehren } from '../lernen/reactTests'
 import { testsAusfuehren } from '../lernen/testLauf'
 import { typenPruefen } from '../lernen/typpruefung'
+import { tsTypenPruefen, tsUebersetzen } from '../lernen/tsLauf'
 import type { Zweisprachig } from '../i18n/SpracheContext'
 import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
 
@@ -16,19 +17,22 @@ import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
  *
  *   Beispiel ohne Lösung   läuft ohne Fehler (React: kein Absturz beim Rendern)
  *   Übung mit Tests        Musterlösung besteht alle Tests, der Startcode NICHT alle
- *   TypeScript             Beispiele und Musterlösungen ohne Typfehler
+ *   TypeScript             Beispiele und Musterlösungen ohne Typfehler (TSX und reines TS mit Typ-Tests)
  *   Test-Modus             die Tests der Beispiele sind grün; bei Übungen erkennt die
  *                          Musterlösung alle kaputten Varianten, der Startcode nicht
  */
 
-export type Modus = { modus: 'js' | 'react' | 'test' | 'java'; typen: boolean; vorschau: boolean }
+export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java'; typen: boolean; vorschau: boolean }
 export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; dauer: number }
 
 /**
  * Beispiele, die absichtlich einen Fehler zeigen - mit Begründung.
  * Die Java-Kapitel bringen ihre eigenen mit (siehe src/java/inhalte.ts).
  */
-export const ERWARTETE_FEHLER: Record<string, string> = { ...JAVA_ERWARTETE_FEHLER }
+export const ERWARTETE_FEHLER: Record<string, string> = {
+  ...JAVA_ERWARTETE_FEHLER,
+  'ts-start-fehler': 'zeigt, dass ein Typfehler das Programm nicht aufhält',
+}
 
 const warten = (ms: number) => new Promise((r) => setTimeout(r, ms))
 const nameVon = (n: string | Zweisprachig) => (typeof n === 'string' ? n : n.de)
@@ -171,6 +175,37 @@ async function uebungPruefen(
   return null
 }
 
+/**
+ * Reines TypeScript (Teil 2): Lösung bzw. Beispiel ohne Typfehler, Typ-Tests grün, läuft ohne Fehler
+ * und besteht die Tests. Der Startcode einer Übung muss an irgendetwas davon scheitern.
+ */
+async function tsPruefen(b: CodeBeispiel): Promise<string | null> {
+  const typTests = b.typTests ?? []
+  const tests = b.tests as Test[] | undefined
+
+  async function durchlauf(code: string) {
+    const typen = await tsTypenPruefen(code, typTests)
+    const typFehler = typen.imCode[0] ? `Typfehler in Zeile ${typen.imCode[0].zeile}: ${typen.imCode[0].text}` : null
+    const testTypFehler = typen.proTest.findIndex((f) => f.length > 0)
+    const uebersetzt = await tsUebersetzen(code)
+    if ('fehler' in uebersetzt) return { meldung: 'nicht übersetzbar: ' + uebersetzt.fehler }
+    const lauf = await jsAusfuehren(uebersetzt.code, { tests, vorbereitung: b.vorbereitung })
+    const meldung =
+      typFehler ??
+      (testTypFehler >= 0 ? `Typ-Test „${nameVon(typTests[testTypFehler].name)}“: ${typen.proTest[testTypFehler][0].text}` : null) ??
+      (tests?.length ? (alleOk(lauf.ergebnisse) ? null : ersterFehler(lauf.ergebnisse, lauf.fehler)) : (lauf.fehler[0] ?? null))
+    return { meldung }
+  }
+
+  const ziel = await durchlauf(b.loesung ?? b.code)
+  if (ziel.meldung) return `${b.loesung ? 'Musterlösung' : 'Beispiel'}: ${ziel.meldung}`
+  if (b.loesung && b.loesung !== b.code && (tests?.length || typTests.length)) {
+    const start = await durchlauf(b.code)
+    if (!start.meldung) return 'Startcode besteht schon alles (Typen, Typ-Tests und Tests)'
+  }
+  return null
+}
+
 /** Eigene Tests (Test-Modus): grün mit der richtigen Komponente, jede Variante wird erkannt. */
 async function testModusPruefen(
   code: string,
@@ -199,6 +234,8 @@ export async function beispielPruefen(
     const ergebnis = javaBeispielPruefen('', b)
     return ergebnis.ok ? null : ergebnis.meldung
   }
+
+  if (m.modus === 'ts') return tsPruefen(b)
 
   if (m.modus === 'test') {
     if (extra.varianten?.length && b.loesung) {

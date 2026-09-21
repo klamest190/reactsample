@@ -3,7 +3,7 @@ import { Demo, Eingabe, Wert } from '../../components/Ui'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.2): Effekt mit Dependency + Event-Listener über einen eigenen Hook. */
+/** Live-Demo (Kapitel 4.2): Effekt mit Dependency + Event-Listener über einen eigenen Hook. */
 
 const TEXTE = {
   de: {

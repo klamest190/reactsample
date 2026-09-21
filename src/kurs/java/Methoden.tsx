@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Methoden.code'
 
 /**
- * KAPITEL 6.4 - Methoden
+ * KAPITEL 7.4 - Methoden
  * Funktionen heißen in Java Methoden, weil sie immer zu einer Klasse gehören.
  */
 export function Methoden() {
@@ -77,7 +77,7 @@ export function Methoden() {
           <li>
             ohne <Code>static</Code> - die Methode gehört einem <strong>Objekt</strong> und darf auf
             dessen Felder zugreifen. Das ist der Normalfall, sobald es Daten gibt (
-            <Verweis nr="6.6" />).
+            <Verweis nr="7.6" />).
           </li>
         </Liste>
         <TryIt modus="java" id="java-methoden-static" {...beispiele['java-methoden-static']} />

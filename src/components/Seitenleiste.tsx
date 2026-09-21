@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { kurs } from '../kurs/kurs'
 import { Icon, type IconName } from './Icon'
+import { TEIL_STIL } from './teilStil'
 import { Aufklapppfeil } from './Ui'
 
 /**
- * Kursnavigation: Suche, zwei Nachschlage-Seiten und darunter die Teile des Kurses.
+ * Kursnavigation: Suche, Nachschlage-Seiten und darunter die Teile des Kurses.
+ * Den Playground gibt es nur einmal oben - zwischen den Teilen wechselt man auf der Seite selbst.
  *
  * Damit die Liste bei über 40 Einträgen übersichtlich bleibt, sind die Teile einklappbar.
  * Standard: nur der Teil des aktuellen Kapitels ist offen. Wer selbst auf- oder
@@ -15,16 +17,6 @@ import { Aufklapppfeil } from './Ui'
  * Die Übersichtsseite des ToDo-Projekts steht nicht separat oben, sondern als
  * erster Eintrag im Teil „Projekt“ - so gibt es jeden Eintrag nur einmal.
  */
-
-// Icon und Farbe pro Teil. Tailwind-Klassen als ganze Strings, damit der Scanner sie findet.
-const TEIL_STIL: Record<string, { icon: IconName; farbe: string }> = {
-  javascript: { icon: 'code', farbe: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300' },
-  react: { icon: 'atom', farbe: 'bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300' },
-  hooks: { icon: 'anker', farbe: 'bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300' },
-  praxis: { icon: 'koffer', farbe: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' },
-  projekt: { icon: 'flagge', farbe: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300' },
-  java: { icon: 'tasse', farbe: 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300' },
-}
 
 /** Kleiner Fortschrittsring; voll = grüner Haken. */
 function Fortschritt({ fertig, gesamt }: { fertig: number; gesamt: number }) {
@@ -73,6 +65,7 @@ export function Seitenleiste({
   const seiten: { href: string; aktiv: boolean; label: string; icon: IconName }[] = [
     { href: '#', aktiv: route === '', label: t.uebersicht, icon: 'start' },
     { href: '#/glossar', aktiv: route.startsWith('glossar'), label: t.glossar, icon: 'buch' },
+    { href: '#/playground', aktiv: route.startsWith('playground'), label: t.playground, icon: 'spielwiese' },
   ]
 
   // Einträge unterhalb eines Teils: dezent, aktiver Eintrag mit Akzentlinie links.

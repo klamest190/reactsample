@@ -1,10 +1,10 @@
 # Lernpfad JS & React · JS & React Learning Path
 
 Eine interaktive Wissensdatenbank mit **React 19 + TypeScript + Tailwind CSS v4 + Vite**: erst die
-JavaScript-Grundlagen, dann React, dann ausführlich die Hooks. In jedem Kapitel gibt es
+JavaScript-Grundlagen, dann TypeScript, dann React und ausführlich die Hooks. In jedem Kapitel gibt es
 „Probier's selbst“-Editoren, in denen man Code direkt im Browser ändert und ausführt.
 
-Obendrauf kommt ein **eigenständiger Java-Teil** (Teil 6). Auch dort läuft der Code im Browser -
+Obendrauf kommt ein **eigenständiger Java-Teil** (Teil 7). Auch dort läuft der Code im Browser -
 ausgeführt von einer kleinen Java-Laufzeit, die zum Projekt gehört (`src/java/`). Java, JavaScript
 und React sind dabei sauber getrennt; wo was liegt, steht unter [Der Java-Teil](#der-java-teil).
 
@@ -28,7 +28,7 @@ npm run build   # Produktionsbuild nach dist/
 npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
 npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
-npm run test:java     # nur Teil 6: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
+npm run test:java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
 ```
 
 ### Selbsttest der Inhalte
@@ -67,13 +67,14 @@ Der Fortschritt („Kapitel abschließen“) und der Code in den Editoren werden
 | Teil | Kapitel |
 |------|---------|
 | **1 · JavaScript-Grundlagen** | Variablen & Datentypen · Operatoren & Bedingungen · Funktionen & Closures · Arrays · Objekte & Destructuring · Referenzen & Immutability · Asynchrones JS · DOM, Events & Module |
-| **2 · React-Grundlagen** | Komponenten & JSX · Props, Listen & Bedingungen · Events & State · State teilen & Datenfluss |
-| **3 · React Hooks im Detail** | Hook-Regeln & `useState` · `useEffect` · `useRef` · `useMemo`/`useCallback`/`memo` · `useReducer` · `useContext` · Eigene Hooks · `useTransition`/`useDeferredValue` · `use`, `useActionState`, `useOptimistic`, `useFormStatus` |
-| **4 · Praxis & Muster** | Formulare · Daten laden · Komposition & Portale · Fehlerbehandlung · Tailwind CSS · Lokal entwickeln (Vite, DevTools, Debugging) · Abschlussprojekt (Gewohnheiten-Tracker) |
-| **5 · Projekt: ToDo-App** | Datenmodell als Funktionen · DOM-Version · Komponenten & Props · State & Events · Datenfluss & Filter · `useReducer` · Speichern mit `useEffect` & eigenem Hook · Fokus mit `useRef` · Context · Validierung · Startdaten laden · **Challenge: von null** |
-| **6 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
+| **2 · TypeScript-Grundlagen** | Warum TypeScript? · Objekttypen & Interfaces · Funktionen typisieren · Unions & Narrowing · Generics · Typ-Operatoren & Utility Types · Klassen, Enums & Module · Fortgeschrittene Typen & Praxis |
+| **3 · React-Grundlagen** | Komponenten & JSX · Props, Listen & Bedingungen · Events & State · State teilen & Datenfluss |
+| **4 · React Hooks im Detail** | Hook-Regeln & `useState` · `useEffect` · `useRef` · `useMemo`/`useCallback`/`memo` · `useReducer` · `useContext` · Eigene Hooks · `useTransition`/`useDeferredValue` · `use`, `useActionState`, `useOptimistic`, `useFormStatus` |
+| **5 · Praxis & Muster** | Formulare · Daten laden · Komposition & Portale · Fehlerbehandlung · Tailwind CSS · Lokal entwickeln (Vite, DevTools, Debugging) · Abschlussprojekt (Gewohnheiten-Tracker) |
+| **6 · Projekt: ToDo-App** | Datenmodell als Funktionen · DOM-Version · Komponenten & Props · State & Events · Datenfluss & Filter · `useReducer` · Speichern mit `useEffect` & eigenem Hook · Fokus mit `useRef` · Context · Validierung · Startdaten laden · **Challenge: von null** |
+| **7 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
 
-Teil 6 ist **eigenständig**: Er setzt keinen der Teile 1-5 voraus und benutzt nichts daraus. Die
+Teil 7 ist **eigenständig**: Er setzt keinen der Teile 1-6 voraus und benutzt nichts daraus. Die
 Querverweise dorthin sind Vergleiche, keine Voraussetzungen.
 
 Zum Nachschlagen gibt es außerdem:
@@ -81,6 +82,7 @@ Zum Nachschlagen gibt es außerdem:
 - **🔍 Suche** (`Strg`/`⌘` + `K`) über Kapitel, Stichworte, Glossar und Projektschritte
 - **📚 Glossar** mit rund 50 Begriffen (`#/glossar/closure` springt direkt zu einem Eintrag)
 - **🧵 Projektübersicht** (`#/projekt`) mit dem Vorwissen jedes Schritts
+- **🛝 Playground** (`#/playground/<teil>`) - siehe [Der Playground](#der-playground)
 
 ### Das ToDo-Projekt
 
@@ -120,15 +122,17 @@ src/
       meta.ts              Die 12 Projektschritte: Titel, Vorwissen, Stichworte
       schritte.ts          Einleitung, Anforderungen, Start, Lösung, Tests und Tipps pro Schritt
       ProjektSchritt.tsx   Eine Seite für alle Schritte
-    js/ react/ hooks/ praxis/
+    js/ typescript/ react/ hooks/ praxis/
       Name.tsx             Kapiteltext Deutsch
       Name.en.tsx          Kapiteltext Englisch
       Name.code.ts         Codebeispiele, Tests und Lösungen - gemeinsam für beide Sprachen
-    java/                ☕ Teil 6, gleicher Aufbau - der Code in den .code.ts ist Java
+    java/                ☕ Teil 7, gleicher Aufbau - der Code in den .code.ts ist Java
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
+    playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   lernen/                  Die Lern-Bausteine
     TryIt.tsx              "Probier's selbst"-Editor (JS, React, Test und Java)
     CodeEditor.tsx         Editor: Textarea über eingefärbtem <pre>, mit Autovervollständigung
+    einfuegen.ts           Code-Bausteine mit passender Einrückung einfügen (Playground)
     vorschlaege.ts         Vorschläge (console.log, Array-Methoden, Hooks, JSX …) mit Erklärungen
     hervorheben.tsx        Mini-Syntax-Highlighter
     jsSandbox.ts         🟨 HTML-Dokument für die JS-Sandbox inkl. Testläufer
@@ -144,6 +148,7 @@ src/
     KapitelSeite.tsx       Rahmen eines Kapitels: Kopf mit "Baut auf", Inhalt, Übungen, roter Faden
     Glossar.tsx            Alphabetisches Glossar mit Filter und Sprungmarken
     ProjektUebersicht.tsx  Zeitleiste der Projektschritte
+    Playground.tsx         Freies Programmieren mit Vorlagen und Bausteinen, ein Editor pro Teil
   components/
     Ui.tsx                 Abschnitt, P, Demo, Hinweis, Merke, Button, Eingabe, …
     Seitenleiste.tsx       Kursnavigation mit einklappbaren Teilen
@@ -180,6 +185,21 @@ und können gestufte Tipps mitbringen (`tipps: { de: [...], en: [...] }`), die m
 />
 ```
 
+**TypeScript** (`modus="ts"`, Teil 2) läuft in derselben Sandbox wie JavaScript. Vorher entfernt
+sucrase die Typen (wie Vite, die Zeilennummern bleiben gleich), und nebenher prüft der echte
+TypeScript-Compiler im Web Worker (`src/lernen/typpruefung.worker.ts`) mit `strict` - Fehler erscheinen
+rot unterschlängelt und in einer Liste unter dem Editor, das Programm läuft trotzdem. Übungen können
+zusätzlich **Typ-Tests** mitbringen: TypeScript-Code, der hinter den Code der Lernenden gehängt und nur
+geprüft wird. Mit `// @ts-expect-error` testet man so auch, dass etwas *verboten* ist
+(`src/lernen/tsLauf.ts`):
+
+```ts
+typTests: [
+  { name: { de: 'isbn ist optional', en: 'isbn is optional' }, code: "const b: Book = { id: 1, title: 'Emma' }" },
+  { name: { de: 'id ist readonly', en: 'id is readonly' }, code: 'declare const b: Book\n// @ts-expect-error\nb.id = 5' },
+]
+```
+
 **React** (`modus="react"`) übersetzt den Code mit [sucrase](https://github.com/alangpierce/sucrase)
 (wird erst beim ersten Ausführen nachgeladen) und rendert die Komponente `App` in eine eigene
 React-Wurzel. Alle Hooks sind ohne Import verfügbar, `import … from 'react'` funktioniert aber
@@ -208,8 +228,13 @@ Verfügbar sind u. a. `render`, `remount`, `click`, `type`, `check`, `blur`, `pr
 `toContain`, `toMatch`, `toHaveLength`, `toBeDisabled` … auch mit `.not`), `logs`, `title`, `code`
 (Quelltext) und `mockFetch`. localStorage, `document.title`, `fetch` und `confirm` werden pro Test isoliert.
 
-Einschränkung: Tailwind-Klassen wirken in der Vorschau nur, wenn sie irgendwo im Projekt-Quelltext
-vorkommen. Für freies Experimentieren eignet sich `style={{ … }}`.
+**Tailwind in den React-Editoren** (`src/lernen/tailwind.ts`, `tailwindMotor.ts`): Das Seiten-CSS enthält
+nur Klassen, die irgendwo im Projekt vorkommen. Deshalb läuft für die Vorschau zusätzlich die Tailwind-Engine
+selbst im Browser (Paket `tailwindcss`, mit dem Theme und den Brand-Farben aus `index.css`) und erzeugt
+CSS für genau die Klassen im Editor-Code - so wirkt jede Klasse. Dieselbe Engine liefert die
+Autovervollständigung in `className="…"`, `cn(…)` und `clsx(…)`: alle Klassen und Varianten wie in VS Code,
+mit Farbfeld und dem erzeugten CSS (Theme-Werte als Kommentar). Geladen wird sie erst, wenn ein Editor
+sie braucht.
 
 **Java** (`modus="java"`) läuft weder im iframe noch im Browser selbst, sondern in der Laufzeit unter
 `src/java/` - siehe [Der Java-Teil](#der-java-teil).
@@ -220,9 +245,36 @@ Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt 
 schließt, Strg+Leertaste öffnet die Liste von Hand. Nach einem Punkt erscheinen Methoden wie `map` oder `filter`.
 Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` …) statt der JavaScript-Vorschläge.
 
+## Der Playground
+
+Für jeden Teil gibt es einen Editor zum freien Programmieren - ohne Aufgabe und ohne Tests
+(`#/playground/javascript`, `/typescript`, `/react`, `/hooks`, `/praxis`, `/projekt`, `/java`). Erreichbar über
+die Seitenleiste (ein Eintrag oben, gewechselt wird über die Teil-Leiste auf der Seite), die Startseite und einen Hinweis am Ende
+jedes Kapitels. Damit man nicht vor einem leeren Blatt sitzt:
+
+- **Vorlagen** ersetzen den ganzen Code durch ein fertiges kleines Programm (Zähler, FizzBuzz, Bankkonto …).
+- **Bausteine** fügen per Klick ein Stück Code ein und führen danach aus. Hat man vorher in den Editor
+  geklickt, landet der Baustein am Cursor - sonst an der passenden Stelle: in JavaScript unten, in React
+  über `App` / im Rumpf von `App` / im JSX, in Java in `main` / als Methode / als eigene Klasse.
+  Komponenten, Methoden und Klassen bringen ihren Aufruf gleich mit (`<Counter />`, `add(2, 3)`), fehlende
+  Java- und React-Imports werden oben ergänzt.
+
+Beides läuft über das Textfeld des Editors, **Strg + Z** macht also jeden Klick rückgängig. Der Code wird
+wie bei jedem Editor im `localStorage` gespeichert (einmal pro Teil).
+
+| Datei | Aufgabe |
+|-------|---------|
+| `src/kurs/playground/<teil>.ts` | Vorlagen und Bausteine eines Teils (Code Englisch, Texte zweisprachig) |
+| `src/kurs/playground/orte.ts` | Wohin ein Baustein ohne Cursor kommt (`ende`, `oben`, `komponente`, `jsx`, `main`, `methode`, `klasse`) |
+| `src/lernen/einfuegen.ts` | Einfügen mit passender Einrückung - von Editor und Selbsttest gemeinsam genutzt |
+| `src/seiten/Playground.tsx` | Die Seite: Teil-Auswahl, Vorlagen, Bausteinleiste, Editor |
+
+`npm run test:inhalte -- playground-` prüft jede Vorlage, jeden Baustein an seiner automatischen Stelle
+und alle Bausteine eines Teils zusammen (findet doppelte Variablennamen und falsche Einfügestellen).
+
 ## Der Java-Teil
 
-Teil 6 ist bewusst so gebaut, dass man auf einen Blick sieht, wo Java aufhört und wo React anfängt.
+Teil 7 ist bewusst so gebaut, dass man auf einen Blick sieht, wo Java aufhört und wo React anfängt.
 
 **Die Grenze.** Die ganze App kennt von `src/java/` genau zwei Funktionen:
 
@@ -307,3 +359,7 @@ Für ein **Java-Kapitel** zusätzlich: im `.code.ts` den Tag `java\`…\`` statt
 jedes `<TryIt>` ein `modus="java"` schreiben - daran erkennen beide Selbsttests, welche Sprache
 ausgeführt werden soll. Beispiele, die absichtlich einen Fehler zeigen, kommen mit Begründung in
 `JAVA_ERWARTETE_FEHLER` (`src/java/inhalte.ts`).
+
+Für ein **TypeScript-Kapitel** (Teil 2) an jedes `<TryIt>` ein `modus="ts"` schreiben. Beispiele
+müssen dann ohne Typfehler kompilieren; eines, das absichtlich einen Typfehler zeigt, kommt mit
+Begründung in `ERWARTETE_FEHLER` (`src/selbsttest/pruefen.ts`).

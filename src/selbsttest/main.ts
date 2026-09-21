@@ -4,6 +4,10 @@ import { uebungDateien, uebungVarianten } from '../kurs/praxis/Testen.code'
 import { schrittInhalte } from '../kurs/projekt/schritte'
 import { projektSchritte } from '../kurs/projekt/meta'
 import type { UebungsSammlung } from '../kurs/uebungen/typen'
+import { playgrounds } from '../kurs/playground'
+import { bausteinSchritte } from '../kurs/playground/orte'
+import type { Baustein } from '../kurs/playground/typen'
+import { einfuegungenPlanen } from '../lernen/einfuegen'
 import { ERWARTETE_FEHLER, beispielPruefen, projektRendern, uebungPruefen, type Ergebnis, type Modus } from './pruefen'
 
 /**
@@ -20,7 +24,7 @@ const kapitelQuellen = import.meta.glob<string>(['../kurs/**/*.tsx', '!../kurs/*
   import: 'default',
   eager: true,
 })
-const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,react,hooks,praxis,java}.ts', { eager: true })
+const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,ts,react,hooks,praxis,java}.ts', { eager: true })
 
 /** Wie ein Beispiel im Kapitel verwendet wird: <TryIt id="…" modus="react" typen /> */
 function modiAusKapiteln() {
@@ -67,7 +71,9 @@ function auftraegeSammeln(): Auftrag[] {
           id: u.id,
           ort,
           pruefen: () =>
-            u.tests?.length
+            u.modus === 'ts'
+              ? beispielPruefen(u, { modus: 'ts', typen: false, vorschau: false })
+              : u.tests?.length
               ? uebungPruefen(u.modus, u.code, u.loesung, u.tests, u.vorbereitung)
               : beispielPruefen({ code: u.code, loesung: u.loesung, vorbereitung: u.vorbereitung }, { modus: u.modus, typen: false, vorschau: Boolean(u.vorschau) }),
         })
@@ -94,6 +100,32 @@ function auftraegeSammeln(): Auftrag[] {
     ort: 'praxis/businessApp/',
     pruefen: async () => (await projektRendern(businessDateien, 'App.tsx'))[0] ?? null,
   })
+
+  // 5. Playgrounds: Vorlagen laufen, jeder Baustein läuft an seiner automatischen Stelle -
+  //    und alle Bausteine eines Teils zusammen (findet doppelte Namen und falsche Stellen).
+  for (const p of playgrounds) {
+    const modus: Modus = { modus: p.modus, typen: false, vorschau: p.modus === 'js' }
+    const ort = `playground/${p.teil}.ts`
+    const start = p.vorlagen[0].code
+    const einfuegen = (code: string, b: Baustein) =>
+      einfuegungenPlanen(code, bausteinSchritte(b, { code, start: 0, ende: 0, vonHand: false })).code
+    const pruefen = (code: string) => beispielPruefen({ code }, modus)
+
+    p.vorlagen.forEach((v, i) => auftraege.push({ id: `playground-${p.teil}-vorlage-${i + 1}`, ort, pruefen: () => pruefen(v.code) }))
+    const alle = p.gruppen.flatMap((g) => g.bausteine)
+    for (const b of alle) {
+      auftraege.push({ id: `playground-${p.teil}-${b.titel.en}`, ort, pruefen: () => pruefen(einfuegen(start, b)) })
+    }
+    auftraege.push({
+      id: `playground-${p.teil}-alle-bausteine`,
+      ort,
+      pruefen: async () => {
+        const code = alle.reduce(einfuegen, start)
+        const meldung = await pruefen(code)
+        return meldung && `${meldung}\n--- Code ---\n${code}`
+      },
+    })
+  }
 
   return auftraege
 }

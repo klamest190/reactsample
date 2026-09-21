@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.4 - Methoden. */
+/** Codebeispiele für Kapitel 7.4 - Methoden. */
 
 export const beispiele = {
   'java-methoden-einstieg': {

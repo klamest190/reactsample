@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Routing.code'
 
 /**
- * KAPITEL 4.7 - Routing mit React Router
+ * KAPITEL 5.7 - Routing mit React Router
  *
  * Die Editoren laden echtes React Router nach. Alle Beispiele nutzen MemoryRouter,
  * weil die Vorschau Teil dieser Seite ist und deren Adresse nicht ändern darf.

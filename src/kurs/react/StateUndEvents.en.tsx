@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './StateUndEvents.code'
 
 /**
- * KAPITEL 2.3 (English) - Events & State
+ * KAPITEL 3.3 (English) - Events & State
  */
 export function StateUndEvents() {
   return (
@@ -68,7 +68,7 @@ export function StateUndEvents() {
         <Hinweis variante="info">
           You recognize hooks by the <Code>use</Code> prefix. They may only be called{' '}
           <strong>at the top level of a component</strong> - not in <Code>if</Code>, loops or nested
-          functions. You will learn why in part 3.
+          functions. You will learn why in part 4.
         </Hinweis>
       </Abschnitt>
 

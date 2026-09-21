@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './Nebenlaeufigkeit.code'
 import { NebenlaeufigkeitsDemo } from '../demos/NebenlaeufigkeitsDemo'
 
 /**
- * KAPITEL 3.8 (English) - useTransition & useDeferredValue
+ * KAPITEL 4.8 (English) - useTransition & useDeferredValue
  */
 export function Nebenlaeufigkeit() {
   return (
@@ -59,7 +59,7 @@ export function Nebenlaeufigkeit() {
           pattern.
         </P>
         <Hinweis variante="info">
-          Unlike debouncing (<Verweis nr="3.7" />) there is <strong>no fixed delay</strong>: on a fast machine nothing
+          Unlike debouncing (<Verweis nr="4.7" />) there is <strong>no fixed delay</strong>: on a fast machine nothing
           lags behind, on a slow one it adapts.
         </Hinweis>
       </Abschnitt>

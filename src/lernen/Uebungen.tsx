@@ -107,6 +107,8 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
               tests={uebung.tests as Test[] | undefined}
               vorbereitung={uebung.vorbereitung}
               vorschau={uebung.vorschau}
+              modus={uebung.modus}
+              typTests={uebung.typTests}
             />
           )}
         </div>

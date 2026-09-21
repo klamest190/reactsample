@@ -72,7 +72,7 @@ export function DomUndModule() {
           </li>
         </Liste>
         <CodeBlock
-          titel="Dieselbe Liste in React (Vorgeschmack auf Teil 2)"
+          titel="Dieselbe Liste in React (Vorgeschmack auf Teil 3)"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>

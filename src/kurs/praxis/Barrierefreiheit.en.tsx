@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele } from './Barrierefreiheit.code'
 
 /**
- * KAPITEL 4.9 (English) - Accessibility (a11y)
+ * KAPITEL 5.9 (English) - Accessibility (a11y)
  */
 
 const elemente: [string, string, string][] = [

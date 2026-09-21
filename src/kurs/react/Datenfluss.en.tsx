@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Datenfluss.code'
 
 /**
- * KAPITEL 2.4 (English) - Sharing State & Data Flow
+ * KAPITEL 3.4 (English) - Sharing State & Data Flow
  */
 export function Datenfluss() {
   return (

@@ -3,7 +3,7 @@ import { Button, Demo, Wert } from '../../components/Ui'
 import { useTheme } from '../../context/ThemeContext'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.6): App-Contexts + eigener Context mit Provider und Consumer-Hook. */
+/** Live-Demo (Kapitel 4.6): App-Contexts + eigener Context mit Provider und Consumer-Hook. */
 
 const TEXTE = {
   de: {
@@ -46,7 +46,7 @@ function WarenkorbProvider({ children }: { children: ReactNode }) {
 
 // Konvention: einen Hook anbieten statt den Context selbst.
 function useWarenkorb() {
-  const ctx = use(WarenkorbContext) // `use` funktioniert wie useContext (siehe Kapitel 3.9)
+  const ctx = use(WarenkorbContext) // `use` funktioniert wie useContext (siehe Kapitel 4.9)
   if (!ctx) throw new Error('useWarenkorb braucht einen <WarenkorbProvider>')
   return ctx
 }

@@ -20,6 +20,7 @@ export function Startseite({
 
   const kbd = 'rounded border px-1 font-mono text-xs'
   const projekt = kurs.find((teil) => teil.id === 'projekt')!
+  const react = kurs.find((teil) => teil.id === 'react')!
   const karte =
     'block rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900'
 
@@ -69,7 +70,7 @@ export function Startseite({
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase">{t.wissensdatenbank}</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <button onClick={sucheOeffnen} className={karte}>
             <span className="text-2xl">🔍</span>
             <span className="mt-1 block font-semibold">
@@ -86,6 +87,11 @@ export function Startseite({
             <span className="text-2xl">🧵</span>
             <span className="mt-1 block font-semibold">{t.projekt}</span>
             <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenProjekt}</span>
+          </a>
+          <a href="#/playground" className={karte}>
+            <span className="text-2xl">🛝</span>
+            <span className="mt-1 block font-semibold">{t.playground}</span>
+            <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenPlayground}</span>
           </a>
         </div>
       </section>
@@ -185,8 +191,8 @@ export function Startseite({
           </li>
           <li>
             {t.tippSprung}{' '}
-            <a href={'#/' + kurs[1].kapitel[0].id} className="text-brand-600 hover:underline dark:text-brand-400">
-              {t.teil} 2
+            <a href={'#/' + react.kapitel[0].id} className="text-brand-600 hover:underline dark:text-brand-400">
+              {t.teil} {react.nummer} · {react.kurztitel[sprache]}
             </a>
             .
           </li>

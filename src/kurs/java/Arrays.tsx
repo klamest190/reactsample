@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Arrays.code'
 
 /**
- * KAPITEL 6.5 - Arrays & Strings
+ * KAPITEL 7.5 - Arrays & Strings
  * Feste Längen, Standardwerte, null - und die berühmte ==-Falle.
  */
 export function Arrays() {
@@ -33,7 +33,7 @@ export function Arrays() {
       <Abschnitt titel="Die Länge ist fest">
         <P>
           Es gibt kein <Code>push</Code>. Wer mehr Platz braucht, legt ein neues Array an und
-          kopiert - oder nimmt gleich eine <Code>ArrayList</Code> (<Verweis nr="6.8" />).
+          kopiert - oder nimmt gleich eine <Code>ArrayList</Code> (<Verweis nr="7.8" />).
         </P>
         <TryIt modus="java" id="java-arrays-laenge" {...beispiele['java-arrays-laenge']} />
         <Hinweis variante="tipp">
@@ -53,7 +53,7 @@ export function Arrays() {
         <P>
           Die <Code>NullPointerException</Code> ist der häufigste Laufzeitfehler in Java überhaupt.
           Ihr Erfinder Tony Hoare nennt sie heute „meinen Milliarden-Dollar-Fehler“. In{' '}
-          <Verweis nr="6.9" /> lernst du, wie man mit ihr umgeht.
+          <Verweis nr="7.9" /> lernst du, wie man mit ihr umgeht.
         </P>
       </Abschnitt>
 

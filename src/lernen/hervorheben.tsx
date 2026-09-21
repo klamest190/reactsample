@@ -28,6 +28,7 @@ const KEYWORDS = new Set(
     'const let var function return if else for while do switch case break continue ' +
     'default new class extends import from export async await try catch finally throw ' +
     'typeof instanceof in of this super yield delete void as type interface ' +
+    'readonly keyof infer satisfies declare ' +
     // Java
     'public private protected static final abstract implements package throws enum ' +
     'record int long short byte double float boolean char synchronized native'

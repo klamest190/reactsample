@@ -13,7 +13,7 @@ const schritte: [string, string, string][] = [
 ]
 
 /**
- * KAPITEL 4.11 - Abschlussprojekt
+ * KAPITEL 5.11 - Abschlussprojekt
  */
 export function Abschlussprojekt() {
   return (
@@ -21,8 +21,8 @@ export function Abschlussprojekt() {
       <Abschnitt titel="Das Projekt: ein Gewohnheiten-Tracker">
         <P>
           Zum Abschluss baust du eine kleine, vollständige App und setzt fast alles aus diesem Kurs
-          zusammen ein: Array-Methoden und Immutability aus Teil 1, Komponenten und Datenfluss aus Teil 2
-          und die Hooks aus Teil 3. Nimm dir Zeit - und schau erst in die Musterlösung, wenn du
+          zusammen ein: Array-Methoden und Immutability aus Teil 1, Komponenten und Datenfluss aus Teil 3
+          und die Hooks aus Teil 4. Nimm dir Zeit - und schau erst in die Musterlösung, wenn du
           festhängst.
         </P>
         <div className="overflow-x-auto">

@@ -29,7 +29,7 @@ export function Variablen() {
         <Hinweis variante="info">
           This is called <strong>static typing</strong>: “static” because the type is settled before
           the program runs. TypeScript brings exactly this idea to JavaScript - except that there the
-          types disappear again during the build (see <Verweis nr="4.8" />).
+          types disappear again during the build (see <Verweis nr="5.8" />).
         </Hinweis>
       </Abschnitt>
 
@@ -71,7 +71,7 @@ export function Variablen() {
         <P>
           <Code>String</Code> is missing from this list on purpose: a string is not a primitive type
           but a <strong>class</strong> - which is why it is capitalized. More on that in{' '}
-          <Verweis nr="6.5" />.
+          <Verweis nr="7.5" />.
         </P>
         <TryIt modus="java" id="java-variablen-typen" {...beispiele['java-variablen-typen']} />
         <Hinweis variante="warnung">
@@ -143,7 +143,7 @@ export function Variablen() {
         </P>
         <CodeBlock code={codeBloecke.wrapper} />
         <P>
-          This matters in <Verweis nr="6.8" />: an <Code>ArrayList</Code> can only hold objects,
+          This matters in <Verweis nr="7.8" />: an <Code>ArrayList</Code> can only hold objects,
           which is why it is <Code>{'List<Integer>'}</Code> there and not <Code>{'List<int>'}</Code>.
         </P>
       </Abschnitt>

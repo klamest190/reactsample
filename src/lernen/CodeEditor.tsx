@@ -1,17 +1,21 @@
 import {
   useEffect,
   useId,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
   type ChangeEvent,
   type KeyboardEvent,
+  type Ref,
   type UIEvent,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
+import { einfuegungenPlanen, type Schritt } from './einfuegen'
 import { HervorgehobenerCode } from './hervorheben'
 import type { Typfehler } from './typpruefung'
+import { klassenWort, tailwindMotor } from './tailwind'
 import { suchen, vorschlaegeFuer, type EditorSprache, type Vorschlag, type VorschlagArt } from './vorschlaege'
 
 /**
@@ -35,13 +39,31 @@ const POPUP_HOEHE = 290
 type Props = {
   wert: string
   beiAenderung: (wert: string) => void
-  beiAusfuehren?: () => void
+  /** Strg+Enter. Bekommt den aktuellen Text mit - wichtig direkt nach einem Einfügen, bevor der State nachzieht. */
+  beiAusfuehren?: (code: string) => void
   label: string
   sprache: EditorSprache
   /** Ab so vielen Zeilen scrollt der Editor, statt weiter zu wachsen. */
   maxZeilen?: number
   /** Typfehler: rot unterschlängelt, Zeilennummer rot, Meldung im Tooltip. */
   markierungen?: Typfehler[]
+  /** Von außen Code einfügen (Bausteine im Playground), siehe EditorSteuerung. */
+  steuerung?: Ref<EditorSteuerung>
+}
+
+/**
+ * Was der Editor nach außen anbietet. Beide Aktionen laufen über das Textfeld selbst,
+ * deshalb lassen sie sich mit Strg+Z rückgängig machen.
+ */
+export type EditorSteuerung = {
+  /** Aktueller Text und Auswahl. `vonHand`: Hat die Person seit dem letzten Einfügen selbst geklickt oder getippt? */
+  stand: () => { code: string; start: number; ende: number; vonHand: boolean }
+  /** Bausteine einfügen (siehe einfuegungenPlanen). */
+  einfuegen: (schritte: Schritt[]) => void
+  /** Den ganzen Code ersetzen (z. B. durch eine Vorlage). */
+  ersetzen: (code: string) => void
+  /** Wie Strg+Enter. */
+  ausfuehren: () => void
 }
 
 type Popup = {
@@ -54,12 +76,23 @@ type Popup = {
   oben: boolean
 }
 
-export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, maxZeilen = MAX_ZEILEN, markierungen = [] }: Props) {
+export function CodeEditor({
+  wert,
+  beiAenderung,
+  beiAusfuehren,
+  label,
+  sprache,
+  maxZeilen = MAX_ZEILEN,
+  markierungen = [],
+  steuerung,
+}: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const preRef = useRef<HTMLPreElement>(null)
   const nummernRef = useRef<HTMLDivElement>(null)
   // Nach Escape darf Tab den Editor verlassen (sonst wäre die Tastatur gefangen).
   const tabFreigegeben = useRef(false)
+  // Tailwind-Vorschläge kommen asynchron - nur die Antwort auf die letzte Anfrage zählt.
+  const tailwindAnfrage = useRef(0)
   // Eigene Einfügungen (Vorschlag übernommen) sollen das Popup nicht gleich wieder öffnen.
   const unterdruecken = useRef(false)
 
@@ -108,13 +141,83 @@ export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, 
     }
   }
 
+  // Steht der Cursor dort, wo die Person ihn hingesetzt hat - oder nur zufällig
+  // (Startposition, nach dem letzten Einfügen)? Davon hängt ab, wo Bausteine landen.
+  const cursorVonHand = useRef(false)
+
+  useImperativeHandle(steuerung, () => ({
+    stand() {
+      const feld = textareaRef.current
+      return {
+        code: feld?.value ?? wert,
+        start: feld?.selectionStart ?? 0,
+        ende: feld?.selectionEnd ?? 0,
+        vonHand: cursorVonHand.current,
+      }
+    },
+    einfuegen(schritte) {
+      const feld = textareaRef.current
+      if (!feld) return
+      const plan = einfuegungenPlanen(feld.value, schritte)
+      feld.focus()
+      unterdruecken.current = true
+      for (const e of plan.einfuegungen) {
+        feld.setSelectionRange(e.start, e.ende)
+        einfuegen(feld, e.text)
+      }
+      unterdruecken.current = false
+      feld.setSelectionRange(plan.cursor, plan.cursor)
+      cursorVonHand.current = false
+      setPopup(null)
+      // Die eingefügte Stelle sichtbar machen.
+      const zeile = feld.value.slice(0, plan.cursor).split('\n').length - 1
+      feld.scrollTop = Math.max(0, zeile * ZEILENHOEHE - feld.clientHeight / 2)
+    },
+    ersetzen(code) {
+      const feld = textareaRef.current
+      if (!feld) return
+      feld.focus()
+      feld.select()
+      unterdruecken.current = true
+      einfuegen(feld, code)
+      unterdruecken.current = false
+      feld.setSelectionRange(0, 0)
+      feld.scrollTop = 0
+      cursorVonHand.current = false
+      setPopup(null)
+    },
+    ausfuehren() {
+      beiAusfuehren?.(textareaRef.current?.value ?? wert)
+    },
+  }))
+
   // ---- Autovervollständigung ------------------------------------------------
 
   function vorschlaegeZeigen(feld: HTMLTextAreaElement, vonHand: boolean) {
     const vorher = feld.value.slice(0, feld.selectionStart)
     const zeile = vorher.slice(vorher.lastIndexOf('\n') + 1)
-    const wort = zeile.match(/[\w$.]*$/)![0]
 
+    // In className="…" gibt es Tailwind-Klassen statt JavaScript. Die Engine lädt beim ersten Mal nach,
+    // deshalb kommt das Ergebnis asynchron - und zählt nur, wenn sich am Text nichts geändert hat.
+    const klassen = sprache === 'react' ? klassenWort(vorher) : null
+    if (klassen !== null) {
+      const anfrage = ++tailwindAnfrage.current
+      if ((!vonHand && !klassen) || feld.selectionStart !== feld.selectionEnd) {
+        setPopup(null)
+        return
+      }
+      void tailwindMotor()
+        .then((motor) => {
+          if (anfrage !== tailwindAnfrage.current) return
+          const { treffer, ersetzeZeichen } = motor.vorschlaege(klassen)
+          popupOeffnen(feld, vorher, treffer, ersetzeZeichen)
+        })
+        .catch((fehler: unknown) => console.error('Tailwind:', fehler))
+      return
+    }
+    tailwindAnfrage.current++
+
+    const wort = zeile.match(/[\w$.]*$/)![0]
     const imKommentar = zeile.slice(0, zeile.length - wort.length).includes('//')
     if ((!vonHand && (!wort || /^\d/.test(wort))) || imKommentar || feld.selectionStart !== feld.selectionEnd) {
       setPopup(null)
@@ -122,10 +225,15 @@ export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, 
     }
 
     const { treffer, ersetzeZeichen } = suchen(alleVorschlaege, feld.value, wort, t.imCode)
+    popupOeffnen(feld, vorher, treffer, ersetzeZeichen)
+  }
+
+  function popupOeffnen(feld: HTMLTextAreaElement, vorher: string, treffer: Vorschlag[], ersetzeZeichen: number) {
     if (treffer.length === 0) {
       setPopup(null)
       return
     }
+    const zeile = vorher.slice(vorher.lastIndexOf('\n') + 1)
 
     // Position des Wortanfangs in Pixeln: Monospace-Schrift, also Spalte × Zeichenbreite.
     const stil = getComputedStyle(feld)
@@ -170,6 +278,8 @@ export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, 
 
     if (cursor >= 0) feld.setSelectionRange(start + cursor, start + cursor)
     setPopup(null)
+    // Nach einer Tailwind-Variante wie "hover:" geht es direkt mit den Klassen weiter.
+    if (vorschlag.art === 'tailwind' && text.endsWith(':')) vorschlaegeZeigen(feld, true)
   }
 
   function beiEingabe(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -214,7 +324,7 @@ export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, 
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault()
       setPopup(null)
-      beiAusfuehren?.()
+      beiAusfuehren?.(feld.value)
       return
     }
     if (e.key === 'Escape') {
@@ -293,6 +403,12 @@ export function CodeEditor({ wert, beiAenderung, beiAusfuehren, label, sprache, 
           onScroll={beiScroll}
           onBlur={() => setPopup(null)}
           onMouseDown={() => setPopup(null)}
+          onMouseUp={() => (cursorVonHand.current = true)}
+          onKeyUp={(e) => {
+            if (!e.ctrlKey && !e.metaKey && !['Escape', 'Tab', 'Shift', 'Control', 'Meta', 'Alt'].includes(e.key)) {
+              cursorVonHand.current = true
+            }
+          }}
           aria-label={label}
           role="combobox"
           aria-autocomplete="list"
@@ -329,6 +445,7 @@ const ART_STIL: Record<VorschlagArt, { kurz: string; klassen: string }> = {
   methode: { kurz: '.m', klassen: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
   jsx: { kurz: '</>', klassen: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300' },
   variable: { kurz: 'x', klassen: 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300' },
+  tailwind: { kurz: 'tw', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
 }
 
 function VorschlagsListe({
@@ -376,16 +493,30 @@ function VorschlagsListe({
                 i === popup.auswahl ? 'bg-brand-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <span className={`w-8 shrink-0 rounded px-1 text-center text-[10px] font-semibold ${stil.klassen}`}>
-                {stil.kurz}
-              </span>
+              {v.farbe ? (
+                // Wie in VS Code: ein Farbfeld statt des Kürzels. Das Schachbrett zeigt Transparenz.
+                <span className="flex w-8 shrink-0 justify-center">
+                  <span
+                    aria-hidden
+                    className="size-3.5 rounded-sm border border-black/15 dark:border-white/25"
+                    style={{ background: `linear-gradient(${v.farbe}, ${v.farbe}), repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 6px 6px` }}
+                  />
+                </span>
+              ) : (
+                <span className={`w-8 shrink-0 rounded px-1 text-center text-[10px] font-semibold ${stil.klassen}`}>
+                  {stil.kurz}
+                </span>
+              )}
               <span className="truncate">{v.label}</span>
             </li>
           )
         })}
       </ul>
       <div className="space-y-1 border-t border-slate-200 px-3 py-2 font-sans text-xs dark:border-slate-700">
-        <p className="text-slate-700 dark:text-slate-200">{aktiv.info}</p>
+        {aktiv.info && <p className="text-slate-700 dark:text-slate-200">{aktiv.info}</p>}
+        {aktiv.css && (
+          <pre className="max-h-40 overflow-auto font-mono text-[11px] break-all whitespace-pre-wrap text-slate-600 dark:text-slate-300">{aktiv.css}</pre>
+        )}
         {vorschau !== aktiv.label && (
           <pre className="max-h-16 overflow-hidden font-mono text-[11px] whitespace-pre text-slate-500 dark:text-slate-400">
             {vorschau}

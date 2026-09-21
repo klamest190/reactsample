@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './Props.code'
 import { BenutzerKarten } from '../demos/BenutzerKarten'
 
 /**
- * KAPITEL 2.2 - Props, Listen & Bedingungen
+ * KAPITEL 3.2 - Props, Listen & Bedingungen
  * Komponenten konfigurierbar machen und Daten in Oberflächen verwandeln.
  */
 export function Props() {

@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.2 - Typen & Variablen. */
+/** Codebeispiele für Kapitel 7.2 - Typen & Variablen. */
 
 export const beispiele = {
   'java-variablen-einstieg': {

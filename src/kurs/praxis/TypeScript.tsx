@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './TypeScript.code'
 
 /**
- * KAPITEL 4.6 - TypeScript mit React
+ * KAPITEL 5.6 - TypeScript mit React
  *
  * Alle Editoren hier laufen mit `typen`: Neben der Vorschau prüft der echte
  * TypeScript-Compiler den Code und unterschlängelt Fehler.
@@ -64,6 +64,10 @@ export function TypeScriptKapitel() {
           Typprüfung unter dem Editor meldet den Fehler, bevor irgendjemand die App benutzt.
         </P>
         <TryIt id="praxis-typescript-einstieg" {...beispiele['praxis-typescript-einstieg']} modus="react" typen />
+        <Hinweis variante="tipp">
+          Dieses Kapitel zeigt TypeScript <strong>in React</strong>. Die Sprache selbst - Objekttypen, Unions,
+          Generics, Utility Types - lernst du ausführlich in Teil 2, beginnend mit <Verweis id="ts-start" />.
+        </Hinweis>
       </Abschnitt>
 
       <Abschnitt titel="Warum TypeScript?">

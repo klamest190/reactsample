@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Variablen.code'
 
 /**
- * KAPITEL 6.2 - Typen & Variablen
+ * KAPITEL 7.2 - Typen & Variablen
  * Der Kern des Unterschieds zu JavaScript: Typen stehen im Code.
  */
 export function Variablen() {
@@ -30,7 +30,7 @@ export function Variablen() {
         <Hinweis variante="info">
           Man nennt das <strong>statische Typisierung</strong>: „statisch“, weil der Typ schon
           feststeht, bevor das Programm läuft. TypeScript bringt genau diese Idee zu JavaScript -
-          nur verschwinden die Typen dort beim Übersetzen wieder (siehe <Verweis nr="4.8" />).
+          nur verschwinden die Typen dort beim Übersetzen wieder (siehe <Verweis nr="5.8" />).
         </Hinweis>
       </Abschnitt>
 
@@ -72,7 +72,7 @@ export function Variablen() {
         <P>
           <Code>String</Code> fehlt in dieser Liste mit Absicht: Ein String ist kein primitiver Typ,
           sondern eine <strong>Klasse</strong> - deshalb wird er großgeschrieben. Mehr dazu in{' '}
-          <Verweis nr="6.5" />.
+          <Verweis nr="7.5" />.
         </P>
         <TryIt modus="java" id="java-variablen-typen" {...beispiele['java-variablen-typen']} />
         <Hinweis variante="warnung">
@@ -144,7 +144,7 @@ export function Variablen() {
         </P>
         <CodeBlock code={codeBloecke.wrapper} />
         <P>
-          Wichtig wird das in <Verweis nr="6.8" />: Eine <Code>ArrayList</Code> kann nur Objekte
+          Wichtig wird das in <Verweis nr="7.8" />: Eine <Code>ArrayList</Code> kann nur Objekte
           aufnehmen, deshalb heißt es dort <Code>{'List<Integer>'}</Code> und nicht{' '}
           <Code>{'List<int>'}</Code>.
         </P>

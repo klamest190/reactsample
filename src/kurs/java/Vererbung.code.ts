@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.7 - Vererbung & Interfaces. */
+/** Codebeispiele für Kapitel 7.7 - Vererbung & Interfaces. */
 
 export const beispiele = {
   'java-vererbung-einstieg': {

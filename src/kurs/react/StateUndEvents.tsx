@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './StateUndEvents.code'
 
 /**
- * KAPITEL 2.3 - Events & State
+ * KAPITEL 3.3 - Events & State
  * Die Oberfläche wird interaktiv: Ereignisse behandeln, Zustand speichern, neu rendern.
  */
 export function StateUndEvents() {
@@ -70,7 +70,7 @@ export function StateUndEvents() {
         <Hinweis variante="info">
           Hooks erkennst du am <Code>use</Code> am Anfang. Sie dürfen nur{' '}
           <strong>direkt oben in einer Komponente</strong> aufgerufen werden - nicht in{' '}
-          <Code>if</Code>, Schleifen oder verschachtelten Funktionen. Warum, erfährst du in Teil 3.
+          <Code>if</Code>, Schleifen oder verschachtelten Funktionen. Warum, erfährst du in Teil 4.
         </Hinweis>
       </Abschnitt>
 

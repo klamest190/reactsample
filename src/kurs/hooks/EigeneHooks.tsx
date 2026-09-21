@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './EigeneHooks.code'
 import { HookDemo } from '../demos/HookDemo'
 
 /**
- * KAPITEL 3.7 - Eigene Hooks
+ * KAPITEL 4.7 - Eigene Hooks
  */
 export function EigeneHooks() {
   return (

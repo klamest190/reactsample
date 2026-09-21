@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.8 - Collections & Generics. */
+/** Codebeispiele für Kapitel 7.8 - Collections & Generics. */
 
 export const beispiele = {
   'java-collections-einstieg': {

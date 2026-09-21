@@ -13,7 +13,7 @@ const steps: [string, string, string][] = [
 ]
 
 /**
- * KAPITEL 4.11 (English) - Final Project
+ * KAPITEL 5.11 (English) - Final Project
  */
 export function Abschlussprojekt() {
   return (
@@ -21,8 +21,8 @@ export function Abschlussprojekt() {
       <Abschnitt titel="The project: a habit tracker">
         <P>
           To finish, you build a small, complete app and put almost everything from this course together:
-          array methods and immutability from part 1, components and data flow from part 2 and the hooks from
-          part 3. Take your time - and only look at the sample solution when you get stuck.
+          array methods and immutability from part 1, components and data flow from part 3 and the hooks from
+          part 4. Take your time - and only look at the sample solution when you get stuck.
         </P>
         <div className="overflow-x-auto">
           <table className="w-full max-w-3xl text-left text-sm">

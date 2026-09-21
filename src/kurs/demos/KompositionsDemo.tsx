@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Button, Code, Demo } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.3): Slots, Render-Prop und Portal. */
+/** Live-Demo (Kapitel 5.3): Slots, Render-Prop und Portal. */
 
 const TEXTE = {
   de: {

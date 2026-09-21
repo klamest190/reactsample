@@ -7,7 +7,7 @@ import { LokalCheckliste } from '../demos/LokalCheckliste'
 import { beispiele, codeBloecke } from './LokalEntwickeln.code'
 
 /**
- * KAPITEL 4.10 (English) - Developing locally: the bridge from the browser editor to your own project
+ * KAPITEL 5.10 (English) - Developing locally: the bridge from the browser editor to your own project
  */
 export function LokalEntwickeln() {
   return (

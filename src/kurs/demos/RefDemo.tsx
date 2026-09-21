@@ -3,7 +3,7 @@ import { Button, Demo, Eingabe, Wert } from '../../components/Ui'
 import { usePrevious } from '../../hooks/usePrevious'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.3): DOM-Ref, Timer-ID und usePrevious. */
+/** Live-Demo (Kapitel 4.3): DOM-Ref, Timer-ID und usePrevious. */
 
 const TEXTE = {
   de: {

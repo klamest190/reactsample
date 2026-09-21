@@ -22,7 +22,7 @@ export function js(teile: TemplateStringsArray): string {
 }
 
 /**
- * Dieselbe Funktion für Java-Beispiele (Teil 6). Ein eigener Name, damit man
+ * Dieselbe Funktion für Java-Beispiele (Teil 7). Ein eigener Name, damit man
  * in `<Teil>/Name.code.ts` auf den ersten Blick sieht, welche Sprache dort steht:
  *
  *   const beispiel = java`

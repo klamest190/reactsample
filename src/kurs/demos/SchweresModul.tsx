@@ -1,5 +1,5 @@
 /**
- * Diese Datei wird von der Demo in Kapitel 3.8 per React.lazy() nachgeladen.
+ * Diese Datei wird von der Demo in Kapitel 4.8 per React.lazy() nachgeladen.
  * Vite packt sie deshalb in einen eigenen JS-Chunk, der erst beim
  * tatsächlichen Anzeigen heruntergeladen wird (Code-Splitting).
  *

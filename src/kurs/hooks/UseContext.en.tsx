@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './UseContext.code'
 import { ContextDemo } from '../demos/ContextDemo'
 
 /**
- * KAPITEL 3.6 (English) - useContext
+ * KAPITEL 4.6 (English) - useContext
  */
 export function UseContext() {
   return (

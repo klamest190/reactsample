@@ -1,3 +1,5 @@
+import type { TypTest } from './tsLauf'
+
 /**
  * Baut das HTML-Dokument, in dem JavaScript-Übungen laufen.
  *
@@ -31,6 +33,8 @@ export type CodeBeispiel = {
   loesung?: string
   vorbereitung?: string
   tests?: Test[] | ReactTest[]
+  /** Nur TypeScript (modus="ts"): Code, der mit dem Code der Lernenden fehlerfrei kompilieren muss. */
+  typTests?: TypTest[]
   tipps?: { de: string[]; en: string[] }
 }
 

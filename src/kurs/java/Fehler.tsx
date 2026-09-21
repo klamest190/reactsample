@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Fehler.code'
 
 /**
- * KAPITEL 6.9 - Exceptions
+ * KAPITEL 7.9 - Exceptions
  * Fehler als eigener Kontrollfluss - mit Typen, die der Compiler kennt.
  */
 export function Fehler() {
@@ -80,7 +80,7 @@ export function Fehler() {
       <Abschnitt titel="Eigene Exceptions">
         <P>
           Eine eigene Exception ist einfach eine Klasse, die von <Code>RuntimeException</Code> erbt
-          (<Verweis nr="6.7" />). Der Vorteil: Sie kann zusätzliche Daten mitbringen - und der
+          (<Verweis nr="7.7" />). Der Vorteil: Sie kann zusätzliche Daten mitbringen - und der
           Aufrufer kann gezielt <em>diesen</em> Fall fangen.
         </P>
         <TryIt modus="java" id="java-fehler-eigene" {...beispiele['java-fehler-eigene']} />
@@ -123,7 +123,7 @@ export function Fehler() {
           <strong>oben</strong>: Dort steht die Stelle, an der es knallte.
         </Hinweis>
         <P>
-          In React gibt es dafür die <em>Error Boundary</em> (<Verweis nr="4.4" />) - die Idee ist
+          In React gibt es dafür die <em>Error Boundary</em> (<Verweis nr="5.4" />) - die Idee ist
           dieselbe: Ein Fehler soll nicht die ganze Anwendung mitreißen.
         </P>
       </Abschnitt>

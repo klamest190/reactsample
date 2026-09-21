@@ -2,7 +2,7 @@ import { useId, useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { Button, Demo } from '../../components/Ui'
 import { useSprache, type Sprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.1): Kontaktformular mit einem State-Objekt und abgeleiteter Validierung. */
+/** Live-Demo (Kapitel 5.1): Kontaktformular mit einem State-Objekt und abgeleiteter Validierung. */
 
 type Formular = {
   name: string

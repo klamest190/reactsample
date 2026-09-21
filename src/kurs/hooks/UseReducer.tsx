@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './UseReducer.code'
 import { AufgabenDemo } from '../demos/AufgabenDemo'
 
 /**
- * KAPITEL 3.5 - useReducer
+ * KAPITEL 4.5 - useReducer
  */
 export function UseReducer() {
   return (

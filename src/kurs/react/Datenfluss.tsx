@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Datenfluss.code'
 
 /**
- * KAPITEL 2.4 - State teilen & Datenfluss
+ * KAPITEL 3.4 - State teilen & Datenfluss
  * "Thinking in React": Wo lebt der State, wie reden Komponenten miteinander?
  */
 export function Datenfluss() {

@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './DatenLaden.code'
 import { LadeDemo } from '../demos/LadeDemo'
 
 /**
- * KAPITEL 4.2 - Daten laden
+ * KAPITEL 5.2 - Daten laden
  */
 export function DatenLaden() {
   return (
@@ -23,7 +23,7 @@ export function DatenLaden() {
 
       <Abschnitt titel="Das Grundmuster">
         <P>
-          Daten vom Server zu laden verbindet alles aus <Verweis nr="1.7" /> (async/await) und <Verweis nr="3.2" /> (useEffect).
+          Daten vom Server zu laden verbindet alles aus <Verweis nr="1.7" /> (async/await) und <Verweis nr="4.2" /> (useEffect).
           Jede Anfrage hat drei mögliche Zustände - und jeder braucht eine Darstellung:
         </P>
         <Liste>
@@ -86,7 +86,7 @@ export function DatenLaden() {
             bzw. auf dem Server.
           </li>
           <li>
-            React 19: <Code>use(promise)</Code> mit <Code>Suspense</Code> (<Verweis nr="3.9" />), wenn das Promise
+            React 19: <Code>use(promise)</Code> mit <Code>Suspense</Code> (<Verweis nr="4.9" />), wenn das Promise
             aus einem Cache kommt.
           </li>
         </Liste>

@@ -5,7 +5,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { useToggle } from '../../hooks/useToggle'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.7): die Hooks aus src/hooks/ im Einsatz. */
+/** Live-Demo (Kapitel 4.7): die Hooks aus src/hooks/ im Einsatz. */
 
 const TEXTE = {
   de: {

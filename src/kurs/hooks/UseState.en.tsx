@@ -19,7 +19,7 @@ const hookOverview: [string, string, string][] = [
 ]
 
 /**
- * KAPITEL 3.1 (English) - Hooks overview & useState in depth
+ * KAPITEL 4.1 (English) - Hooks overview & useState in depth
  */
 export function UseState() {
   return (

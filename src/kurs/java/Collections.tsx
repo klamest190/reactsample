@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Collections.code'
 
 /**
- * KAPITEL 6.8 - Collections & Generics
+ * KAPITEL 7.8 - Collections & Generics
  * ArrayList und HashMap - was in JavaScript Array und Objekt sind.
  */
 export function Collections() {
@@ -57,7 +57,7 @@ export function Collections() {
           Der Diamant <Code>{'<>'}</Code> auf der rechten Seite bleibt leer - der Compiler weiß aus
           der linken Seite schon, was gemeint ist. Und: In eine Collection passen nur Objekte,
           deshalb <Code>{'List<Integer>'}</Code> statt <Code>{'List<int>'}</Code> (siehe{' '}
-          <Verweis nr="6.2" />).
+          <Verweis nr="7.2" />).
         </Hinweis>
       </Abschnitt>
 
@@ -93,7 +93,7 @@ export function Collections() {
         </P>
         <P>
           Wenn dir das bekannt vorkommt: Genau so entstehen in React Listen aus Daten (
-          <Verweis nr="1.4" /> und <Verweis nr="2.2" />). Die Idee ist dieselbe, nur die Schreibweise
+          <Verweis nr="1.4" /> und <Verweis nr="3.2" />). Die Idee ist dieselbe, nur die Schreibweise
           ist anders.
         </P>
       </Abschnitt>

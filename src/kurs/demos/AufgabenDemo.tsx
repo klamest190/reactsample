@@ -2,7 +2,7 @@ import { useReducer, useState } from 'react'
 import { Button, Demo, Eingabe, Wert } from '../../components/Ui'
 import { useSprache, type Sprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 3.5): Aufgabenliste mit useReducer - Actions als Discriminated Union. */
+/** Live-Demo (Kapitel 4.5): Aufgabenliste mit useReducer - Actions als Discriminated Union. */
 
 type Aufgabe = { id: number; text: string; erledigt: boolean }
 type Filter = 'alle' | 'offen' | 'erledigt'

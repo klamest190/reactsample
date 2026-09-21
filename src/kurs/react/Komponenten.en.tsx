@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Komponenten.code'
 
 /**
- * KAPITEL 2.1 (English) - Components & JSX
+ * KAPITEL 3.1 (English) - Components & JSX
  */
 export function Komponenten() {
   return (

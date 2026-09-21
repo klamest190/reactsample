@@ -2,7 +2,7 @@ import { Suspense, lazy, useDeferredValue, useMemo, useState, useTransition } fr
 import { Button, Code, Demo, Eingabe, Wert } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demos (Kapitel 3.8): useDeferredValue, useTransition, lazy + Suspense. */
+/** Live-Demos (Kapitel 4.8): useDeferredValue, useTransition, lazy + Suspense. */
 
 // Wird erst geladen, wenn es das erste Mal gerendert wird.
 const SchweresModul = lazy(() => import('./SchweresModul'))

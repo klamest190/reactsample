@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
 
 /**
- * KAPITEL 4.8 - Testen mit Vitest und React Testing Library
+ * KAPITEL 5.8 - Testen mit Vitest und React Testing Library
  *
  * Die Editoren laufen mit modus="test": Lernende schreiben die Tests selbst,
  * die Ausgabe sieht aus wie im Terminal von Vitest.

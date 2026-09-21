@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Routing.code'
 
 /**
- * KAPITEL 4.7 (English) - Routing with React Router
+ * KAPITEL 5.7 (English) - Routing with React Router
  */
 export function Routing() {
   return (

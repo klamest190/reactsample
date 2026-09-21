@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.5 - Arrays & Strings. */
+/** Codebeispiele für Kapitel 7.5 - Arrays & Strings. */
 
 export const beispiele = {
   'java-arrays-einstieg': {
@@ -234,7 +234,7 @@ export const codeBloecke = {
 
     // Java: one type, a fixed length
     int[] list = {1, 2, 3};
-    // list.push(4);        does not exist → ArrayList (chapter 6.8)
+    // list.push(4);        does not exist → ArrayList (chapter 7.8)
   `,
   gleichheit: java`
     String a = "hello";

@@ -56,7 +56,7 @@ export function Collections() {
           The diamond <Code>{'<>'}</Code> on the right stays empty - the compiler already knows from
           the left side what is meant. And: a collection only takes objects, hence{' '}
           <Code>{'List<Integer>'}</Code> instead of <Code>{'List<int>'}</Code> (see{' '}
-          <Verweis nr="6.2" />).
+          <Verweis nr="7.2" />).
         </Hinweis>
       </Abschnitt>
 
@@ -91,7 +91,7 @@ export function Collections() {
         </P>
         <P>
           If this looks familiar: it is exactly how lists become UI in React (<Verweis nr="1.4" />{' '}
-          and <Verweis nr="2.2" />). Same idea, different spelling.
+          and <Verweis nr="3.2" />). Same idea, different spelling.
         </P>
       </Abschnitt>
 

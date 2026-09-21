@@ -84,6 +84,7 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
     { ziel: '', titel: t.uebersicht },
     { ziel: 'glossar', titel: t.glossar },
     { ziel: 'projekt', titel: t.projekt },
+    { ziel: 'playground', titel: t.playground },
   ]
   const treffer = suchen(anfrage, sprache, seiten)
   const aktiv = Math.min(auswahl, Math.max(treffer.length - 1, 0))

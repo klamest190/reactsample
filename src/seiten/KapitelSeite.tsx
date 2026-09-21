@@ -116,6 +116,17 @@ export function KapitelSeite({
         </aside>
       )}
 
+      <a
+        href={'#/playground/' + kapitel.teil.id}
+        className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-dashed border-slate-300 px-4 py-3 text-sm transition hover:border-brand-400 hover:bg-brand-50/50 dark:border-slate-700 dark:hover:bg-brand-500/10"
+      >
+        <span className="text-lg" aria-hidden>
+          🛝
+        </span>
+        <span className="flex-1 text-slate-600 dark:text-slate-300">{t.playgroundHinweis(kapitel.teil.kurztitel[sprache])}</span>
+        <span className="font-medium text-brand-700 dark:text-brand-400">{t.zumPlayground}</span>
+      </a>
+
       <footer className="space-y-4 border-t border-slate-200 pt-6 dark:border-slate-800">
         <div className="flex flex-wrap items-center gap-3">
           {istErledigt ? (

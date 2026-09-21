@@ -2,7 +2,7 @@ import { Demo } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
 /**
- * Live-Demo (Kapitel 2.2): typisierte Props + Liste mit key.
+ * Live-Demo (Kapitel 3.2): typisierte Props + Liste mit key.
  * Die Texte liegen zweisprachig im Objekt TEXTE - so machen es alle Demos.
  */
 

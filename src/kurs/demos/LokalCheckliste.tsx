@@ -2,7 +2,7 @@ import { Demo } from '../../components/Ui'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.10): Checkliste für das erste lokale Projekt - wird gespeichert. */
+/** Live-Demo (Kapitel 5.10): Checkliste für das erste lokale Projekt - wird gespeichert. */
 
 const TEXTE = {
   de: {

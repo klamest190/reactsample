@@ -74,7 +74,7 @@ export function Methoden() {
           </li>
           <li>
             without <Code>static</Code> - the method belongs to an <strong>object</strong> and may
-            access its fields. That is the normal case as soon as there is data (<Verweis nr="6.6" />
+            access its fields. That is the normal case as soon as there is data (<Verweis nr="7.6" />
             ).
           </li>
         </Liste>

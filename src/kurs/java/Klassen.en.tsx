@@ -69,7 +69,7 @@ export function Klassen() {
             <Code>public</Code> - from anywhere. The normal case for methods others should use.
           </li>
           <li>
-            <Code>protected</Code> - additionally for subclasses (<Verweis nr="6.7" />).
+            <Code>protected</Code> - additionally for subclasses (<Verweis nr="7.7" />).
           </li>
           <li>nothing written - visible within the same package. Fine while learning.</li>
         </Liste>

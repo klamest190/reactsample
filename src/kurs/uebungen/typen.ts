@@ -1,5 +1,6 @@
 import type { Zweisprachig } from '../../i18n/SpracheContext'
 import type { ReactTest, Test } from '../../lernen/jsSandbox'
+import type { TypTest } from '../../lernen/tsLauf'
 
 /**
  * Zusätzliche Übungen pro Kapitel - in vier Stufen:
@@ -36,12 +37,14 @@ export type Vorhersage = Basis & {
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
   aufgabe: Zweisprachig
-  modus: 'js' | 'react' | 'java'
+  modus: 'js' | 'ts' | 'react' | 'java'
   code: string
   loesung: string
   vorbereitung?: string
   vorschau?: boolean
   tests?: Test[] | ReactTest[]
+  /** Nur bei modus 'ts': Code, der zusammen mit der Lösung ohne Typfehler kompilieren muss (siehe tsLauf.ts). */
+  typTests?: TypTest[]
   tipps: Zweisprachig<string[]>
 }
 

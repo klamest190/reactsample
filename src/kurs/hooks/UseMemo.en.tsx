@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './UseMemo.code'
 import { PerformanceDemo } from '../demos/PerformanceDemo'
 
 /**
- * KAPITEL 3.4 (English) - useMemo, useCallback & memo
+ * KAPITEL 4.4 (English) - useMemo, useCallback & memo
  */
 export function UseMemo() {
   return (

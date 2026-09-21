@@ -2,7 +2,7 @@ import { java, js } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
 /**
- * Codebeispiele für Kapitel 6.10 - Java, JavaScript & React im Vergleich.
+ * Codebeispiele für Kapitel 7.10 - Java, JavaScript & React im Vergleich.
  *
  * Als einziges Kapitel des Java-Teils mischt dieses hier absichtlich alle drei
  * Sprachen: Jedes Beispiel steht einmal in Java, einmal in JavaScript und
@@ -250,7 +250,7 @@ export const codeBloecke = {
         index.ts               javaAusfuehren() - the only door to the outside
 
       kurs/
-        java/                ☕ the chapters of part 6 (Java code in .code.ts)
+        java/                ☕ the chapters of part 7 (Java code in .code.ts)
         js/                  🟨 the chapters of part 1 (JavaScript)
         react/ hooks/ praxis/ ⚛️ the chapters of parts 2-4 (React)
 

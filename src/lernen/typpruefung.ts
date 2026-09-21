@@ -26,11 +26,12 @@ export function typenPruefenProjekt(dateien: { pfad: string; code: string }[], a
   return senden({ dateien, aktiv })
 }
 
-export function typenPruefen(code: string): Promise<Typfehler[]> {
-  return senden({ code })
+/** Editor-Code prüfen - als TSX (React) oder mit `ts` als reines TypeScript ohne JSX (Teil 2). */
+export function typenPruefen(code: string, optionen: { ts?: boolean } = {}): Promise<Typfehler[]> {
+  return senden({ code, ts: optionen.ts })
 }
 
-function senden(nachricht: { code?: string; dateien?: { pfad: string; code: string }[]; aktiv?: string }): Promise<Typfehler[]> {
+function senden(nachricht: { code?: string; ts?: boolean; dateien?: { pfad: string; code: string }[]; aktiv?: string }): Promise<Typfehler[]> {
   if (!worker) {
     worker = new Worker(new URL('./typpruefung.worker.ts', import.meta.url), { type: 'module' })
     worker.onmessage = (e: MessageEvent<Antwort>) => {

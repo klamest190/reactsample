@@ -2,7 +2,7 @@ import { java } from '../../lernen/quelltext'
 import type { UebungsSammlung } from './typen'
 
 /**
- * Zusätzliche Übungen für Teil 6 (Java) - pro Kapitel gestuft:
+ * Zusätzliche Übungen für Teil 7 (Java) - pro Kapitel gestuft:
  * vorhersagen -> Fehler finden -> ergänzen / frei schreiben.
  *
  * Die Vorhersage-Übungen zielen bewusst auf die Stellen, an denen Java sich

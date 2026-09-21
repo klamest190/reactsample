@@ -21,7 +21,7 @@ export function Vergleich() {
         <P>
           Two things stand out: Java needs noticeably more scaffolding - and the cast{' '}
           <Code>(double)</Code> is mandatory, because <Code>int / int</Code> would cut off otherwise
-          (<Verweis nr="6.2" />).
+          (<Verweis nr="7.2" />).
         </P>
       </Abschnitt>
 
@@ -60,7 +60,7 @@ export function Vergleich() {
           </table>
         </div>
         <Hinweis variante="info">
-          TypeScript (<Verweis nr="4.8" />) sits exactly in between: types like Java, runtime like
+          TypeScript (<Verweis nr="5.8" />) sits exactly in between: types like Java, runtime like
           JavaScript. During the build the types are removed again - but they are checked before.
         </Hinweis>
       </Abschnitt>
@@ -77,7 +77,7 @@ export function Vergleich() {
           The chain <Code>stream().filter(…).toList()</Code> and{' '}
           <Code>{'tasks.filter(t => !t.done)'}</Code> say the same thing. React only adds one thing:
           the filtered list automatically becomes what you see - when state changes, React redraws (
-          <Verweis nr="2.3" />).
+          <Verweis nr="3.3" />).
         </P>
         <Hinweis variante="tipp">
           That is exactly why this course starts with JavaScript: React is not a language of its own
@@ -163,7 +163,7 @@ export function Vergleich() {
         </P>
         <CodeBlock code={codeBloecke.echtesProjekt} />
         <P>
-          The path there is the same as in <Verweis nr="4.11" /> for React: out of the browser
+          The path there is the same as in <Verweis nr="5.11" /> for React: out of the browser
           editor, into a real project.
         </P>
       </Abschnitt>
@@ -180,7 +180,7 @@ export function Vergleich() {
           </li>
           <li>
             <strong>Both together</strong> is the normal case in companies: a Java backend serving
-            JSON and a React frontend displaying it (<Verweis nr="4.2" />).
+            JSON and a React frontend displaying it (<Verweis nr="5.2" />).
           </li>
         </Liste>
       </Abschnitt>

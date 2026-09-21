@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './UseEffect.code'
 import { TitelUndFenster } from '../demos/TitelUndFenster'
 
 /**
- * KAPITEL 3.2 - useEffect
+ * KAPITEL 4.2 - useEffect
  */
 export function UseEffect() {
   return (

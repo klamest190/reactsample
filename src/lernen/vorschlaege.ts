@@ -15,7 +15,7 @@ import type { Sprache, Zweisprachig } from '../i18n/SpracheContext'
  * Die Reihenfolge in den Listen ist die Rangfolge bei gleich guten Treffern.
  */
 
-export type VorschlagArt = 'funktion' | 'hook' | 'snippet' | 'keyword' | 'methode' | 'jsx' | 'variable'
+export type VorschlagArt = 'funktion' | 'hook' | 'snippet' | 'keyword' | 'methode' | 'jsx' | 'variable' | 'tailwind'
 
 /** Ein Vorschlag, aufgelöst für eine Sprache. */
 export type Vorschlag = {
@@ -23,6 +23,10 @@ export type Vorschlag = {
   einfuegen?: string
   art: VorschlagArt
   info: string
+  /** Tailwind: das CSS, das die Klasse erzeugt (siehe tailwindMotor.ts). */
+  css?: string
+  /** Tailwind: Farbe für das Farbfeld in der Liste, z. B. oklch(…). */
+  farbe?: string
 }
 
 type Eintrag = {
@@ -32,7 +36,7 @@ type Eintrag = {
   info: Zweisprachig
 }
 
-export type EditorSprache = 'js' | 'react' | 'java'
+export type EditorSprache = 'js' | 'ts' | 'react' | 'java'
 
 const JAVASCRIPT: Eintrag[] = [
   // --- Konsole -------------------------------------------------------------
@@ -134,6 +138,34 @@ const JAVASCRIPT: Eintrag[] = [
   { label: '.preventDefault', einfuegen: 'preventDefault()', art: 'methode', info: { de: 'Event: Standardverhalten verhindern (z. B. Seite neu laden).', en: 'Event: prevent the default behavior (e.g. page reload).' } },
   { label: '.current', art: 'methode', info: { de: 'Ref: der gespeicherte Wert bzw. das DOM-Element.', en: 'Ref: the stored value or DOM element.' } },
   { label: '.focus', einfuegen: 'focus()', art: 'methode', info: { de: 'DOM: Element fokussieren.', en: 'DOM: focus the element.' } },
+]
+
+// TypeScript (Teil 2) - kommt zusätzlich zu den JavaScript-Vorschlägen.
+const TYPESCRIPT: Eintrag[] = [
+  { label: 'type', einfuegen: 'type $0 = {\n  \n}', art: 'snippet', info: { de: 'Typ-Alias: einem Typ einen Namen geben.', en: 'Type alias: give a type a name.' } },
+  { label: 'interface', einfuegen: 'interface $0 {\n  \n}', art: 'snippet', info: { de: 'Beschreibt die Form eines Objekts, erweiterbar mit extends.', en: 'Describes the shape of an object, extendable with extends.' } },
+  { label: 'string', art: 'keyword', info: { de: 'Typ für Texte.', en: 'Type for text.' } },
+  { label: 'number', art: 'keyword', info: { de: 'Typ für Zahlen (ganz und mit Komma).', en: 'Type for numbers (integers and decimals).' } },
+  { label: 'boolean', art: 'keyword', info: { de: 'Typ für true und false.', en: 'Type for true and false.' } },
+  { label: 'unknown', art: 'keyword', info: { de: 'Irgendein Wert - muss vor der Benutzung eingegrenzt werden.', en: 'Any value - must be narrowed before use.' } },
+  { label: 'any', art: 'keyword', info: { de: 'Schaltet die Typprüfung ab - möglichst vermeiden.', en: 'Turns type checking off - avoid it.' } },
+  { label: 'never', art: 'keyword', info: { de: 'Typ ohne Werte - z. B. für „kann nie passieren“.', en: 'A type with no values - e.g. for “can never happen”.' } },
+  { label: 'void', art: 'keyword', info: { de: 'Rückgabetyp einer Funktion, die nichts zurückgibt.', en: 'Return type of a function that returns nothing.' } },
+  { label: 'readonly', einfuegen: 'readonly $0', art: 'keyword', info: { de: 'Feld darf nach dem Erzeugen nicht geändert werden.', en: 'The field may not be changed after creation.' } },
+  { label: 'keyof', einfuegen: 'keyof $0', art: 'keyword', info: { de: 'Union aller Schlüssel eines Typs.', en: 'Union of all keys of a type.' } },
+  { label: 'as const', art: 'keyword', info: { de: 'Wert so eng wie möglich typisieren (Literale, readonly).', en: 'Type a value as narrowly as possible (literals, readonly).' } },
+  { label: 'satisfies', einfuegen: 'satisfies $0', art: 'keyword', info: { de: 'Prüft einen Wert gegen einen Typ, ohne ihn zu verbreitern.', en: 'Checks a value against a type without widening it.' } },
+  { label: 'generic', einfuegen: 'function $0<T>(value: T): T {\n  return value\n}', art: 'snippet', info: { de: 'Generische Funktion mit Typparameter T.', en: 'Generic function with a type parameter T.' } },
+  { label: 'union', einfuegen: "type $0 = 'a' | 'b'", art: 'snippet', info: { de: 'Union aus Literal-Typen: nur diese Werte sind erlaubt.', en: 'Union of literal types: only these values are allowed.' } },
+  { label: 'typeguard', einfuegen: "function is$0(value: unknown): value is string {\n  return typeof value === 'string'\n}", art: 'snippet', info: { de: 'Type Guard: eigene Prüfung, die den Typ eingrenzt.', en: 'Type guard: your own check that narrows the type.' } },
+  { label: 'Partial', einfuegen: 'Partial<$0>', art: 'funktion', info: { de: 'Alle Felder optional.', en: 'All fields optional.' } },
+  { label: 'Required', einfuegen: 'Required<$0>', art: 'funktion', info: { de: 'Alle Felder Pflicht.', en: 'All fields required.' } },
+  { label: 'Readonly', einfuegen: 'Readonly<$0>', art: 'funktion', info: { de: 'Alle Felder readonly.', en: 'All fields readonly.' } },
+  { label: 'Pick', einfuegen: "Pick<$0, ''>", art: 'funktion', info: { de: 'Nur die genannten Felder übernehmen.', en: 'Keep only the listed fields.' } },
+  { label: 'Omit', einfuegen: "Omit<$0, ''>", art: 'funktion', info: { de: 'Die genannten Felder weglassen.', en: 'Leave out the listed fields.' } },
+  { label: 'Record', einfuegen: 'Record<string, $0>', art: 'funktion', info: { de: 'Objekt mit Schlüsseltyp und Werttyp.', en: 'Object with a key type and a value type.' } },
+  { label: 'ReturnType', einfuegen: 'ReturnType<typeof $0>', art: 'funktion', info: { de: 'Rückgabetyp einer Funktion.', en: 'Return type of a function.' } },
+  { label: 'Promise', einfuegen: 'Promise<$0>', art: 'funktion', info: { de: 'Typ eines Promise, das einen Wert liefert.', en: 'Type of a promise that resolves to a value.' } },
 ]
 
 const REACT: Eintrag[] = [
@@ -264,7 +296,8 @@ const JAVA: Eintrag[] = [
 
 /** Alle Vorschläge für einen Editor, aufgelöst in der Oberflächensprache. */
 export function vorschlaegeFuer(editor: EditorSprache, sprache: Sprache): Vorschlag[] {
-  const eintraege = editor === 'java' ? JAVA : editor === 'react' ? [...REACT, ...JAVASCRIPT] : JAVASCRIPT
+  const eintraege =
+    editor === 'java' ? JAVA : editor === 'react' ? [...REACT, ...JAVASCRIPT] : editor === 'ts' ? [...TYPESCRIPT, ...JAVASCRIPT] : JAVASCRIPT
   return eintraege.map((e) => ({ ...e, info: e.info[sprache] }))
 }
 

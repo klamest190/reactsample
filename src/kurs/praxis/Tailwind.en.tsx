@@ -6,7 +6,7 @@ import { beispiele, codeBloecke } from './Tailwind.code'
 import { TailwindDemo } from '../demos/TailwindDemo'
 
 /**
- * KAPITEL 4.5 (English) - Tailwind CSS in React
+ * KAPITEL 5.5 (English) - Tailwind CSS in React
  */
 export function Tailwind() {
   return (
@@ -52,11 +52,10 @@ export function Tailwind() {
           {...beispiele['praxis-tailwind-karte']}
           modus="react"
         />
-        <Hinweis variante="warnung">
-          <strong>Limitation in the editor:</strong> Tailwind only generates classes that appear in the
-          project’s source code at build time. Classes from the examples here work - completely new ones you
-          type yourself may not. In a real project with a running Vite server there is no such limitation. For
-          free experimentation, use <Code>{'style={{ … }}'}</Code>.
+        <Hinweis variante="tipp">
+          <strong>Autocompletion like in VS Code:</strong> start typing inside <Code>className="…"</Code>, e.g.{' '}
+          <Code>bg-</Code> or <Code>hover:text-</Code> - the editor suggests every class, with a color swatch and
+          the CSS Tailwind generates for it. Every class takes effect in the preview right away.
         </Hinweis>
       </Abschnitt>
 

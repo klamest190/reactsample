@@ -3,10 +3,11 @@ import type { Uebung, UebungsSammlung } from './typen'
 /**
  * Übungen werden pro Kursteil erst geladen, wenn ein Kapitel des Teils geöffnet wird.
  * Die Promises werden zwischengespeichert - `use(promise)` braucht bei jedem Render
- * dasselbe Promise-Objekt (siehe Kapitel 3.9).
+ * dasselbe Promise-Objekt (siehe Kapitel 4.9).
  */
 const LADER: Record<string, () => Promise<{ uebungen: UebungsSammlung }>> = {
   js: () => import('./js'),
+  ts: () => import('./ts'),
   java: () => import('./java'),
   react: () => import('./react'),
   hooks: () => import('./hooks'),

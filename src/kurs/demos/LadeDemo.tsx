@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, Demo } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.2): laden / Fehler / Daten mit AbortController im Cleanup. */
+/** Live-Demo (Kapitel 5.2): laden / Fehler / Daten mit AbortController im Cleanup. */
 
 type Benutzer = { id: number; name: string; ort: string }
 

@@ -15,7 +15,7 @@ const structure: [string, string][] = [
 ]
 
 /**
- * KAPITEL 4.12 (English) - A complete business app
+ * KAPITEL 5.12 (English) - A complete business app
  */
 export function BusinessApp() {
   return (

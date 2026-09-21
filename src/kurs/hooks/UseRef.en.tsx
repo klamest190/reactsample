@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './UseRef.code'
 import { RefDemo } from '../demos/RefDemo'
 
 /**
- * KAPITEL 3.3 (English) - useRef
+ * KAPITEL 4.3 (English) - useRef
  */
 export function UseRef() {
   return (

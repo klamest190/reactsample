@@ -19,7 +19,7 @@ const hookUebersicht: [string, string, string][] = [
 ]
 
 /**
- * KAPITEL 3.1 - Hooks-Überblick & useState im Detail
+ * KAPITEL 4.1 - Hooks-Überblick & useState im Detail
  */
 export function UseState() {
   return (

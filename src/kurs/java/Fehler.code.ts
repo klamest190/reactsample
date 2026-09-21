@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.9 - Exceptions. */
+/** Codebeispiele für Kapitel 7.9 - Exceptions. */
 
 export const beispiele = {
   'java-fehler-einstieg': {

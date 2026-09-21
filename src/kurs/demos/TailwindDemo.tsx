@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Demo } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.5): Varianten, responsive Grid, group und bedingte Klassen. */
+/** Live-Demo (Kapitel 5.5): Varianten, responsive Grid, group und bedingte Klassen. */
 
 const TEXTE = {
   de: {

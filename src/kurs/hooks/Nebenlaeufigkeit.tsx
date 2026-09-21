@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './Nebenlaeufigkeit.code'
 import { NebenlaeufigkeitsDemo } from '../demos/NebenlaeufigkeitsDemo'
 
 /**
- * KAPITEL 3.8 - useTransition & useDeferredValue
+ * KAPITEL 4.8 - useTransition & useDeferredValue
  */
 export function Nebenlaeufigkeit() {
   return (
@@ -59,7 +59,7 @@ export function Nebenlaeufigkeit() {
           verworfen. Die Lösung zur Aufgabe oben zeigt das Muster.
         </P>
         <Hinweis variante="info">
-          Anders als Debouncing (<Verweis nr="3.7" />) gibt es <strong>keine feste Wartezeit</strong>: Auf einem
+          Anders als Debouncing (<Verweis nr="4.7" />) gibt es <strong>keine feste Wartezeit</strong>: Auf einem
           schnellen Rechner hinkt nichts hinterher, auf einem langsamen passt es sich an.
         </Hinweis>
       </Abschnitt>

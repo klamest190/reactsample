@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Vererbung.code'
 
 /**
- * KAPITEL 6.7 - Vererbung & Interfaces
+ * KAPITEL 7.7 - Vererbung & Interfaces
  * Der zweite Pfeiler der Objektorientierung - und der größte Unterschied zu React.
  */
 export function Vererbung() {
@@ -74,7 +74,7 @@ export function Vererbung() {
         <P>
           Zwei Spezialformen, die viel Tipparbeit sparen. Ein <Code>enum</Code> ist eine Klasse mit
           einer festen, abzählbaren Menge von Objekten - Javas Antwort auf den Union-Type aus
-          TypeScript (<Verweis nr="4.8" />).
+          TypeScript (<Verweis nr="5.8" />).
         </P>
         <TryIt modus="java" id="java-vererbung-enum" {...beispiele['java-vererbung-enum']} />
         <P>
@@ -89,7 +89,7 @@ export function Vererbung() {
         <P>
           React kennt keine Vererbung zwischen Komponenten. Statt eine Basiskomponente zu erweitern,
           steckt man kleine Komponenten ineinander - das ist <strong>Komposition</strong> (
-          <Verweis nr="4.3" />).
+          <Verweis nr="5.3" />).
         </P>
         <CodeBlock code={codeBloecke.reactVergleich} />
         <P>

@@ -16,7 +16,7 @@ import { projektSchritte } from './projekt/meta'
  */
 
 /**
- * Jedes Kapitel wird erst geladen, wenn man es öffnet (Code-Splitting, siehe Kapitel 3.8).
+ * Jedes Kapitel wird erst geladen, wenn man es öffnet (Code-Splitting, siehe Kapitel 4.8).
  * lazy() erwartet einen default-Export - die Kapitel exportieren aber benannt,
  * deshalb wird der Export hier umverpackt.
  */
@@ -215,8 +215,157 @@ export const kurs: Teil[] = [
     ],
   },
   {
-    id: 'react',
+    id: 'typescript',
     nummer: 2,
+    titel: { de: 'TypeScript-Grundlagen', en: 'TypeScript Fundamentals' },
+    kurztitel: { de: 'TypeScript', en: 'TypeScript' },
+    icon: '🟦',
+    beschreibung: {
+      de: 'JavaScript mit Typen: Objekte und Funktionen beschreiben, Unions eingrenzen, Generics und Utility Types - alles mit echter Typprüfung im Editor.',
+      en: 'JavaScript with types: describe objects and functions, narrow unions, generics and utility types - all with real type checking in the editor.',
+    },
+    kapitel: [
+      {
+        id: 'ts-start',
+        titel: { de: 'Warum TypeScript?', en: 'Why TypeScript?' },
+        kurz: {
+          de: 'Typen, Inferenz und die wichtigsten Grundtypen - und warum Typen zur Laufzeit verschwinden.',
+          en: 'Types, inference and the essential basic types - and why types disappear at runtime.',
+        },
+        dauer: 25,
+        lernziele: {
+          de: ['Typannotationen schreiben und Inferenz nutzen', 'Die Grundtypen, Arrays und Tupel kennen', 'any und unknown unterscheiden', 'Verstehen, dass Typen nur beim Prüfen existieren'],
+          en: ['Write type annotations and rely on inference', 'Know the basic types, arrays and tuples', 'Tell any and unknown apart', 'Understand that types only exist while checking'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Einstieg'), 'Einstieg'),
+          en: laden(() => import('./typescript/Einstieg.en'), 'Einstieg'),
+        },
+      },
+      {
+        id: 'ts-objekte',
+        titel: { de: 'Objekttypen & Interfaces', en: 'Object Types & Interfaces' },
+        kurz: {
+          de: 'Die Form von Objekten beschreiben: type, interface, optionale und readonly Felder.',
+          en: 'Describe the shape of objects: type, interface, optional and readonly fields.',
+        },
+        dauer: 30,
+        lernziele: {
+          de: ['Objekttypen mit type und interface beschreiben', 'Optionale und readonly Felder einsetzen', 'Typen mit extends und & kombinieren', 'Strukturelle Typisierung verstehen'],
+          en: ['Describe object types with type and interface', 'Use optional and readonly fields', 'Combine types with extends and &', 'Understand structural typing'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Objekte'), 'Objekte'),
+          en: laden(() => import('./typescript/Objekte.en'), 'Objekte'),
+        },
+      },
+      {
+        id: 'ts-funktionen',
+        titel: { de: 'Funktionen typisieren', en: 'Typing Functions' },
+        kurz: {
+          de: 'Parameter, Rückgabewerte, Callbacks und Funktionstypen.',
+          en: 'Parameters, return values, callbacks and function types.',
+        },
+        dauer: 25,
+        lernziele: {
+          de: ['Parameter und Rückgabewerte typisieren', 'Optionale, Default- und Rest-Parameter nutzen', 'Funktionstypen für Callbacks schreiben', 'void und never einordnen'],
+          en: ['Type parameters and return values', 'Use optional, default and rest parameters', 'Write function types for callbacks', 'Understand void and never'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Funktionen'), 'Funktionen'),
+          en: laden(() => import('./typescript/Funktionen.en'), 'Funktionen'),
+        },
+      },
+      {
+        id: 'ts-unions',
+        titel: { de: 'Unions & Narrowing', en: 'Unions & Narrowing' },
+        kurz: {
+          de: 'Ein Wert, mehrere mögliche Typen - und wie TypeScript sie sicher eingrenzt.',
+          en: 'One value, several possible types - and how TypeScript narrows them safely.',
+        },
+        dauer: 35,
+        lernziele: {
+          de: ['Union- und Literal-Typen einsetzen', 'Mit typeof, in und instanceof eingrenzen', 'Discriminated Unions modellieren', 'Mit never auf Vollständigkeit prüfen'],
+          en: ['Use union and literal types', 'Narrow with typeof, in and instanceof', 'Model discriminated unions', 'Check for exhaustiveness with never'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Unions'), 'Unions'),
+          en: laden(() => import('./typescript/Unions.en'), 'Unions'),
+        },
+      },
+      {
+        id: 'ts-generics',
+        titel: { de: 'Generics', en: 'Generics' },
+        kurz: {
+          de: 'Funktionen und Typen, die mit jedem Typ funktionieren - ohne any.',
+          en: 'Functions and types that work with any type - without any.',
+        },
+        dauer: 35,
+        lernziele: {
+          de: ['Generische Funktionen schreiben', 'Typparameter mit extends einschränken', 'keyof mit Generics kombinieren', 'Generische Typen und Klassen bauen'],
+          en: ['Write generic functions', 'Constrain type parameters with extends', 'Combine keyof with generics', 'Build generic types and classes'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Generics'), 'Generics'),
+          en: laden(() => import('./typescript/Generics.en'), 'Generics'),
+        },
+      },
+      {
+        id: 'ts-utility',
+        titel: { de: 'Typ-Operatoren & Utility Types', en: 'Type Operators & Utility Types' },
+        kurz: {
+          de: 'Typen aus anderen Typen ableiten: keyof, typeof, Partial, Pick, Omit, as const und satisfies.',
+          en: 'Derive types from other types: keyof, typeof, Partial, Pick, Omit, as const and satisfies.',
+        },
+        dauer: 30,
+        lernziele: {
+          de: ['keyof, typeof und Indexzugriff nutzen', 'Die wichtigsten Utility Types einsetzen', 'as const und satisfies verstehen', 'Typen ableiten statt doppelt schreiben'],
+          en: ['Use keyof, typeof and indexed access', 'Apply the most important utility types', 'Understand as const and satisfies', 'Derive types instead of writing them twice'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/UtilityTypes'), 'UtilityTypes'),
+          en: laden(() => import('./typescript/UtilityTypes.en'), 'UtilityTypes'),
+        },
+      },
+      {
+        id: 'ts-klassen',
+        titel: { de: 'Klassen, Enums & Module', en: 'Classes, Enums & Modules' },
+        kurz: {
+          de: 'Klassen mit Zugriffsmodifikatoren, Interfaces implementieren, Enums und Typen importieren.',
+          en: 'Classes with access modifiers, implementing interfaces, enums and importing types.',
+        },
+        dauer: 30,
+        lernziele: {
+          de: ['Klassen mit private, readonly und Parameter-Properties schreiben', 'Interfaces implementieren und abstract nutzen', 'Enums und Union-Typen vergleichen', 'import type und Deklarationsdateien kennen'],
+          en: ['Write classes with private, readonly and parameter properties', 'Implement interfaces and use abstract', 'Compare enums and union types', 'Know import type and declaration files'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Klassen'), 'Klassen'),
+          en: laden(() => import('./typescript/Klassen.en'), 'Klassen'),
+        },
+      },
+      {
+        id: 'ts-fortgeschritten',
+        titel: { de: 'Fortgeschrittene Typen & Praxis', en: 'Advanced Types & Practice' },
+        kurz: {
+          de: 'Mapped und Conditional Types, Template Literal Types, sichere API-Daten und die tsconfig.',
+          en: 'Mapped and conditional types, template literal types, safe API data and the tsconfig.',
+        },
+        dauer: 35,
+        lernziele: {
+          de: ['Mapped und Conditional Types lesen und schreiben', 'Template Literal Types einsetzen', 'Async-Code und API-Daten sicher typisieren', 'Type Assertions sparsam einsetzen und die tsconfig verstehen'],
+          en: ['Read and write mapped and conditional types', 'Use template literal types', 'Type async code and API data safely', 'Use type assertions sparingly and understand the tsconfig'],
+        },
+        Komponente: {
+          de: laden(() => import('./typescript/Fortgeschritten'), 'Fortgeschritten'),
+          en: laden(() => import('./typescript/Fortgeschritten.en'), 'Fortgeschritten'),
+        },
+      },
+    ],
+  },
+  {
+    id: 'react',
+    nummer: 3,
     titel: { de: 'React-Grundlagen', en: 'React Fundamentals' },
     kurztitel: { de: 'React', en: 'React' },
     icon: '⚛️',
@@ -297,7 +446,7 @@ export const kurs: Teil[] = [
   },
   {
     id: 'hooks',
-    nummer: 3,
+    nummer: 4,
     titel: { de: 'React Hooks im Detail', en: 'React Hooks in Depth' },
     kurztitel: { de: 'Hooks', en: 'Hooks' },
     icon: '🪝',
@@ -463,7 +612,7 @@ export const kurs: Teil[] = [
   },
   {
     id: 'praxis',
-    nummer: 4,
+    nummer: 5,
     titel: { de: 'Praxis & Muster', en: 'Practice & Patterns' },
     kurztitel: { de: 'Praxis', en: 'Practice' },
     icon: '🛠️',
@@ -680,7 +829,7 @@ export const kurs: Teil[] = [
   },
   {
     id: 'projekt',
-    nummer: 5,
+    nummer: 6,
     titel: { de: 'Projekt: ToDo-App', en: 'Project: Todo App' },
     kurztitel: { de: 'Projekt', en: 'Project' },
     icon: '🧵',
@@ -700,7 +849,7 @@ export const kurs: Teil[] = [
   },
   {
     id: 'java',
-    nummer: 6,
+    nummer: 7,
     titel: { de: 'Java-Grundlagen', en: 'Java Fundamentals' },
     kurztitel: { de: 'Java', en: 'Java' },
     icon: '☕',
@@ -896,6 +1045,15 @@ const GRUNDLAGEN: Record<string, string[]> = {
   'js-async': ['js-funktionen'],
   'js-fehler': ['js-funktionen', 'js-objekte'],
   'js-dom': ['js-funktionen', 'js-objekte'],
+  // Teil 2 baut direkt auf JavaScript auf. React (Teil 3) setzt ihn nicht voraus - erst das TypeScript-Kapitel in Teil 5.
+  'ts-start': ['js-variablen', 'js-funktionen'],
+  'ts-objekte': ['ts-start', 'js-objekte'],
+  'ts-funktionen': ['ts-objekte', 'js-funktionen'],
+  'ts-unions': ['ts-funktionen', 'js-kontrollfluss'],
+  'ts-generics': ['ts-unions', 'js-arrays'],
+  'ts-utility': ['ts-generics'],
+  'ts-klassen': ['ts-objekte', 'js-fehler'],
+  'ts-fortgeschritten': ['ts-utility', 'js-async'],
   'react-komponenten': ['js-dom', 'js-funktionen'],
   'react-props': ['react-komponenten', 'js-objekte', 'js-arrays'],
   'react-state': ['react-props', 'js-funktionen'],
@@ -914,14 +1072,14 @@ const GRUNDLAGEN: Record<string, string[]> = {
   'praxis-komposition': ['react-props'],
   'praxis-fehler': ['react-komponenten', 'js-async'],
   'praxis-tailwind': ['react-komponenten'],
-  'praxis-typescript': ['react-props', 'hooks-usereducer', 'hooks-usecontext', 'js-objekte'],
+  'praxis-typescript': ['react-props', 'hooks-usereducer', 'hooks-usecontext', 'ts-unions', 'ts-generics'],
   'praxis-routing': ['react-props', 'react-datenfluss', 'praxis-komposition', 'praxis-daten'],
   'praxis-testen': ['react-state', 'praxis-formulare', 'praxis-daten', 'js-async'],
   'praxis-barrierefreiheit': ['praxis-formulare', 'praxis-testen', 'hooks-useref'],
   'praxis-lokal': ['react-komponenten', 'hooks-useeffect'],
   'praxis-projekt': ['hooks-usereducer', 'hooks-eigene', 'hooks-useeffect'],
   'praxis-business': ['hooks-usecontext', 'hooks-usereducer', 'praxis-formulare', 'praxis-komposition'],
-  // Teil 6 steht für sich: Java braucht kein React. Die Verweise auf den
+  // Teil 7 steht für sich: Java braucht kein React. Die Verweise auf den
   // JavaScript-Teil sind Vergleichspunkte, keine Voraussetzungen.
   'java-variablen': ['java-start'],
   'java-kontrollfluss': ['java-variablen'],
@@ -944,6 +1102,14 @@ const STICHWORTE: Record<string, string[]> = {
   'js-async': ['promise', 'async', 'await', 'fetch', 'setTimeout', 'event loop', 'Promise.all', 'try catch', 'microtask', 'call stack', 'queueMicrotask'],
   'js-fehler': ['try', 'catch', 'finally', 'throw', 'Error', 'TypeError', 'class', 'Klasse', 'constructor', 'this', 'bind', 'extends', 'super', 'getter', 'private', 'instanceof', 'custom error'],
   'js-dom': ['DOM', 'querySelector', 'addEventListener', 'event', 'import', 'export', 'module', 'imperativ', 'deklarativ'],
+  'ts-start': ['typescript', 'ts', 'type', 'Typ', 'annotation', 'inference', 'Inferenz', 'string', 'number', 'boolean', 'array', 'tuple', 'Tupel', 'any', 'unknown', 'strict', 'tsc', 'type erasure'],
+  'ts-objekte': ['type', 'interface', 'optional', 'readonly', 'extends', 'intersection', 'structural typing', 'strukturell', 'index signature', 'Record', 'excess property'],
+  'ts-funktionen': ['function', 'Funktion', 'parameter', 'return type', 'Rückgabetyp', 'callback', 'void', 'never', 'overload', 'Überladung', 'rest parameter', 'function type'],
+  'ts-unions': ['union', 'literal type', 'narrowing', 'Eingrenzen', 'typeof', 'instanceof', 'discriminated union', 'exhaustive', 'never', 'type guard', 'type predicate', 'null', 'undefined', 'strictNullChecks'],
+  'ts-generics': ['generics', 'Generics', 'generic', 'type parameter', 'Typparameter', 'extends', 'constraint', 'keyof', 'default type'],
+  'ts-utility': ['utility types', 'keyof', 'typeof', 'indexed access', 'Partial', 'Required', 'Readonly', 'Pick', 'Omit', 'Record', 'ReturnType', 'Parameters', 'Awaited', 'NonNullable', 'Exclude', 'Extract', 'as const', 'satisfies'],
+  'ts-klassen': ['class', 'Klasse', 'private', 'protected', 'public', 'readonly', 'parameter properties', 'implements', 'abstract', 'enum', 'import type', 'export', 'module', 'd.ts', 'declare'],
+  'ts-fortgeschritten': ['mapped types', 'conditional types', 'infer', 'template literal types', 'type assertion', 'non-null assertion', 'Promise', 'async', 'fetch', 'unknown', 'validation', 'Validierung', 'tsconfig', 'strict', 'noUncheckedIndexedAccess'],
   'react-komponenten': ['component', 'JSX', 'createRoot', 'fragment', 'className'],
   'react-props': ['props', 'children', 'key', 'list', 'Liste', 'conditional rendering'],
   'react-state': ['useState', 'onClick', 'event handler', 'render', 'snapshot', 'batching'],

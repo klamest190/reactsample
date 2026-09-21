@@ -5,7 +5,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Komponenten.code'
 
 /**
- * KAPITEL 2.1 - Komponenten & JSX
+ * KAPITEL 3.1 - Komponenten & JSX
  * Der Schritt von "DOM von Hand ändern" zu "Oberfläche beschreiben".
  */
 export function Komponenten() {

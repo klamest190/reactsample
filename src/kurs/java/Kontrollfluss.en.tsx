@@ -51,7 +51,7 @@ export function Kontrollfluss() {
         <Hinweis variante="info">
           When in doubt use the arrow form. It is shorter, cannot forget anything and turns the{' '}
           <Code>switch</Code> into an expression - much like <Code>useReducer</Code> in React turns
-          an action into a new state (<Verweis nr="3.5" />).
+          an action into a new state (<Verweis nr="4.5" />).
         </Hinweis>
       </Abschnitt>
 

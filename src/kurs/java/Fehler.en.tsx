@@ -77,7 +77,7 @@ export function Fehler() {
       <Abschnitt titel="Your own exceptions">
         <P>
           A custom exception is simply a class extending <Code>RuntimeException</Code> (
-          <Verweis nr="6.7" />). The benefit: it can carry extra data - and callers can catch exactly{' '}
+          <Verweis nr="7.7" />). The benefit: it can carry extra data - and callers can catch exactly{' '}
           <em>this</em> case.
         </P>
         <TryIt modus="java" id="java-fehler-eigene" {...beispiele['java-fehler-eigene']} />
@@ -119,7 +119,7 @@ export function Fehler() {
           <strong>top</strong>: that is where it blew up.
         </Hinweis>
         <P>
-          React has the <em>error boundary</em> for this (<Verweis nr="4.4" />) - same idea: one
+          React has the <em>error boundary</em> for this (<Verweis nr="5.4" />) - same idea: one
           error should not take the whole application down with it.
         </P>
       </Abschnitt>

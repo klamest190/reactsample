@@ -9,7 +9,7 @@
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen über React bis zu Java',
+  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -22,7 +22,7 @@ const de = {
   heroTitel: 'Von JavaScript zu React - ',
   heroTitelBetont: 'Schritt für Schritt',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt.',
+    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt.',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: '🎉 Du hast alle Kapitel abgeschlossen!',
@@ -130,6 +130,35 @@ const de = {
   letzterStand: 'Die App zeigt weiter den letzten funktionierenden Stand.',
   mehrDazu: 'Mehr dazu:',
 
+  // --- Playground ---------------------------------------------------------------------------
+  playground: 'Playground',
+  playgroundKopf: '🛝 Playground',
+  playgroundText:
+    'Hier programmierst du frei - ohne Aufgabe und ohne Tests. Starte mit einer Vorlage oder klicke dir Bausteine zusammen und bau sie weiter aus.',
+  playgroundTeile: 'Playground für',
+  vorlagen: 'Vorlagen',
+  vorlageHinweis: 'Eine Vorlage ersetzt den ganzen Code - Strg + Z holt ihn zurück.',
+  bausteine: 'Bausteine',
+  bausteinFilter: 'Bausteine filtern …',
+  keineBausteine: 'Kein Baustein passt dazu.',
+  bausteinHinweis:
+    'Ein Klick fügt den Baustein ein und führt den Code aus. Er landet automatisch an der passenden Stelle - oder am Cursor, wenn du vorher in den Code klickst.',
+  bausteinEinfuegen: (titel: string) => `Baustein „${titel}“ einfügen`,
+  bausteinKapitel: 'Im Kapitel nachlesen',
+  orte: {
+    ende: '',
+    oben: 'über App',
+    komponente: 'in App',
+    jsx: 'im JSX',
+    main: 'in main',
+    methode: 'Methode',
+    klasse: 'Klasse',
+  },
+  mitNutzung: '+ Aufruf',
+  kartenPlayground: 'Frei programmieren - mit Vorlagen und Bausteinen für jeden Teil.',
+  playgroundHinweis: (teil: string) => `Lust, frei weiterzuprobieren? Im Playground „${teil}“ gibt es Vorlagen und Bausteine zu diesem Teil.`,
+  zumPlayground: 'Zum Playground →',
+
   // --- Autovervollständigung --------------------------------------------------------------
   vorschlaege: 'Vorschläge',
   vorschlagHinweis: '↑↓ auswählen · Enter/Tab einfügen · Esc schließen',
@@ -182,7 +211,7 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics through React to Java',
+  appUntertitel: 'From JavaScript basics through TypeScript and React to Java',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -194,7 +223,7 @@ const en: Texte = {
   heroTitel: 'From JavaScript to React - ',
   heroTitelBetont: 'step by step',
   heroText:
-    'First the JavaScript fundamentals React is built on. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world.',
+    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world.',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: '🎉 You have completed all chapters!',
@@ -297,6 +326,34 @@ const en: Texte = {
   typfehlerHinweis: 'The preview still runs - like Vite, compiling only strips the types, it does not check them.',
   letzterStand: 'The app keeps showing the last working version.',
   mehrDazu: 'Learn more:',
+
+  playground: 'Playground',
+  playgroundKopf: '🛝 Playground',
+  playgroundText:
+    'Code freely here - no task, no tests. Start from a template or click building blocks together and keep building on them.',
+  playgroundTeile: 'Playground for',
+  vorlagen: 'Templates',
+  vorlageHinweis: 'A template replaces all the code - Ctrl + Z brings it back.',
+  bausteine: 'Building blocks',
+  bausteinFilter: 'Filter building blocks …',
+  keineBausteine: 'No building block matches.',
+  bausteinHinweis:
+    'One click inserts the block and runs the code. It lands in the right place automatically - or at the cursor if you click into the code first.',
+  bausteinEinfuegen: (titel) => `Insert building block "${titel}"`,
+  bausteinKapitel: 'Read up in the chapter',
+  orte: {
+    ende: '',
+    oben: 'above App',
+    komponente: 'in App',
+    jsx: 'in JSX',
+    main: 'in main',
+    methode: 'method',
+    klasse: 'class',
+  },
+  mitNutzung: '+ usage',
+  kartenPlayground: 'Code freely - with templates and building blocks for every part.',
+  playgroundHinweis: (teil) => `Want to keep experimenting freely? The ${teil} playground has templates and building blocks for this part.`,
+  zumPlayground: 'Open the playground →',
 
   vorschlaege: 'Suggestions',
   vorschlagHinweis: '↑↓ select · Enter/Tab insert · Esc close',

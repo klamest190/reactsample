@@ -2,7 +2,7 @@ import { js } from '../../lernen/quelltext'
 import type { WerkstattDatei } from '../../lernen/Werkstatt'
 
 /**
- * Die Business-App für Kapitel 4.12 - ein echtes kleines Projekt.
+ * Die Business-App für Kapitel 5.12 - ein echtes kleines Projekt.
  *
  * Die Dateien liegen als normale .tsx/.ts-Dateien unter ./businessApp/ und werden
  * hier nur als Text eingelesen (?raw). So bleiben sie lesbar, man kann sie 1:1 in

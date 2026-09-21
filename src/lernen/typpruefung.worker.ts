@@ -31,6 +31,8 @@ const TYPEN = import.meta.glob(
 
 const LIB_ORDNER = '/lib/'
 const DATEI = '/app.tsx'
+// Reines TypeScript (Teil 2): ohne JSX, damit z. B. <T>(x: T) => x eine generische Funktion ist.
+const DATEI_TS = '/app.ts'
 
 // Im Editor gibt es Hooks & Co. ohne Import (siehe GLOBALE in reactKompilieren.ts) - das muss der Compiler wissen.
 const GLOBALE = `
@@ -74,7 +76,7 @@ for (const [pfad, inhalt] of Object.entries(LIB)) {
 
 /** Inhalt einer Datei: Editor, Projekt oder mitgeliefertes Typ-Paket. */
 function lesen(pfad: string): string | undefined {
-  if (pfad === DATEI) return editorCode
+  if (pfad === aktiveDatei) return editorCode
   return projekt.get(pfad)?.code ?? dateien.get(pfad)
 }
 
@@ -94,6 +96,7 @@ const OPTIONEN: ts.CompilerOptions = {
 }
 
 let editorCode = ''
+let aktiveDatei = DATEI
 let version = 0
 
 // Mehrere Dateien (Werkstatt): Pfad -> Inhalt + Version. Die Version sagt dem
@@ -114,9 +117,9 @@ function projektSetzen(dateien: { pfad: string; code: string }[]) {
 }
 
 const host: ts.LanguageServiceHost = {
-  getScriptFileNames: () => [DATEI, '/globale.d.ts', ...projekt.keys()],
+  getScriptFileNames: () => [aktiveDatei, '/globale.d.ts', ...projekt.keys()],
   getScriptVersion: (pfad) => {
-    if (pfad === DATEI) return String(version)
+    if (pfad === aktiveDatei) return String(version)
     return String(projekt.get(pfad)?.version ?? 1)
   },
   getScriptSnapshot: (pfad) => {
@@ -162,20 +165,21 @@ function pruefen(datei: string): Typfehler[] {
 
 // Im Worker ist self der Worker-Scope. Die Projekt-Typen kennen nur das DOM, deshalb diese schmale Beschreibung.
 const scope = self as unknown as {
-  onmessage: (e: MessageEvent<{ id: number; code?: string; dateien?: { pfad: string; code: string }[]; aktiv?: string }>) => void
+  onmessage: (e: MessageEvent<{ id: number; code?: string; ts?: boolean; dateien?: { pfad: string; code: string }[]; aktiv?: string }>) => void
   postMessage: (nachricht: unknown) => void
 }
 
 scope.onmessage = (e) => {
-  const { id, code, dateien: projektDateien, aktiv } = e.data
+  const { id, code, ts: nurTs, dateien: projektDateien, aktiv } = e.data
   try {
     if (projektDateien) {
       projektSetzen(projektDateien)
       scope.postMessage({ id, fehler: pruefen(PROJEKT_ORDNER + aktiv) })
     } else {
       editorCode = code ?? ''
+      aktiveDatei = nurTs ? DATEI_TS : DATEI
       version++
-      scope.postMessage({ id, fehler: pruefen(DATEI) })
+      scope.postMessage({ id, fehler: pruefen(aktiveDatei) })
     }
   } catch (fehler) {
     scope.postMessage({ id, fehler: [], absturz: String(fehler) })

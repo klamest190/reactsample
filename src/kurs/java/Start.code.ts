@@ -2,7 +2,7 @@ import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
 /**
- * Codebeispiele für Kapitel 6.1 - für die deutsche UND die englische Fassung.
+ * Codebeispiele für Kapitel 7.1 - für die deutsche UND die englische Fassung.
  *
  * Java-Code ist (wie aller Code im Kurs) immer Englisch; nur die angezeigten
  * Testnamen gibt es in beiden Sprachen. Ausgeführt wird das hier von der

@@ -6,7 +6,7 @@ import { beispiele } from './Formulare.code'
 import { Kontaktformular } from '../demos/Kontaktformular'
 
 /**
- * KAPITEL 4.1 - Formulare
+ * KAPITEL 5.1 - Formulare
  */
 export function Formulare() {
   return (
@@ -31,7 +31,7 @@ export function Formulare() {
           <li>
             <strong>Uncontrolled</strong>: Das DOM hält den Wert. Du liest ihn erst beim Absenden,
             z. B. über <Code>FormData</Code> oder eine Ref. Weniger Code, gut für einfache Formulare -
-            und die Grundlage der Form-Actions aus <Verweis nr="3.9" />.
+            und die Grundlage der Form-Actions aus <Verweis nr="4.9" />.
           </li>
         </Liste>
         <TryIt

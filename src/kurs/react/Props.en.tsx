@@ -7,7 +7,7 @@ import { beispiele, codeBloecke } from './Props.code'
 import { BenutzerKarten } from '../demos/BenutzerKarten'
 
 /**
- * KAPITEL 2.2 (English) - Props, Lists & Conditions
+ * KAPITEL 3.2 (English) - Props, Lists & Conditions
  */
 export function Props() {
   return (

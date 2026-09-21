@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke } from './Kontrollfluss.code'
 
 /**
- * KAPITEL 6.3 - Bedingungen & Schleifen
+ * KAPITEL 7.3 - Bedingungen & Schleifen
  * Fast alles ist wie in JavaScript - bis auf den einen Punkt: kein truthy.
  */
 export function Kontrollfluss() {
@@ -52,7 +52,7 @@ export function Kontrollfluss() {
         <Hinweis variante="info">
           Nimm im Zweifel die Pfeil-Variante. Sie ist kürzer, kann nichts vergessen und macht aus
           dem <Code>switch</Code> einen Ausdruck - so wie <Code>useReducer</Code> in React eine
-          Action in einen neuen State verwandelt (<Verweis nr="3.5" />).
+          Action in einen neuen State verwandelt (<Verweis nr="4.5" />).
         </Hinweis>
       </Abschnitt>
 

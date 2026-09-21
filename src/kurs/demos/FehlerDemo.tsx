@@ -3,7 +3,7 @@ import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { Button, Demo } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
 
-/** Live-Demo (Kapitel 4.4): Error Boundary um einen Teilbereich + try/catch im Event-Handler. */
+/** Live-Demo (Kapitel 5.4): Error Boundary um einen Teilbereich + try/catch im Event-Handler. */
 
 const TEXTE = {
   de: {

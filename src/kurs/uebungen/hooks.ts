@@ -1,7 +1,7 @@
 import { js } from '../../lernen/quelltext'
 import type { UebungsSammlung } from './typen'
 
-/** Zusätzliche Übungen für Teil 3 (Hooks) - gestuft wie in js.ts. */
+/** Zusätzliche Übungen für Teil 4 (Hooks) - gestuft wie in js.ts. */
 
 const t = (de: string, en: string) => ({ de, en })
 

@@ -1,7 +1,7 @@
 import { java } from '../../lernen/quelltext'
 import type { CodeBeispiel } from '../../lernen/jsSandbox'
 
-/** Codebeispiele für Kapitel 6.6 - Klassen & Objekte. */
+/** Codebeispiele für Kapitel 7.6 - Klassen & Objekte. */
 
 export const beispiele = {
   'java-klassen-einstieg': {

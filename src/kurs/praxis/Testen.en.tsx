@@ -6,7 +6,7 @@ import { TryIt } from '../../lernen/TryIt'
 import { beispiele, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
 
 /**
- * KAPITEL 4.8 (English) - Testing with Vitest and React Testing Library
+ * KAPITEL 5.8 (English) - Testing with Vitest and React Testing Library
  */
 
 const ebenen: [string, string, string][] = [

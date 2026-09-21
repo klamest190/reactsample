@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  type Ref,
 } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../components/ErrorBoundary'
@@ -13,13 +14,15 @@ import { useTheme } from '../context/ThemeContext'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { CodeBlock } from './CodeBlock'
-import { CodeEditor } from './CodeEditor'
+import { CodeEditor, type EditorSteuerung } from './CodeEditor'
 import { Text } from './Text'
 import { sandboxDokument, type ReactTest, type SandboxNachricht, type Test, type TestErgebnis } from './jsSandbox'
 import { reactTestsAusfuehren } from './reactTests'
 import { formatieren, kompilieren, type Protokoll } from './reactKompilieren'
 import { hash } from './quelltext'
+import { tailwindFuerVorschau } from './tailwind'
 import { typenPruefen, type Typfehler } from './typpruefung'
+import { tsTypenPruefen, tsUebersetzen, typErgebnisse, type TypTest } from './tsLauf'
 import type { JavaLauf } from '../java'
 import { testsAusfuehren, type TestBericht } from './testLauf'
 import type { ProjektDatei } from './reactKompilieren'
@@ -31,10 +34,11 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
  *   <TryIt id="…" code={…} />                  JavaScript, Ausgabe = Konsole
  *   <TryIt id="…" code={…} tests={[…]} />      JavaScript-Übung mit automatischer Prüfung
  *   <TryIt id="…" code={…} vorschau />         JavaScript mit sichtbarem <div id="app">
+ *   <TryIt id="…" code={…} modus="ts" />       TypeScript mit Konsole und Typprüfung (Teil 2), siehe tsLauf.ts
  *   <TryIt id="…" code={…} modus="react" />    JSX, gerendert wird die Komponente App
  *   <TryIt id="…" code={…} modus="react" typen />  TSX mit echter Typprüfung
  *   <TryIt id="…" code={…} modus="test" />     Eigene Tests (Vitest + Testing Library), siehe testLauf.ts
- *   <TryIt id="…" code={…} modus="java" />     Java, ausgeführt von src/java/ (Teil 6)
+ *   <TryIt id="…" code={…} modus="java" />     Java, ausgeführt von src/java/ (Teil 7)
  *
  * Der Code wird pro `id` im localStorage gespeichert, damit Eingaben einen
  * Kapitelwechsel überleben.
@@ -50,11 +54,18 @@ type Gemeinsam = {
   loesung?: string
   /** Gestufte Tipps, die nacheinander vor der Musterlösung aufgedeckt werden können. */
   tipps?: { de: string[]; en: string[] }
+  /** Playground: Zugriff auf den Editor von außen (Bausteine einfügen), eigene Überschrift, größerer Editor. */
+  editorRef?: Ref<EditorSteuerung>
+  kopf?: string
+  maxZeilen?: number
 }
 
 type JsProps = Gemeinsam & {
-  modus?: 'js'
+  /** 'ts': Typen werden vor dem Ausführen entfernt und nebenher geprüft. */
+  modus?: 'js' | 'ts'
   tests?: Test[]
+  /** Nur bei 'ts': Typ-Tests einer Übung (siehe tsLauf.ts). */
+  typTests?: TypTest[]
   /** Unsichtbarer Code, der vorher läuft (z. B. Hilfsfunktionen oder Testdaten). */
   vorbereitung?: string
   /** Zeigt das Dokument des iframes an, damit DOM-Code sichtbar wird. */
@@ -103,6 +114,7 @@ const ABZEICHEN = {
   Java: { text: 'JAVA', klassen: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' },
   React: { text: 'JSX', klassen: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' },
   TypeScript: { text: 'TSX', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
+  TS: { text: 'TS', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
   Test: { text: 'TEST', klassen: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
 }
 
@@ -123,8 +135,14 @@ function Rahmen({
   laeuft,
   markierungen,
   oben,
+  editorRef,
+  kopf,
+  maxZeilen,
   children,
 }: {
+  editorRef?: Ref<EditorSteuerung>
+  kopf?: string
+  maxZeilen?: number
   art: keyof typeof ABZEICHEN
   markierungen?: Typfehler[]
   /** Inhalt zwischen Aufgabe und Editor, z. B. nur lesbare Dateien. */
@@ -152,7 +170,7 @@ function Rahmen({
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
         <h3 className="text-sm font-semibold">
-          {istUebung ? t.uebung : t.probierSelbst}
+          {kopf ?? (istUebung ? t.uebung : t.probierSelbst)}
           {titel && <span className="font-normal text-slate-500 dark:text-slate-400"> · {titel}</span>}
         </h3>
         <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold ${ABZEICHEN[art].klassen}`}>
@@ -171,10 +189,12 @@ function Rahmen({
       <CodeEditor
         wert={code}
         beiAenderung={setCode}
-        beiAusfuehren={() => ausfuehren()}
+        beiAusfuehren={(c) => ausfuehren(c)}
         label={`${t.codeEditor}${titel ? ': ' + titel : ''}`}
-        sprache={art === 'JavaScript' ? 'js' : art === 'Java' ? 'java' : 'react'}
+        sprache={art === 'JavaScript' ? 'js' : art === 'Java' ? 'java' : art === 'TS' ? 'ts' : 'react'}
         markierungen={markierungen}
+        steuerung={editorRef}
+        maxZeilen={maxZeilen}
       />
 
       <div className="flex flex-wrap items-center gap-2 border-y border-slate-200 px-4 py-2 dark:border-slate-800">
@@ -316,21 +336,38 @@ function Testergebnisse({ ergebnisse }: { ergebnisse: TestErgebnis[] | null }) {
 // JavaScript im iframe
 // ---------------------------------------------------------------------------
 
-function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, vorbereitung, vorschau }: JsProps) {
+function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, typTests, vorbereitung, vorschau, modus, ...playground }: JsProps) {
   const { theme } = useTheme()
   const { sprache } = useSprache()
   const t = useTexte()
   const [code, setCode] = useGespeicherterCode(id, startCode)
+  const ts = modus === 'ts'
+  const istUebung = Boolean(tests || typTests)
 
-  // Ein Lauf = fortlaufende Nummer + der Code zum Zeitpunkt des Klicks.
-  // Beispiele laufen sofort (Startwert), Übungen erst auf Knopfdruck (null) -
-  // dafür braucht es keinen Effekt, der Startwert reicht.
+  // Ein Lauf = fortlaufende Nummer + der (bei TypeScript schon übersetzte) Code zum Zeitpunkt des Klicks.
+  // JS-Beispiele laufen sofort (Startwert), Übungen erst auf Knopfdruck (null).
+  // TypeScript muss erst übersetzt werden - das geht nur asynchron, deshalb startet es im Effekt unten.
   const [lauf, setLauf] = useState<{ nummer: number; code: string; dunkel: boolean } | null>(() =>
-    tests ? null : { nummer: 1, code, dunkel: theme === 'dark' },
+    istUebung || ts ? null : { nummer: 1, code, dunkel: theme === 'dark' },
   )
+
+  // TypeScript: Typprüfung kurz nach dem letzten Tastendruck (wie im React-Modus mit `typen`).
+  const [typpruefung, setTyppruefung] = useState<{ code: string; fehler: Typfehler[] } | null>(null)
+  useEffect(() => {
+    if (!ts) return
+    const zeitgeber = setTimeout(() => {
+      void tsTypenPruefen(code).then(({ imCode }) => setTyppruefung({ code, fehler: imCode }))
+    }, 700)
+    return () => clearTimeout(zeitgeber)
+  }, [code, ts])
+  // Bis das neue Ergebnis da ist, bleibt das letzte stehen - sonst flackert die Anzeige bei jedem Tastendruck.
+  const typfehler = typpruefung?.fehler ?? null
+  // Übungen: Typprüfung samt Typ-Tests als zusätzliche Testergebnisse, pro Lauf.
+  const [typTestErgebnisse, setTypTestErgebnisse] = useState<TestErgebnis[] | null>(null)
+  const uebersetzungRef = useRef(0)
   const [zeilen, setZeilen] = useState<Zeile[]>([])
   const [ergebnisse, setErgebnisse] = useState<TestErgebnis[] | null>(null)
-  const [laeuft, setLaeuft] = useState(!tests)
+  const [laeuft, setLaeuft] = useState(!istUebung)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const testIframeRef = useRef<HTMLIFrameElement>(null)
   // Tests klicken und tippen im Dokument. Bei sichtbarer Vorschau laufen sie deshalb in
@@ -352,8 +389,53 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
     setZeilen([])
     setErgebnisse(null)
     setLaeuft(true)
-    setLauf((alt) => ({ nummer: (alt?.nummer ?? 0) + 1, code: quelltext, dunkel: theme === 'dark' }))
+    const dunkel = theme === 'dark'
+    if (!ts) {
+      setLauf((alt) => ({ nummer: (alt?.nummer ?? 0) + 1, code: quelltext, dunkel }))
+      return
+    }
+    setTypTestErgebnisse(null)
+    tsStarten(quelltext, dunkel)
   }
+
+  // TypeScript: prüfen und übersetzen, danach laufen lassen. Setzt State nur asynchron.
+  function tsStarten(quelltext: string, dunkel: boolean) {
+    const nummer = ++uebersetzungRef.current
+    if (istUebung) {
+      void tsTypenPruefen(quelltext, typTests).then((pruefung) => {
+        if (nummer === uebersetzungRef.current) setTypTestErgebnisse(typErgebnisse(pruefung, typTests ?? [], sprache, t))
+      })
+    }
+    void tsUebersetzen(quelltext).then((ergebnis) => {
+      if (nummer !== uebersetzungRef.current) return // inzwischen neu gestartet
+      if ('fehler' in ergebnis) {
+        // Syntaxfehler: Es gibt kein JavaScript, das laufen könnte.
+        setLauf(null)
+        setZeilen([{ typ: 'fehler', text: ergebnis.fehler }])
+        setLaeuft(false)
+        return
+      }
+      setLauf((alt) => ({ nummer: (alt?.nummer ?? 0) + 1, code: ergebnis.code, dunkel }))
+    })
+  }
+
+  // TypeScript-Beispiele laufen wie JS-Beispiele sofort - nur eben nach dem Übersetzen.
+  const ersterLauf = useEffectEvent(() => {
+    if (ts && !istUebung) tsStarten(code, theme === 'dark')
+  })
+  useEffect(() => {
+    ersterLauf()
+  }, [])
+
+  // Bei TypeScript-Übungen zählen die Typen mit: erst wenn beides da ist, gibt es ein Ergebnis.
+  const alleErgebnisse =
+    !ts || !istUebung
+      ? ergebnisse
+      : !tests?.length
+        ? typTestErgebnisse
+        : ergebnisse && typTestErgebnisse
+          ? [...ergebnisse, ...typTestErgebnisse]
+          : null
 
   // Nachrichten aus dem iframe einsammeln - nur vom aktuellen Lauf.
   useEffect(() => {
@@ -394,7 +476,8 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
 
   return (
     <Rahmen
-      art="JavaScript"
+      {...playground}
+      art={ts ? 'TS' : 'JavaScript'}
       titel={titel}
       aufgabe={aufgabe}
       code={code}
@@ -404,7 +487,9 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
       tipps={tipps}
       laeuft={laeuft}
       ausfuehren={(c) => ausfuehren(c ?? code)}
+      markierungen={typfehler ?? undefined}
     >
+      {ts && <Typfehlerliste fehler={typfehler} />}
       {lauf && (
         <div className={vorschau ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
           {vorschau && (
@@ -433,11 +518,11 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
           )}
         </div>
       )}
-      <Testergebnisse ergebnisse={ergebnisse} />
+      <Testergebnisse ergebnisse={alleErgebnisse} />
       <Konsole
         zeilen={zeilen}
         leerText={
-          tests && !lauf
+          istUebung && !lauf
             ? t.uebungStart
             : vorschau
               ? undefined
@@ -461,7 +546,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
  *  - Beim Tippen prüft `javaPruefen` im Hintergrund (rote Schlangenlinien).
  *  - Erst wenn es keine Fehler mehr gibt, startet das Programm überhaupt.
  */
-function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, vorbereitung }: JavaProps) {
+function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, vorbereitung, ...playground }: JavaProps) {
   const { sprache } = useSprache()
   const t = useTexte()
   const [code, setCode] = useGespeicherterCode(id, startCode)
@@ -503,13 +588,15 @@ function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests,
         code: 0,
       }))
       setPruefung({ code, fehler })
-    }, 400)
+    }, 700)
     return () => clearTimeout(zeitgeber)
   }, [code, sprache, java])
-  const markierungen = pruefung?.code === code ? pruefung.fehler : undefined
+  // Bis das neue Ergebnis da ist, bleibt das letzte stehen - sonst flackert die Anzeige bei jedem Tastendruck.
+  const markierungen = pruefung?.fehler
 
   return (
     <Rahmen
+      {...playground}
       art="Java"
       titel={titel}
       aufgabe={aufgabe}
@@ -565,7 +652,7 @@ function sicherAusfuehren(
 // React: JSX übersetzen und in eine eigene Wurzel rendern
 // ---------------------------------------------------------------------------
 
-function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, typen }: ReactProps) {
+function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, typen, ...playground }: ReactProps) {
   const { sprache } = useSprache()
   const t = useTexte()
   const [code, setCode] = useGespeicherterCode(id, startCode)
@@ -577,10 +664,11 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
     if (!typen) return
     const zeitgeber = setTimeout(() => {
       void typenPruefen(code).then((fehler) => setTyppruefung({ code, fehler }))
-    }, 400)
+    }, 700)
     return () => clearTimeout(zeitgeber)
   }, [code, typen])
-  const typfehler = typpruefung?.code === code ? typpruefung.fehler : null
+  // Bis das neue Ergebnis da ist, bleibt das letzte stehen - sonst flackert die Anzeige bei jedem Tastendruck.
+  const typfehler = typpruefung?.fehler ?? null
   const [zeilen, setZeilen] = useState<Zeile[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const rootRef = useRef<Root | null>(null)
@@ -611,6 +699,8 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
       if (!root) return
 
       try {
+        // Tailwind-Klassen aus dem Editor sollen auch wirken, wenn sie sonst nirgends im Projekt stehen.
+        tailwindFuerVorschau(quelltext)
         const { App, aufraeumen } = await kompilieren(quelltext, protokoll, sprache)
         // Inzwischen neu gestartet oder die Wurzel wurde abgebaut? Dann verwerfen.
         if (nummer !== laufRef.current || rootRef.current !== root) return aufraeumen()
@@ -698,6 +788,7 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
 
   return (
     <Rahmen
+      {...playground}
       art={typen ? 'TypeScript' : 'React'}
       titel={titel}
       aufgabe={aufgabe}
@@ -768,7 +859,7 @@ export function Typfehlerliste({ fehler }: { fehler: Typfehler[] | null }) {
 
 const TESTDATEI = 'App.test.jsx'
 
-function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps, dateien = [], varianten }: TestProps) {
+function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps, dateien = [], varianten, ...playground }: TestProps) {
   const { sprache } = useSprache()
   const t = useTexte()
   const [code, setCode] = useGespeicherterCode(id, startCode)
@@ -821,6 +912,7 @@ function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps, dateie
 
   return (
     <Rahmen
+      {...playground}
       art="Test"
       titel={titel}
       aufgabe={aufgabe}

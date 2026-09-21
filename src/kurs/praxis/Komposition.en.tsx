@@ -5,7 +5,7 @@ import { beispiele } from './Komposition.code'
 import { KompositionsDemo } from '../demos/KompositionsDemo'
 
 /**
- * KAPITEL 4.3 (English) - Composition & Portals
+ * KAPITEL 5.3 (English) - Composition & Portals
  */
 export function Komposition() {
   return (
