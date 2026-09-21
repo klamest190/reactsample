@@ -32,7 +32,7 @@ type Eintrag = {
   info: Zweisprachig
 }
 
-export type EditorSprache = 'js' | 'react'
+export type EditorSprache = 'js' | 'react' | 'java'
 
 const JAVASCRIPT: Eintrag[] = [
   // --- Konsole -------------------------------------------------------------
@@ -180,9 +180,91 @@ const REACT: Eintrag[] = [
   { label: 'placeholder', einfuegen: 'placeholder="$0"', art: 'jsx', info: { de: 'Platzhaltertext im Eingabefeld.', en: 'Placeholder text in an input.' } },
 ]
 
+/**
+ * Java hat eine eigene Liste - hier gibt es kein `const` und kein `console.log`,
+ * dafür Typen, `System.out.println` und die Sammlungen aus java.util.
+ */
+const JAVA: Eintrag[] = [
+  // --- Ausgabe ---------------------------------------------------------------
+  { label: 'System.out.println', einfuegen: 'System.out.println($0);', art: 'funktion', info: { de: 'Gibt eine Zeile aus. Der lange Name: System → out (der Ausgabestrom) → println.', en: 'Prints one line. The long name: System → out (the output stream) → println.' } },
+  { label: 'System.out.print', einfuegen: 'System.out.print($0);', art: 'funktion', info: { de: 'Gibt aus - ohne Zeilenumbruch.', en: 'Prints without a line break.' } },
+  { label: 'System.out.printf', einfuegen: 'System.out.printf("%s%n", $0);', art: 'funktion', info: { de: 'Formatierte Ausgabe: %s Text, %d Zahl, %.2f Kommazahl, %n Zeilenumbruch.', en: 'Formatted output: %s text, %d integer, %.2f decimal, %n line break.' } },
+  { label: 'System.err.println', einfuegen: 'System.err.println($0);', art: 'funktion', info: { de: 'Ausgabe auf dem Fehlerstrom (rot).', en: 'Prints to the error stream (red).' } },
+
+  // --- Grundgerüste ----------------------------------------------------------
+  { label: 'main', einfuegen: 'public static void main(String[] args) {\n    $0\n}', art: 'snippet', info: { de: 'Der Startpunkt jedes Java-Programms.', en: 'The entry point of every Java program.' } },
+  { label: 'class', einfuegen: 'class $0 {\n    \n}', art: 'snippet', info: { de: 'Eine neue Klasse - der Bauplan für Objekte.', en: 'A new class - the blueprint for objects.' } },
+  { label: 'sout', einfuegen: 'System.out.println($0);', art: 'snippet', info: { de: 'Kürzel für System.out.println (wie in IntelliJ).', en: 'Shortcut for System.out.println (as in IntelliJ).' } },
+  { label: 'if', einfuegen: 'if ($0) {\n    \n}', art: 'snippet', info: { de: 'Die Bedingung muss ein boolean sein - „truthy“ gibt es in Java nicht.', en: 'The condition must be a boolean - Java has no “truthy”.' } },
+  { label: 'ifelse', einfuegen: 'if ($0) {\n    \n} else {\n    \n}', art: 'snippet', info: { de: 'if mit else-Zweig.', en: 'if with an else branch.' } },
+  { label: 'for', einfuegen: 'for (int i = 0; i < $0; i++) {\n    \n}', art: 'snippet', info: { de: 'Zählschleife.', en: 'Counting loop.' } },
+  { label: 'foreach', einfuegen: 'for (String item : $0) {\n    \n}', art: 'snippet', info: { de: 'Erweiterte for-Schleife über Arrays und Listen.', en: 'Enhanced for loop over arrays and lists.' } },
+  { label: 'while', einfuegen: 'while ($0) {\n    \n}', art: 'snippet', info: { de: 'Wiederholen, solange die Bedingung gilt.', en: 'Repeat while the condition holds.' } },
+  { label: 'switch', einfuegen: 'switch ($0) {\n    case 1 -> System.out.println("eins");\n    default -> System.out.println("andere");\n}', art: 'snippet', info: { de: 'switch mit Pfeil (ab Java 14) - kein break nötig.', en: 'Arrow switch (Java 14+) - no break needed.' } },
+  { label: 'trycatch', einfuegen: 'try {\n    $0\n} catch (Exception e) {\n    System.out.println(e.getMessage());\n}', art: 'snippet', info: { de: 'Fehler abfangen.', en: 'Catch errors.' } },
+
+  // --- Typen -----------------------------------------------------------------
+  { label: 'int', einfuegen: 'int $0 = ', art: 'keyword', info: { de: 'Ganze Zahl (-2.147.483.648 bis 2.147.483.647).', en: 'Whole number (-2,147,483,648 to 2,147,483,647).' } },
+  { label: 'double', einfuegen: 'double $0 = ', art: 'keyword', info: { de: 'Kommazahl.', en: 'Decimal number.' } },
+  { label: 'boolean', einfuegen: 'boolean $0 = ', art: 'keyword', info: { de: 'true oder false - sonst nichts.', en: 'true or false - nothing else.' } },
+  { label: 'char', einfuegen: "char $0 = '';", art: 'keyword', info: { de: 'Ein einzelnes Zeichen in einfachen Anführungszeichen.', en: 'A single character in single quotes.' } },
+  { label: 'long', einfuegen: 'long $0 = ', art: 'keyword', info: { de: 'Sehr große ganze Zahl.', en: 'Very large whole number.' } },
+  { label: 'String', einfuegen: 'String $0 = "";', art: 'keyword', info: { de: 'Text. Groß geschrieben, weil String eine Klasse ist.', en: 'Text. Capitalized, because String is a class.' } },
+  { label: 'var', einfuegen: 'var $0 = ', art: 'keyword', info: { de: 'Typ wird aus dem Wert abgeleitet (ab Java 10) - trotzdem fest.', en: 'Type inferred from the value (Java 10+) - still fixed.' } },
+  { label: 'final', einfuegen: 'final $0', art: 'keyword', info: { de: 'Wert darf nicht mehr geändert werden (wie const).', en: 'Value cannot be reassigned (like const).' } },
+  { label: 'static', einfuegen: 'static $0', art: 'keyword', info: { de: 'Gehört der Klasse, nicht einem Objekt.', en: 'Belongs to the class, not to an object.' } },
+  { label: 'new', einfuegen: 'new $0()', art: 'keyword', info: { de: 'Erzeugt ein Objekt aus einer Klasse.', en: 'Creates an object from a class.' } },
+  { label: 'return', einfuegen: 'return $0;', art: 'keyword', info: { de: 'Beendet die Methode und gibt einen Wert zurück.', en: 'Ends the method and returns a value.' } },
+  { label: 'true', art: 'keyword', info: { de: 'boolean: wahr.', en: 'boolean: true.' } },
+  { label: 'false', art: 'keyword', info: { de: 'boolean: falsch.', en: 'boolean: false.' } },
+  { label: 'null', art: 'keyword', info: { de: '„Kein Objekt“. Nur bei Klassen möglich, nie bei int oder boolean.', en: '“No object”. Only for classes, never for int or boolean.' } },
+
+  // --- Klassen der Standardbibliothek ---------------------------------------
+  { label: 'ArrayList', einfuegen: 'ArrayList<String> $0 = new ArrayList<>();', art: 'funktion', info: { de: 'Liste, die mitwächst - anders als ein Array.', en: 'A list that grows - unlike an array.' } },
+  { label: 'HashMap', einfuegen: 'HashMap<String, Integer> $0 = new HashMap<>();', art: 'funktion', info: { de: 'Zuordnung Schlüssel → Wert.', en: 'Mapping from key to value.' } },
+  { label: 'StringBuilder', einfuegen: 'StringBuilder $0 = new StringBuilder();', art: 'funktion', info: { de: 'Strings effizient zusammenbauen.', en: 'Build strings efficiently.' } },
+  { label: 'Math.max', einfuegen: 'Math.max($0)', art: 'funktion', info: { de: 'Die größere von zwei Zahlen.', en: 'The larger of two numbers.' } },
+  { label: 'Math.min', einfuegen: 'Math.min($0)', art: 'funktion', info: { de: 'Die kleinere von zwei Zahlen.', en: 'The smaller of two numbers.' } },
+  { label: 'Math.abs', einfuegen: 'Math.abs($0)', art: 'funktion', info: { de: 'Betrag (immer positiv).', en: 'Absolute value (always positive).' } },
+  { label: 'Math.round', einfuegen: 'Math.round($0)', art: 'funktion', info: { de: 'Rundet zur nächsten ganzen Zahl.', en: 'Rounds to the nearest whole number.' } },
+  { label: 'Math.random', einfuegen: 'Math.random()', art: 'funktion', info: { de: 'Zufallszahl zwischen 0.0 und 1.0.', en: 'Random number between 0.0 and 1.0.' } },
+  { label: 'Integer.parseInt', einfuegen: 'Integer.parseInt($0)', art: 'funktion', info: { de: 'Text zu int. Wirft NumberFormatException, wenn es nicht passt.', en: 'Text to int. Throws NumberFormatException if it does not fit.' } },
+  { label: 'Double.parseDouble', einfuegen: 'Double.parseDouble($0)', art: 'funktion', info: { de: 'Text zu double.', en: 'Text to double.' } },
+  { label: 'String.valueOf', einfuegen: 'String.valueOf($0)', art: 'funktion', info: { de: 'Beliebigen Wert zu Text.', en: 'Any value to text.' } },
+  { label: 'String.format', einfuegen: 'String.format("%s", $0)', art: 'funktion', info: { de: 'Formatierten String bauen (statt ausgeben).', en: 'Build a formatted string (instead of printing).' } },
+  { label: 'Arrays.toString', einfuegen: 'Arrays.toString($0)', art: 'funktion', info: { de: 'Array lesbar ausgeben - sonst kommt [I@1b6d nur Müll.', en: 'Print an array readably - otherwise you only get [I@1b6d.' } },
+  { label: 'Arrays.sort', einfuegen: 'Arrays.sort($0)', art: 'funktion', info: { de: 'Sortiert das Array an Ort und Stelle.', en: 'Sorts the array in place.' } },
+  { label: 'List.of', einfuegen: 'List.of($0)', art: 'funktion', info: { de: 'Feste, unveränderliche Liste.', en: 'A fixed, unmodifiable list.' } },
+  { label: 'throw', einfuegen: 'throw new IllegalArgumentException("$0");', art: 'snippet', info: { de: 'Fehler auslösen.', en: 'Throw an error.' } },
+
+  // --- Methoden (nach einem Punkt) -------------------------------------------
+  { label: '.length', einfuegen: 'length', art: 'methode', info: { de: 'Array: Anzahl Felder. Achtung - ohne Klammern!', en: 'Array: number of slots. Careful - no parentheses!' } },
+  { label: '.length()', einfuegen: 'length()', art: 'methode', info: { de: 'String: Anzahl Zeichen - hier MIT Klammern.', en: 'String: number of characters - here WITH parentheses.' } },
+  { label: '.size', einfuegen: 'size()', art: 'methode', info: { de: 'Liste/Map: Anzahl Einträge.', en: 'List/map: number of entries.' } },
+  { label: '.equals', einfuegen: 'equals($0)', art: 'methode', info: { de: 'Inhalt vergleichen. Bei Objekten immer equals statt ==!', en: 'Compare content. For objects always use equals instead of ==!' } },
+  { label: '.charAt', einfuegen: 'charAt($0)', art: 'methode', info: { de: 'String: Zeichen an Position (0-basiert).', en: 'String: character at an index (0-based).' } },
+  { label: '.substring', einfuegen: 'substring($0)', art: 'methode', info: { de: 'String: Ausschnitt ab Position (optional bis).', en: 'String: section from an index (optionally to).' } },
+  { label: '.toUpperCase', einfuegen: 'toUpperCase()', art: 'methode', info: { de: 'String: in Großbuchstaben (neuer String!).', en: 'String: to upper case (a new string!).' } },
+  { label: '.toLowerCase', einfuegen: 'toLowerCase()', art: 'methode', info: { de: 'String: in Kleinbuchstaben.', en: 'String: to lower case.' } },
+  { label: '.trim', einfuegen: 'trim()', art: 'methode', info: { de: 'String: Leerzeichen am Rand entfernen.', en: 'String: remove whitespace at the edges.' } },
+  { label: '.contains', einfuegen: 'contains($0)', art: 'methode', info: { de: 'String/Liste: enthält …?', en: 'String/list: contains …?' } },
+  { label: '.split', einfuegen: 'split("$0")', art: 'methode', info: { de: 'String: in ein String[] zerlegen.', en: 'String: split into a String[].' } },
+  { label: '.isEmpty', einfuegen: 'isEmpty()', art: 'methode', info: { de: 'String/Liste: leer?', en: 'String/list: empty?' } },
+  { label: '.add', einfuegen: 'add($0)', art: 'methode', info: { de: 'Liste: Element anhängen.', en: 'List: append an element.' } },
+  { label: '.get', einfuegen: 'get($0)', art: 'methode', info: { de: 'Liste: Element an Position. Map: Wert zum Schlüssel.', en: 'List: element at an index. Map: value for a key.' } },
+  { label: '.put', einfuegen: 'put($0, )', art: 'methode', info: { de: 'Map: Schlüssel → Wert eintragen.', en: 'Map: store key → value.' } },
+  { label: '.remove', einfuegen: 'remove($0)', art: 'methode', info: { de: 'Liste/Map: Eintrag entfernen.', en: 'List/map: remove an entry.' } },
+  { label: '.containsKey', einfuegen: 'containsKey($0)', art: 'methode', info: { de: 'Map: gibt es den Schlüssel?', en: 'Map: does the key exist?' } },
+  { label: '.keySet', einfuegen: 'keySet()', art: 'methode', info: { de: 'Map: alle Schlüssel (zum Durchlaufen).', en: 'Map: all keys (for iterating).' } },
+  { label: '.getMessage', einfuegen: 'getMessage()', art: 'methode', info: { de: 'Exception: der Text, der beim Werfen mitgegeben wurde.', en: 'Exception: the text passed when it was thrown.' } },
+  { label: '.toString', einfuegen: 'toString()', art: 'methode', info: { de: 'Objekt als Text. Eigene Klassen sollten sie überschreiben.', en: 'Object as text. Your own classes should override it.' } },
+  { label: '.append', einfuegen: 'append($0)', art: 'methode', info: { de: 'StringBuilder: anhängen.', en: 'StringBuilder: append.' } },
+  { label: '.stream', einfuegen: 'stream()', art: 'methode', info: { de: 'Liste: Strom für filter/map/… - Javas Gegenstück zu Array-Methoden.', en: 'List: a stream for filter/map/… - Java’s counterpart to array methods.' } },
+]
+
 /** Alle Vorschläge für einen Editor, aufgelöst in der Oberflächensprache. */
 export function vorschlaegeFuer(editor: EditorSprache, sprache: Sprache): Vorschlag[] {
-  const eintraege = editor === 'react' ? [...REACT, ...JAVASCRIPT] : JAVASCRIPT
+  const eintraege = editor === 'java' ? JAVA : editor === 'react' ? [...REACT, ...JAVASCRIPT] : JAVASCRIPT
   return eintraege.map((e) => ({ ...e, info: e.info[sprache] }))
 }
 

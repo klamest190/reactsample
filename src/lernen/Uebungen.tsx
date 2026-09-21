@@ -86,6 +86,17 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
               tipps={uebung.tipps}
               tests={uebung.tests as ReactTest[] | undefined}
             />
+          ) : uebung.modus === 'java' ? (
+            <TryIt
+              modus="java"
+              id={'uebung-' + uebung.id}
+              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
+              code={uebung.code}
+              loesung={uebung.loesung}
+              tipps={uebung.tipps}
+              tests={uebung.tests as Test[] | undefined}
+              vorbereitung={uebung.vorbereitung}
+            />
           ) : (
             <TryIt
               id={'uebung-' + uebung.id}

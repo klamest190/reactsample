@@ -20,7 +20,7 @@ const kapitelQuellen = import.meta.glob<string>(['../kurs/**/*.tsx', '!../kurs/*
   import: 'default',
   eager: true,
 })
-const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,react,hooks,praxis}.ts', { eager: true })
+const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,react,hooks,praxis,java}.ts', { eager: true })
 
 /** Wie ein Beispiel im Kapitel verwendet wird: <TryIt id="…" modus="react" typen /> */
 function modiAusKapiteln() {

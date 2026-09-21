@@ -1,9 +1,13 @@
 /**
- * Minimaler Syntax-Highlighter für JavaScript/JSX.
+ * Minimaler Syntax-Highlighter für JavaScript/JSX - und für Java.
  *
  * Kein vollständiger Parser - ein einziger regulärer Ausdruck zerlegt den Code
  * in Kommentare, Strings, JSX-Tags, Zahlen und Wörter. Für Lernbeispiele reicht
  * das völlig und kostet keine zusätzliche Bibliothek.
+ *
+ * Die Schlüsselwörter beider Sprachen stehen in einer gemeinsamen Liste. Das
+ * genügt hier, weil sich die Wörter kaum überschneiden und ein falsch
+ * eingefärbtes Wort niemandem wehtut.
  */
 
 type TokenTyp =
@@ -23,7 +27,10 @@ const KEYWORDS = new Set(
   (
     'const let var function return if else for while do switch case break continue ' +
     'default new class extends import from export async await try catch finally throw ' +
-    'typeof instanceof in of this super yield delete void as type interface'
+    'typeof instanceof in of this super yield delete void as type interface ' +
+    // Java
+    'public private protected static final abstract implements package throws enum ' +
+    'record int long short byte double float boolean char synchronized native'
   ).split(' '),
 )
 const LITERALE = new Set(['true', 'false', 'null', 'undefined', 'NaN', 'Infinity'])

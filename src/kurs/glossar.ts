@@ -706,4 +706,124 @@ export const glossar: GlossarEintrag[] = [
     },
     kapitel: ['hooks-usememo'],
   },
+
+  // --- Teil 6: Java ---------------------------------------------------------
+  {
+    id: 'jvm',
+    begriff: 'JVM',
+    deutsch: 'Java Virtual Machine',
+    erklaerung: {
+      de: 'Das Programm, das Java-**Bytecode** ausführt. Weil es die JVM für Windows, Mac, Linux und Android gibt, läuft dieselbe `.class`-Datei überall - „write once, run anywhere“. Im Browser gibt es keine JVM; der Kurs bildet sie in [[java-vergleich]] nach.',
+      en: 'The program that executes Java **bytecode**. Because the JVM exists for Windows, Mac, Linux and Android, the same `.class` file runs everywhere - “write once, run anywhere”. There is no JVM in the browser; the course rebuilds one, see [[java-vergleich]].',
+    },
+    kapitel: ['java-start', 'java-vergleich'],
+  },
+  {
+    id: 'bytecode',
+    begriff: 'Bytecode',
+    erklaerung: {
+      de: 'Die Zwischensprache, die `javac` aus deinem Quelltext erzeugt (`.class`-Dateien). Kein Mensch schreibt sie - die JVM führt sie aus.',
+      en: 'The intermediate language `javac` produces from your source (`.class` files). Nobody writes it by hand - the JVM executes it.',
+    },
+    kapitel: ['java-start'],
+  },
+  {
+    id: 'statische-typisierung',
+    begriff: 'Static typing',
+    deutsch: 'Statische Typisierung',
+    erklaerung: {
+      de: 'Der Typ jeder Variablen steht schon **vor** dem Start fest und wird vom Compiler geprüft. Java macht das, JavaScript nicht - TypeScript holt es nach.',
+      en: 'The type of every variable is settled **before** the program starts and is checked by the compiler. Java does this, JavaScript does not - TypeScript adds it.',
+    },
+    code: js`int age = 36;   // in Java kann age nie ein String werden`,
+    kapitel: ['java-variablen', 'praxis-typescript'],
+  },
+  {
+    id: 'primitiver-typ',
+    begriff: 'Primitive type',
+    deutsch: 'Primitiver Typ',
+    erklaerung: {
+      de: 'Die acht eingebauten Typen von Java (`int`, `double`, `boolean`, `char`, `long`, `float`, `short`, `byte`). Sie sind **keine** Objekte, haben keine Methoden und können nie `null` sein. Zu jedem gibt es eine Wrapper-Klasse (`int` → `Integer`).',
+      en: 'The eight built-in types of Java (`int`, `double`, `boolean`, `char`, `long`, `float`, `short`, `byte`). They are **not** objects, have no methods and can never be `null`. Each has a wrapper class (`int` → `Integer`).',
+    },
+    kapitel: ['java-variablen'],
+  },
+  {
+    id: 'autoboxing',
+    begriff: 'Autoboxing',
+    erklaerung: {
+      de: 'Java wandelt automatisch zwischen primitivem Typ und Wrapper-Klasse um. Nötig, weil Sammlungen nur Objekte aufnehmen: `List<Integer>`, nie `List<int>`.',
+      en: 'Java converts automatically between a primitive type and its wrapper class. Needed because collections only hold objects: `List<Integer>`, never `List<int>`.',
+    },
+    code: js`List<Integer> numbers = new ArrayList<>();
+numbers.add(5);        // int → Integer`,
+    kapitel: ['java-collections', 'java-variablen'],
+  },
+  {
+    id: 'konstruktor',
+    begriff: 'Constructor',
+    deutsch: 'Konstruktor',
+    erklaerung: {
+      de: 'Die Methode, die beim `new` läuft und das Objekt in einen gültigen Zustand bringt. Sie heißt wie die Klasse und hat **keinen** Rückgabetyp.',
+      en: 'The method that runs on `new` and brings the object into a valid state. It is named like the class and has **no** return type.',
+    },
+    code: js`Person(String name) { this.name = name; }`,
+    kapitel: ['java-klassen'],
+  },
+  {
+    id: 'kapselung',
+    begriff: 'Encapsulation',
+    deutsch: 'Kapselung',
+    erklaerung: {
+      de: 'Felder sind `private`, der Zugriff läuft über Methoden. So kann das Objekt prüfen, was mit seinen Daten passiert - statt sie jedem offenzulegen.',
+      en: 'Fields are `private`, access goes through methods. That way the object can check what happens to its data instead of exposing it to everyone.',
+    },
+    kapitel: ['java-klassen'],
+  },
+  {
+    id: 'polymorphie',
+    begriff: 'Polymorphism',
+    deutsch: 'Polymorphie',
+    erklaerung: {
+      de: 'Der Typ der Variablen bestimmt, **was man aufrufen darf** - das Objekt bestimmt, **welche Fassung läuft**. Deshalb kann eine Liste von `Animal` Hunde und Katzen enthalten und trotzdem jeder den richtigen Laut machen.',
+      en: 'The variable type decides **what you may call** - the object decides **which version runs**. That is why a list of `Animal` can hold dogs and cats and each still makes the right sound.',
+    },
+    kapitel: ['java-vererbung'],
+  },
+  {
+    id: 'interface-java',
+    begriff: 'Interface (Java)',
+    erklaerung: {
+      de: 'Ein Vertrag aus Methoden ohne Rumpf: „Wer das implementiert, kann Folgendes.“ Eine Klasse hat genau eine Oberklasse, darf aber beliebig viele Interfaces implementieren. Nicht zu verwechseln mit `interface` in TypeScript.',
+      en: 'A contract of methods without bodies: “whoever implements this can do the following.” A class has exactly one superclass but may implement any number of interfaces. Not the same as `interface` in TypeScript.',
+    },
+    kapitel: ['java-vererbung'],
+  },
+  {
+    id: 'generics-java',
+    begriff: 'Generics',
+    erklaerung: {
+      de: 'Die spitzen Klammern in `List<String>`: ein Versprechen an den Compiler, was in einer Sammlung steckt. Dadurch werden Laufzeitfehler zu Kompilierfehlern - und man spart jeden Cast.',
+      en: 'The angle brackets in `List<String>`: a promise to the compiler about what is inside a collection. It turns runtime errors into compile errors - and saves every cast.',
+    },
+    kapitel: ['java-collections'],
+  },
+  {
+    id: 'exception',
+    begriff: 'Exception',
+    erklaerung: {
+      de: 'Ein Fehler als Objekt. Wird mit `throw` geworfen und mit `try/catch` gefangen; sonst endet das Programm mit einem **Stacktrace**. `RuntimeException` (unchecked) darf man ignorieren, alles andere (checked) nicht.',
+      en: 'An error as an object. Thrown with `throw` and caught with `try/catch`; otherwise the program ends with a **stack trace**. `RuntimeException` (unchecked) may be ignored, everything else (checked) may not.',
+    },
+    kapitel: ['java-fehler'],
+  },
+  {
+    id: 'nullpointerexception',
+    begriff: 'NullPointerException',
+    erklaerung: {
+      de: 'Der häufigste Laufzeitfehler in Java: Eine Methode wird auf `null` aufgerufen. Häufige Quellen sind nicht gefüllte Objekt-Arrays und `map.get(…)` mit einem unbekannten Schlüssel.',
+      en: 'The most common runtime error in Java: a method is called on `null`. Common sources are unfilled object arrays and `map.get(…)` with an unknown key.',
+    },
+    kapitel: ['java-fehler', 'java-arrays'],
+  },
 ]

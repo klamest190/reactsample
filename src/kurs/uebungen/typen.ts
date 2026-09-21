@@ -36,7 +36,7 @@ export type Vorhersage = Basis & {
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
   aufgabe: Zweisprachig
-  modus: 'js' | 'react'
+  modus: 'js' | 'react' | 'java'
   code: string
   loesung: string
   vorbereitung?: string

@@ -9,7 +9,7 @@
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen bis zu den React Hooks',
+  appUntertitel: 'Von den JavaScript-Grundlagen über React bis zu Java',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -22,7 +22,7 @@ const de = {
   heroTitel: 'Von JavaScript zu React - ',
   heroTitelBetont: 'Schritt für Schritt',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst.',
+    'Erst die JavaScript-Grundlagen, auf denen React aufbaut. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt.',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: '🎉 Du hast alle Kapitel abgeschlossen!',
@@ -182,7 +182,7 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics to React Hooks',
+  appUntertitel: 'From JavaScript basics through React to Java',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -194,7 +194,7 @@ const en: Texte = {
   heroTitel: 'From JavaScript to React - ',
   heroTitelBetont: 'step by step',
   heroText:
-    'First the JavaScript fundamentals React is built on. Then components and state. And then the hooks in depth - with editors where you try everything yourself.',
+    'First the JavaScript fundamentals React is built on. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world.',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: '🎉 You have completed all chapters!',

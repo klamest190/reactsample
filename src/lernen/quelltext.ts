@@ -21,6 +21,16 @@ export function js(teile: TemplateStringsArray): string {
   return zeilen.map((z) => z.slice(einrueckung)).join('\n')
 }
 
+/**
+ * Dieselbe Funktion für Java-Beispiele (Teil 6). Ein eigener Name, damit man
+ * in `<Teil>/Name.code.ts` auf den ersten Blick sieht, welche Sprache dort steht:
+ *
+ *   const beispiel = java`
+ *     public class Main { … }
+ *   `
+ */
+export const java = js
+
 /** Kurzer Hash, damit gespeicherter Code verfällt, wenn sich der Startcode ändert. */
 export function hash(text: string) {
   let h = 0

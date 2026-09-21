@@ -7,6 +7,7 @@ import type { Uebung, UebungsSammlung } from './typen'
  */
 const LADER: Record<string, () => Promise<{ uebungen: UebungsSammlung }>> = {
   js: () => import('./js'),
+  java: () => import('./java'),
   react: () => import('./react'),
   hooks: () => import('./hooks'),
   praxis: () => import('./praxis'),

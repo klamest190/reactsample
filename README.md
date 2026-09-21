@@ -4,6 +4,10 @@ Eine interaktive Wissensdatenbank mit **React 19 + TypeScript + Tailwind CSS v4 
 JavaScript-Grundlagen, dann React, dann ausführlich die Hooks. In jedem Kapitel gibt es
 „Probier's selbst“-Editoren, in denen man Code direkt im Browser ändert und ausführt.
 
+Obendrauf kommt ein **eigenständiger Java-Teil** (Teil 6). Auch dort läuft der Code im Browser -
+ausgeführt von einer kleinen Java-Laufzeit, die zum Projekt gehört (`src/java/`). Java, JavaScript
+und React sind dabei sauber getrennt; wo was liegt, steht unter [Der Java-Teil](#der-java-teil).
+
 **Alles ist frei erreichbar** - es gibt keine Level und nichts wird freigeschaltet. Den roten Faden
 liefern Querverweise („Baut auf“, „Darauf bauen auf“) und ein durchgehendes **ToDo-App-Projekt**, das
 mit den Kapiteln wächst.
@@ -12,7 +16,8 @@ Der Kurs ist **zweisprachig (Deutsch/Englisch)** - umschaltbar oben rechts. Übe
 drumherum; **Codebeispiele sind in beiden Sprachen identisch und immer Englisch** (`count`, `todos`, `handleClick`).
 
 *An interactive, bilingual (German/English) course: JavaScript fundamentals, React basics and React
-hooks in depth, with runnable editors, auto-graded exercises and quizzes. Switch the language at the top right.*
+hooks in depth - plus a self-contained Java part with its own runtime in the browser. With runnable
+editors, auto-graded exercises and quizzes. Switch the language at the top right.*
 
 ## Starten
 
@@ -23,6 +28,7 @@ npm run build   # Produktionsbuild nach dist/
 npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
 npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
+npm run test:java     # nur Teil 6: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
 ```
 
 ### Selbsttest der Inhalte
@@ -43,7 +49,7 @@ Jedes Kapitel folgt derselben Struktur:
 
 1. **Lernziele** - was man danach kann
 2. **Erklärung** mit Codebeispielen
-3. **🧪 Probier's selbst** - Editor mit Ausführen-Knopf (JavaScript oder JSX)
+3. **🧪 Probier's selbst** - Editor mit Ausführen-Knopf (JavaScript, JSX oder Java)
 4. **👀 Live-Demos** - in TypeScript geschriebene Komponenten aus dem Projekt
 5. **🏋️ Übung** - Aufgabe mit automatischen Tests, gestuften Tipps und Musterlösung
 6. **✅ Quiz** und **📌 Zusammenfassung**
@@ -65,11 +71,15 @@ Der Fortschritt („Kapitel abschließen“) und der Code in den Editoren werden
 | **3 · React Hooks im Detail** | Hook-Regeln & `useState` · `useEffect` · `useRef` · `useMemo`/`useCallback`/`memo` · `useReducer` · `useContext` · Eigene Hooks · `useTransition`/`useDeferredValue` · `use`, `useActionState`, `useOptimistic`, `useFormStatus` |
 | **4 · Praxis & Muster** | Formulare · Daten laden · Komposition & Portale · Fehlerbehandlung · Tailwind CSS · Lokal entwickeln (Vite, DevTools, Debugging) · Abschlussprojekt (Gewohnheiten-Tracker) |
 | **5 · Projekt: ToDo-App** | Datenmodell als Funktionen · DOM-Version · Komponenten & Props · State & Events · Datenfluss & Filter · `useReducer` · Speichern mit `useEffect` & eigenem Hook · Fokus mit `useRef` · Context · Validierung · Startdaten laden · **Challenge: von null** |
+| **6 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
+
+Teil 6 ist **eigenständig**: Er setzt keinen der Teile 1-5 voraus und benutzt nichts daraus. Die
+Querverweise dorthin sind Vergleiche, keine Voraussetzungen.
 
 Zum Nachschlagen gibt es außerdem:
 
 - **🔍 Suche** (`Strg`/`⌘` + `K`) über Kapitel, Stichworte, Glossar und Projektschritte
-- **📚 Glossar** mit rund 40 Begriffen (`#/glossar/closure` springt direkt zu einem Eintrag)
+- **📚 Glossar** mit rund 50 Begriffen (`#/glossar/closure` springt direkt zu einem Eintrag)
 - **🧵 Projektübersicht** (`#/projekt`) mit dem Vorwissen jedes Schritts
 
 ### Das ToDo-Projekt
@@ -81,8 +91,20 @@ folgen denselben Konventionen, die die Tests prüfen: Eingabefeld „What needs 
 
 ## Projektstruktur
 
+Die Sprachen sind an der Ordnerstruktur ablesbar: ☕ nur Java, 🟨 nur JavaScript, ⚛️ React.
+
 ```
 src/
+  java/                  ☕ Die Java-Laufzeit - reines TypeScript, kein React, kein DOM
+    lexer.ts               Zeichen → Token
+    parser.ts              Token → Syntaxbaum (ast.ts)
+    pruefer.ts             Typprüfung VOR dem Lauf - das, was javac macht
+    interpreter.ts         Führt den Syntaxbaum aus - die Rolle der JVM
+    bibliothek.ts          System.out, Math, String, ArrayList, HashMap, Exceptions …
+    werte.ts               int/double/String/Objekte zur Laufzeit, Java-Ausgabeformat
+    index.ts               javaAusfuehren() + javaPruefen() - die einzige Tür nach außen
+    selbsttest.ts          Java-Programme mit der Ausgabe, die echtes Java liefern würde
+    inhalte.ts             Prüft die Beispiele der Kapitel (von beiden Selbsttests genutzt)
   main.tsx                 Einstiegspunkt: createRoot, StrictMode, ThemeProvider
   App.tsx                  Layout, Routing über den URL-Hash, Lernfortschritt, Sprachumschalter
   i18n/
@@ -102,20 +124,21 @@ src/
       Name.tsx             Kapiteltext Deutsch
       Name.en.tsx          Kapiteltext Englisch
       Name.code.ts         Codebeispiele, Tests und Lösungen - gemeinsam für beide Sprachen
+    java/                ☕ Teil 6, gleicher Aufbau - der Code in den .code.ts ist Java
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
   lernen/                  Die Lern-Bausteine
-    TryIt.tsx              "Probier's selbst"-Editor (JS und React)
+    TryIt.tsx              "Probier's selbst"-Editor (JS, React, Test und Java)
     CodeEditor.tsx         Editor: Textarea über eingefärbtem <pre>, mit Autovervollständigung
     vorschlaege.ts         Vorschläge (console.log, Array-Methoden, Hooks, JSX …) mit Erklärungen
     hervorheben.tsx        Mini-Syntax-Highlighter
-    jsSandbox.ts           HTML-Dokument für die JS-Sandbox inkl. Testläufer
-    reactKompilieren.ts    JSX mit sucrase übersetzen und als Komponente ausführen
+    jsSandbox.ts         🟨 HTML-Dokument für die JS-Sandbox inkl. Testläufer
+    reactKompilieren.ts  ⚛️  JSX mit sucrase übersetzen und als Komponente ausführen
     CodeBlock.tsx          Statisches Codebeispiel
     Quiz.tsx               Multiple-Choice-Fragen
     Uebungen.tsx           Einklappbare Übungskarten (Vorhersage oder Editor)
     Text.tsx               Mini-Syntax für Texte aus Daten: `code`, **fett**, [[kapitel-id]]
     reactTests.ts          Mini-Testing-Library für React-Übungen
-    quelltext.ts           js`…` Tag für Codebeispiele (roh, automatisch ausgerückt)
+    quelltext.ts           js`…` / java`…` Tag für Codebeispiele (roh, automatisch ausgerückt)
   seiten/
     Startseite.tsx         Übersicht, Nachschlagen, Lernpfad, roter Faden, "Weiter lernen"
     KapitelSeite.tsx       Rahmen eines Kapitels: Kopf mit "Baut auf", Inhalt, Übungen, roter Faden
@@ -188,10 +211,69 @@ Verfügbar sind u. a. `render`, `remount`, `click`, `type`, `check`, `blur`, `pr
 Einschränkung: Tailwind-Klassen wirken in der Vorschau nur, wenn sie irgendwo im Projekt-Quelltext
 vorkommen. Für freies Experimentieren eignet sich `style={{ … }}`.
 
+**Java** (`modus="java"`) läuft weder im iframe noch im Browser selbst, sondern in der Laufzeit unter
+`src/java/` - siehe [Der Java-Teil](#der-java-teil).
+
 **Autovervollständigung:** Beim Tippen schlägt der Editor passende Einträge aus
 `src/lernen/vorschlaege.ts` vor, dazu Namen, die schon im Code stehen. Jeder Vorschlag hat eine kurze
 Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt die Cursorposition), Esc
 schließt, Strg+Leertaste öffnet die Liste von Hand. Nach einem Punkt erscheinen Methoden wie `map` oder `filter`.
+Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` …) statt der JavaScript-Vorschläge.
+
+## Der Java-Teil
+
+Teil 6 ist bewusst so gebaut, dass man auf einen Blick sieht, wo Java aufhört und wo React anfängt.
+
+**Die Grenze.** Die ganze App kennt von `src/java/` genau zwei Funktionen:
+
+```ts
+javaAusfuehren(quelltext, { sprache, tests, vorbereitung })  // → { zeilen, ergebnisse, fehler }
+javaPruefen(quelltext, sprache)                              // → [{ zeile, text }]  (nur prüfen)
+```
+
+Die Laufzeit kennt weder React noch das DOM, und die Komponenten kennen keine Syntaxbäume. Deshalb
+läuft derselbe Code im Browser **und** auf der Kommandozeile (`npm run test:java`).
+
+**Die vier Schritte** - dieselben, die `javac` und die JVM gehen:
+
+| Datei | Aufgabe | Entspricht |
+|-------|---------|------------|
+| `lexer.ts` | Text → Token | Teil von `javac` |
+| `parser.ts` | Token → Syntaxbaum | Teil von `javac` |
+| `pruefer.ts` | Typen, unbekannte Namen, fehlendes `return` | Teil von `javac` |
+| `interpreter.ts` + `bibliothek.ts` | Ausführen | die JVM |
+
+`pruefer.ts` läuft zusätzlich beim Tippen (400 ms nach dem letzten Tastendruck) und erzeugt die roten
+Schlangenlinien im Editor - wie eine Java-IDE. Grundregel dort: **im Zweifel nichts melden**; ein
+falscher Fehler wäre schlimmer als ein übersehener.
+
+**Was nachgebaut ist,** weil der Kurs es erklärt: int-Überlauf, abschneidende `int`-Division,
+`ArithmeticException` bei `/ 0`, Standardwerte von Feldern, der String-Pool (`==` vs. `equals`),
+dynamische Bindung, Autoboxing, das Java-Ausgabeformat für `double` (`1.0`, `1.0E10`) und
+`[I@1b6d2f1d` für Arrays ohne `Arrays.toString`.
+
+**Was fehlt:** Threads, Dateizugriff, `Scanner` (es gibt keine Tastatureingabe), Pakete über mehrere
+Dateien, anonyme und innere Klassen, `try`-with-resources. Die Laufzeit sagt es, wenn etwas davon
+vorkommt.
+
+**Übungen in Java** funktionieren wie die JavaScript-Übungen: Die Tests sind Java-**Ausdrücke**, die
+nach `main` im Zustand des Programms ausgewertet werden. Sichtbar sind dort die lokalen Variablen von
+`main`, alle Methoden und Klassen - und `output`, die gesammelte Konsolenausgabe:
+
+```ts
+tests: [
+  { name: { de: 'summe ist 5', en: 'sum is 5' }, ausdruck: 'sum', erwartet: 5 },
+  { name: { de: 'isPrime(7)', en: 'isPrime(7)' }, ausdruck: 'isPrime(7)', erwartet: true },
+  { name: { de: 'Ausgabe', en: 'output' }, ausdruck: 'output.contains("Ada")', erwartet: true },
+]
+```
+
+Braucht ein Test `try/catch` oder eine Schleife, kommt eine unsichtbare Hilfsklasse in
+`vorbereitung` dazu - sie wird hinter den Code der Lernenden gehängt.
+
+**Geprüft wird alles zweifach:** `npm run test:java` (schnell, ohne Browser) und `npm run test:inhalte`
+(im Browser, zusammen mit allen anderen Kapiteln). `src/java/selbsttest.ts` enthält dafür über 40
+Java-Programme mit genau der Ausgabe, die eine echte JVM liefern würde.
 
 ## Zweisprachigkeit
 
@@ -220,3 +302,8 @@ schließt, Strg+Leertaste öffnet die Liste von Hand. Nach einem Punkt erscheine
 
 Navigation, Startseite, Nummerierung und Fortschritt ergeben sich automatisch. Die `id` jedes
 `TryIt` muss kursweit eindeutig sein.
+
+Für ein **Java-Kapitel** zusätzlich: im `.code.ts` den Tag `java\`…\`` statt `js\`…\`` verwenden und an
+jedes `<TryIt>` ein `modus="java"` schreiben - daran erkennen beide Selbsttests, welche Sprache
+ausgeführt werden soll. Beispiele, die absichtlich einen Fehler zeigen, kommen mit Begründung in
+`JAVA_ERWARTETE_FEHLER` (`src/java/inhalte.ts`).

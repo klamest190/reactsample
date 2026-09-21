@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test:inhalte": "node scripts/inhalte-testen.mjs"
+    "test:inhalte": "node scripts/inhalte-testen.mjs",
+    "test:java": "jiti scripts/java-testen.ts"
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.2",

@@ -8,6 +8,7 @@ import { reactTestsAusfuehren } from '../lernen/reactTests'
 import { testsAusfuehren } from '../lernen/testLauf'
 import { typenPruefen } from '../lernen/typpruefung'
 import type { Zweisprachig } from '../i18n/SpracheContext'
+import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
 
 /**
  * Selbsttest der Kursinhalte: führt jedes Beispiel, jede Übung und jeden Projektschritt
@@ -20,11 +21,14 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
  *                          Musterlösung alle kaputten Varianten, der Startcode nicht
  */
 
-export type Modus = { modus: 'js' | 'react' | 'test'; typen: boolean; vorschau: boolean }
+export type Modus = { modus: 'js' | 'react' | 'test' | 'java'; typen: boolean; vorschau: boolean }
 export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; dauer: number }
 
-/** Beispiele, die absichtlich einen Fehler zeigen - mit Begründung. */
-export const ERWARTETE_FEHLER: Record<string, string> = {}
+/**
+ * Beispiele, die absichtlich einen Fehler zeigen - mit Begründung.
+ * Die Java-Kapitel bringen ihre eigenen mit (siehe src/java/inhalte.ts).
+ */
+export const ERWARTETE_FEHLER: Record<string, string> = { ...JAVA_ERWARTETE_FEHLER }
 
 const warten = (ms: number) => new Promise((r) => setTimeout(r, ms))
 const nameVon = (n: string | Zweisprachig) => (typeof n === 'string' ? n : n.de)
@@ -136,14 +140,19 @@ const alleOk = (e: TestErgebnis[] | null) => Boolean(e?.length) && e!.every((x) 
 const ersterFehler = (e: TestErgebnis[] | null, fehler: string[] = []) =>
   fehler[0] ?? e?.find((x) => !x.ok)?.name + ': ' + e?.find((x) => !x.ok)?.meldung
 
-/** Musterlösung grün, Startcode rot - für JS- und React-Übungen. */
+/** Musterlösung grün, Startcode rot - für JS-, React- und Java-Übungen. */
 async function uebungPruefen(
-  modus: 'js' | 'react',
+  modus: 'js' | 'react' | 'java',
   start: string,
   loesung: string,
   tests: Test[] | ReactTest[],
   vorbereitung?: string,
 ): Promise<string | null> {
+  // Java prüft sich selbst - die Laufzeit in src/java/ braucht weder DOM noch iframe.
+  if (modus === 'java') {
+    const ergebnis = javaBeispielPruefen('', { code: start, loesung, tests: tests as Test[], vorbereitung })
+    return ergebnis.ok ? null : ergebnis.meldung
+  }
   if (modus === 'react') {
     const mitLoesung = await reactTestsAusfuehren(loesung, tests as ReactTest[], 'de')
     if (!alleOk(mitLoesung)) return 'Musterlösung besteht nicht: ' + ersterFehler(mitLoesung)
@@ -186,6 +195,11 @@ export async function beispielPruefen(
   m: Modus,
   extra: { dateien?: ProjektDatei[]; varianten?: { dateien: ProjektDatei[] }[] } = {},
 ): Promise<string | null> {
+  if (m.modus === 'java') {
+    const ergebnis = javaBeispielPruefen('', b)
+    return ergebnis.ok ? null : ergebnis.meldung
+  }
+
   if (m.modus === 'test') {
     if (extra.varianten?.length && b.loesung) {
       const mitLoesung = await testModusPruefen(b.loesung, extra.dateien, extra.varianten)

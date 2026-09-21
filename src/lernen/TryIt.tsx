@@ -20,6 +20,7 @@ import { reactTestsAusfuehren } from './reactTests'
 import { formatieren, kompilieren, type Protokoll } from './reactKompilieren'
 import { hash } from './quelltext'
 import { typenPruefen, type Typfehler } from './typpruefung'
+import type { JavaLauf } from '../java'
 import { testsAusfuehren, type TestBericht } from './testLauf'
 import type { ProjektDatei } from './reactKompilieren'
 import type { Zweisprachig } from '../i18n/SpracheContext'
@@ -33,6 +34,7 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
  *   <TryIt id="…" code={…} modus="react" />    JSX, gerendert wird die Komponente App
  *   <TryIt id="…" code={…} modus="react" typen />  TSX mit echter Typprüfung
  *   <TryIt id="…" code={…} modus="test" />     Eigene Tests (Vitest + Testing Library), siehe testLauf.ts
+ *   <TryIt id="…" code={…} modus="java" />     Java, ausgeführt von src/java/ (Teil 6)
  *
  * Der Code wird pro `id` im localStorage gespeichert, damit Eingaben einen
  * Kapitelwechsel überleben.
@@ -75,9 +77,18 @@ type TestProps = Gemeinsam & {
   varianten?: { name: Zweisprachig; dateien: ProjektDatei[] }[]
 }
 
-export function TryIt(props: JsProps | ReactProps | TestProps) {
+type JavaProps = Gemeinsam & {
+  modus: 'java'
+  /** Wie bei JS: ein Ausdruck, der nach `main` ausgewertet wird - nur eben in Java. */
+  tests?: Test[]
+  /** Unsichtbare Hilfsklassen, die hinter den Code gehängt werden (für Tests). */
+  vorbereitung?: string
+}
+
+export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps) {
   if (props.modus === 'react') return <TryItReact {...props} />
   if (props.modus === 'test') return <TryItTest {...props} />
+  if (props.modus === 'java') return <TryItJava {...props} />
   return <TryItJs {...props} />
 }
 
@@ -89,6 +100,7 @@ export type Zeile = { typ: 'log' | 'info' | 'warn' | 'error' | 'fehler'; text: s
 
 const ABZEICHEN = {
   JavaScript: { text: 'JS', klassen: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' },
+  Java: { text: 'JAVA', klassen: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' },
   React: { text: 'JSX', klassen: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' },
   TypeScript: { text: 'TSX', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
   Test: { text: 'TEST', klassen: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
@@ -161,7 +173,7 @@ function Rahmen({
         beiAenderung={setCode}
         beiAusfuehren={() => ausfuehren()}
         label={`${t.codeEditor}${titel ? ': ' + titel : ''}`}
-        sprache={art === 'JavaScript' ? 'js' : 'react'}
+        sprache={art === 'JavaScript' ? 'js' : art === 'Java' ? 'java' : 'react'}
         markierungen={markierungen}
       />
 
@@ -434,6 +446,119 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, v
       />
     </Rahmen>
   )
+}
+
+// ---------------------------------------------------------------------------
+// Java: ausgeführt von der Laufzeit in src/java/
+// ---------------------------------------------------------------------------
+
+/**
+ * Anders als JavaScript braucht Java keinen iframe: Der Code läuft nie im
+ * Browser, sondern wird von unserem Interpreter gelesen und Schritt für
+ * Schritt ausgeführt. Er kann deshalb gar nicht an die Seite herankommen.
+ *
+ * Zwei Dinge fühlen sich dadurch wie eine echte Java-IDE an:
+ *  - Beim Tippen prüft `javaPruefen` im Hintergrund (rote Schlangenlinien).
+ *  - Erst wenn es keine Fehler mehr gibt, startet das Programm überhaupt.
+ */
+function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, vorbereitung }: JavaProps) {
+  const { sprache } = useSprache()
+  const t = useTexte()
+  const [code, setCode] = useGespeicherterCode(id, startCode)
+  // Die Laufzeit wird erst beim ersten Java-Kapitel geladen (siehe javaHolen).
+  const [java, setJava] = useState(javaModul)
+
+  const javaTests = useMemo(
+    () => tests?.map((test) => ({ ...test, name: typeof test.name === 'string' ? test.name : test.name[sprache] })),
+    [tests, sprache],
+  )
+
+  const [lauf, setLauf] = useState<JavaLauf | null>(null)
+  const starten = (quelltext: string, mitTests: boolean) => {
+    void javaHolen().then((modul) => {
+      setJava(modul)
+      setLauf(sicherAusfuehren(modul, quelltext, sprache, mitTests ? javaTests : undefined, vorbereitung))
+    })
+  }
+
+  // Beispiele laufen sofort, Übungen erst auf Knopfdruck.
+  const ersterLauf = useEffectEvent(() => {
+    if (!tests) starten(code, false)
+  })
+  useEffect(() => {
+    ersterLauf()
+  }, [])
+
+  // Die Fehlerprüfung läuft wie in einer IDE kurz nach dem letzten Tastendruck.
+  const [pruefung, setPruefung] = useState<{ code: string; fehler: Typfehler[] } | null>(null)
+  useEffect(() => {
+    if (!java) return
+    const zeitgeber = setTimeout(() => {
+      const zeilenTexte = code.split('\n')
+      const fehler = java.javaPruefen(code, sprache).map((m) => ({
+        zeile: m.zeile,
+        spalte: Math.max(0, (zeilenTexte[m.zeile - 1] ?? '').length - (zeilenTexte[m.zeile - 1] ?? '').trimStart().length),
+        laenge: (zeilenTexte[m.zeile - 1] ?? '').trim().length || 1,
+        text: m.text,
+        code: 0,
+      }))
+      setPruefung({ code, fehler })
+    }, 400)
+    return () => clearTimeout(zeitgeber)
+  }, [code, sprache, java])
+  const markierungen = pruefung?.code === code ? pruefung.fehler : undefined
+
+  return (
+    <Rahmen
+      art="Java"
+      titel={titel}
+      aufgabe={aufgabe}
+      code={code}
+      setCode={setCode}
+      startCode={startCode}
+      loesung={loesung}
+      tipps={tipps}
+      markierungen={markierungen}
+      ausfuehren={(c) => starten(c ?? code, true)}
+    >
+      <Testergebnisse ergebnisse={lauf?.ergebnisse ?? null} />
+      <Konsole zeilen={lauf?.zeilen ?? []} leerText={lauf ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
+    </Rahmen>
+  )
+}
+
+/**
+ * Die Java-Laufzeit (rund 3000 Zeilen) wird erst geladen, wenn wirklich ein
+ * Java-Kapitel offen ist - wie die Kapitel selbst (siehe kurs.ts).
+ */
+type JavaModul = typeof import('../java')
+let javaModul: JavaModul | null = null
+let javaLaden: Promise<JavaModul> | null = null
+function javaHolen(): Promise<JavaModul> {
+  javaLaden ??= import('../java').then((modul) => {
+    javaModul = modul
+    return modul
+  })
+  return javaLaden
+}
+
+/** Ein Lauf darf die Seite nie mitreißen - auch nicht bei einem Fehler im Interpreter. */
+function sicherAusfuehren(
+  modul: JavaModul,
+  code: string,
+  sprache: 'de' | 'en',
+  tests: { name: string; ausdruck: string; erwartet?: unknown }[] | undefined,
+  vorbereitung?: string,
+): JavaLauf {
+  try {
+    return modul.javaAusfuehren(code, { sprache, tests, vorbereitung })
+  } catch (fehler) {
+    return {
+      zeilen: [{ typ: 'fehler', text: String(fehler instanceof Error ? fehler.message : fehler) }],
+      ergebnisse: null,
+      fehler: true,
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

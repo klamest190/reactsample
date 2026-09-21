@@ -65,6 +65,14 @@ const PFADE = {
       <rect x="3" y="14" width="7" height="7" rx="1" />
     </>
   ),
+  // Java heißt nach dem Kaffee, den die Erfinder getrunken haben.
+  tasse: (
+    <>
+      <path d="M4 8h13v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" />
+      <path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17" />
+      <path d="M8 2v3M12 2v3" />
+    </>
+  ),
   haken: <path d="M20 6 9 17l-5-5" />,
 }
 
