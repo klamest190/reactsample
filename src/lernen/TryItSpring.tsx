@@ -249,7 +249,7 @@ function ServerBar({ server }: { server: SpringServer | null }) {
               {routes.map((r) => (
                 <li key={r.method + r.path}>
                   <MethodBadge method={r.method} /> {r.path}
-                  <span className="block pl-2 text-[11px] text-slate-500 dark:text-slate-400">→ {r.handler}</span>
+                  <span className="block pl-2 text-2xs text-slate-500 dark:text-slate-400">→ {r.handler}</span>
                 </li>
               ))}
             </ul>
@@ -270,7 +270,7 @@ const METHOD_COLORS: Record<string, string> = {
 }
 
 function MethodBadge({ method }: { method: string }) {
-  return <span className={`inline-block rounded px-1.5 py-px font-mono text-[11px] font-bold ${METHOD_COLORS[method] ?? METHOD_COLORS['*']}`}>{method}</span>
+  return <span className={`inline-block rounded px-1.5 py-px font-mono text-2xs font-bold ${METHOD_COLORS[method] ?? METHOD_COLORS['*']}`}>{method}</span>
 }
 
 // ---------------------------------------------------------------------------
@@ -365,7 +365,7 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
               onChange={(e) => setBody(e.target.value)}
               spellCheck={false}
               rows={4}
-              className="mt-0.5 block w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 font-mono text-[13px] dark:border-slate-700 dark:bg-slate-900"
+              className="mt-0.5 block w-full rounded-lg border border-slate-300 bg-white px-2 py-1.5 font-mono text-code dark:border-slate-700 dark:bg-slate-900"
             />
           </label>
         )}
@@ -390,20 +390,20 @@ function ExchangeView({ exchange }: { exchange: Exchange }) {
         : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
   const body = response.body
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white text-[13px] dark:border-slate-800 dark:bg-slate-900">
+    <div className="overflow-hidden rounded-lg border border-slate-200 bg-white text-code dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-3 py-1.5 font-mono dark:border-slate-800">
         <MethodBadge method={request.method} />
         <span className="min-w-0 flex-1 break-all">{request.path}</span>
-        <span className={`rounded px-1.5 py-px text-[11px] font-bold ${color}`}>
+        <span className={`rounded px-1.5 py-px text-2xs font-bold ${color}`}>
           {status} {reason(status)}
         </span>
-        <span className="text-[11px] text-slate-400">{response.millis} ms</span>
+        <span className="text-2xs text-slate-400">{response.millis} ms</span>
       </div>
       {request.body && <pre className="overflow-x-auto border-b border-slate-100 px-3 py-1.5 text-slate-500 dark:border-slate-800">{compact(request.body)}</pre>}
       <pre className="max-h-64 overflow-auto px-3 py-2">
         {body.kind === 'json' ? formatJson(body.value) : body.kind === 'text' ? body.text : <span className="text-slate-400 italic">{t.empty}</span>}
       </pre>
-      {response.headers.Location && <p className="px-3 pb-2 font-mono text-[11px] text-slate-500">Location: {response.headers.Location}</p>}
+      {response.headers.Location && <p className="px-3 pb-2 font-mono text-2xs text-slate-500">Location: {response.headers.Location}</p>}
       {mismatch && (
         <p className="border-t border-rose-200 bg-rose-50 px-3 py-1.5 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
           {t.expectationFailed} {mismatch[sprache]}

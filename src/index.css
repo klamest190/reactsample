@@ -17,8 +17,19 @@
   --color-brand-500: oklch(0.6 0.19 255);
   --color-brand-600: oklch(0.52 0.19 255);
   --color-brand-700: oklch(0.44 0.16 255);
+  --color-brand-800: oklch(0.37 0.13 255);
   --color-brand-900: oklch(0.3 0.1 255);
   --color-brand-950: oklch(0.22 0.07 255);
+
+  /* Schriftstapel festschreiben. Ohne das wählt jedes System selbst -
+     besonders beim Monospace, und die halbe App ist ein Code-Editor. */
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+
+  /* Kleine Stufen unterhalb von text-xs. Standen vorher als feste Pixelwerte im Code. */
+  --text-3xs: 0.625rem; /* Tastenkappen */
+  --text-2xs: 0.6875rem; /* Abzeichen, Nummern */
+  --text-code: 0.8125rem; /* Editor, Konsole, Codeblöcke */
 }
 
 /* Basis-Styles für die ganze Seite. */
@@ -31,6 +42,24 @@
   }
   .dark body {
     @apply bg-slate-950 text-slate-100;
+  }
+  /* Ein Fokusring für alles. Vorher hatte nur der Button einen eigenen -
+     alle anderen Elemente fielen auf den Browser-Standard zurück. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+  /* Wer im Betriebssystem weniger Bewegung eingestellt hat, bekommt keine. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

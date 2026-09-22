@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { TEIL_STIL } from '../components/teilStil'
+import { KARTE, KLEBT_LG } from '../components/Ui'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { kurs } from '../kurs/kurs'
 import { playgrounds } from '../kurs/playground'
@@ -139,7 +140,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
         {/* Bausteine */}
         <aside
           aria-labelledby="bausteine-titel"
-          className="rounded-xl border border-slate-200 bg-white lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100vh-6rem)] lg:flex-col dark:border-slate-800 dark:bg-slate-900"
+          className={`${KARTE} ${KLEBT_LG} lg:flex lg:flex-col`}
         >
           <div className="space-y-2 border-b border-slate-200 p-3 dark:border-slate-800">
             <h2 id="bausteine-titel" className="text-sm font-semibold">
@@ -177,9 +178,9 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
                         className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-left transition hover:border-brand-400 hover:bg-brand-50 dark:border-slate-800 dark:hover:border-brand-600 dark:hover:bg-brand-500/10"
                       >
                         <span className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-mono text-[13px] font-semibold">{b.titel[sprache]}</span>
+                          <span className="font-mono text-code font-semibold">{b.titel[sprache]}</span>
                           {t.orte[b.ort] && (
-                            <span className="rounded bg-slate-100 px-1 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                            <span className="rounded bg-slate-100 px-1 text-3xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                               {t.orte[b.ort]}
                               {b.nutzung ? ' ' + t.mitNutzung : ''}
                             </span>

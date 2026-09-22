@@ -171,24 +171,24 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
 
       <div className="grid border-t border-slate-200 lg:grid-cols-2 dark:border-slate-800">
         <div className="min-w-0 border-b border-slate-200 lg:border-r lg:border-b-0 dark:border-slate-800">
-          <div className="px-4 py-1 text-[11px] tracking-wider text-slate-500 uppercase">{t.preview}</div>
+          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.preview}</div>
           <div ref={previewRef} className="vorschau min-h-40 px-4 pb-4" />
           <Konsole zeilen={browserLines} />
         </div>
         <div className="min-w-0">
-          <div className="px-4 py-1 text-[11px] tracking-wider text-slate-500 uppercase">{t.network}</div>
+          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.network}</div>
           <div className="max-h-56 overflow-auto px-4 pb-3">
             {network.length === 0 ? (
               <p className="text-xs text-slate-500 italic">{t.noRequests}</p>
             ) : (
-              <table className="w-full font-mono text-[12px]">
+              <table className="w-full font-mono text-xs">
                 <tbody>
                   {network.map((n, i) => (
                     <tr key={i} className={n.status === null || n.status >= 400 ? 'text-rose-600 dark:text-rose-400' : ''}>
                       <td className="pr-2 font-bold">{n.method}</td>
                       <td className="pr-2 break-all">
                         {n.url}
-                        {n.body && <span className="block text-[11px] text-slate-500">{n.body}</span>}
+                        {n.body && <span className="block text-2xs text-slate-500">{n.body}</span>}
                       </td>
                       <td className="pr-2">{n.status ?? 'failed'}</td>
                       <td className="text-right text-slate-500">{n.millis} ms</td>
@@ -199,7 +199,7 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
             )}
           </div>
           <details>
-            <summary className="cursor-pointer px-4 py-1 text-[11px] tracking-wider text-slate-500 uppercase">{t.serverLog}</summary>
+            <summary className="cursor-pointer px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.serverLog}</summary>
             <Konsole zeilen={serverLines} />
           </details>
         </div>

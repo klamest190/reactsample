@@ -229,7 +229,7 @@ export function Rahmen({
           {kopf ?? (istUebung ? t.uebung : t.probierSelbst)}
           {titel && <span className="font-normal text-slate-500 dark:text-slate-400"> · {titel}</span>}
         </h3>
-        <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold ${ABZEICHEN[art].klassen}`}>
+        <span className={`rounded-full px-2 py-0.5 font-mono text-2xs font-semibold ${ABZEICHEN[art].klassen}`}>
           {ABZEICHEN[art].text}
         </span>
       </div>
@@ -338,8 +338,8 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
   if (zeilen.length === 0 && !leerText) return null
 
   return (
-    <div className="bg-slate-900 px-4 py-3 font-mono text-[13px] leading-5 dark:bg-black/40">
-      <div className="mb-1 text-[11px] tracking-wider text-slate-500 uppercase">{t.konsole}</div>
+    <div className="bg-slate-900 px-4 py-3 font-mono text-code leading-5 dark:bg-black/40">
+      <div className="mb-1 text-2xs tracking-wider text-slate-500 uppercase">{t.konsole}</div>
       {zeilen.length === 0 ? (
         <div className="text-slate-500 italic">{leerText}</div>
       ) : (
@@ -549,7 +549,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
       {lauf && (
         <div className={vorschau ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
           {vorschau && (
-            <div className="px-4 pt-2 text-[11px] tracking-wider text-slate-500 uppercase">
+            <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase">
               {t.vorschau}
             </div>
           )}
@@ -858,7 +858,7 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
       markierungen={typfehler ?? undefined}
     >
       {typen && <Typfehlerliste fehler={typfehler} />}
-      <div className="px-4 pt-2 text-[11px] tracking-wider text-slate-500 uppercase">{t.vorschau}</div>
+      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase">{t.vorschau}</div>
       <div ref={containerRef} className="vorschau min-h-16 px-4 pt-1 pb-4" />
       {tests?.length ? (
         <div className="border-t border-slate-200 dark:border-slate-800">
@@ -1009,8 +1009,8 @@ function Testausgabe({ bericht, laeuft }: { bericht: TestBericht; laeuft: boolea
   const fehlgeschlagen = bericht.faelle.length - bestanden
 
   return (
-    <div className={`bg-slate-900 px-4 py-3 font-mono text-[13px] leading-5 text-slate-200 transition-opacity dark:bg-black/40 ${laeuft ? 'opacity-60' : ''}`}>
-      <div className="mb-1 text-[11px] tracking-wider text-slate-500 uppercase">{t.deineTests}</div>
+    <div className={`bg-slate-900 px-4 py-3 font-mono text-code leading-5 text-slate-200 transition-opacity dark:bg-black/40 ${laeuft ? 'opacity-60' : ''}`}>
+      <div className="mb-1 text-2xs tracking-wider text-slate-500 uppercase">{t.deineTests}</div>
       {bericht.fehler ? (
         <div className="text-rose-300">
           ⛔ {t.testDateiFehler}

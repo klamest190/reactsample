@@ -26,7 +26,7 @@ function Box({ title, children, tone = 'slate' }: { title: ReactNode; children?:
 /** An arrow with a label - horizontal on wide screens, vertical on phones. */
 function Arrow({ label, back }: { label: ReactNode; back?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-0.5 px-1 py-1 text-center font-mono text-[11px] text-slate-500 dark:text-slate-400">
+    <div className="flex flex-col items-center justify-center gap-0.5 px-1 py-1 text-center font-mono text-2xs text-slate-500 dark:text-slate-400">
       <span>{label}</span>
       <span aria-hidden="true" className="text-lg leading-none">
         <span className="hidden sm:inline">⟶</span>

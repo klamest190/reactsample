@@ -3,7 +3,7 @@ import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { kurs } from '../kurs/kurs'
 import { Icon, type IconName } from './Icon'
 import { TEIL_STIL } from './teilStil'
-import { Aufklapppfeil } from './Ui'
+import { Aufklapppfeil, KLEBT_MD, Taste } from './Ui'
 
 /**
  * Kursnavigation: Suche, Nachschlage-Seiten und darunter die Teile des Kurses.
@@ -70,7 +70,7 @@ export function Seitenleiste({
 
   // Einträge unterhalb eines Teils: dezent, aktiver Eintrag mit Akzentlinie links.
   const eintragStil = (aktiv: boolean) =>
-    `-ml-px flex items-baseline gap-2 rounded-r-md border-l-2 py-1 pr-2 pl-3 text-[13px] leading-snug transition ${
+    `-ml-px flex items-baseline gap-2 rounded-r-md border-l-2 py-1 pr-2 pl-3 text-code leading-snug transition ${
       aktiv
         ? 'border-brand-500 bg-brand-50 font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-300'
         : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-100'
@@ -84,9 +84,9 @@ export function Seitenleiste({
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('a')) schliessen()
       }}
-      // Mobil: nur sichtbar, wenn das Menü offen ist (dann als Overlay).
-      // Ab md: immer sichtbar, klebt beim Scrollen und scrollt selbst.
-      className={`${offen ? 'fixed inset-x-0 top-14.25 bottom-0 z-30 block overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-950' : 'hidden'} md:sticky md:top-20 md:block md:max-h-[calc(100vh-6rem)] md:w-60 md:shrink-0 md:overflow-y-auto md:bg-transparent md:p-0 md:pr-2`}
+      // Mobil: nur sichtbar, wenn das Menü offen ist (dann als Overlay unter der Kopfzeile -
+      // top-14.25 ist deren gemessene Höhe). Ab md: immer sichtbar, klebt beim Scrollen.
+      className={`${offen ? 'fixed inset-x-0 top-14.25 bottom-0 z-30 block overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-950' : 'hidden'} ${KLEBT_MD} md:block md:w-60 md:shrink-0 md:bg-transparent md:p-0 md:pr-2`}
     >
       <button
         onClick={() => {
@@ -97,9 +97,7 @@ export function Seitenleiste({
       >
         <Icon name="suche" className="size-4 text-slate-400" />
         <span className="flex-1">{t.sucheOeffnen}</span>
-        <kbd className="rounded border border-slate-200 px-1 font-sans text-[10px] text-slate-400 dark:border-slate-700">
-          {t.strg} K
-        </kbd>
+        <Taste>{t.strg} K</Taste>
       </button>
 
       <ul className="mb-3 space-y-0.5">
@@ -175,7 +173,7 @@ export function Seitenleiste({
                     return (
                       <li key={k.id}>
                         <a href={'#/' + k.id} aria-current={istAktiv ? 'page' : undefined} className={eintragStil(istAktiv)}>
-                          <span className="w-4 shrink-0 text-right text-[11px] text-slate-400 tabular-nums dark:text-slate-500">
+                          <span className="w-4 shrink-0 text-right text-2xs text-slate-400 tabular-nums dark:text-slate-500">
                             {i + 1}
                           </span>
                           <span className="flex-1">{k.titel[sprache]}</span>

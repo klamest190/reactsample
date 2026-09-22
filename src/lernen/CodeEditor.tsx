@@ -354,7 +354,7 @@ export function CodeEditor({
 
   return (
     <div
-      className="flex bg-slate-50 font-mono text-[13px] dark:bg-slate-950"
+      className="flex bg-slate-50 font-mono text-code dark:bg-slate-950"
       style={{ lineHeight: ZEILENHOEHE + 'px' }}
     >
       <div
@@ -474,7 +474,7 @@ function VorschlagsListe({
       // mousedown würde den Fokus aus dem Textfeld nehmen und das Popup schließen
       onMouseDown={(e) => e.preventDefault()}
       data-vorschlaege
-      className="fixed z-50 overflow-hidden rounded-lg border border-slate-200 bg-white font-mono text-[13px] shadow-xl dark:border-slate-700 dark:bg-slate-900"
+      className="fixed z-50 overflow-hidden rounded-lg border border-slate-200 bg-white font-mono text-code shadow-xl dark:border-slate-700 dark:bg-slate-900"
       style={{
         left: popup.x,
         width: POPUP_BREITE,
@@ -505,7 +505,7 @@ function VorschlagsListe({
                   />
                 </span>
               ) : (
-                <span className={`w-8 shrink-0 rounded px-1 text-center text-[10px] font-semibold ${stil.klassen}`}>
+                <span className={`w-8 shrink-0 rounded px-1 text-center text-3xs font-semibold ${stil.klassen}`}>
                   {stil.kurz}
                 </span>
               )}
@@ -517,14 +517,14 @@ function VorschlagsListe({
       <div className="space-y-1 border-t border-slate-200 px-3 py-2 font-sans text-xs dark:border-slate-700">
         {aktiv.info && <p className="text-slate-700 dark:text-slate-200">{aktiv.info}</p>}
         {aktiv.css && (
-          <pre className="max-h-40 overflow-auto font-mono text-[11px] break-all whitespace-pre-wrap text-slate-600 dark:text-slate-300">{aktiv.css}</pre>
+          <pre className="max-h-40 overflow-auto font-mono text-2xs break-all whitespace-pre-wrap text-slate-600 dark:text-slate-300">{aktiv.css}</pre>
         )}
         {vorschau !== aktiv.label && (
-          <pre className="max-h-16 overflow-hidden font-mono text-[11px] whitespace-pre text-slate-500 dark:text-slate-400">
+          <pre className="max-h-16 overflow-hidden font-mono text-2xs whitespace-pre text-slate-500 dark:text-slate-400">
             {vorschau}
           </pre>
         )}
-        <p className="text-[11px] text-slate-400">{t.vorschlagHinweis}</p>
+        <p className="text-2xs text-slate-400">{t.vorschlagHinweis}</p>
       </div>
     </div>
   )

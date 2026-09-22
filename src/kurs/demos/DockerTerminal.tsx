@@ -108,19 +108,19 @@ export function DockerTerminal({
 
   return (
     <Demo titel={t.title}>
-      <div className="overflow-hidden rounded-lg bg-slate-950 font-mono text-[13px] leading-5 text-slate-100 shadow-inner">
+      <div className="overflow-hidden rounded-lg bg-slate-950 font-mono text-code leading-5 text-slate-100 shadow-inner">
         <div className="flex items-center gap-1.5 border-b border-slate-800 px-3 py-1.5">
           <span className="size-2.5 rounded-full bg-rose-500" aria-hidden="true" />
           <span className="size-2.5 rounded-full bg-amber-400" aria-hidden="true" />
           <span className="size-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
-          <span className="ml-2 text-[11px] text-slate-400">bash · {t.running(running)}</span>
+          <span className="ml-2 text-2xs text-slate-400">bash · {t.running(running)}</span>
           <button
             onClick={() => {
               setState(newState())
               setLines([])
               inputRef.current?.focus()
             }}
-            className="ml-auto text-[11px] text-slate-400 hover:text-slate-200"
+            className="ml-auto text-2xs text-slate-400 hover:text-slate-200"
           >
             ↺ {t.reset}
           </button>
@@ -184,7 +184,7 @@ export function DockerTerminal({
                         setInput(task.command!)
                         inputRef.current?.focus()
                       }}
-                      className="ml-2 rounded border border-slate-300 px-1 font-mono text-[11px] text-slate-500 hover:border-brand-400 hover:text-brand-600 dark:border-slate-700"
+                      className="ml-2 rounded border border-slate-300 px-1 font-mono text-2xs text-slate-500 hover:border-brand-400 hover:text-brand-600 dark:border-slate-700"
                       title={task.command}
                     >
                       {t.use}

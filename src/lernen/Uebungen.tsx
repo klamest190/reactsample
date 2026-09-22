@@ -1,5 +1,5 @@
 import { use, useState } from 'react'
-import { Aufklapppfeil } from '../components/Ui'
+import { Aufklapppfeil, KARTE } from '../components/Ui'
 import { Verweis } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { uebungenFuer } from '../kurs/uebungen'
@@ -50,14 +50,14 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
   const [offen, setOffen] = useState(false)
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900" data-uebung={uebung.id}>
+    <div className={`${KARTE} overflow-hidden`} data-uebung={uebung.id}>
       <button
         onClick={() => setOffen((o) => !o)}
         aria-expanded={offen}
         className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
       >
         <span className="w-5 shrink-0 text-sm text-slate-400 tabular-nums">{nummer}</span>
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${STUFEN_STIL[uebung.stufe]}`}>
+        <span className={`shrink-0 rounded-full px-2 py-0.5 text-2xs font-semibold ${STUFEN_STIL[uebung.stufe]}`}>
           {t.stufen[uebung.stufe]}
         </span>
         <span className="min-w-0 flex-1 font-medium">{uebung.titel[sprache]}</span>

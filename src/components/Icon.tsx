@@ -1,7 +1,10 @@
 /**
  * Schlichte Linien-Icons als Inline-SVG (Stil wie Lucide), ohne Bibliothek.
- * Sie übernehmen die Textfarbe (stroke="currentColor") und sehen auf jedem
- * System gleich aus - anders als Emojis.
+ * Sie übernehmen die Textfarbe (stroke="currentColor") und sehen auf jedem System gleich aus.
+ *
+ * Die Aufteilung im Projekt: SVG für Navigation und Bedienelemente (Seitenleiste,
+ * Knöpfe, Zustände), Emoji für Kursinhalte und die Symbole der Kursteile.
+ * Emoji sind dort Absicht - sie sind schneller zu erfassen und gehören zum Ton des Kurses.
  */
 
 const PFADE = {

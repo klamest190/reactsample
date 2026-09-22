@@ -44,6 +44,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Klasse am <html>-Element und localStorage) gehört in einen Effekt.
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
+    // Sagt dem Browser, wie er Scrollbalken und native Bedienelemente einfärben soll.
+    // Muss hier stehen und nicht als <meta> - unser Dark Mode hängt am Umschalter, nicht am System.
+    document.documentElement.style.colorScheme = theme
     localStorage.setItem('theme', theme)
   }, [theme]) // läuft neu, sobald sich `theme` ändert
 

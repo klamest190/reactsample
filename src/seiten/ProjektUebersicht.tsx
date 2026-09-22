@@ -1,3 +1,4 @@
+import { ButtonLink, KARTE } from '../components/Ui'
 import { KapitelChip, Verweis } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { alleKapitel } from '../kurs/kurs'
@@ -16,12 +17,9 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
       <header className="space-y-3">
         <h1 className="text-3xl font-bold tracking-tight">{t.projektTitel}</h1>
         <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-400">{t.projektText}</p>
-        <a
-          href={'#/' + schritte[0].id}
-          className="inline-block rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700"
-        >
+        <ButtonLink href={'#/' + schritte[0].id} groesse="gross">
           {t.projektStarten} →
-        </a>
+        </ButtonLink>
       </header>
 
       <ol className="relative space-y-3 border-l-2 border-slate-200 pl-6 dark:border-slate-800">
@@ -41,9 +39,9 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
               >
                 {fertig ? '✓' : i + 1}
               </span>
-              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+              <div className={`${KARTE} p-4`}>
                 <a href={'#/' + schritt.id} className="group block">
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     {t.schrittNr(i + 1)} · ⏱ {t.dauer(schritt.dauer)}
                   </span>
                   <span className="block font-semibold group-hover:text-brand-600 dark:group-hover:text-brand-400">
@@ -52,7 +50,7 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
                   <span className="block text-sm text-slate-600 dark:text-slate-400">{schritt.kurz[sprache]}</span>
                 </a>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="text-xs text-slate-500">{t.vorwissen}:</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{t.vorwissen}:</span>
                   {vorwissen.map((id) => (
                     <KapitelChip key={id} id={id} />
                   ))}

@@ -243,7 +243,7 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
             </select>
           </label>
           <div className="hidden py-2 md:block">
-            <p className="px-3 pb-1 text-[11px] font-semibold tracking-wider text-slate-500 uppercase">{t.dateien}</p>
+            <p className="px-3 pb-1 text-2xs font-semibold tracking-wider text-slate-500 uppercase">{t.dateien}</p>
             {ordner.map(([name, inhalt]) => (
               <div key={name}>
                 {name && <p className="px-3 pt-2 font-mono text-xs text-slate-500 dark:text-slate-400">📁 {name}</p>}

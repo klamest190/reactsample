@@ -1,3 +1,4 @@
+import { Button, KARTE, Taste } from '../components/Ui'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { alleKapitel, kurs } from '../kurs/kurs'
 
@@ -18,11 +19,9 @@ export function Startseite({
   const naechstes = alleKapitel.find((k) => !erledigt.includes(k.id))
   const gesamtMinuten = alleKapitel.reduce((summe, k) => summe + k.dauer, 0)
 
-  const kbd = 'rounded border px-1 font-mono text-xs'
   const projekt = kurs.find((teil) => teil.id === 'projekt')!
   const react = kurs.find((teil) => teil.id === 'react')!
-  const karte =
-    'block rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-brand-500 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900'
+  const karte = `${KARTE} block p-4 text-left transition hover:border-brand-500 hover:shadow-sm`
 
   return (
     <div className="space-y-12">
@@ -34,13 +33,10 @@ export function Startseite({
         <p className="max-w-2xl text-lg text-slate-600 dark:text-slate-400">{t.heroText}</p>
         <div className="flex flex-wrap items-center gap-3">
           {naechstes ? (
-            <button
-              onClick={() => navigieren(naechstes.id)}
-              className="rounded-lg bg-brand-600 px-5 py-2.5 font-medium text-white transition hover:bg-brand-700"
-            >
+            <Button groesse="gross" onClick={() => navigieren(naechstes.id)}>
               {erledigt.length === 0 ? t.jetztStarten : t.weiterLernen}: {naechstes.nummer}{' '}
               {naechstes.titel[sprache]} →
-            </button>
+            </Button>
           ) : (
             <p className="font-medium text-emerald-600">{t.allesGeschafft}</p>
           )}
@@ -51,14 +47,15 @@ export function Startseite({
       </section>
 
       <section>
-        <h2 className="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase">{t.soLernstDu}</h2>
+        <h2 className="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+          {t.soLernstDu}
+        </h2>
         <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {t.schritte.map((s, i) => (
-            <li
-              key={s.icon}
-              className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
-            >
-              <div className="text-2xl">{s.icon}</div>
+            <li key={s.icon} className={`${KARTE} p-4`}>
+              <div className="text-2xl" aria-hidden>
+                {s.icon}
+              </div>
               <div className="mt-2 font-semibold">
                 {i + 1}. {s.titel}
               </div>
@@ -69,27 +66,37 @@ export function Startseite({
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase">{t.wissensdatenbank}</h2>
+        <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+          {t.wissensdatenbank}
+        </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <button onClick={sucheOeffnen} className={karte}>
-            <span className="text-2xl">🔍</span>
+            <span className="text-2xl" aria-hidden>
+              🔍
+            </span>
             <span className="mt-1 block font-semibold">
-              {t.suche} <kbd className={kbd + ' ml-1 font-normal text-slate-500'}>{t.strg} K</kbd>
+              {t.suche} <Taste className="ml-1">{t.strg} K</Taste>
             </span>
             <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenSuche}</span>
           </button>
           <a href="#/glossar" className={karte}>
-            <span className="text-2xl">📚</span>
+            <span className="text-2xl" aria-hidden>
+              📚
+            </span>
             <span className="mt-1 block font-semibold">{t.glossar}</span>
             <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenGlossar}</span>
           </a>
           <a href="#/projekt" className={karte}>
-            <span className="text-2xl">🧵</span>
+            <span className="text-2xl" aria-hidden>
+              🧵
+            </span>
             <span className="mt-1 block font-semibold">{t.projekt}</span>
             <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenProjekt}</span>
           </a>
           <a href="#/playground" className={karte}>
-            <span className="text-2xl">🛝</span>
+            <span className="text-2xl" aria-hidden>
+              🛝
+            </span>
             <span className="mt-1 block font-semibold">{t.playground}</span>
             <span className="text-sm text-slate-600 dark:text-slate-400">{t.kartenPlayground}</span>
           </a>
@@ -97,17 +104,16 @@ export function Startseite({
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase">{t.derLernpfad}</h2>
+        <h2 className="text-sm font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+          {t.derLernpfad}
+        </h2>
         <div className="grid gap-4 lg:grid-cols-2">
           {kurs
             .filter((teil) => teil !== projekt)
             .map((teil) => {
             const fertig = teil.kapitel.filter((k) => erledigt.includes(k.id)).length
             return (
-              <div
-                key={teil.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
-              >
+              <div key={teil.id} className={`${KARTE} p-5`}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold text-brand-600 uppercase dark:text-brand-400">
@@ -175,19 +181,19 @@ export function Startseite({
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 text-sm leading-relaxed text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
+      <section className={`${KARTE} p-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400`}>
         <h2 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">{t.editorTippsTitel}</h2>
         <ul className="list-disc space-y-1 pl-5">
           <li>
-            <kbd className={kbd}>{t.strg}</kbd> + <kbd className={kbd}>Enter</kbd> {t.tippAusfuehren}
+            <Taste>{t.strg}</Taste> + <Taste>Enter</Taste> {t.tippAusfuehren}
           </li>
           <li>
-            {t.tippVorschlaege} <kbd className={kbd}>{t.strg}</kbd> + <kbd className={kbd}>{t.leertaste}</kbd>{' '}
+            {t.tippVorschlaege} <Taste>{t.strg}</Taste> + <Taste>{t.leertaste}</Taste>{' '}
             {t.tippVorschlaegeOeffnen}
           </li>
           <li>{t.tippSpeichern}</li>
           <li>
-            <kbd className={kbd}>Tab</kbd> {t.tippTab} <kbd className={kbd}>Esc</kbd> {t.tippTabVerlassen}
+            <Taste>Tab</Taste> {t.tippTab} <Taste>Esc</Taste> {t.tippTabVerlassen}
           </li>
           <li>
             {t.tippSprung}{' '}

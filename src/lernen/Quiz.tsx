@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { KARTE } from '../components/Ui'
 import { useTexte } from '../i18n/SpracheContext'
 
 /** Eine Multiple-Choice-Frage. `richtig` ist der Index der richtigen Antwort. */
@@ -17,7 +18,7 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
   const richtig = fragen.filter((f, i) => gewaehlt[i] === f.richtig).length
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className={`${KARTE} space-y-4 p-4 shadow-sm`}>
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">{t.quizTitel}</h3>
         {beantwortet > 0 && (

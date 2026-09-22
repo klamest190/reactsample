@@ -24,14 +24,15 @@ export function CodeBlock({ code, titel, sprache }: { code: string; titel?: stri
           {titel}
         </figcaption>
       )}
-      <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-5">
+      <pre className="overflow-x-auto p-4 font-mono text-code leading-5">
         <code>
           <HervorgehobenerCode code={code} sprache={modus} />
         </code>
       </pre>
       <button
         onClick={kopieren}
-        className="absolute top-2 right-2 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-600 opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+        // Dauerhaft sichtbar, nur dezent - auf Touch-Geräten gibt es kein Hover.
+        className="absolute top-2 right-2 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-600 opacity-60 transition hover:opacity-100 focus-visible:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
       >
         {kopiert ? t.kopiert : t.kopieren}
       </button>

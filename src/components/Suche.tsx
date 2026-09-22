@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSprache, useTexte, type Sprache } from '../i18n/SpracheContext'
+import { Taste } from './Ui'
 import { glossar } from '../kurs/glossar'
 import { alleKapitel } from '../kurs/kurs'
 
@@ -149,10 +150,12 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
             aria-label={t.suchePlatzhalter}
             className="w-full bg-transparent py-3 text-base outline-none"
           />
-          <kbd className="rounded border border-slate-300 px-1.5 font-mono text-xs text-slate-500 dark:border-slate-700">Esc</kbd>
+          <Taste>Esc</Taste>
         </div>
 
-        {anfrage.trim() && treffer.length === 0 && <p className="px-4 py-6 text-sm text-slate-500">{t.sucheKeineTreffer}</p>}
+        {anfrage.trim() && treffer.length === 0 && (
+          <p className="px-4 py-6 text-sm text-slate-500 dark:text-slate-400">{t.sucheKeineTreffer}</p>
+        )}
 
         {treffer.length > 0 && (
           <ul id="suchergebnisse" role="listbox" ref={listeRef} className="max-h-[60vh] overflow-y-auto p-2">
@@ -166,7 +169,7 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
                 onClick={() => oeffnen(tr.ziel)}
                 className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 ${i === aktiv ? 'bg-brand-50 dark:bg-slate-800' : ''}`}
               >
-                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${artStil[tr.art]}`}>
+                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-3xs font-semibold uppercase ${artStil[tr.art]}`}>
                   {t.sucheArten[tr.art]}
                 </span>
                 <span className="min-w-0">
@@ -178,7 +181,9 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
           </ul>
         )}
 
-        <p className="border-t border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-800">{t.sucheHinweis}</p>
+        <p className="border-t border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+          {t.sucheHinweis}
+        </p>
       </div>
     </div>
   )

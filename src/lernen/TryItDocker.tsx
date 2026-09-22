@@ -196,7 +196,7 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
   return (
     <div className="space-y-4 px-4 py-3 text-sm">
       {result.first.error ? (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-[13px] whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-code whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
           ⛔ {t.failed} ({t.line(result.first.error.line)}):{'\n'}
           {result.first.error.message}
         </div>
@@ -238,7 +238,7 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
           <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.hints}</h4>
           <ul className="space-y-1.5">
             {result.findings.map((f, i) => (
-              <li key={i} className="flex gap-2 text-[13px]">
+              <li key={i} className="flex gap-2 text-code">
                 <span aria-hidden="true">{f.severity === 'error' ? '⛔' : f.severity === 'warning' ? '⚠️' : '💡'}</span>
                 <span>
                   <span className="text-xs text-slate-500">
@@ -254,8 +254,8 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
       )}
 
       {result.run && (
-        <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-[13px] leading-5 dark:bg-black/40">
-          <div className="border-b border-slate-700 px-3 py-1 text-[11px] tracking-wider text-slate-400 uppercase">$ {t.run}</div>
+        <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-code leading-5 dark:bg-black/40">
+          <div className="border-b border-slate-700 px-3 py-1 text-2xs tracking-wider text-slate-400 uppercase">$ {t.run}</div>
           <div className="px-3 py-2">
             {result.run.lines.map((l, i) => (
               <div key={i} className={`whitespace-pre-wrap ${result.run!.ok ? 'text-slate-100' : 'text-rose-300'}`}>
@@ -278,7 +278,7 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
         <span>{title}</span>
         <span className="font-mono text-slate-700 normal-case dark:text-slate-200">⏱ {t.seconds(run.seconds)}</span>
       </h4>
-      <ol className="overflow-hidden rounded-lg border border-slate-200 font-mono text-[12px] dark:border-slate-800">
+      <ol className="overflow-hidden rounded-lg border border-slate-200 font-mono text-xs dark:border-slate-800">
         {run.steps.map((s, i) => (
           <li
             key={i}
@@ -289,7 +289,7 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
           >
             <span className="min-w-0 flex-1 break-all">{s.label}</span>
             {s.cached ? (
-              <span className="shrink-0 rounded bg-emerald-100 px-1 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{t.cached}</span>
+              <span className="shrink-0 rounded bg-emerald-100 px-1 text-3xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{t.cached}</span>
             ) : (
               <span className="shrink-0 text-slate-500">{s.seconds.toFixed(1)}s</span>
             )}
@@ -316,7 +316,7 @@ function LayerBar({ image, title }: { image: NonNullable<BuildResult['image']>; 
           />
         ))}
       </div>
-      <ul className="mt-1 grid gap-x-4 text-[11px] text-slate-500 sm:grid-cols-2 dark:text-slate-400">
+      <ul className="mt-1 grid gap-x-4 text-2xs text-slate-500 sm:grid-cols-2 dark:text-slate-400">
         {parts.map((p, i) => (
           <li key={i} className="truncate font-mono">
             <span className={`mr-1 inline-block size-2 rounded-sm ${p.base ? 'bg-slate-300 dark:bg-slate-600' : 'bg-cyan-400 dark:bg-cyan-600'}`} />
@@ -332,7 +332,7 @@ function LayerBar({ image, title }: { image: NonNullable<BuildResult['image']>; 
 function InlineCode({ text }: { text: string }) {
   return text.split(/(`[^`]+`)/).map((part, i) =>
     part.startsWith('`') ? (
-      <code key={i} className="rounded bg-slate-100 px-1 font-mono text-[12px] dark:bg-slate-800">
+      <code key={i} className="rounded bg-slate-100 px-1 font-mono text-xs dark:bg-slate-800">
         {part.slice(1, -1)}
       </code>
     ) : (
@@ -437,7 +437,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
       {result.findings.length > 0 && (
         <ul className="space-y-1.5">
           {result.findings.map((f, i) => (
-            <li key={i} className="flex gap-2 text-[13px]">
+            <li key={i} className="flex gap-2 text-code">
               <span aria-hidden="true">{f.severity === 'error' ? '⛔' : f.severity === 'warning' ? '⚠️' : '💡'}</span>
               <span>
                 <span className="text-xs text-slate-500">{t.line(f.line)}:</span> <InlineCode text={f[sprache]} />
@@ -448,8 +448,8 @@ function ComposeView({ result }: { result: ComposeResult }) {
       )}
 
       {result.log.length > 0 && (
-        <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-[12.5px] leading-5 dark:bg-black/40">
-          <div className="border-b border-slate-700 px-3 py-1 text-[11px] tracking-wider text-slate-400 uppercase">$ docker compose up</div>
+        <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-xs leading-5 dark:bg-black/40">
+          <div className="border-b border-slate-700 px-3 py-1 text-2xs tracking-wider text-slate-400 uppercase">$ docker compose up</div>
           <div className="max-h-96 overflow-auto px-3 py-2">
             {result.log.map((l, i) => (
               <div key={i} className={`whitespace-pre-wrap ${l.kind === 'error' ? 'text-rose-300' : l.kind === 'warn' ? 'text-amber-300' : l.kind === 'ok' && !l.service ? 'text-emerald-300' : 'text-slate-200'}`}>
@@ -464,7 +464,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
       {result.containers.length > 0 && (
         <div className="overflow-x-auto">
           <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">$ {t.containers}</h4>
-          <table className="w-full min-w-md text-left font-mono text-[12px]">
+          <table className="w-full min-w-md text-left font-mono text-xs">
             <thead className="text-slate-500">
               <tr>
                 <th className="pr-3 font-normal">NAME</th>
@@ -490,7 +490,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
       {result.urls.length > 0 && (
         <div>
           <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.browser}</h4>
-          <ul className="space-y-0.5 font-mono text-[12px]">
+          <ul className="space-y-0.5 font-mono text-xs">
             {result.urls.map((u) => (
               <li key={u.url} className={u.ok ? '' : 'text-rose-600 dark:text-rose-400'}>
                 {u.ok ? '✅' : '❌'} {u.url} → {u.answer}

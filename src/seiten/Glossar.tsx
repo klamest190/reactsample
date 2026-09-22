@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Eingabe } from '../components/Ui'
 import { KapitelChip } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { glossar } from '../kurs/glossar'
@@ -36,13 +37,13 @@ export function Glossar({ ziel }: { ziel?: string }) {
       <header className="space-y-3">
         <h1 className="text-3xl font-bold tracking-tight">{t.glossarTitel}</h1>
         <p className="max-w-3xl text-slate-600 dark:text-slate-400">{t.glossarText}</p>
-        <input
+        <Eingabe
           type="search"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder={t.glossarFilter}
           aria-label={t.glossarFilter}
-          className="w-full max-w-md rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-900"
+          className="max-w-md bg-white dark:bg-slate-900"
         />
         {!suche && (
           <nav className="flex flex-wrap gap-1 text-sm" aria-label="A–Z">
@@ -59,7 +60,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
         )}
       </header>
 
-      {sichtbar.length === 0 && <p className="text-slate-500">{t.sucheKeineTreffer}</p>}
+      {sichtbar.length === 0 && <p className="text-slate-500 dark:text-slate-400">{t.sucheKeineTreffer}</p>}
 
       <dl className="space-y-3">
         {sichtbar.map((eintrag) => (
@@ -73,7 +74,9 @@ export function Glossar({ ziel }: { ziel?: string }) {
           >
             <dt className="flex flex-wrap items-baseline gap-2">
               <span className="text-lg font-semibold">{eintrag.begriff}</span>
-              {eintrag.deutsch && sprache === 'de' && <span className="text-sm text-slate-500">· {eintrag.deutsch}</span>}
+              {eintrag.deutsch && sprache === 'de' && (
+                <span className="text-sm text-slate-500 dark:text-slate-400">· {eintrag.deutsch}</span>
+              )}
             </dt>
             <dd className="space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
               <p>
@@ -81,7 +84,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
               </p>
               {eintrag.code && <CodeBlock code={eintrag.code} />}
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-slate-500">{t.glossarMehr}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{t.glossarMehr}</span>
                 {eintrag.kapitel.map((id) => (
                   <KapitelChip key={id} id={id} />
                 ))}
