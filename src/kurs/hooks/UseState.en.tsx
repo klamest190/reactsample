@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
@@ -39,28 +39,15 @@ export function UseState() {
           context and more. They always start with <Code>use</Code>. In this part you will learn all the
           important hooks - each with the problem it solves.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Hook</th>
-                <th className="py-2 pr-4">What for?</th>
-                <th className="py-2">Chapter</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {hookOverview.map(([hook, purpose, chapter]) => (
-                <tr key={hook}>
-                  <td className="py-2 pr-4">
-                    <Code>{hook}</Code>
-                  </td>
-                  <td className="py-2 pr-4">{purpose}</td>
-                  <td className="py-2 tabular-nums">{chapter}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Hook', 'What for?', 'Chapter']}
+          spalten={[undefined, undefined, 'tabular-nums']}
+          zeilen={hookOverview.map(([hook, purpose, chapter]) => [
+            <Code key={hook}>{hook}</Code>,
+            purpose,
+            chapter,
+          ])}
+        />
       </Abschnitt>
 
       <Abschnitt titel="The rules of hooks - and why they exist">

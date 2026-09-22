@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
@@ -25,26 +25,11 @@ export function Abschlussprojekt() {
           array methods and immutability from part 1, components and data flow from part 3 and the hooks from
           part 4. Take your time - and only look at the sample solution when you get stuck.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">#</th>
-                <th className="py-2 pr-4">Step</th>
-                <th className="py-2">What to do</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {steps.map(([nr, title, text]) => (
-                <tr key={nr}>
-                  <td className="py-2 pr-4 tabular-nums">{nr}</td>
-                  <td className="py-2 pr-4 font-medium whitespace-nowrap">{title}</td>
-                  <td className="py-2">{text}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['#', 'Step', 'What to do']}
+          spalten={['tabular-nums', 'font-medium whitespace-nowrap']}
+          zeilen={steps}
+        />
         <Hinweis variante="tipp">
           Work step by step and press ▶ Run after each step. Your code is saved automatically, so you can take a
           break at any time.

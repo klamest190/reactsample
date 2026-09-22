@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -28,41 +28,22 @@ export function UseRef() {
           <Code>current</Code> jederzeit ändern - und das löst <strong>kein</strong> neues Rendern
           aus.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4"></th>
-                <th className="py-2 pr-4">useState</th>
-                <th className="py-2">useRef</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              <tr>
-                <td className="py-2 pr-4 font-medium">Ändern löst Render aus</td>
-                <td className="py-2 pr-4">ja</td>
-                <td className="py-2">nein</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-medium">Ändern</td>
-                <td className="py-2 pr-4">über den Setter, wirkt ab dem nächsten Render</td>
-                <td className="py-2">
-                  <Code>ref.current = x</Code>, sofort
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-medium">Beim Rendern lesen</td>
-                <td className="py-2 pr-4">ja</td>
-                <td className="py-2">nein (außer beim Initialisieren)</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-medium">Typisch für</td>
-                <td className="py-2 pr-4">alles, was man sieht</td>
-                <td className="py-2">DOM-Elemente, Timer-IDs, „Mechanik“</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['', 'useState', 'useRef']}
+          spalten={['font-medium']}
+          zeilen={[
+            ['Ändern löst Render aus', 'ja', 'nein'],
+            [
+              'Ändern',
+              'über den Setter, wirkt ab dem nächsten Render',
+              <>
+                <Code>ref.current = x</Code>, sofort
+              </>,
+            ],
+            ['Beim Rendern lesen', 'ja', 'nein (außer beim Initialisieren)'],
+            ['Typisch für', 'alles, was man sieht', 'DOM-Elemente, Timer-IDs, „Mechanik“'],
+          ]}
+        />
         <TryIt
           id="hooks-useref-vergleich"
           {...beispiele['hooks-useref-vergleich']}

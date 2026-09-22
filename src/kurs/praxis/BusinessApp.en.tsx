@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -41,26 +41,11 @@ export function BusinessApp() {
       </Abschnitt>
 
       <Abschnitt titel="How the app is structured">
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">File / folder</th>
-                <th className="py-2">Purpose</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {structure.map(([file, purpose]) => (
-                <tr key={file}>
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    <Code>{file}</Code>
-                  </td>
-                  <td className="py-2">{purpose}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['File / folder', 'Purpose']}
+          spalten={['whitespace-nowrap']}
+          zeilen={structure.map(([file, purpose]) => [<Code key={file}>{file}</Code>, purpose])}
+        />
         <P>The data always flows in the same circle:</P>
         <Liste>
           <li>

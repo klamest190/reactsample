@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -42,26 +42,11 @@ export function BusinessApp() {
       </Abschnitt>
 
       <Abschnitt titel="So ist die App aufgebaut">
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Datei / Ordner</th>
-                <th className="py-2">Aufgabe</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {aufbau.map(([datei, aufgabe]) => (
-                <tr key={datei}>
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    <Code>{datei}</Code>
-                  </td>
-                  <td className="py-2">{aufgabe}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Datei / Ordner', 'Aufgabe']}
+          spalten={['whitespace-nowrap']}
+          zeilen={aufbau.map(([datei, aufgabe]) => [<Code key={datei}>{datei}</Code>, aufgabe])}
+        />
         <P>Die Daten fließen immer im selben Kreis:</P>
         <Liste>
           <li>

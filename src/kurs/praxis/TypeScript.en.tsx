@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -26,31 +26,9 @@ const hilfstypen: [string, string][] = [
   ['ReturnType<typeof f>', 'The return type of a function'],
 ]
 
-/** Two-column table, code on the left. `codeRechts`: right column as code too. */
-function Tabelle({ kopf, zeilen, codeRechts = false }: { kopf: [string, string]; zeilen: [string, string][]; codeRechts?: boolean }) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full max-w-3xl text-left text-sm">
-        <thead className="border-b border-slate-300 dark:border-slate-700">
-          <tr>
-            <th className="py-2 pr-4">{kopf[0]}</th>
-            <th className="py-2">{kopf[1]}</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-          {zeilen.map(([a, b]) => (
-            <tr key={a}>
-              <td className="py-1.5 pr-4 align-top">
-                <Code>{a}</Code>
-              </td>
-              <td className="py-1.5">{codeRechts ? <Code>{b}</Code> : b}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
+/** Zeilen dieser beiden Übersichten: links immer Code, rechts wahlweise. */
+const codeZeilen = (zeilen: [string, string][], codeRechts = false) =>
+  zeilen.map(([a, b]) => [<Code key={a}>{a}</Code>, codeRechts ? <Code key={b}>{b}</Code> : b])
 
 export function TypeScriptKapitel() {
   return (
@@ -150,7 +128,7 @@ export function TypeScriptKapitel() {
           If you write handlers inline in JSX (<Code>{'onChange={(e) => …}'}</Code>), TypeScript knows the type of{' '}
           <Code>e</Code> on its own. Only handlers defined separately need an annotation:
         </P>
-        <Tabelle kopf={['Event', 'Type (from react)']} zeilen={ereignisse} codeRechts />
+        <Tabelle dicht spalten={['align-top']} kopf={['Event', 'Type (from react)']} zeilen={codeZeilen(ereignisse, true)} />
         <Hinweis variante="tipp">
           No need to memorize them: hover over <Code>onChange</Code> in VS Code - the tooltip shows the type.
         </Hinweis>
@@ -190,7 +168,7 @@ export function TypeScriptKapitel() {
 
       <Abschnitt titel="Types from types and outside data">
         <P>Instead of writing similar types several times, you derive them. The most important utility types:</P>
-        <Tabelle kopf={['Utility type', 'Result']} zeilen={hilfstypen} />
+        <Tabelle dicht spalten={['align-top']} kopf={['Utility type', 'Result']} zeilen={codeZeilen(hilfstypen)} />
         <P>
           TypeScript knows nothing about data from outside - from <Code>JSON.parse</Code>, <Code>fetch</Code> or{' '}
           <Code>localStorage</Code>. Give it the type <Code>unknown</Code> and check it before using it. A function

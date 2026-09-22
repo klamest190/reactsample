@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -38,36 +38,20 @@ export function Variablen() {
           Java has eight built-in types that are not objects. In practice you need four of them:{' '}
           <Code>int</Code>, <Code>double</Code>, <Code>boolean</Code> and <Code>char</Code>.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Type</th>
-                <th className="py-2 pr-4">What for</th>
-                <th className="py-2">Default value</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['int', 'Whole numbers - the default choice', '0'],
-                ['long', 'Very large whole numbers (timestamps, IDs)', '0'],
-                ['double', 'Decimals - the default choice', '0.0'],
-                ['float', 'Decimals, half as precise. Rare.', '0.0'],
-                ['boolean', 'true or false. Nothing else.', 'false'],
-                ['char', "Exactly one character: 'A'", "'\\u0000'"],
-                ['byte, short', 'Very small numbers. Almost never needed.', '0'],
-              ].map(([typ, wofuer, standard]) => (
-                <tr key={typ}>
-                  <td className="py-2 pr-4 align-top">
-                    <Code>{typ}</Code>
-                  </td>
-                  <td className="py-2 pr-4">{wofuer}</td>
-                  <td className="py-2 font-mono text-xs">{standard}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Type', 'What for', 'Default value']}
+          spalten={['align-top', undefined, 'font-mono text-xs']}
+          zeilen={[
+            ['int', 'Whole numbers - the default choice', '0'],
+            ['long', 'Very large whole numbers (timestamps, IDs)', '0'],
+            ['double', 'Decimals - the default choice', '0.0'],
+            ['float', 'Decimals, half as precise. Rare.', '0.0'],
+            ['boolean', 'true or false. Nothing else.', 'false'],
+            ['char', "Exactly one character: 'A'", "'\\u0000'"],
+            ['byte, short', 'Very small numbers. Almost never needed.', '0'],
+          ].map(([typ, wofuer, standard]) => [<Code key={typ}>{typ}</Code>, wofuer, standard])}
+        />
         <P>
           <Code>String</Code> is missing from this list on purpose: a string is not a primitive type
           but a <strong>class</strong> - which is why it is capitalized. More on that in{' '}

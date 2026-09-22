@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -43,26 +43,7 @@ export function Testen() {
           sind ausprobieren <strong>als Code</strong>: einmal geschrieben, danach bei jedem Speichern in Sekunden
           wiederholt. Die Übungen in diesem Kurs prüfen deine Lösungen übrigens genauso.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Art</th>
-                <th className="py-2 pr-4">Was wird geprüft?</th>
-                <th className="py-2">Werkzeug</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {ebenen.map(([art, was, werkzeug]) => (
-                <tr key={art}>
-                  <td className="py-1.5 pr-4 font-medium">{art}</td>
-                  <td className="py-1.5 pr-4">{was}</td>
-                  <td className="py-1.5">{werkzeug}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle dicht kopf={['Art', 'Was wird geprüft?', 'Werkzeug']} spalten={['font-medium']} zeilen={ebenen} />
         <P>
           Viele schnelle Unit- und Komponenten-Tests, wenige langsame End-to-End-Tests für die wichtigsten Abläufe
           (Anmelden, Bestellen). In diesem Kapitel geht es um die ersten beiden.
@@ -101,20 +82,11 @@ export function Testen() {
         </P>
         <TryIt id="praxis-testen-rtl" {...beispiele['praxis-testen-rtl']} modus="test" />
         <P>Die Abfragen gibt es in vier Varianten:</P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {abfragen.map(([name, text]) => (
-                <tr key={name}>
-                  <td className="py-1.5 pr-4 align-top">
-                    <Code>{name}</Code>
-                  </td>
-                  <td className="py-1.5">{text}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          dicht
+          spalten={['align-top']}
+          zeilen={abfragen.map(([name, text]) => [<Code key={name}>{name}</Code>, text])}
+        />
         <P>
           Und wonach suchen? In dieser Reihenfolge: <Code>ByRole</Code> (Knöpfe, Überschriften, Felder …),{' '}
           <Code>ByLabelText</Code> (Formularfelder), <Code>ByText</Code>, und nur als letzter Ausweg{' '}

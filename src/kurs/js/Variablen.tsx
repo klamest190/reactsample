@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -71,34 +71,17 @@ export function Variablen() {
           Jeder Wert hat einen Typ. Mit <Code>typeof</Code> kannst du ihn abfragen. Die sogenannten{' '}
           <strong>primitiven</strong> Typen sind:
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Typ</th>
-                <th className="py-2 pr-4">Beispiel</th>
-                <th className="py-2">Wofür?</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['string', "'Hallo', \"Welt\", `Text`", 'Text'],
-                ['number', '42, 3.14, -7, NaN', 'Ganz- und Kommazahlen (es gibt nur einen Zahlentyp)'],
-                ['boolean', 'true, false', 'Ja/Nein-Entscheidungen'],
-                ['undefined', 'undefined', '„Noch kein Wert zugewiesen“'],
-                ['null', 'null', '„Absichtlich leer“'],
-              ].map(([typ, beispiel, wofuer]) => (
-                <tr key={typ}>
-                  <td className="py-2 pr-4">
-                    <Code>{typ}</Code>
-                  </td>
-                  <td className="py-2 pr-4 font-mono text-xs">{beispiel}</td>
-                  <td className="py-2">{wofuer}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Typ', 'Beispiel', 'Wofür?']}
+          spalten={[undefined, 'font-mono text-xs']}
+          zeilen={[
+            ['string', "'Hallo', \"Welt\", `Text`", 'Text'],
+            ['number', '42, 3.14, -7, NaN', 'Ganz- und Kommazahlen (es gibt nur einen Zahlentyp)'],
+            ['boolean', 'true, false', 'Ja/Nein-Entscheidungen'],
+            ['undefined', 'undefined', '„Noch kein Wert zugewiesen“'],
+            ['null', 'null', '„Absichtlich leer“'],
+          ].map(([typ, beispiel, wofuer]) => [<Code key={typ}>{typ}</Code>, beispiel, wofuer])}
+        />
         <P>
           Alles andere - Objekte, Arrays, Funktionen - sind <strong>Objekte</strong>. Warum dieser
           Unterschied für React so wichtig ist, lernst du in <Verweis nr="1.6" />.

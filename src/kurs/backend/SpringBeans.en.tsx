@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -42,30 +42,17 @@ export function SpringBeans() {
           Spring looks for all classes with one of these annotations and turns each one into exactly
           one bean:
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Annotation</th>
-                <th className="py-2">for</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['@Component', 'any bean - the general form'],
-                ['@Service', 'business logic'],
-                ['@Repository', 'data access'],
-                ['@RestController', 'answers HTTP requests'],
-                ['@Configuration', 'contains @Bean methods'],
-              ].map(([annotation, purpose]) => (
-                <tr key={annotation}>
-                  <td className="py-2 pr-4 font-mono text-xs">{annotation}</td>
-                  <td className="py-2">{purpose}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Annotation', 'for']}
+          spalten={['font-mono text-xs']}
+          zeilen={[
+            ['@Component', 'any bean - the general form'],
+            ['@Service', 'business logic'],
+            ['@Repository', 'data access'],
+            ['@RestController', 'answers HTTP requests'],
+            ['@Configuration', 'contains @Bean methods'],
+          ]}
+        />
         <P>
           Technically <Code>@Service</Code> and <Code>@Repository</Code> do the same as{' '}
           <Code>@Component</Code> - the name tells humans which role the class plays. The bean’s name

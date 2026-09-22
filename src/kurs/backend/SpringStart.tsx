@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -62,52 +62,26 @@ export function SpringStart() {
           <CodeBlock code={codeBloecke.anlegen} titel="Anlegen · request.http" />
           <CodeBlock code={codeBloecke.angelegt} titel="Antwort" sprache="konfig" />
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Methode</th>
-                <th className="py-2">Bedeutung</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['GET', 'lesen - ändert nichts, darf beliebig oft wiederholt werden'],
-                ['POST', 'etwas Neues anlegen'],
-                ['PUT', 'etwas komplett ersetzen'],
-                ['PATCH', 'etwas teilweise ändern'],
-                ['DELETE', 'etwas löschen'],
-              ].map(([methode, bedeutung]) => (
-                <tr key={methode}>
-                  <td className="py-2 pr-4 font-mono text-xs font-bold">{methode}</td>
-                  <td className="py-2">{bedeutung}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Status</th>
-                <th className="py-2">Bedeutung</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['2xx', '200 OK, 201 Created, 204 No Content - hat geklappt'],
-                ['4xx', '400 Bad Request, 404 Not Found, 405 Method Not Allowed - der Client hat etwas falsch gemacht'],
-                ['5xx', '500 Internal Server Error - der Server hat einen Fehler (meist eine Exception)'],
-              ].map(([status, bedeutung]) => (
-                <tr key={status}>
-                  <td className="py-2 pr-4 font-mono text-xs font-bold">{status}</td>
-                  <td className="py-2">{bedeutung}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Methode', 'Bedeutung']}
+          spalten={['font-mono text-xs font-bold']}
+          zeilen={[
+            ['GET', 'lesen - ändert nichts, darf beliebig oft wiederholt werden'],
+            ['POST', 'etwas Neues anlegen'],
+            ['PUT', 'etwas komplett ersetzen'],
+            ['PATCH', 'etwas teilweise ändern'],
+            ['DELETE', 'etwas löschen'],
+          ]}
+        />
+        <Tabelle
+          kopf={['Status', 'Bedeutung']}
+          spalten={['font-mono text-xs font-bold']}
+          zeilen={[
+            ['2xx', '200 OK, 201 Created, 204 No Content - hat geklappt'],
+            ['4xx', '400 Bad Request, 404 Not Found, 405 Method Not Allowed - der Client hat etwas falsch gemacht'],
+            ['5xx', '500 Internal Server Error - der Server hat einen Fehler (meist eine Exception)'],
+          ]}
+        />
         <Hinweis variante="tipp">
           Die Schreibweise oben ist das <Code>.http</Code>-Format, das IntelliJ IDEA und VS Code
           (mit der Erweiterung „REST Client“) direkt ausführen können. Genau so schreiben wir in

@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -43,30 +43,17 @@ export function SpringBeans() {
           Ein Objekt, das Spring anlegt und verwaltet, heißt <strong>Bean</strong>. Beim Start sucht
           Spring alle Klassen mit einer dieser Annotationen und macht aus jeder genau eine Bean:
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Annotation</th>
-                <th className="py-2">wofür</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['@Component', 'irgendeine Bean - die allgemeine Form'],
-                ['@Service', 'Geschäftslogik'],
-                ['@Repository', 'Datenzugriff'],
-                ['@RestController', 'beantwortet HTTP-Anfragen'],
-                ['@Configuration', 'enthält @Bean-Methoden'],
-              ].map(([annotation, wofuer]) => (
-                <tr key={annotation}>
-                  <td className="py-2 pr-4 font-mono text-xs">{annotation}</td>
-                  <td className="py-2">{wofuer}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Annotation', 'wofür']}
+          spalten={['font-mono text-xs']}
+          zeilen={[
+            ['@Component', 'irgendeine Bean - die allgemeine Form'],
+            ['@Service', 'Geschäftslogik'],
+            ['@Repository', 'Datenzugriff'],
+            ['@RestController', 'beantwortet HTTP-Anfragen'],
+            ['@Configuration', 'enthält @Bean-Methoden'],
+          ]}
+        />
         <P>
           Technisch machen <Code>@Service</Code> und <Code>@Repository</Code> dasselbe wie{' '}
           <Code>@Component</Code> - der Name sagt Menschen, welche Rolle die Klasse spielt. Der Name

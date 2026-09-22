@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
@@ -58,28 +58,12 @@ export function Barrierefreiheit() {
           <strong>Rolle</strong>, die Browser und Screenreader kennen - samt Tastaturbedienung. Ein{' '}
           <Code>{'<div onClick>'}</Code> hat keine Rolle, ist nicht fokussierbar und reagiert nicht auf Enter.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Element</th>
-                <th className="py-2 pr-4">Rolle</th>
-                <th className="py-2">Was man geschenkt bekommt</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {elemente.map(([el, rolle, text]) => (
-                <tr key={el}>
-                  <td className="py-1.5 pr-4 align-top">
-                    <Code>{el}</Code>
-                  </td>
-                  <td className="py-1.5 pr-4 align-top">{rolle}</td>
-                  <td className="py-1.5">{text}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          dicht
+          kopf={['Element', 'Rolle', 'Was man geschenkt bekommt']}
+          spalten={['align-top', 'align-top']}
+          zeilen={elemente.map(([el, rolle, text]) => [<Code key={el}>{el}</Code>, rolle, text])}
+        />
         <TryIt id="praxis-a11y-semantik" {...beispiele['praxis-a11y-semantik']} modus="react" />
         <Liste>
           <li>

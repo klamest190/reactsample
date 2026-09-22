@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -51,32 +51,17 @@ export function Start() {
       <Abschnitt titel="Das Gerüst Wort für Wort">
         <CodeBlock code={codeBloecke.geruest} titel="Main.java" />
         <P>Jedes Wort in der zweiten Zeile hat eine Aufgabe:</P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Wort</th>
-                <th className="py-2">Bedeutung</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['public', 'Von überall aufrufbar. Ohne public würde die JVM die Methode nicht finden.'],
-                ['static', 'Gehört der Klasse selbst - es muss also kein Objekt erzeugt werden, um zu starten.'],
-                ['void', 'Die Methode gibt nichts zurück. („void“ = leer)'],
-                ['main', 'Der feste Name, nach dem die JVM beim Start sucht.'],
-                ['String[] args', 'Die Argumente von der Kommandozeile, als Array von Texten.'],
-              ].map(([wort, bedeutung]) => (
-                <tr key={wort}>
-                  <td className="py-2 pr-4 align-top">
-                    <Code>{wort}</Code>
-                  </td>
-                  <td className="py-2">{bedeutung}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Wort', 'Bedeutung']}
+          spalten={['align-top']}
+          zeilen={[
+            ['public', 'Von überall aufrufbar. Ohne public würde die JVM die Methode nicht finden.'],
+            ['static', 'Gehört der Klasse selbst - es muss also kein Objekt erzeugt werden, um zu starten.'],
+            ['void', 'Die Methode gibt nichts zurück. („void“ = leer)'],
+            ['main', 'Der feste Name, nach dem die JVM beim Start sucht.'],
+            ['String[] args', 'Die Argumente von der Kommandozeile, als Array von Texten.'],
+          ].map(([wort, bedeutung]) => [<Code key={wort}>{wort}</Code>, bedeutung])}
+        />
         <P>
           Zum Vergleich - dasselbe Programm in JavaScript braucht genau eine Zeile und keinerlei
           Rahmen:
@@ -143,33 +128,23 @@ export function Start() {
       </Abschnitt>
 
       <Abschnitt titel="Die ersten Unterschiede zu JavaScript">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Thema</th>
-                <th className="py-2 pr-4">Java</th>
-                <th className="py-2">JavaScript</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['Einstiegspunkt', 'public static void main(String[] args)', 'die erste Zeile der Datei'],
-                ['Drumherum', 'immer eine Klasse', 'Code kann frei stehen'],
-                ['Semikolon', 'Pflicht', 'meistens optional'],
-                ['Typen', 'stehen im Code: int, String …', 'ergeben sich zur Laufzeit'],
-                ['Fehler', 'viele schon beim Kompilieren', 'erst beim Ausführen'],
-                ['Ausgabe', 'System.out.println(x)', 'console.log(x)'],
-              ].map(([thema, java, js]) => (
-                <tr key={thema}>
-                  <td className="py-2 pr-4 align-top font-medium">{thema}</td>
-                  <td className="py-2 pr-4 font-mono text-xs">{java}</td>
-                  <td className="py-2 font-mono text-xs text-slate-500 dark:text-slate-400">{js}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Thema', 'Java', 'JavaScript']}
+          spalten={[
+            'align-top font-medium',
+            'font-mono text-xs',
+            'font-mono text-xs text-slate-500 dark:text-slate-400',
+          ]}
+          zeilen={[
+            ['Einstiegspunkt', 'public static void main(String[] args)', 'die erste Zeile der Datei'],
+            ['Drumherum', 'immer eine Klasse', 'Code kann frei stehen'],
+            ['Semikolon', 'Pflicht', 'meistens optional'],
+            ['Typen', 'stehen im Code: int, String …', 'ergeben sich zur Laufzeit'],
+            ['Fehler', 'viele schon beim Kompilieren', 'erst beim Ausführen'],
+            ['Ausgabe', 'System.out.println(x)', 'console.log(x)'],
+          ]}
+        />
       </Abschnitt>
 
       <Abschnitt titel="Übung">

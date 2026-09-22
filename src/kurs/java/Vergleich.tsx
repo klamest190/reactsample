@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -29,39 +29,25 @@ export function Vergleich() {
       </Abschnitt>
 
       <Abschnitt titel="Die Unterschiede auf einer Seite">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Thema</th>
-                <th className="py-2 pr-4">Java</th>
-                <th className="py-2">JavaScript</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['Typen', 'im Code, vom Compiler geprüft', 'erst zur Laufzeit'],
-                ['Fehler', 'viele vor dem Start', 'beim Ausführen'],
-                ['Einstieg', 'main in einer Klasse', 'die erste Zeile der Datei'],
-                ['Funktionen', 'Methoden in Klassen', 'überall, auch als Wert'],
-                ['Objekte', 'aus einer Klasse gebaut', 'jederzeit frei gebaut'],
-                ['Vererbung', 'extends, abstract, interface', 'Prototypen - selten benutzt'],
-                ['Listen', 'Array (fest) / ArrayList', 'Array (wächst)'],
-                ['„leer“', 'nur null', 'null und undefined'],
-                ['Gleichheit', '== Identität, equals Inhalt', '=== Wert bzw. Identität'],
-                ['Bedingungen', 'nur boolean', 'alles ist truthy/falsy'],
-                ['Nebenläufigkeit', 'echte Threads', 'ein Thread + Event Loop'],
-                ['Läuft', 'überall, wo eine JVM ist', 'im Browser und in Node'],
-              ].map(([thema, javaSeite, jsSeite]) => (
-                <tr key={thema}>
-                  <td className="py-2 pr-4 align-top font-medium">{thema}</td>
-                  <td className="py-2 pr-4">{javaSeite}</td>
-                  <td className="py-2 text-slate-600 dark:text-slate-400">{jsSeite}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Thema', 'Java', 'JavaScript']}
+          spalten={['align-top font-medium', undefined, 'text-slate-600 dark:text-slate-400']}
+          zeilen={[
+            ['Typen', 'im Code, vom Compiler geprüft', 'erst zur Laufzeit'],
+            ['Fehler', 'viele vor dem Start', 'beim Ausführen'],
+            ['Einstieg', 'main in einer Klasse', 'die erste Zeile der Datei'],
+            ['Funktionen', 'Methoden in Klassen', 'überall, auch als Wert'],
+            ['Objekte', 'aus einer Klasse gebaut', 'jederzeit frei gebaut'],
+            ['Vererbung', 'extends, abstract, interface', 'Prototypen - selten benutzt'],
+            ['Listen', 'Array (fest) / ArrayList', 'Array (wächst)'],
+            ['„leer“', 'nur null', 'null und undefined'],
+            ['Gleichheit', '== Identität, equals Inhalt', '=== Wert bzw. Identität'],
+            ['Bedingungen', 'nur boolean', 'alles ist truthy/falsy'],
+            ['Nebenläufigkeit', 'echte Threads', 'ein Thread + Event Loop'],
+            ['Läuft', 'überall, wo eine JVM ist', 'im Browser und in Node'],
+          ]}
+        />
         <Hinweis variante="info">
           TypeScript (<Verweis nr="5.8" />) liegt genau dazwischen: Typen wie in Java, Laufzeit wie
           in JavaScript. Beim Bauen werden die Typen wieder entfernt - geprüft wird trotzdem vorher.

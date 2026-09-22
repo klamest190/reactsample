@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -64,31 +64,18 @@ export function Arrays() {
           darfst du State nie direkt verändern (warum, lernst du in <Verweis nr="1.6" />). Für jede gibt es
           eine nicht-mutierende Alternative:
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Mutiert ❌</th>
-                <th className="py-2">Erzeugt neues Array ✅</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 font-mono text-xs dark:divide-slate-800">
-              {[
-                ['arr.push(x)', '[...arr, x]'],
-                ['arr.unshift(x)', '[x, ...arr]'],
-                ['arr.splice(i, 1)', 'arr.filter((_, idx) => idx !== i)  oder  arr.toSpliced(i, 1)'],
-                ['arr[i] = x', 'arr.map((el, idx) => idx === i ? x : el)  oder  arr.with(i, x)'],
-                ['arr.sort()', 'arr.toSorted()'],
-                ['arr.reverse()', 'arr.toReversed()'],
-              ].map(([alt, neu]) => (
-                <tr key={alt}>
-                  <td className="py-2 pr-4">{alt}</td>
-                  <td className="py-2">{neu}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Mutiert ❌', 'Erzeugt neues Array ✅']}
+          spalten={['font-mono text-xs', 'font-mono text-xs']}
+          zeilen={[
+            ['arr.push(x)', '[...arr, x]'],
+            ['arr.unshift(x)', '[x, ...arr]'],
+            ['arr.splice(i, 1)', 'arr.filter((_, idx) => idx !== i)  oder  arr.toSpliced(i, 1)'],
+            ['arr[i] = x', 'arr.map((el, idx) => idx === i ? x : el)  oder  arr.with(i, x)'],
+            ['arr.sort()', 'arr.toSorted()'],
+            ['arr.reverse()', 'arr.toReversed()'],
+          ]}
+        />
         <TryIt
           id="js-arrays-4"
           {...beispiele['js-arrays-4']}

@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -34,33 +34,20 @@ export function SpringErrors() {
           Feldern. Im echten Projekt braucht es dazu diesen Starter:
         </P>
         <CodeBlock code={codeBloecke.abhaengigkeit} titel="pom.xml" />
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Annotation</th>
-                <th className="py-2">prüft</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['@NotNull', 'nicht null'],
-                ['@NotBlank', 'Text nicht null, nicht leer und nicht nur Leerzeichen'],
-                ['@NotEmpty', 'Text oder Liste nicht leer'],
-                ['@Size(min = 1, max = 40)', 'Länge von Text oder Liste'],
-                ['@Min(1) / @Max(5)', 'Zahlenbereich'],
-                ['@Positive', 'größer als 0'],
-                ['@Email', 'sieht aus wie eine E-Mail-Adresse'],
-                ['@Pattern(regexp = "…")', 'passt zu einem regulären Ausdruck'],
-              ].map(([annotation, pruefung]) => (
-                <tr key={annotation}>
-                  <td className="py-2 pr-4 font-mono text-xs">{annotation}</td>
-                  <td className="py-2">{pruefung}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          kopf={['Annotation', 'prüft']}
+          spalten={['font-mono text-xs']}
+          zeilen={[
+            ['@NotNull', 'nicht null'],
+            ['@NotBlank', 'Text nicht null, nicht leer und nicht nur Leerzeichen'],
+            ['@NotEmpty', 'Text oder Liste nicht leer'],
+            ['@Size(min = 1, max = 40)', 'Länge von Text oder Liste'],
+            ['@Min(1) / @Max(5)', 'Zahlenbereich'],
+            ['@Positive', 'größer als 0'],
+            ['@Email', 'sieht aus wie eine E-Mail-Adresse'],
+            ['@Pattern(regexp = "…")', 'passt zu einem regulären Ausdruck'],
+          ]}
+        />
         <Hinweis variante="warnung">
           Ohne <Code>@Valid</Code> am Parameter passiert gar nichts - die Annotationen am Record
           werden dann einfach ignoriert. Das ist der häufigste Grund für „meine Validierung

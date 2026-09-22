@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -26,39 +26,25 @@ export function Vergleich() {
       </Abschnitt>
 
       <Abschnitt titel="The differences on one page">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Topic</th>
-                <th className="py-2 pr-4">Java</th>
-                <th className="py-2">JavaScript</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['Types', 'in the code, checked by the compiler', 'only at runtime'],
-                ['Errors', 'many before the start', 'while running'],
-                ['Entry point', 'main inside a class', 'the first line of the file'],
-                ['Functions', 'methods inside classes', 'anywhere, also as values'],
-                ['Objects', 'built from a class', 'built freely at any time'],
-                ['Inheritance', 'extends, abstract, interface', 'prototypes - rarely used'],
-                ['Lists', 'array (fixed) / ArrayList', 'array (grows)'],
-                ['“empty”', 'only null', 'null and undefined'],
-                ['Equality', '== identity, equals content', '=== value or identity'],
-                ['Conditions', 'boolean only', 'everything is truthy/falsy'],
-                ['Concurrency', 'real threads', 'one thread + event loop'],
-                ['Runs', 'anywhere there is a JVM', 'in the browser and in Node'],
-              ].map(([topic, javaSeite, jsSeite]) => (
-                <tr key={topic}>
-                  <td className="py-2 pr-4 align-top font-medium">{topic}</td>
-                  <td className="py-2 pr-4">{javaSeite}</td>
-                  <td className="py-2 text-slate-600 dark:text-slate-400">{jsSeite}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Topic', 'Java', 'JavaScript']}
+          spalten={['align-top font-medium', undefined, 'text-slate-600 dark:text-slate-400']}
+          zeilen={[
+            ['Types', 'in the code, checked by the compiler', 'only at runtime'],
+            ['Errors', 'many before the start', 'while running'],
+            ['Entry point', 'main inside a class', 'the first line of the file'],
+            ['Functions', 'methods inside classes', 'anywhere, also as values'],
+            ['Objects', 'built from a class', 'built freely at any time'],
+            ['Inheritance', 'extends, abstract, interface', 'prototypes - rarely used'],
+            ['Lists', 'array (fixed) / ArrayList', 'array (grows)'],
+            ['“empty”', 'only null', 'null and undefined'],
+            ['Equality', '== identity, equals content', '=== value or identity'],
+            ['Conditions', 'boolean only', 'everything is truthy/falsy'],
+            ['Concurrency', 'real threads', 'one thread + event loop'],
+            ['Runs', 'anywhere there is a JVM', 'in the browser and in Node'],
+          ]}
+        />
         <Hinweis variante="info">
           TypeScript (<Verweis nr="5.8" />) sits exactly in between: types like Java, runtime like
           JavaScript. During the build the types are removed again - but they are checked before.

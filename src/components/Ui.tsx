@@ -93,6 +93,66 @@ export function Demo({ titel, children }: { titel?: string; children: ReactNode 
   )
 }
 
+/**
+ * Tabelle für Übersichten im Kapiteltext.
+ *
+ * Die Struktur (waagerechter Scroll, Kopfzeile, Trennlinien, Zellabstände) steckt
+ * hier, damit sie nicht in jedem Kapitel wieder abgetippt wird. Die Kapitel geben
+ * nur noch Inhalte - `zeilen` ist eine Liste von Zeilen, jede Zeile eine Liste von Zellen.
+ *
+ * `spalten` setzt zusätzliche Klassen je Spalte, z.B. `font-mono` für eine Codespalte.
+ * `breit` gibt die volle Spaltenbreite frei (sonst gilt die Lesebreite des Fließtexts),
+ * `dicht` verkleinert die Zeilenhöhe für lange Listen.
+ */
+export function Tabelle({
+  kopf,
+  zeilen,
+  spalten,
+  breit,
+  dicht,
+}: {
+  kopf?: ReactNode[]
+  zeilen: ReactNode[][]
+  spalten?: (string | undefined)[]
+  breit?: boolean
+  dicht?: boolean
+}) {
+  // Letzte Spalte ohne rechten Abstand - sonst steht die Tabelle rechts schief.
+  const zelle = (index: number, anzahl: number) =>
+    [dicht ? 'py-1.5' : 'py-2', index < anzahl - 1 ? 'pr-4' : '', spalten?.[index] ?? '']
+      .filter(Boolean)
+      .join(' ')
+
+  return (
+    <div className="overflow-x-auto">
+      <table className={`w-full text-left text-sm ${breit ? '' : 'max-w-3xl'}`}>
+        {kopf && (
+          <thead className="border-b border-slate-300 dark:border-slate-700">
+            <tr>
+              {kopf.map((inhalt, i) => (
+                <th key={i} className={zelle(i, kopf.length)}>
+                  {inhalt}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
+        <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+          {zeilen.map((zeile, r) => (
+            <tr key={r}>
+              {zeile.map((inhalt, i) => (
+                <td key={i} className={zelle(i, zeile.length)}>
+                  {inhalt}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 /** Farbiger Hinweiskasten. `variante` ist ein Union-Type = nur diese Werte erlaubt. */
 export function Hinweis({
   variante = 'info',

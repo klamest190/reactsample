@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -32,31 +32,19 @@ export function Fehler() {
 
       <Abschnitt titel="Die drei, die du am häufigsten siehst">
         <TryIt modus="java" id="java-fehler-typen" {...beispiele['java-fehler-typen']} />
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Exception</th>
-                <th className="py-2">Passiert, wenn …</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['NullPointerException', 'du eine Methode auf null aufrufst - der Klassiker'],
-                ['ArrayIndexOutOfBoundsException', 'du an einen Index greifst, den es nicht gibt'],
-                ['NumberFormatException', 'Integer.parseInt(…) keinen Text mit Zahl bekommt'],
-                ['ArithmeticException', 'du ganzzahlig durch 0 teilst'],
-                ['ClassCastException', 'ein Cast auf einen Typ geht, der nicht passt'],
-                ['IllegalArgumentException', 'du sie selbst wirfst, weil ein Argument unsinnig ist'],
-              ].map(([name, wann]) => (
-                <tr key={name}>
-                  <td className="py-2 pr-4 align-top font-mono text-xs">{name}</td>
-                  <td className="py-2">{wann}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Exception', 'Passiert, wenn …']}
+          spalten={['align-top font-mono text-xs']}
+          zeilen={[
+            ['NullPointerException', 'du eine Methode auf null aufrufst - der Klassiker'],
+            ['ArrayIndexOutOfBoundsException', 'du an einen Index greifst, den es nicht gibt'],
+            ['NumberFormatException', 'Integer.parseInt(…) keinen Text mit Zahl bekommt'],
+            ['ArithmeticException', 'du ganzzahlig durch 0 teilst'],
+            ['ClassCastException', 'ein Cast auf einen Typ geht, der nicht passt'],
+            ['IllegalArgumentException', 'du sie selbst wirfst, weil ein Argument unsinnig ist'],
+          ]}
+        />
       </Abschnitt>
 
       <Abschnitt titel="finally: läuft immer">

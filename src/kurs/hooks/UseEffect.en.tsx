@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
@@ -35,27 +35,20 @@ export function UseEffect() {
 
       <Abschnitt titel="The dependency array">
         <P>The second argument decides when the effect runs again:</P>
-        <div className="overflow-x-auto">
-          <table className="w-full max-w-3xl text-left text-sm">
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              <tr>
-                <td className="py-2 pr-4 font-mono">[]</td>
-                <td className="py-2">Only after the first render. Cleanup when the component is removed.</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-mono">[a, b]</td>
-                <td className="py-2">
-                  After the first render and whenever <Code>a</Code> or <Code>b</Code> has changed (compared
-                  with <Code>Object.is</Code>).
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-mono">omitted</td>
-                <td className="py-2">After every render - rarely what you want.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          spalten={['font-mono']}
+          zeilen={[
+            ['[]', 'Only after the first render. Cleanup when the component is removed.'],
+            [
+              '[a, b]',
+              <>
+                After the first render and whenever <Code>a</Code> or <Code>b</Code> has changed (compared
+                with <Code>Object.is</Code>).
+              </>,
+            ],
+            ['omitted', 'After every render - rarely what you want.'],
+          ]}
+        />
         <TryIt
           id="hooks-useeffect-deps"
           {...beispiele['hooks-useeffect-deps']}

@@ -1,4 +1,4 @@
-import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
+import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
@@ -39,36 +39,20 @@ export function Variablen() {
           Java hat acht eingebaute Typen, die keine Objekte sind. In der Praxis brauchst du vier
           davon: <Code>int</Code>, <Code>double</Code>, <Code>boolean</Code> und <Code>char</Code>.
         </P>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-slate-300 dark:border-slate-700">
-              <tr>
-                <th className="py-2 pr-4">Typ</th>
-                <th className="py-2 pr-4">Wofür</th>
-                <th className="py-2">Standardwert</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {[
-                ['int', 'Ganze Zahlen - die Standardwahl', '0'],
-                ['long', 'Sehr große ganze Zahlen (Zeitstempel, IDs)', '0'],
-                ['double', 'Kommazahlen - die Standardwahl', '0.0'],
-                ['float', 'Kommazahlen, halb so genau. Selten.', '0.0'],
-                ['boolean', 'true oder false. Sonst nichts.', 'false'],
-                ['char', 'Genau ein Zeichen: \'A\'', "'\\u0000'"],
-                ['byte, short', 'Sehr kleine Zahlen. Fast nie nötig.', '0'],
-              ].map(([typ, wofuer, standard]) => (
-                <tr key={typ}>
-                  <td className="py-2 pr-4 align-top">
-                    <Code>{typ}</Code>
-                  </td>
-                  <td className="py-2 pr-4">{wofuer}</td>
-                  <td className="py-2 font-mono text-xs">{standard}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Tabelle
+          breit
+          kopf={['Typ', 'Wofür', 'Standardwert']}
+          spalten={['align-top', undefined, 'font-mono text-xs']}
+          zeilen={[
+            ['int', 'Ganze Zahlen - die Standardwahl', '0'],
+            ['long', 'Sehr große ganze Zahlen (Zeitstempel, IDs)', '0'],
+            ['double', 'Kommazahlen - die Standardwahl', '0.0'],
+            ['float', 'Kommazahlen, halb so genau. Selten.', '0.0'],
+            ['boolean', 'true oder false. Sonst nichts.', 'false'],
+            ['char', "Genau ein Zeichen: 'A'", "'\\u0000'"],
+            ['byte, short', 'Sehr kleine Zahlen. Fast nie nötig.', '0'],
+          ].map(([typ, wofuer, standard]) => [<Code key={typ}>{typ}</Code>, wofuer, standard])}
+        />
         <P>
           <Code>String</Code> fehlt in dieser Liste mit Absicht: Ein String ist kein primitiver Typ,
           sondern eine <strong>Klasse</strong> - deshalb wird er großgeschrieben. Mehr dazu in{' '}
