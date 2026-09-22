@@ -1648,7 +1648,7 @@ export const schrittInhalte: Record<string, SchrittInhalt> = {
     ],
   },
 
-  'projekt-12-challenge': {
+  'projekt-15-challenge': {
     modus: 'react',
     einleitung: {
       de: 'Jetzt ohne Vorlage: Baue die ToDo-App **von null** - so, wie du es für richtig hältst. Die Tests prüfen nur, was ein Mensch sieht und tut, nicht wie dein Code aufgebaut ist.\n\nVersuch es zuerst ganz ohne Tipps und ohne in die früheren Schritte zu schauen. Wenn du hängst: Die Tipps verweisen auf die passenden Kapitel. Und wenn alle Tests grün sind, kannst du die App mit [[praxis-lokal]] auf deinen eigenen Rechner holen.',

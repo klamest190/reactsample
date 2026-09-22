@@ -4,7 +4,7 @@ import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
 import { ContainersVsVms, PortMapping } from '../demos/BackendDiagrams'
 import { DockerTerminal } from '../demos/DockerTerminal'
-import { codeBloecke, terminalTasks } from './DockerStart.code'
+import { codeBloecke, terminalTasks, uebungTasks } from './DockerStart.code'
 
 /**
  * CHAPTER 8.8 - Containers & images (English version)
@@ -103,6 +103,14 @@ export function DockerStart() {
           This makes containers <strong>disposable</strong>: you delete them without worry and start
           new ones - the state lives in the volume or the database, never in the container itself.
         </P>
+      </Abschnitt>
+
+      <Abschnitt titel="Exercise">
+        <P>
+          Back to the terminal, this time with a volume: start a database, watch it come up and throw
+          the container away without losing the data.
+        </P>
+        <DockerTerminal tasks={uebungTasks} />
       </Abschnitt>
 
       <Quiz

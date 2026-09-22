@@ -1,5 +1,6 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
+import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
 import { beispiele } from './Abschlussprojekt.code'
 
@@ -18,7 +19,7 @@ const steps: [string, string, string][] = [
 export function Abschlussprojekt() {
   return (
     <>
-      <Abschnitt titel="The project: a habit tracker">
+      <Abschnitt titel="At a glance">
         <P>
           To finish, you build a small, complete app and put almost everything from this course together:
           array methods and immutability from part 1, components and data flow from part 3 and the hooks from
@@ -50,7 +51,7 @@ export function Abschlussprojekt() {
         </Hinweis>
       </Abschnitt>
 
-      <Abschnitt titel="Let’s go">
+      <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-projekt"
           {...beispiele['praxis-projekt']}
@@ -124,6 +125,44 @@ export function Abschlussprojekt() {
           </li>
         </Liste>
       </Abschnitt>
+
+      <Quiz
+        fragen={[
+          {
+            frage: 'Where do you sensibly start with an app like the tracker?',
+            antworten: [
+              'With the layout and the colors',
+              'With the data model and the transitions - that is, the reducer',
+              'With the components, the UI follows from them',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Once it is clear what the data looks like and how it changes, the UI is only a rendering of it.',
+          },
+          {
+            frage: 'The streak (“🔥 4”) of a habit - where does it belong?',
+            antworten: [
+              'In its own state that is updated whenever a day is ticked',
+              'In the reducer as an extra field on every habit',
+              'Not in state at all - it is computed from the ticked days',
+            ],
+            richtig: 2,
+            erklaerung:
+              'Whatever can be derived from existing state does not belong in state. Otherwise the two values can drift apart.',
+          },
+          {
+            frage: 'What is a custom hook like useLocalStorage good for?',
+            antworten: [
+              'It makes the app faster',
+              'It encapsulates recurring mechanics so components do not repeat them every time',
+              'It replaces the reducer',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Custom hooks gather logic with state and effects in one place - the component stays readable.',
+          },
+        ]}
+      />
 
       <Merke
         punkte={[

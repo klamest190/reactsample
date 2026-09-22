@@ -189,7 +189,7 @@ export const projektSchritte: SchrittMeta[] = [
     stichworte: ['test', 'vitest', 'testing library', 'userEvent', 'beforeEach', 'mutation', 'Mutationstest'],
   },
   {
-    id: 'projekt-12-challenge',
+    id: 'projekt-15-challenge',
     titel: { de: 'Challenge: ToDo-App von null', en: 'Challenge: todo app from scratch' },
     kurz: { de: 'Ein leerer Editor, eine Anforderungsliste und Tests - zeig, was du kannst.', en: 'An empty editor, a list of requirements and tests - show what you can do.' },
     dauer: 60,

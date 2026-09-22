@@ -1,6 +1,7 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
+import { Quiz } from '../../lernen/Quiz'
 import { Werkstatt } from '../../lernen/Werkstatt'
 import { codeBloecke, dateien } from './BusinessApp.code'
 
@@ -20,7 +21,7 @@ const structure: [string, string][] = [
 export function BusinessApp() {
   return (
     <>
-      <Abschnitt titel="A real app instead of single snippets">
+      <Abschnitt titel="At a glance">
         <P>
           So far you have tried out every concept on its own. Here you see how everything works together
           in a real application: <strong>BrightDesk</strong>, a small customer and order management app
@@ -36,9 +37,6 @@ export function BusinessApp() {
           Use the app first: search and sort customers, click a customer and edit it, create an order,
           change its status - and watch how the dashboard changes along with it.
         </Hinweis>
-      </Abschnitt>
-
-      <Abschnitt titel="The workshop">
         <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.tsx" typen />
       </Abschnitt>
 
@@ -85,7 +83,7 @@ export function BusinessApp() {
         <P>For every file, the workshop shows above the editor which chapters explain the concepts used.</P>
       </Abschnitt>
 
-      <Abschnitt titel="Things to try">
+      <Abschnitt titel="Exercise">
         <Liste>
           <li>
             <strong>New status:</strong> In <Code>data.ts</Code>, add the status <Code>'cancelled'</Code> to{' '}
@@ -145,6 +143,44 @@ export function BusinessApp() {
           like <Code>blue</Code>.
         </P>
       </Abschnitt>
+
+      <Quiz
+        fragen={[
+          {
+            frage: 'A page needs the customer list. Where does it get the data from?',
+            antworten: [
+              'Through props that App.tsx passes down through every level',
+              'Through useStore() - which uses useContext underneath',
+              'It loads them from data.ts itself',
+            ],
+            richtig: 1,
+            erklaerung:
+              'The store provides data and dispatch via context. A custom hook wraps that so no page has to call useContext itself.',
+          },
+          {
+            frage: 'Why do the filter, the select and the badge adapt on their own when you add a status in data.ts?',
+            antworten: [
+              'React picks up new values automatically',
+              'Because all three are generated from the same ORDER_STATUSES list',
+              'Because the reducer recomputes them',
+            ],
+            richtig: 1,
+            erklaerung:
+              'One source, three uses: extending the list changes everything with it. Copies would have to be maintained one by one.',
+          },
+          {
+            frage: 'The revenue on the dashboard - where does it come from?',
+            antworten: [
+              'It is a field in state that is written along on every change',
+              'It is computed from the orders on every render',
+              'It is cached in localStorage',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Derived values do not belong in state - otherwise the figure can drift away from the orders.',
+          },
+        ]}
+      />
 
       <Merke
         punkte={[

@@ -12,7 +12,7 @@ import { beispiele, codeBloecke } from './LokalEntwickeln.code'
 export function LokalEntwickeln() {
   return (
     <>
-      <Abschnitt titel="Why leave the browser editor?">
+      <Abschnitt titel="At a glance">
         <P>
           The editors here are built for learning: hooks are already imported, everything lives in one file, and
           tests tell you whether it works. Real projects look different - many files, imports, TypeScript, a build
@@ -92,17 +92,6 @@ export function LokalEntwickeln() {
           </li>
         </Liste>
         <CodeBlock code={codeBloecke.debugger} />
-        <TryIt
-          id="praxis-lokal-debugging"
-          titel="🐞 Bug hunt"
-          {...beispiele['praxis-lokal-debugging']}
-          aufgabe={
-            <p>
-              <Code>averageLength</Code> returns wrong values. Use <Code>console.log</Code> to find out why and fix the
-              function - for an empty list too.
-            </p>
-          }
-        />
       </Abschnitt>
 
       <Abschnitt titel="Rebuild the todo app locally">
@@ -121,19 +110,20 @@ export function LokalEntwickeln() {
         </P>
       </Abschnitt>
 
-      <Merke
-        punkte={[
-          <>
-            <Code>npm create vite@latest</Code> creates a project, <Code>npm run dev</Code> starts it,{' '}
-            <Code>npm run build</Code> builds it.
-          </>,
-          <>In a real project you import hooks yourself and spread components across files.</>,
-          <>
-            You find bugs with <Code>console.log</Code>, breakpoints and the React DevTools - instead of guessing.
-          </>,
-          <>In development, StrictMode runs effects twice to reveal missing cleanups.</>,
-        ]}
-      />
+      <Abschnitt titel="Exercise">
+        <P>Debugging works the same everywhere - here in the browser editor just as in your own project later.</P>
+        <TryIt
+          id="praxis-lokal-debugging"
+          titel="🐞 Bug hunt"
+          {...beispiele['praxis-lokal-debugging']}
+          aufgabe={
+            <p>
+              <Code>averageLength</Code> returns wrong values. Use <Code>console.log</Code> to find out why and fix the
+              function - for an empty list too.
+            </p>
+          }
+        />
+      </Abschnitt>
 
       <Quiz
         fragen={[
@@ -155,6 +145,20 @@ export function LokalEntwickeln() {
             richtig: 1,
             erklaerung: 'The Components tab shows the props, state and hooks of every component - and you can even edit values.',
           },
+        ]}
+      />
+
+      <Merke
+        punkte={[
+          <>
+            <Code>npm create vite@latest</Code> creates a project, <Code>npm run dev</Code> starts it,{' '}
+            <Code>npm run build</Code> builds it.
+          </>,
+          <>In a real project you import hooks yourself and spread components across files.</>,
+          <>
+            You find bugs with <Code>console.log</Code>, breakpoints and the React DevTools - instead of guessing.
+          </>,
+          <>In development, StrictMode runs effects twice to reveal missing cleanups.</>,
         ]}
       />
     </>

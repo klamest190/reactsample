@@ -112,6 +112,14 @@ export function Dockerfile() {
         <TryIt modus="dockerfile" id="docker-dockerfile-react" {...beispiele['docker-dockerfile-react']} />
       </Abschnitt>
 
+      <Abschnitt titel="Bauen und starten">
+        <P>
+          Dasselbe Dockerfile im Terminal: bauen, starten, fragen. Das Terminal benutzt das
+          Multi-Stage-Dockerfile von oben.
+        </P>
+        <DockerTerminal tasks={terminalTasks} dockerfile={terminalDockerfile} project="spring" ignore={terminalIgnore} />
+      </Abschnitt>
+
       <Abschnitt titel="Übung">
         <TryIt
           modus="dockerfile"
@@ -128,14 +136,6 @@ export function Dockerfile() {
             </>
           }
         />
-      </Abschnitt>
-
-      <Abschnitt titel="Bauen und starten">
-        <P>
-          Zum Schluss dasselbe Dockerfile im Terminal: bauen, starten, fragen. Das Terminal benutzt
-          das Multi-Stage-Dockerfile von oben.
-        </P>
-        <DockerTerminal tasks={terminalTasks} dockerfile={terminalDockerfile} project="spring" ignore={terminalIgnore} />
       </Abschnitt>
 
       <Quiz

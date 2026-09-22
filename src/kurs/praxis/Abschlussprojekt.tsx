@@ -1,5 +1,6 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
+import { Quiz } from '../../lernen/Quiz'
 import { TryIt } from '../../lernen/TryIt'
 import { beispiele } from './Abschlussprojekt.code'
 
@@ -18,7 +19,7 @@ const schritte: [string, string, string][] = [
 export function Abschlussprojekt() {
   return (
     <>
-      <Abschnitt titel="Das Projekt: ein Gewohnheiten-Tracker">
+      <Abschnitt titel="Auf einen Blick">
         <P>
           Zum Abschluss baust du eine kleine, vollständige App und setzt fast alles aus diesem Kurs
           zusammen ein: Array-Methoden und Immutability aus Teil 1, Komponenten und Datenfluss aus Teil 3
@@ -51,7 +52,7 @@ export function Abschlussprojekt() {
         </Hinweis>
       </Abschnitt>
 
-      <Abschnitt titel="Los geht’s">
+      <Abschnitt titel="Übung">
         <TryIt
           id="praxis-projekt"
           {...beispiele['praxis-projekt']}
@@ -125,6 +126,44 @@ export function Abschlussprojekt() {
           </li>
         </Liste>
       </Abschnitt>
+
+      <Quiz
+        fragen={[
+          {
+            frage: 'Womit fängst du bei einer App wie dem Tracker sinnvollerweise an?',
+            antworten: [
+              'Mit dem Layout und den Farben',
+              'Mit dem Datenmodell und den Übergängen - also dem Reducer',
+              'Mit den Komponenten, die Oberfläche ergibt sich daraus',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Steht fest, wie die Daten aussehen und wie sie sich ändern, ist die Oberfläche nur noch eine Darstellung davon.',
+          },
+          {
+            frage: 'Die Serie („🔥 4“) einer Gewohnheit - wo gehört sie hin?',
+            antworten: [
+              'Als eigener State, der beim Abhaken mitgepflegt wird',
+              'In den Reducer als zusätzliches Feld jeder Gewohnheit',
+              'Gar nicht in den State - sie wird aus den abgehakten Tagen berechnet',
+            ],
+            richtig: 2,
+            erklaerung:
+              'Was sich aus vorhandenem State ableiten lässt, gehört nicht in den State. Sonst können beide Werte auseinanderlaufen.',
+          },
+          {
+            frage: 'Wofür ist ein eigener Hook wie useLocalStorage gut?',
+            antworten: [
+              'Er macht die App schneller',
+              'Er kapselt wiederkehrende Mechanik, damit Komponenten sie nicht jedes Mal wiederholen',
+              'Er ersetzt den Reducer',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Eigene Hooks bündeln Logik mit State und Effekten an einer Stelle - die Komponente bleibt lesbar.',
+          },
+        ]}
+      />
 
       <Merke
         punkte={[

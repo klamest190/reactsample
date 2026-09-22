@@ -4,7 +4,7 @@ import { CodeBlock } from '../../lernen/CodeBlock'
 import { Quiz } from '../../lernen/Quiz'
 import { ContainersVsVms, PortMapping } from '../demos/BackendDiagrams'
 import { DockerTerminal } from '../demos/DockerTerminal'
-import { codeBloecke, terminalTasks } from './DockerStart.code'
+import { codeBloecke, terminalTasks, uebungTasks } from './DockerStart.code'
 
 /**
  * CHAPTER 8.8 - Containers & images
@@ -104,6 +104,14 @@ export function DockerStart() {
           Container sind damit <strong>wegwerfbar</strong>: Man löscht sie ohne Bedenken und startet
           neue - der Zustand liegt im Volume oder in der Datenbank, nie im Container selbst.
         </P>
+      </Abschnitt>
+
+      <Abschnitt titel="Übung">
+        <P>
+          Noch einmal im Terminal, diesmal mit Volume: Starte eine Datenbank, sieh ihr beim Hochfahren
+          zu und wirf den Container weg, ohne die Daten zu verlieren.
+        </P>
+        <DockerTerminal tasks={uebungTasks} />
       </Abschnitt>
 
       <Quiz

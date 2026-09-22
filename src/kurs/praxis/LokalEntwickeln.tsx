@@ -12,7 +12,7 @@ import { beispiele, codeBloecke } from './LokalEntwickeln.code'
 export function LokalEntwickeln() {
   return (
     <>
-      <Abschnitt titel="Warum raus aus dem Browser-Editor?">
+      <Abschnitt titel="Auf einen Blick">
         <P>
           Die Editoren hier sind zum Lernen gebaut: Hooks sind schon importiert, alles steht in einer Datei, und
           Tests sagen dir, ob es stimmt. Echte Projekte sehen anders aus - viele Dateien, Imports, TypeScript,
@@ -94,17 +94,6 @@ export function LokalEntwickeln() {
           </li>
         </Liste>
         <CodeBlock code={codeBloecke.debugger} />
-        <TryIt
-          id="praxis-lokal-debugging"
-          titel="🐞 Fehlersuche"
-          {...beispiele['praxis-lokal-debugging']}
-          aufgabe={
-            <p>
-              <Code>averageLength</Code> liefert falsche Werte. Finde mit <Code>console.log</Code> heraus, warum, und
-              korrigiere die Funktion - auch für eine leere Liste.
-            </p>
-          }
-        />
       </Abschnitt>
 
       <Abschnitt titel="Die ToDo-App lokal nachbauen">
@@ -123,19 +112,22 @@ export function LokalEntwickeln() {
         </P>
       </Abschnitt>
 
-      <Merke
-        punkte={[
-          <>
-            <Code>npm create vite@latest</Code> legt ein Projekt an, <Code>npm run dev</Code> startet es,{' '}
-            <Code>npm run build</Code> baut es.
-          </>,
-          <>Im echten Projekt importierst du Hooks selbst und verteilst Komponenten auf Dateien.</>,
-          <>
-            Fehler findest du mit <Code>console.log</Code>, Breakpoints und den React DevTools - statt zu raten.
-          </>,
-          <>StrictMode ruft Effekte in der Entwicklung doppelt auf, um fehlende Cleanups aufzudecken.</>,
-        ]}
-      />
+      <Abschnitt titel="Übung">
+        <P>
+          Fehlersuche funktioniert überall gleich - hier im Browser-Editor genauso wie später in deinem Projekt.
+        </P>
+        <TryIt
+          id="praxis-lokal-debugging"
+          titel="🐞 Fehlersuche"
+          {...beispiele['praxis-lokal-debugging']}
+          aufgabe={
+            <p>
+              <Code>averageLength</Code> liefert falsche Werte. Finde mit <Code>console.log</Code> heraus, warum, und
+              korrigiere die Funktion - auch für eine leere Liste.
+            </p>
+          }
+        />
+      </Abschnitt>
 
       <Quiz
         fragen={[
@@ -157,6 +149,20 @@ export function LokalEntwickeln() {
             richtig: 1,
             erklaerung: 'Der Components-Tab zeigt Props, State und Hooks jeder Komponente - und du kannst Werte sogar ändern.',
           },
+        ]}
+      />
+
+      <Merke
+        punkte={[
+          <>
+            <Code>npm create vite@latest</Code> legt ein Projekt an, <Code>npm run dev</Code> startet es,{' '}
+            <Code>npm run build</Code> baut es.
+          </>,
+          <>Im echten Projekt importierst du Hooks selbst und verteilst Komponenten auf Dateien.</>,
+          <>
+            Fehler findest du mit <Code>console.log</Code>, Breakpoints und den React DevTools - statt zu raten.
+          </>,
+          <>StrictMode ruft Effekte in der Entwicklung doppelt auf, um fehlende Cleanups aufzudecken.</>,
         ]}
       />
     </>

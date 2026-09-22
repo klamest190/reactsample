@@ -834,8 +834,8 @@ export const kurs: Teil[] = [
     kurztitel: { de: 'Projekt', en: 'Project' },
     icon: '🧵',
     beschreibung: {
-      de: 'Der rote Faden: eine ToDo-App in 12 Schritten, die mit jedem Kursteil wächst - bis zur Challenge ohne Vorlage.',
-      en: 'The common thread: a todo app in 12 steps that grows with every part of the course - up to a challenge without a template.',
+      de: 'Der rote Faden: eine ToDo-App in 15 Schritten, die mit jedem Kursteil wächst - bis zur Challenge ohne Vorlage.',
+      en: 'The common thread: a todo app in 15 steps that grows with every part of the course - up to a challenge without a template.',
     },
     // Alle Schritte teilen sich eine Seite, die ihre Daten per id nachlädt.
     kapitel: projektSchritte.map((schritt) => {

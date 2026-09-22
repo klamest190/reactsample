@@ -1,6 +1,7 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/Verweis'
 import { CodeBlock } from '../../lernen/CodeBlock'
+import { Quiz } from '../../lernen/Quiz'
 import { Werkstatt } from '../../lernen/Werkstatt'
 import { codeBloecke, dateien } from './BusinessApp.code'
 
@@ -20,7 +21,7 @@ const aufbau: [string, string][] = [
 export function BusinessApp() {
   return (
     <>
-      <Abschnitt titel="Eine echte App statt einzelner Schnipsel">
+      <Abschnitt titel="Auf einen Blick">
         <P>
           Bisher hast du jedes Konzept für sich ausprobiert. Hier siehst du, wie alles in einer richtigen
           Anwendung zusammenspielt: <strong>BrightDesk</strong>, eine kleine Kunden- und
@@ -37,9 +38,6 @@ export function BusinessApp() {
           Benutze die App erst einmal: Kunden suchen und sortieren, einen Kunden anklicken und bearbeiten,
           einen Auftrag anlegen, den Status ändern - und schau, wie sich das Dashboard mitverändert.
         </Hinweis>
-      </Abschnitt>
-
-      <Abschnitt titel="Die Werkstatt">
         <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.tsx" typen />
       </Abschnitt>
 
@@ -89,7 +87,7 @@ export function BusinessApp() {
         </P>
       </Abschnitt>
 
-      <Abschnitt titel="Aufgaben zum Ausprobieren">
+      <Abschnitt titel="Übung">
         <Liste>
           <li>
             <strong>Neuer Status:</strong> Füge in <Code>data.ts</Code> den Status{' '}
@@ -151,6 +149,44 @@ export function BusinessApp() {
           <Code>blue</Code>.
         </P>
       </Abschnitt>
+
+      <Quiz
+        fragen={[
+          {
+            frage: 'Eine Seite braucht die Kundenliste. Woher bekommt sie die Daten?',
+            antworten: [
+              'Über Props, die App.tsx durch alle Ebenen reicht',
+              'Über useStore() - dahinter steckt useContext',
+              'Sie lädt sie selbst aus data.ts',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Der Store stellt Daten und dispatch per Context bereit. Ein eigener Hook verpackt das, damit keine Seite useContext selbst aufrufen muss.',
+          },
+          {
+            frage: 'Warum passen sich Filter, Auswahlliste und Etikett von selbst an, wenn du in data.ts einen Status ergänzt?',
+            antworten: [
+              'React erkennt neue Werte automatisch',
+              'Weil alle drei aus derselben Liste ORDER_STATUSES erzeugt werden',
+              'Weil der Reducer sie neu berechnet',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Eine Quelle, drei Verwendungen: Wer die Liste erweitert, ändert alles mit. Kopien müsste man einzeln pflegen.',
+          },
+          {
+            frage: 'Der Umsatz im Dashboard - wie kommt er zustande?',
+            antworten: [
+              'Er steht als Feld im State und wird bei jeder Änderung mitgeschrieben',
+              'Er wird bei jedem Rendern aus den Aufträgen berechnet',
+              'Er wird in localStorage zwischengespeichert',
+            ],
+            richtig: 1,
+            erklaerung:
+              'Abgeleitete Werte gehören nicht in den State - sonst kann die Kennzahl von den Aufträgen abweichen.',
+          },
+        ]}
+      />
 
       <Merke
         punkte={[

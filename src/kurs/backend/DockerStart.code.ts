@@ -44,6 +44,42 @@ export const terminalTasks: TerminalTask[] = [
   },
 ]
 
+/** Exercise: volumes, logs and exec - the topics of the later sections. */
+export const uebungTasks: TerminalTask[] = [
+  {
+    text: {
+      de: 'Starte PostgreSQL als `shop-db` im Hintergrund, mit dem Volume `shop-data` auf `/var/lib/postgresql/data`.',
+      en: 'Start PostgreSQL as `shop-db` in the background, with the volume `shop-data` on `/var/lib/postgresql/data`.',
+    },
+    command: 'docker run -d --name shop-db -e POSTGRES_PASSWORD=secret -v shop-data:/var/lib/postgresql/data postgres:17',
+    // Auch über die Historie, damit der Haken stehen bleibt, wenn der Container
+    // in der letzten Aufgabe wieder entfernt wird.
+    done: (s) =>
+      s.containers.some(
+        (c) => c.name === 'shop-db' && running('postgres')(c) && c.volumes.some((v) => v.source === 'shop-data'),
+      ) || s.history.some((h) => /run .*--name shop-db.*-v shop-data:/.test(h)),
+  },
+  {
+    text: {
+      de: 'Sieh nach, was der Container ausgegeben hat.',
+      en: 'Check what the container printed.',
+    },
+    command: 'docker logs shop-db',
+    done: (s) => s.history.some((h) => /^docker logs .*shop-db/.test(h)),
+  },
+  {
+    text: {
+      de: 'Entferne `shop-db` wieder - und prüfe, dass das Volume `shop-data` noch da ist.',
+      en: 'Remove `shop-db` again - and check that the volume `shop-data` is still there.',
+    },
+    command: 'docker rm -f shop-db && docker volume ls',
+    done: (s) =>
+      !s.containers.some((c) => c.name === 'shop-db') &&
+      s.volumes.includes('shop-data') &&
+      s.history.some((h) => /^docker volume ls/.test(h)),
+  },
+]
+
 export const codeBloecke = {
   befehle: js`
     docker run hello-world                      # pull the image (if needed) and start a container
