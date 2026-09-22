@@ -49,6 +49,7 @@ import {
   statischesFeld,
   stringMethode,
 } from './bibliothek'
+import type { Extension } from './extension'
 
 // ---------------------------------------------------------------------------
 // Fehler und Signale
@@ -153,10 +154,14 @@ export class Interpreter {
   hauptUmgebung: Umgebung | null = null
   hauptKlasse: Klasse | null = null
 
+  /** Additional library, e.g. Spring - see extension.ts. */
+  readonly extension?: Extension
+
   private schritte = 0
   private puffer = { out: '', err: '' }
 
-  constructor(programm: Programm) {
+  constructor(programm: Programm, extension?: Extension) {
+    this.extension = extension
     for (const dekl of programm.typen) {
       if (this.klassen.has(dekl.name)) {
         throw new JavaAbbruch(
@@ -518,6 +523,9 @@ export class Interpreter {
       case 'super':
         return kontext.selbst ?? NULL
 
+      case 'classLiteral':
+        return { art: 'nativ', typ: 'Class', daten: { text: ausdruck.className, klasse: this.klassen.get(ausdruck.className) } }
+
       case 'feld':
         return this.feldLesen(ausdruck.ziel, ausdruck.name, kontext, ausdruck.zeile)
 
@@ -611,7 +619,7 @@ export class Interpreter {
           aufrufen: (argumente) => {
             if (name === '<init>') return this.neuErzeugen(ziel, argumente, ausdruck.zeile)
             const klasse = this.klassen.get(ziel)
-            if (klasse || EINGEBAUTE_KLASSEN.has(ziel)) {
+            if (klasse || this.isBuiltIn(ziel)) {
               // Statisch (Integer::parseInt) oder auf dem ersten Argument (String::toUpperCase).
               try {
                 return this.statischAufrufen(ziel, name, argumente, ausdruck.zeile)
@@ -767,7 +775,7 @@ export class Interpreter {
         }
         this.abbruch(`${klassenName} hat kein statisches Feld \`${name}\`.`, `cannot find symbol: variable ${name}`, zeile)
       }
-      const eingebaut = statischesFeld(klassenName, name, this)
+      const eingebaut = this.extension?.staticField?.(klassenName, name, this) ?? statischesFeld(klassenName, name, this)
       if (eingebaut) return eingebaut
     }
 
@@ -957,7 +965,7 @@ export class Interpreter {
         if (gefunden) return this.methodeLaufen(gefunden.klasse, gefunden.methode, null, argumente, zeile)
         this.abbruch(`${klassenName} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, zeile)
       }
-      if (EINGEBAUTE_KLASSEN.has(klassenName)) return this.statischAufrufen(klassenName, name, argumente, zeile)
+      if (this.isBuiltIn(klassenName)) return this.statischAufrufen(klassenName, name, argumente, zeile)
     }
 
     const ziel = this.auswerten(ausdruck.ziel, kontext)
@@ -965,7 +973,25 @@ export class Interpreter {
   }
 
   statischAufrufen(klasse: string, name: string, argumente: Wert[], zeile: number): Wert {
-    return statischerAufruf(klasse, name, argumente, this, zeile)
+    return this.extension?.staticCall?.(klasse, name, argumente, this, zeile) ?? statischerAufruf(klasse, name, argumente, this, zeile)
+  }
+
+  /** A class that can be used without a declaration - from the standard library or an extension. */
+  isBuiltIn(className: string): boolean {
+    return EINGEBAUTE_KLASSEN.has(className) || Boolean(this.extension?.classes.has(className))
+  }
+
+  /**
+   * Runs one specific method on an object - for libraries that find methods by
+   * their annotations (this is how Spring calls `@GetMapping` methods).
+   */
+  invoke(owner: Klasse, method: MethodenDekl, self: JavaObjekt | null, args: Wert[]): Wert {
+    return this.methodeLaufen(owner, method, self, args, method.zeile)
+  }
+
+  /** Starts a fresh step budget - a server handles many requests, and each one gets its own limit. */
+  resetStepLimit() {
+    this.schritte = 0
   }
 
   /** Methodenaufruf auf einem Wert - hier passiert die dynamische Bindung. */
@@ -974,7 +1000,7 @@ export class Interpreter {
       this.werfen('NullPointerException', `Cannot invoke "${name}()" because the value is null`, zeile)
     }
     if (ziel.art === 'string') return stringMethode(ziel, name, argumente, this, zeile)
-    if (ziel.art === 'nativ') return nativMethode(ziel, name, argumente, this, zeile)
+    if (ziel.art === 'nativ') return this.extension?.method?.(ziel, name, argumente, this, zeile) ?? nativMethode(ziel, name, argumente, this, zeile)
     if (ziel.art === 'funktion') {
       // Funktionale Interfaces: egal ob apply, accept, test, get, run oder compare.
       return ziel.aufrufen(argumente)
@@ -1138,7 +1164,7 @@ export class Interpreter {
       }
       return this.objektErzeugen(klasse, argumente, zeile)
     }
-    const nativ = nativErzeugen(klassenName, argumente, this, zeile)
+    const nativ = this.extension?.create?.(klassenName, argumente, this, zeile) ?? nativErzeugen(klassenName, argumente, this, zeile)
     if (nativ) return nativ
     this.abbruch(`Die Klasse \`${klassenName}\` ist unbekannt.`, `cannot find symbol: class ${klassenName}`, zeile)
   }
@@ -1321,7 +1347,7 @@ export class Interpreter {
           if (k.interfaces.has(typ)) return true
           // Eigene Exception, die von einer eingebauten erbt
           if (!k.oberklasse && k.dekl.oberklasse) {
-            for (let e: string | undefined = k.dekl.oberklasse; e; e = oberklasseVon(e)) {
+            for (let e: string | undefined = k.dekl.oberklasse; e; e = oberklasseVon(e) ?? this.extension?.superClasses?.[e]) {
               if (e === typ) return true
             }
           }
@@ -1329,7 +1355,7 @@ export class Interpreter {
         return false
       }
       case 'nativ': {
-        for (let t: string | undefined = wert.typ; t; t = oberklasseVon(t)) {
+        for (let t: string | undefined = wert.typ; t; t = oberklasseVon(t) ?? this.extension?.superClasses?.[t]) {
           if (t === typ) return true
         }
         return ['List', 'Collection', 'Iterable'].includes(typ) && ['ArrayList', 'LinkedList'].includes(wert.typ)
@@ -1384,6 +1410,8 @@ export class Interpreter {
   }
 
   private nativText(wert: NativWert): string {
+    const own = this.extension?.text?.(wert, this)
+    if (own !== undefined) return own
     const { liste, map, text, meldung } = wert.daten
     if (wert.typ === 'StringBuilder') return text ?? ''
     if (wert.typ === 'Class') return 'class ' + text
@@ -1397,7 +1425,7 @@ export class Interpreter {
   /** Wie Java eine Exception beim Absturz meldet. */
   ausnahmeText(wert: Wert): string {
     if (wert.art === 'nativ') {
-      const name = 'java.lang.' + wert.typ
+      const name = (this.extension?.packageOf?.(wert.typ) ?? 'java.lang') + '.' + wert.typ
       return wert.daten.meldung ? `${name}: ${wert.daten.meldung}` : name
     }
     if (wert.art === 'objekt') {
@@ -1409,6 +1437,11 @@ export class Interpreter {
   }
 
   // --- Fehler werfen --------------------------------------------------------
+
+  /** Throws any Java value as an exception - e.g. the one an `orElseThrow` supplier created. */
+  throwValue(value: Wert, line: number): never {
+    throw new JavaAusnahme(value, line)
+  }
 
   /** Wirft eine eingebaute Exception (fangbar). */
   werfen(klasse: string, meldung: string | null, zeile: number): never {

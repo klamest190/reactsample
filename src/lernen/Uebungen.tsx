@@ -5,7 +5,7 @@ import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { uebungenFuer } from '../kurs/uebungen'
 import type { Stufe, Uebung, Vorhersage } from '../kurs/uebungen/typen'
 import { CodeBlock } from './CodeBlock'
-import type { ReactTest, Test } from './jsSandbox'
+import type { DockerTest, ReactTest, SpringTestSpec, Test } from './jsSandbox'
 import { Text } from './Text'
 import { TryIt } from './TryIt'
 
@@ -85,6 +85,30 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
               loesung={uebung.loesung}
               tipps={uebung.tipps}
               tests={uebung.tests as ReactTest[] | undefined}
+            />
+          ) : uebung.modus === 'spring' ? (
+            <TryIt
+              modus="spring"
+              id={'uebung-' + uebung.id}
+              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
+              code={uebung.code}
+              loesung={uebung.loesung}
+              tipps={uebung.tipps}
+              tests={uebung.tests as SpringTestSpec[] | undefined}
+              properties={uebung.properties}
+              requests={uebung.requests}
+            />
+          ) : uebung.modus === 'dockerfile' || uebung.modus === 'compose' ? (
+            <TryIt
+              modus={uebung.modus}
+              id={'uebung-' + uebung.id}
+              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
+              code={uebung.code}
+              loesung={uebung.loesung}
+              tipps={uebung.tipps}
+              tests={uebung.tests as DockerTest[] | undefined}
+              project={uebung.project}
+              ignore={uebung.ignore}
             />
           ) : uebung.modus === 'java' ? (
             <TryIt

@@ -8,6 +8,11 @@ Obendrauf kommt ein **eigenständiger Java-Teil** (Teil 7). Auch dort läuft der
 ausgeführt von einer kleinen Java-Laufzeit, die zum Projekt gehört (`src/java/`). Java, JavaScript
 und React sind dabei sauber getrennt; wo was liegt, steht unter [Der Java-Teil](#der-java-teil).
 
+Darauf baut **Teil 8: Spring Boot & Docker** auf - ein Backend für die ToDo-App. Spring läuft als
+kleine Nachbildung (`src/spring/`) auf der Java-Laufzeit, Docker als Simulator (`src/docker/`); beides
+ohne Server und ohne Netzwerk, aber mit denselben Regeln und Meldungen wie das Original. Mehr unter
+[Der Backend-Teil](#der-backend-teil).
+
 **Alles ist frei erreichbar** - es gibt keine Level und nichts wird freigeschaltet. Den roten Faden
 liefern Querverweise („Baut auf“, „Darauf bauen auf“) und ein durchgehendes **ToDo-App-Projekt**, das
 mit den Kapiteln wächst.
@@ -29,6 +34,7 @@ npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
 npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
 npm run test:java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
+npm run test:backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
 ```
 
 ### Selbsttest der Inhalte
@@ -73,9 +79,11 @@ Der Fortschritt („Kapitel abschließen“) und der Code in den Editoren werden
 | **5 · Praxis & Muster** | Formulare · Daten laden · Komposition & Portale · Fehlerbehandlung · Tailwind CSS · Lokal entwickeln (Vite, DevTools, Debugging) · Abschlussprojekt (Gewohnheiten-Tracker) |
 | **6 · Projekt: ToDo-App** | Datenmodell als Funktionen · DOM-Version · Komponenten & Props · State & Events · Datenfluss & Filter · `useReducer` · Speichern mit `useEffect` & eigenem Hook · Fokus mit `useRef` · Context · Validierung · Startdaten laden · **Challenge: von null** |
 | **7 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
+| **8 · Backend: Spring Boot & Docker** 🍃 | Hallo Spring Boot · Beans & Dependency Injection · REST-APIs · Validierung & Fehlerbehandlung · Spring Data JPA · Konfiguration, Profile & Tests · **React trifft Spring Boot** (Full-Stack-Werkstatt) · Container & Images · Dockerfile · **Docker Compose** |
 
 Teil 7 ist **eigenständig**: Er setzt keinen der Teile 1-6 voraus und benutzt nichts daraus. Die
-Querverweise dorthin sind Vergleiche, keine Voraussetzungen.
+Querverweise dorthin sind Vergleiche, keine Voraussetzungen. Teil 8 setzt Teil 7 voraus (Klassen,
+Records, Collections) und für das Kapitel „React trifft Spring Boot“ auch `fetch` aus Teil 5.
 
 Zum Nachschlagen gibt es außerdem:
 
@@ -107,6 +115,26 @@ src/
     index.ts               javaAusfuehren() + javaPruefen() - die einzige Tür nach außen
     selbsttest.ts          Java-Programme mit der Ausgabe, die echtes Java liefern würde
     inhalte.ts             Prüft die Beispiele der Kapitel (von beiden Selbsttests genutzt)
+    extension.ts           Schnittstelle für Bibliotheken, die der Laufzeit Klassen beibringen (Spring)
+  spring/                🍃 Teil 8: Spring Boot auf der Java-Laufzeit - kein React, kein DOM
+    index.ts               springStart / springRun / springCheck - die Tür nach außen
+    context.ts             Komponenten-Scan, Beans, Dependency Injection, Startfehler wie Spring Boot
+    web.ts                 Routing, @PathVariable/@RequestParam/@RequestBody, Status-Codes, @ExceptionHandler
+    json.ts                Objekte ↔ JSON nach den Regeln von Jackson (Getter, Records, Setter)
+    data.ts                Spring Data: Repositories ohne Implementierung, Abfragen aus Methodennamen, SQL-Log
+    validation.ts          Bean Validation (@NotBlank, @Size, @Min …) mit den Standardmeldungen
+    config.ts              application.properties, Platzhalter, Profile, #---
+    library.ts             ResponseEntity, HttpStatus, ProblemDetail, SpringApplication …
+    http.ts                Anfragen in .http-Notation mit erwarteter Antwort (→ 201 {…})
+    selftest.ts            Spring-Anwendungen mit der Antwort, die echtes Spring Boot gäbe
+    contents.ts            Prüft die Spring-Beispiele der Kapitel
+  docker/                🐳 Teil 8: Docker-Simulator - kein React, kein DOM
+    build.ts               docker build: Schichten, Cache, Multi-Stage, .dockerignore, Lint-Hinweise
+    compose.ts             docker compose up: Prüfung wie Compose, Startreihenfolge, typische Fehler
+    cli.ts                 das Terminal: run, ps, logs, exec, stop, rm, build, curl …
+    dockerfile.ts yaml.ts  Parser für Dockerfile und compose.yaml
+    images.ts projects.ts  bekannte Images mit Größen, die Kursprojekte als Build-Kontext
+    selftest.ts contents.ts  Simulator-Selbsttest und Prüfung der Kapitelbeispiele
   main.tsx                 Einstiegspunkt: createRoot, StrictMode, ThemeProvider
   App.tsx                  Layout, Routing über den URL-Hash, Lernfortschritt, Sprachumschalter
   i18n/
@@ -127,6 +155,7 @@ src/
       Name.en.tsx          Kapiteltext Englisch
       Name.code.ts         Codebeispiele, Tests und Lösungen - gemeinsam für beide Sprachen
     java/                ☕ Teil 7, gleicher Aufbau - der Code in den .code.ts ist Java
+    backend/             🍃 Teil 8, gleicher Aufbau - Java mit Spring, Dockerfiles, compose.yaml
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   lernen/                  Die Lern-Bausteine
@@ -239,6 +268,10 @@ sie braucht.
 **Java** (`modus="java"`) läuft weder im iframe noch im Browser selbst, sondern in der Laufzeit unter
 `src/java/` - siehe [Der Java-Teil](#der-java-teil).
 
+**Spring, Dockerfile, Compose** (`modus="spring"`, `"dockerfile"`, `"compose"`, Teil 8) haben eigene
+Editoren (`src/lernen/TryItSpring.tsx`, `TryItDocker.tsx`), die erst nachgeladen werden, wenn sie gebraucht
+werden - siehe [Der Backend-Teil](#der-backend-teil).
+
 **Autovervollständigung:** Beim Tippen schlägt der Editor passende Einträge aus
 `src/lernen/vorschlaege.ts` vor, dazu Namen, die schon im Code stehen. Jeder Vorschlag hat eine kurze
 Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt die Cursorposition), Esc
@@ -248,7 +281,7 @@ Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` �
 ## Der Playground
 
 Für jeden Teil gibt es einen Editor zum freien Programmieren - ohne Aufgabe und ohne Tests
-(`#/playground/javascript`, `/typescript`, `/react`, `/hooks`, `/praxis`, `/projekt`, `/java`). Erreichbar über
+(`#/playground/javascript`, `/typescript`, `/react`, `/hooks`, `/praxis`, `/projekt`, `/java`, `/backend`). Erreichbar über
 die Seitenleiste (ein Eintrag oben, gewechselt wird über die Teil-Leiste auf der Seite), die Startseite und einen Hinweis am Ende
 jedes Kapitels. Damit man nicht vor einem leeren Blatt sitzt:
 
@@ -327,6 +360,49 @@ Braucht ein Test `try/catch` oder eine Schleife, kommt eine unsichtbare Hilfskla
 (im Browser, zusammen mit allen anderen Kapiteln). `src/java/selbsttest.ts` enthält dafür über 40
 Java-Programme mit genau der Ausgabe, die eine echte JVM liefern würde.
 
+## Der Backend-Teil
+
+Teil 8 bleibt beim Prinzip von Teil 7: Die Laufzeiten kennen kein React, die Komponenten keine Syntaxbäume.
+
+**Spring** (`src/spring/`) steckt sich als *Erweiterung* in die Java-Laufzeit (`src/java/extension.ts`) -
+im Java-Ordner selbst steht kein Wort über Spring. Der Parser bewahrt dafür Annotationen auf. Beim Start
+passiert, was `SpringApplication.run` auch tut: Komponenten-Scan, Beans anlegen, Konstruktor-Parameter
+nach Typ injizieren, Routen sammeln, `CommandLineRunner` ausführen. Geht etwas schief, erscheint der
+Bericht von Spring Boot (`APPLICATION FAILED TO START` mit *Description* und *Action*) plus ein Hinweis
+auf Deutsch bzw. Englisch.
+
+**Nachgebaut, weil die Kapitel es erklären:** fehlende, mehrdeutige und zyklische Beans, `@Primary`,
+`@Qualifier`, `List<…>`-Injektion, `@Bean`, `@Value`, `@ConfigurationProperties`, Profile, 404/405/400,
+Typumwandlung von Parametern, JSON über Getter (und 500 ohne Getter), `@Valid` mit den Meldungen von
+Hibernate Validator, `ResponseStatusException`, `@ResponseStatus`, `@RestControllerAdvice`,
+`ProblemDetail`, Spring-Data-Repositories mit Abfragen aus Methodennamen (geprüft beim Start) und das
+SQL-Log von `spring.jpa.show-sql`. **Nicht dabei:** echte Datenbanken, Transaktionen/Dirty Checking,
+Security, Templates.
+
+**Anfragen und Tests** stehen in `.http`-Notation mit einer Zeile für die erwartete Antwort:
+
+```ts
+tests: [
+  { name: { de: 'PUT auf ein unbekanntes Buch → 404', en: 'PUT on an unknown book → 404' }, http: 'PUT /api/books/9\n{"title": "x"}\n→ 404' },
+  { name: { de: 'Beide Rabatte sind Beans', en: 'Both discounts are beans' }, ausdruck: 'context.containsBean("noDiscount")' },
+]
+```
+
+Erwartetes JSON wird „locker“ verglichen: Was dasteht, muss stimmen, zusätzliche Felder sind erlaubt.
+Jeder Test startet eine frische Anwendung.
+
+**Docker** (`src/docker/`) simuliert `docker build` (mit den Kursprojekten `todo-api` und `todo-web` als
+Build-Kontext, Schicht-Cache, Multi-Stage, `.dockerignore`, Lint-Hinweisen wie hadolint und einer
+`docker run`-Vorschau), `docker compose up` (Validierung wie Compose, Startreihenfolge, Healthchecks, die
+`localhost`-Falle) und ein Terminal mit den Alltagsbefehlen. Die Tests der Übungen sind Funktionen über das
+Ergebnis: `{ name, dockerfile: (r) => r.image!.sizeMb < 350 }`.
+
+Die **Full-Stack-Werkstatt** (`src/kurs/demos/FullStack.tsx`) verbindet beides mit React: Das `fetch` der
+React-App wird durch eine Brücke ersetzt, die `/api/…` an die Spring-Anwendung im selben Tab schickt - wie
+der Vite-Proxy im echten Projekt.
+
+**Geprüft wird alles zweifach:** `npm run test:backend` (ohne Browser) und `npm run test:inhalte`.
+
 ## Zweisprachigkeit
 
 - **Oberfläche:** Texte stehen in `src/i18n/texte.ts`. Der Typ des englischen Objekts wird aus dem
@@ -363,3 +439,9 @@ ausgeführt werden soll. Beispiele, die absichtlich einen Fehler zeigen, kommen 
 Für ein **TypeScript-Kapitel** (Teil 2) an jedes `<TryIt>` ein `modus="ts"` schreiben. Beispiele
 müssen dann ohne Typfehler kompilieren; eines, das absichtlich einen Typfehler zeigt, kommt mit
 Begründung in `ERWARTETE_FEHLER` (`src/selbsttest/pruefen.ts`).
+
+Für ein Kapitel aus **Teil 8** an jedes `<TryIt>` `modus="spring"`, `"dockerfile"` oder `"compose"` schreiben.
+Im `.code.ts` gehören zu einem Spring-Beispiel optional `properties` und `requests` (`.http`-Notation), zu einem
+Dockerfile `project` (`'spring'` oder `'react'`) und `ignore` (die `.dockerignore`). Beispiele, die absichtlich
+nicht starten, stehen mit Begründung in `SPRING_EXPECTED_FAILURES` (`src/spring/contents.ts`) bzw.
+`DOCKER_EXPECTED_FAILURES` (`src/docker/contents.ts`).

@@ -1,4 +1,5 @@
 import type { Sprache, Zweisprachig } from '../i18n/SpracheContext'
+import { COMPOSE, DOCKERFILE, SPRING } from './backendSuggestions'
 
 /**
  * Die Vorschläge für die Autovervollständigung im Editor.
@@ -29,14 +30,14 @@ export type Vorschlag = {
   farbe?: string
 }
 
-type Eintrag = {
+export type Eintrag = {
   label: string
   einfuegen?: string
   art: VorschlagArt
   info: Zweisprachig
 }
 
-export type EditorSprache = 'js' | 'ts' | 'react' | 'java'
+export type EditorSprache = 'js' | 'ts' | 'react' | 'java' | 'spring' | 'docker' | 'yaml' | 'properties'
 
 const JAVASCRIPT: Eintrag[] = [
   // --- Konsole -------------------------------------------------------------
@@ -297,7 +298,14 @@ const JAVA: Eintrag[] = [
 /** Alle Vorschläge für einen Editor, aufgelöst in der Oberflächensprache. */
 export function vorschlaegeFuer(editor: EditorSprache, sprache: Sprache): Vorschlag[] {
   const eintraege =
-    editor === 'java' ? JAVA : editor === 'react' ? [...REACT, ...JAVASCRIPT] : editor === 'ts' ? [...TYPESCRIPT, ...JAVASCRIPT] : JAVASCRIPT
+    editor === 'java' ? JAVA
+      : editor === 'spring' ? [...SPRING, ...JAVA]
+      : editor === 'docker' ? DOCKERFILE
+      : editor === 'yaml' ? COMPOSE
+      : editor === 'properties' ? []
+      : editor === 'react' ? [...REACT, ...JAVASCRIPT]
+      : editor === 'ts' ? [...TYPESCRIPT, ...JAVASCRIPT]
+      : JAVASCRIPT
   return eintraege.map((e) => ({ ...e, info: e.info[sprache] }))
 }
 
@@ -332,7 +340,8 @@ export function suchen(
   }
 
   // Leeres Wort (Strg+Leertaste) zeigt alles, Zahlen und Sonderzeichen nichts.
-  if (wort && !/^[A-Za-z_$]/.test(wort)) return { treffer: [], ersetzeZeichen: 0 }
+  // `@` starts an annotation (Spring: @GetMapping).
+  if (wort && !/^[A-Za-z_$@]/.test(wort)) return { treffer: [], ersetzeZeichen: 0 }
 
   const statisch = alle.filter((v) => !v.label.startsWith('.'))
   const beginnt = statisch.filter((v) => v.label.toLowerCase().startsWith(klein))

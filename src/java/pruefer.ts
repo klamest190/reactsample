@@ -33,7 +33,8 @@ const BEKANNTE_KLASSEN = new Set([
   'Predicate', 'UnaryOperator', 'BinaryOperator', 'Iterator', 'Void', 'Class',
 ])
 
-export function pruefen(programm: Programm): Pruefmeldung[] {
+/** `knownClasses`: additional classes from an extension (e.g. Spring) that exist without a declaration. */
+export function pruefen(programm: Programm, knownClasses?: ReadonlySet<string>): Pruefmeldung[] {
   const meldungen: Pruefmeldung[] = []
   const klassen = new Map(programm.typen.map((t) => [t.name, t]))
 
@@ -41,7 +42,8 @@ export function pruefen(programm: Programm): Pruefmeldung[] {
     if (meldungen.length < 10 && !meldungen.some((m) => m.zeile === zeile)) meldungen.push({ zeile, deutsch, englisch })
   }
 
-  const istKlasse = (name: string) => klassen.has(name) || BEKANNTE_KLASSEN.has(name) || istAusnahmeKlasse(name)
+  const istKlasse = (name: string) =>
+    klassen.has(name) || BEKANNTE_KLASSEN.has(name) || istAusnahmeKlasse(name) || Boolean(knownClasses?.has(name))
 
   /** Alle Felder einer Klasse: eigene, geerbte und die der umgebenden Klasse. */
   function felderVon(klasse: TypDeklaration): Map<string, TypRef> {

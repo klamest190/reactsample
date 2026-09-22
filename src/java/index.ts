@@ -260,5 +260,6 @@ function zeigen(wert: unknown): string {
   return String(wert)
 }
 
-export { alsZahl }
+// Also used by the Spring part (src/spring/), which evaluates Java test expressions the same way.
+export { alsZahl, alsJs, tiefGleich, zeigen }
 export type { Wert }

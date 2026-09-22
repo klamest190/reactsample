@@ -921,4 +921,146 @@ numbers.add(5);        // int → Integer`,
     },
     kapitel: ['java-fehler', 'java-arrays'],
   },
+  // --- Part 8: Spring Boot & Docker ------------------------------------------
+  {
+    id: 'http',
+    begriff: 'HTTP',
+    erklaerung: {
+      de: 'Das Protokoll zwischen Browser und Server: Eine **Anfrage** hat Methode (GET, POST, PUT, PATCH, DELETE), Pfad, Header und manchmal einen Body; die **Antwort** einen Status-Code (200, 201, 404, 500 …), Header und Body.',
+      en: 'The protocol between browser and server: a **request** has a method (GET, POST, PUT, PATCH, DELETE), a path, headers and sometimes a body; the **response** has a status code (200, 201, 404, 500 …), headers and a body.',
+    },
+    code: js`GET /api/todos/7  →  200 OK  {"id": 7, "title": "Buy milk"}`,
+    kapitel: ['spring-start', 'spring-rest'],
+  },
+  {
+    id: 'rest',
+    begriff: 'REST',
+    erklaerung: {
+      de: 'Konvention für HTTP-APIs: Der Pfad nennt eine **Ressource** (`/api/todos/7`), die Methode sagt, was damit passiert. GET ändert nie etwas.',
+      en: 'A convention for HTTP APIs: the path names a **resource** (`/api/todos/7`), the method says what happens to it. GET never changes anything.',
+    },
+    kapitel: ['spring-rest'],
+  },
+  {
+    id: 'spring-boot',
+    begriff: 'Spring Boot',
+    erklaerung: {
+      de: 'Framework für Java-Backends: eingebauter Webserver (Tomcat), sinnvolle Standardeinstellungen, **Starter** für Web, Datenbanken, Validierung. Klassen werden über Annotationen beschrieben und von Spring aufgerufen.',
+      en: 'A framework for Java backends: embedded web server (Tomcat), sensible defaults, **starters** for web, databases, validation. Classes are described with annotations and called by Spring.',
+    },
+    kapitel: ['spring-start'],
+  },
+  {
+    id: 'annotation',
+    begriff: 'Annotation',
+    erklaerung: {
+      de: 'Eine Markierung mit `@` an Klassen, Methoden, Feldern oder Parametern. Sie ändert den Code nicht selbst - Frameworks wie Spring lesen sie und handeln danach.',
+      en: 'A marker with `@` on classes, methods, fields or parameters. It does not change the code itself - frameworks like Spring read it and act on it.',
+    },
+    code: js`@GetMapping("/api/todos/{id}")`,
+    kapitel: ['spring-start', 'java-vererbung'],
+  },
+  {
+    id: 'bean',
+    begriff: 'Bean',
+    erklaerung: {
+      de: 'Ein Objekt, das der Spring-Container anlegt und verwaltet - aus Klassen mit `@Component`, `@Service`, `@Repository`, `@RestController` oder aus `@Bean`-Methoden. Standardmäßig gibt es jede Bean genau einmal.',
+      en: 'An object that the Spring container creates and manages - from classes with `@Component`, `@Service`, `@Repository`, `@RestController` or from `@Bean` methods. By default every bean exists exactly once.',
+    },
+    kapitel: ['spring-beans'],
+  },
+  {
+    id: 'dependency-injection',
+    begriff: 'Dependency Injection',
+    erklaerung: {
+      de: 'Eine Klasse erzeugt ihre Abhängigkeiten nicht selbst mit `new`, sondern bekommt sie gereicht - in Spring meist als Konstruktor-Parameter. Dadurch lassen sich Teile austauschen, auch für Tests.',
+      en: 'A class does not create its dependencies itself with `new` but gets them passed in - in Spring usually as constructor parameters. This makes parts replaceable, also for tests.',
+    },
+    code: js`TodoController(TodoService service) { this.service = service; }`,
+    kapitel: ['spring-beans'],
+  },
+  {
+    id: 'dto',
+    begriff: 'DTO',
+    deutsch: 'Data Transfer Object',
+    erklaerung: {
+      de: 'Eine Klasse (oft ein Record) nur für den Transport über die API - z. B. `TodoRequest` ohne `id`, weil die der Server vergibt.',
+      en: 'A class (often a record) only for transport over the API - e.g. `TodoRequest` without an `id`, because the server assigns it.',
+    },
+    kapitel: ['spring-rest'],
+  },
+  {
+    id: 'entity',
+    begriff: 'Entity',
+    erklaerung: {
+      de: 'Eine Klasse mit `@Entity`, die einer Datenbanktabelle entspricht. Das Feld mit `@Id` ist der Primärschlüssel. JPA/Hibernate übersetzt zwischen Objekten und Zeilen (ORM).',
+      en: 'A class with `@Entity` that corresponds to a database table. The field with `@Id` is the primary key. JPA/Hibernate translates between objects and rows (ORM).',
+    },
+    kapitel: ['spring-daten'],
+  },
+  {
+    id: 'repository',
+    begriff: 'Repository',
+    erklaerung: {
+      de: 'Die Schicht für den Datenzugriff. Mit Spring Data genügt ein Interface, das `JpaRepository` erweitert - die Implementierung samt Abfragen aus Methodennamen (`findByDoneFalse`) entsteht beim Start.',
+      en: 'The data access layer. With Spring Data an interface that extends `JpaRepository` is enough - the implementation, including queries from method names (`findByDoneFalse`), is created at startup.',
+    },
+    kapitel: ['spring-daten'],
+  },
+  {
+    id: 'cors',
+    begriff: 'CORS',
+    erklaerung: {
+      de: 'Cross-Origin Resource Sharing: Der Browser erlaubt einer Seite nur Anfragen an ihren eigenen Ursprung (Protokoll + Host + Port) - außer der andere Server erlaubt es mit `Access-Control-Allow-Origin`. Beim Entwickeln umgeht man es meist mit dem Vite-Proxy.',
+      en: 'Cross-origin resource sharing: the browser only allows a page to make requests to its own origin (protocol + host + port) - unless the other server allows it with `Access-Control-Allow-Origin`. During development it is usually avoided with the Vite proxy.',
+    },
+    kapitel: ['spring-react'],
+  },
+  {
+    id: 'container',
+    begriff: 'Container',
+    erklaerung: {
+      de: 'Eine laufende, abgeschottete Instanz eines **Images**. Container teilen sich den Kernel des Rechners - deshalb sind sie viel leichter als virtuelle Maschinen. Sie sind wegwerfbar; Daten gehören in Volumes.',
+      en: 'A running, isolated instance of an **image**. Containers share the machine’s kernel - that is why they are much lighter than virtual machines. They are disposable; data belongs in volumes.',
+    },
+    code: js`docker run -d --name web -p 8080:80 nginx`,
+    kapitel: ['docker-start'],
+  },
+  {
+    id: 'image',
+    begriff: 'Image',
+    erklaerung: {
+      de: 'Der unveränderliche Bauplan für Container: ein Programm mit allem, was es braucht. Entsteht aus einem **Dockerfile** Schicht für Schicht und liegt in einer Registry wie Docker Hub - mit einer Version als **Tag** (`postgres:17`).',
+      en: 'The immutable blueprint for containers: a program with everything it needs. Built from a **Dockerfile** layer by layer and stored in a registry like Docker Hub - with a version as its **tag** (`postgres:17`).',
+    },
+    kapitel: ['docker-start', 'docker-dockerfile'],
+  },
+  {
+    id: 'dockerfile',
+    begriff: 'Dockerfile',
+    erklaerung: {
+      de: 'Die Bauanleitung für ein Image: `FROM`, `COPY`, `RUN` … Jede Anweisung ist eine Schicht, die Docker zwischenspeichert. Mit mehreren `FROM` (Multi-Stage) trennt man Bauen und Ausliefern.',
+      en: 'The build instructions for an image: `FROM`, `COPY`, `RUN` … Every instruction is a layer that Docker caches. With several `FROM` (multi-stage) you separate building from shipping.',
+    },
+    kapitel: ['docker-dockerfile'],
+  },
+  {
+    id: 'volume',
+    begriff: 'Volume',
+    erklaerung: {
+      de: 'Ein von Docker verwalteter Speicherbereich, der in einen Container eingehängt wird. Er überlebt den Container - Pflicht für Datenbanken.',
+      en: 'A storage area managed by Docker that is mounted into a container. It survives the container - a must for databases.',
+    },
+    code: js`-v db-data:/var/lib/postgresql/data`,
+    kapitel: ['docker-start', 'docker-compose'],
+  },
+  {
+    id: 'docker-compose',
+    begriff: 'Docker Compose',
+    erklaerung: {
+      de: 'Beschreibt alle Container einer Anwendung in einer `compose.yaml` und startet sie mit `docker compose up`. Die Container erreichen sich über ihre Service-Namen (`db:5432`).',
+      en: 'Describes all containers of an application in a `compose.yaml` and starts them with `docker compose up`. The containers reach each other by their service names (`db:5432`).',
+    },
+    kapitel: ['docker-compose'],
+  },
 ]

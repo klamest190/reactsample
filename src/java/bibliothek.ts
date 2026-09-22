@@ -556,6 +556,8 @@ export function nativMethode(ziel: NativWert, name: string, a: Wert[], i: Interp
         return wahrheit(!vorhanden)
       case 'orElse':
         return vorhanden ? daten.liste[0] : a[0]
+      case 'orElseGet':
+        return vorhanden ? daten.liste[0] : funktionAufrufen(a[0], [], i, zeile, 'get')
       case 'ifPresent':
         if (vorhanden) funktionAufrufen(a[0], [daten.liste[0]], i, zeile, 'accept')
         return NULL
@@ -564,6 +566,8 @@ export function nativMethode(ziel: NativWert, name: string, a: Wert[], i: Interp
       case 'get':
       case 'getAsDouble':
       case 'orElseThrow':
+        // orElseThrow(() -> new TodoNotFoundException(id)) throws what the supplier creates.
+        if (!vorhanden && name === 'orElseThrow' && a[0]) i.throwValue(funktionAufrufen(a[0], [], i, zeile, 'get'), zeile)
         if (!vorhanden) i.werfen('NoSuchElementException', 'No value present', zeile)
         return daten.liste[0]
       case 'toString':

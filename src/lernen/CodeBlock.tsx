@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { useTexte } from '../i18n/SpracheContext'
-import { HervorgehobenerCode } from './hervorheben'
+import { HervorgehobenerCode, type HighlightMode } from './hervorheben'
+
+/** Files that are no program code get the config highlighting (# comments, keys, instructions). */
+const CONFIG_TITLE = /Dockerfile|\.dockerignore|\.ya?ml$|\.properties$|\.http$|\.env$|Terminal/i
 
 /** Statisches, eingefärbtes Codebeispiel mit Kopieren-Knopf. */
-export function CodeBlock({ code, titel }: { code: string; titel?: string }) {
+export function CodeBlock({ code, titel, sprache }: { code: string; titel?: string; sprache?: HighlightMode }) {
+  const modus = sprache ?? (titel && CONFIG_TITLE.test(titel) ? 'konfig' : 'code')
   const t = useTexte()
   const [kopiert, setKopiert] = useState(false)
 
@@ -22,7 +26,7 @@ export function CodeBlock({ code, titel }: { code: string; titel?: string }) {
       )}
       <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-5">
         <code>
-          <HervorgehobenerCode code={code} />
+          <HervorgehobenerCode code={code} sprache={modus} />
         </code>
       </pre>
       <button

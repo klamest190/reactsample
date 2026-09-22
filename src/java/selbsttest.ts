@@ -16,6 +16,25 @@ type Fall = { name: string; code: string; erwartet: string[]; tests?: JavaTest[]
 const main = (rumpf: string) => `public class Main {\n  public static void main(String[] args) {\n${rumpf}\n  }\n}`
 
 const faelle: Fall[] = [
+  // --- Optional (used a lot with Spring Data in part 8) -----------------------
+  {
+    name: 'Optional: orElse, orElseGet and orElseThrow with a supplier',
+    code: `import java.util.*;
+public class Main {
+  public static void main(String[] args) {
+    Optional<String> empty = Optional.empty();
+    System.out.println(empty.orElse("fallback"));
+    System.out.println(empty.orElseGet(() -> "computed"));
+    System.out.println(Optional.of("Ada").orElseThrow());
+    try {
+      empty.orElseThrow(() -> new IllegalStateException("nothing here"));
+    } catch (IllegalStateException e) {
+      System.out.println("caught: " + e.getMessage());
+    }
+  }
+}`,
+    erwartet: ['fallback', 'computed', 'Ada', 'caught: nothing here'],
+  },
   // --- Zahlen und Typen ----------------------------------------------------
   {
     name: 'int-Division schneidet ab',

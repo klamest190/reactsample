@@ -8,6 +8,10 @@
  * Die Schlüsselwörter beider Sprachen stehen in einer gemeinsamen Liste. Das
  * genügt hier, weil sich die Wörter kaum überschneiden und ein falsch
  * eingefärbtes Wort niemandem wehtut.
+ *
+ * Part 8 adds a second mode, `konfig`, for files that are not program code:
+ * Dockerfiles, compose.yaml, application.properties, `.http` requests and
+ * terminal commands - `#` comments, instructions, keys and values.
  */
 
 type TokenTyp =
@@ -19,9 +23,12 @@ type TokenTyp =
   | 'tag'
   | 'funktion'
   | 'komponente'
+  | 'annotation'
   | 'text'
 
 type Token = { typ: TokenTyp; text: string }
+
+export type HighlightMode = 'code' | 'konfig'
 
 const KEYWORDS = new Set(
   (
@@ -36,9 +43,9 @@ const KEYWORDS = new Set(
 )
 const LITERALE = new Set(['true', 'false', 'null', 'undefined', 'NaN', 'Infinity'])
 
-// Gruppen: 1 Kommentar · 2 String · 3 JSX-Tag · 4 Zahl · 5 Wort
+// Gruppen: 1 Kommentar · 2 String · 3 JSX-Tag · 4 Zahl · 5 Annotation (Java: @GetMapping) · 6 Wort
 const MUSTER =
-  /(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\[\s\S]|[^`\\])*`?)|(<\/?[A-Za-z][\w.]*)|(\b\d[\d_]*(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)/g
+  /(\/\/[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|("(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|`(?:\\[\s\S]|[^`\\])*`?)|(<\/?[A-Za-z][\w.]*)|(\b\d[\d_]*(?:\.\d+)?\b)|(@[A-Za-z][\w.]*)|([A-Za-z_$][\w$]*)/g
 
 function tokenisieren(code: string): Token[] {
   const tokens: Token[] = []
@@ -47,7 +54,7 @@ function tokenisieren(code: string): Token[] {
   for (const treffer of code.matchAll(MUSTER)) {
     const start = treffer.index
     if (start > position) tokens.push({ typ: 'text', text: code.slice(position, start) })
-    const [text, kommentar, string, tag, zahl, wort] = treffer
+    const [text, kommentar, string, tag, zahl, annotation, wort] = treffer
     position = start + text.length
 
     if (kommentar) tokens.push({ typ: 'kommentar', text })
@@ -62,6 +69,7 @@ function tokenisieren(code: string): Token[] {
         tokens.push({ typ: 'tag', text })
       }
     } else if (zahl) tokens.push({ typ: 'zahl', text })
+    else if (annotation) tokens.push({ typ: 'annotation', text })
     else if (wort) {
       const danach = code.slice(position).match(/^\s*(.)/)?.[1]
       const typ: TokenTyp = KEYWORDS.has(wort)
@@ -81,6 +89,49 @@ function tokenisieren(code: string): Token[] {
   return tokens
 }
 
+// --- Config files: Dockerfile, YAML, properties, .http, shell -----------------------------
+
+const INSTRUCTION = /^(\s*)(FROM|RUN|CMD|LABEL|EXPOSE|ENV|ADD|COPY|ENTRYPOINT|VOLUME|USER|WORKDIR|ARG|HEALTHCHECK|SHELL|STOPSIGNAL|ONBUILD|GET|POST|PUT|PATCH|DELETE|docker|curl|mvn|npm|\$)(?=\s|$)/
+const KEY = /^(\s*(?:-\s+)?)([\w.$@-]+)(\s*[:=])/
+const VALUE = /("(?:\\.|[^"\\\n])*"?|'[^'\n]*'?)|(\$\{[^}\n]*\}|--?[\w-]+=?|→|->)|(\b\d+(?:\.\d+)?\b)|(\b(?:true|false|null|AS|as)\b)/g
+
+function tokenizeConfig(code: string): Token[] {
+  const tokens: Token[] = []
+  code.split('\n').forEach((line, index) => {
+    if (index > 0) tokens.push({ typ: 'text', text: '\n' })
+    const comment = line.match(/^(\s*)(#.*)$/)
+    if (comment) {
+      tokens.push({ typ: 'text', text: comment[1] }, { typ: 'kommentar', text: comment[2] })
+      return
+    }
+    let rest = line
+    const instruction = rest.match(INSTRUCTION)
+    if (instruction) {
+      tokens.push({ typ: 'text', text: instruction[1] }, { typ: 'keyword', text: instruction[2] })
+      rest = rest.slice(instruction[0].length)
+    } else {
+      const key = rest.match(KEY)
+      if (key) {
+        tokens.push({ typ: 'text', text: key[1] }, { typ: 'funktion', text: key[2] }, { typ: 'text', text: key[3] })
+        rest = rest.slice(key[0].length)
+      }
+    }
+    // A trailing comment after a value: "image: nginx  # web server"
+    const trailing = rest.match(/\s#.*$/)
+    const body = trailing ? rest.slice(0, trailing.index) : rest
+    let position = 0
+    for (const match of body.matchAll(VALUE)) {
+      if (match.index > position) tokens.push({ typ: 'text', text: body.slice(position, match.index) })
+      const [text, string, special, number, literal] = match
+      tokens.push({ typ: string ? 'string' : special ? 'literal' : number ? 'zahl' : literal ? 'keyword' : 'text', text })
+      position = match.index + text.length
+    }
+    if (position < body.length) tokens.push({ typ: 'text', text: body.slice(position) })
+    if (trailing) tokens.push({ typ: 'kommentar', text: trailing[0] })
+  })
+  return tokens
+}
+
 // Vollständige Klassennamen, damit der Tailwind-Scanner sie findet.
 const FARBEN: Record<TokenTyp, string> = {
   kommentar: 'text-slate-400 italic dark:text-slate-500',
@@ -91,12 +142,13 @@ const FARBEN: Record<TokenTyp, string> = {
   tag: 'text-rose-600 dark:text-rose-400',
   funktion: 'text-sky-700 dark:text-sky-400',
   komponente: 'text-teal-700 dark:text-teal-300',
+  annotation: 'text-amber-600 dark:text-amber-300',
   text: '',
 }
 
 /** Rendert Code als eingefärbte <span>s - für CodeBlock und CodeEditor. */
-export function HervorgehobenerCode({ code }: { code: string }) {
-  return tokenisieren(code).map((t, i) =>
+export function HervorgehobenerCode({ code, sprache = 'code' }: { code: string; sprache?: HighlightMode }) {
+  return (sprache === 'konfig' ? tokenizeConfig(code) : tokenisieren(code)).map((t, i) =>
     t.typ === 'text' ? (
       t.text
     ) : (

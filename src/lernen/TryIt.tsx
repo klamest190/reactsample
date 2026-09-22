@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useEffectEvent,
@@ -11,15 +13,15 @@ import {
 import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { useTheme } from '../context/ThemeContext'
-import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { CodeBlock } from './CodeBlock'
 import { CodeEditor, type EditorSteuerung } from './CodeEditor'
+import type { EditorSprache } from './vorschlaege'
+import { useSavedCode } from './useSavedCode'
 import { Text } from './Text'
 import { sandboxDokument, type ReactTest, type SandboxNachricht, type Test, type TestErgebnis } from './jsSandbox'
 import { reactTestsAusfuehren } from './reactTests'
 import { formatieren, kompilieren, type Protokoll } from './reactKompilieren'
-import { hash } from './quelltext'
 import { tailwindFuerVorschau } from './tailwind'
 import { typenPruefen, type Typfehler } from './typpruefung'
 import { tsTypenPruefen, tsUebersetzen, typErgebnisse, type TypTest } from './tsLauf'
@@ -27,6 +29,12 @@ import type { JavaLauf } from '../java'
 import { testsAusfuehren, type TestBericht } from './testLauf'
 import type { ProjektDatei } from './reactKompilieren'
 import type { Zweisprachig } from '../i18n/SpracheContext'
+import type { DockerTest, SpringTestSpec } from './jsSandbox'
+import type { ProjectId } from '../docker/projects'
+
+// Part 8 - loaded only when such an editor appears (they bring the Spring runtime and the Docker simulator).
+const TryItSpring = lazy(() => import('./TryItSpring').then((m) => ({ default: m.TryItSpring })))
+const TryItDocker = lazy(() => import('./TryItDocker').then((m) => ({ default: m.TryItDocker })))
 
 /**
  * "Probier's selbst" - ein Editor mit Ausführen-Knopf.
@@ -39,6 +47,9 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
  *   <TryIt id="…" code={…} modus="react" typen />  TSX mit echter Typprüfung
  *   <TryIt id="…" code={…} modus="test" />     Eigene Tests (Vitest + Testing Library), siehe testLauf.ts
  *   <TryIt id="…" code={…} modus="java" />     Java, ausgeführt von src/java/ (Teil 7)
+ *   <TryIt id="…" code={…} modus="spring" />   Spring Boot on top of the Java runtime, see src/spring/ (part 8)
+ *   <TryIt id="…" code={…} modus="dockerfile" />  a simulated docker build, see src/docker/ (part 8)
+ *   <TryIt id="…" code={…} modus="compose" />  a simulated docker compose up (part 8)
  *
  * Der Code wird pro `id` im localStorage gespeichert, damit Eingaben einen
  * Kapitelwechsel überleben.
@@ -96,11 +107,39 @@ type JavaProps = Gemeinsam & {
   vorbereitung?: string
 }
 
-export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps) {
+export type SpringProps = Gemeinsam & {
+  modus: 'spring'
+  /** Requests in `.http` notation, optionally with `→ status body` - see src/spring/http.ts. */
+  tests?: SpringTestSpec[]
+  /** application.properties - shown as a second, editable file. */
+  properties?: string
+  /** Requests sent automatically after every start (`.http` notation). */
+  requests?: string
+}
+
+type DockerBase = Gemeinsam & {
+  tests?: DockerTest[]
+  /** Which course project is the build context (Dockerfile only). */
+  project?: ProjectId
+  /** Content of .dockerignore - editable next to the Dockerfile. */
+  ignore?: string
+}
+// Two types instead of `modus: 'dockerfile' | 'compose'` - so TypeScript can tell all modes apart.
+export type DockerProps = (DockerBase & { modus: 'dockerfile' }) | (DockerBase & { modus: 'compose' })
+
+export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps) {
   if (props.modus === 'react') return <TryItReact {...props} />
   if (props.modus === 'test') return <TryItTest {...props} />
   if (props.modus === 'java') return <TryItJava {...props} />
+  if (props.modus === 'spring') return <Suspense fallback={<Laedt />}><TryItSpring {...props} /></Suspense>
+  if (props.modus === 'dockerfile' || props.modus === 'compose') return <Suspense fallback={<Laedt />}><TryItDocker {...props} /></Suspense>
   return <TryItJs {...props} />
+}
+
+/** Placeholder while an editor of part 8 is loading. */
+function Laedt() {
+  const t = useTexte()
+  return <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800">{t.laeuft}</div>
 }
 
 // ---------------------------------------------------------------------------
@@ -116,14 +155,29 @@ const ABZEICHEN = {
   TypeScript: { text: 'TSX', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
   TS: { text: 'TS', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
   Test: { text: 'TEST', klassen: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
+  Spring: { text: 'SPRING', klassen: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' },
+  Docker: { text: 'DOCKERFILE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
+  Compose: { text: 'COMPOSE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
 }
 
-function useGespeicherterCode(id: string, startCode: string) {
-  return useLocalStorage(`tryit:${id}:${hash(startCode)}`, startCode)
+const EDITOR_SPRACHE: Record<keyof typeof ABZEICHEN, EditorSprache> = {
+  JavaScript: 'js',
+  Java: 'java',
+  TS: 'ts',
+  React: 'react',
+  TypeScript: 'react',
+  Test: 'react',
+  Spring: 'spring',
+  Docker: 'docker',
+  Compose: 'yaml',
 }
 
-function Rahmen({
+// Gespeichert wird pro id - siehe useSavedCode.ts (auch von den Editoren aus Teil 8 benutzt).
+const useGespeicherterCode = useSavedCode
+
+export function Rahmen({
   art,
+  startText,
   titel,
   aufgabe,
   code,
@@ -144,6 +198,8 @@ function Rahmen({
   kopf?: string
   maxZeilen?: number
   art: keyof typeof ABZEICHEN
+  /** Label of the run button, e.g. "▶ docker build" (default: ▶ Ausführen). */
+  startText?: string
   markierungen?: Typfehler[]
   /** Inhalt zwischen Aufgabe und Editor, z. B. nur lesbare Dateien. */
   oben?: ReactNode
@@ -191,7 +247,7 @@ function Rahmen({
         beiAenderung={setCode}
         beiAusfuehren={(c) => ausfuehren(c)}
         label={`${t.codeEditor}${titel ? ': ' + titel : ''}`}
-        sprache={art === 'JavaScript' ? 'js' : art === 'Java' ? 'java' : art === 'TS' ? 'ts' : 'react'}
+        sprache={EDITOR_SPRACHE[art]}
         markierungen={markierungen}
         steuerung={editorRef}
         maxZeilen={maxZeilen}
@@ -202,7 +258,7 @@ function Rahmen({
           onClick={() => ausfuehren()}
           className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700"
         >
-          {t.ausfuehren}
+          {startText ?? t.ausfuehren}
         </button>
         <button
           onClick={() => {
@@ -298,7 +354,7 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
   )
 }
 
-function Testergebnisse({ ergebnisse }: { ergebnisse: TestErgebnis[] | null }) {
+export function Testergebnisse({ ergebnisse }: { ergebnisse: TestErgebnis[] | null }) {
   const t = useTexte()
   if (!ergebnisse) return null
   const bestanden = ergebnisse.filter((e) => e.ok).length

@@ -1,4 +1,7 @@
 import type { TypTest } from './tsLauf'
+import type { BuildResult } from '../docker/build'
+import type { ComposeResult } from '../docker/compose'
+import type { ProjectId } from '../docker/projects'
 
 /**
  * Baut das HTML-Dokument, in dem JavaScript-Übungen laufen.
@@ -32,10 +35,38 @@ export type CodeBeispiel = {
   code: string
   loesung?: string
   vorbereitung?: string
-  tests?: Test[] | ReactTest[]
+  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[]
   /** Nur TypeScript (modus="ts"): Code, der mit dem Code der Lernenden fehlerfrei kompilieren muss. */
   typTests?: TypTest[]
   tipps?: { de: string[]; en: string[] }
+  /** Spring (part 8): application.properties and requests sent after every start. */
+  properties?: string
+  requests?: string
+  /** Dockerfile (part 8): the course project that is built, and its .dockerignore. */
+  project?: ProjectId
+  ignore?: string
+}
+
+/**
+ * Test for a Spring exercise (part 8): requests in `.http` notation with expected answers
+ * (`→ 201 {"title": "Milk"}`) and/or a Java expression evaluated afterwards, where
+ * `context` (the ApplicationContext) and `output` are available. Every test gets a fresh application.
+ */
+export type SpringTestSpec = {
+  name: string | { de: string; en: string }
+  http?: string
+  ausdruck?: string
+  erwartet?: unknown
+}
+
+/**
+ * Test for a Dockerfile or compose exercise (part 8): a function that looks at the simulated
+ * result - the built image or the started containers.
+ */
+export type DockerTest = {
+  name: string | { de: string; en: string }
+  dockerfile?: (result: BuildResult) => boolean
+  compose?: (result: ComposeResult) => boolean
 }
 
 /**

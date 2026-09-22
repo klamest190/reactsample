@@ -37,3 +37,12 @@ export function hash(text: string) {
   for (let i = 0; i < text.length; i++) h = (Math.imul(31, h) + text.charCodeAt(i)) | 0
   return (h >>> 0).toString(36)
 }
+
+/**
+ * The same function for the files of part 8 - the name says what is inside:
+ * a Dockerfile, a compose.yaml, requests in `.http` notation or application.properties.
+ */
+export const docker = js
+export const yaml = js
+export const http = js
+export const properties = js

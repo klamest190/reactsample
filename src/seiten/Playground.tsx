@@ -211,6 +211,8 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
             <TryIt {...gemeinsam} modus="react" />
           ) : daten.modus === 'java' ? (
             <TryIt {...gemeinsam} modus="java" />
+          ) : daten.modus === 'spring' ? (
+            <TryIt {...gemeinsam} modus="spring" />
           ) : daten.modus === 'ts' ? (
             <TryIt {...gemeinsam} modus="ts" />
           ) : (

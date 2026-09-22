@@ -88,6 +88,14 @@ const PFADE = {
     </>
   ),
   haken: <path d="M20 6 9 17l-5-5" />,
+  // Part 8: two server units - Spring Boot and Docker live on the server side.
+  server: (
+    <>
+      <rect x="3" y="3" width="18" height="8" rx="2" />
+      <rect x="3" y="13" width="18" height="8" rx="2" />
+      <path d="M7 7h.01M7 17h.01" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof PFADE

@@ -9,4 +9,5 @@ export const TEIL_STIL: Record<string, { icon: IconName; farbe: string }> = {
   praxis: { icon: 'koffer', farbe: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' },
   projekt: { icon: 'flagge', farbe: 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300' },
   java: { icon: 'tasse', farbe: 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300' },
+  backend: { icon: 'server', farbe: 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300' },
 }

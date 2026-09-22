@@ -1,5 +1,6 @@
 import type { Zweisprachig } from '../../i18n/SpracheContext'
-import type { ReactTest, Test } from '../../lernen/jsSandbox'
+import type { DockerTest, ReactTest, SpringTestSpec, Test } from '../../lernen/jsSandbox'
+import type { ProjectId } from '../../docker/projects'
 import type { TypTest } from '../../lernen/tsLauf'
 
 /**
@@ -37,12 +38,17 @@ export type Vorhersage = Basis & {
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
   aufgabe: Zweisprachig
-  modus: 'js' | 'ts' | 'react' | 'java'
+  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'dockerfile' | 'compose'
   code: string
   loesung: string
   vorbereitung?: string
   vorschau?: boolean
-  tests?: Test[] | ReactTest[]
+  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[]
+  /** Part 8: application.properties and requests (spring), project and .dockerignore (dockerfile). */
+  properties?: string
+  requests?: string
+  project?: ProjectId
+  ignore?: string
   /** Nur bei modus 'ts': Code, der zusammen mit der Lösung ohne Typfehler kompilieren muss (siehe tsLauf.ts). */
   typTests?: TypTest[]
   tipps: Zweisprachig<string[]>

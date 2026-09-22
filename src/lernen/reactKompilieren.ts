@@ -149,7 +149,11 @@ function umgebung(protokoll: Protokoll) {
   return { globale: { console: konsole, ...timer, ...GLOBALE }, aufraeumen }
 }
 
-export async function kompilieren(quelltext: string, protokoll: Protokoll, sprache: 'de' | 'en') {
+/**
+ * `extraGlobals`: additional values the code sees as globals - the full-stack workshop
+ * (part 8) passes its own `fetch` that talks to the simulated Spring backend.
+ */
+export async function kompilieren(quelltext: string, protokoll: Protokoll, sprache: 'de' | 'en', extraGlobals: Record<string, unknown> = {}) {
   const { transform } = await import('sucrase')
   await moduleNachladen([quelltext])
   const { code } = transform(quelltext, OPTIONEN)
@@ -160,7 +164,7 @@ export async function kompilieren(quelltext: string, protokoll: Protokoll, sprac
     throw new Error(MELDUNGEN[sprache].import(name))
   }
 
-  const parameter = { React, require, exports: {}, ...globale }
+  const parameter = { React, require, exports: {}, ...globale, ...extraGlobals }
   const fabrik = new Function(
     ...Object.keys(parameter),
     code + '\n;return typeof App !== "undefined" ? App : exports.default;',

@@ -14,6 +14,8 @@
 
 import { JavaSyntaxFehler, tokenisieren, type Token } from './lexer'
 import type {
+  Annotation,
+  AnnotationValue,
   Anweisung,
   Ausdruck,
   Block,
@@ -36,7 +38,13 @@ const MODIFIKATOREN = new Set([
   'synchronized', 'native', 'transient', 'volatile', 'strictfp',
 ])
 
-type Modifikatoren = { statisch: boolean; final: boolean; abstrakt: boolean; sichtbarkeit: Sichtbarkeit }
+type Modifikatoren = {
+  statisch: boolean
+  final: boolean
+  abstrakt: boolean
+  sichtbarkeit: Sichtbarkeit
+  annotations: Annotation[]
+}
 
 export function parsen(quelle: string): Programm {
   const tokens = tokenisieren(quelle)
@@ -151,12 +159,11 @@ export function parsen(quelle: string): Programm {
   // --- Modifikatoren & Annotationen ----------------------------------------
 
   function modifikatorenLesen(): Modifikatoren {
-    const m: Modifikatoren = { statisch: false, final: false, abstrakt: false, sichtbarkeit: 'paket' }
+    const m: Modifikatoren = { statisch: false, final: false, abstrakt: false, sichtbarkeit: 'paket', annotations: [] }
     while (true) {
-      if (ist('@')) {
-        pos++ // @Override, @FunctionalInterface … werden gelesen und ignoriert
-        erwarteName()
-        if (ist('(')) klammerUeberspringen()
+      // `@interface` would declare an annotation type - not supported here.
+      if (ist('@') && !ist('interface', 1)) {
+        m.annotations.push(readAnnotation())
         continue
       }
       const t = jetzt().text
@@ -172,13 +179,77 @@ export function parsen(quelle: string): Programm {
     }
   }
 
-  function klammerUeberspringen() {
-    let tiefe = 0
-    do {
-      if (ist('(')) tiefe++
-      else if (ist(')')) tiefe--
+  /**
+   * `@Name`, `@Name("value")` or `@Name(a = 1, b = {"x", "y"})`.
+   * The runtime ignores annotations; they are only kept for libraries like Spring.
+   */
+  function readAnnotation(): Annotation {
+    const line = erwarte('@').zeile
+    let name = erwarteName()
+    // Fully qualified: @jakarta.validation.constraints.NotBlank → NotBlank
+    while (ist('.') && istName(1)) {
       pos++
-    } while (tiefe > 0 && !istEnde())
+      name = erwarteName()
+    }
+    const values: Record<string, AnnotationValue> = {}
+    if (nimm('(')) {
+      if (!ist(')')) {
+        if (istName() && ist('=', 1)) {
+          do {
+            const key = erwarteName()
+            erwarte('=')
+            values[key] = readAnnotationValue()
+          } while (nimm(','))
+        } else {
+          values.value = readAnnotationValue()
+        }
+      }
+      erwarte(')')
+    }
+    return { name, values, line }
+  }
+
+  function readAnnotationValue(): AnnotationValue {
+    if (nimm('{')) {
+      const list: AnnotationValue[] = []
+      while (!ist('}') && !istEnde()) {
+        list.push(readAnnotationValue())
+        if (!nimm(',')) break
+      }
+      erwarte('}')
+      return list
+    }
+    const t = jetzt()
+    if (t.art === 'text') {
+      pos++
+      // "a" + "b" - happens with long paths or messages
+      let text = t.text
+      while (ist('+') && naechstes(1).art === 'text') {
+        pos++
+        text += tokens[pos++].text
+      }
+      return text
+    }
+    if (t.art === 'zahl') {
+      pos++
+      return t.wert ?? Number(t.text)
+    }
+    if (ist('-') && naechstes(1).art === 'zahl') {
+      pos++
+      return -(tokens[pos++].wert ?? 0)
+    }
+    if (ist('true') || ist('false')) return tokens[pos++].text === 'true'
+    if (t.art === 'name') {
+      // HttpStatus.CREATED, RequestMethod.GET, Todo.class
+      const parts = [erwarteName()]
+      while (ist('.') && (istName(1) || ist('class', 1))) {
+        pos++
+        if (nimm('class')) return parts.join('.')
+        parts.push(erwarteName())
+      }
+      return parts.join('.')
+    }
+    fehler(`illegal annotation value: '${t.text}'`)
   }
 
   // --- Typdeklarationen -----------------------------------------------------
@@ -203,6 +274,8 @@ export function parsen(quelle: string): Programm {
       felder: [],
       methoden: [],
       konstanten: [],
+      superTypes: [],
+      annotations: mods.annotations,
       zeile,
     }
 
@@ -211,16 +284,23 @@ export function parsen(quelle: string): Programm {
     }
     if (nimm('extends')) {
       const erster = typErwarten()
+      deklaration.superTypes!.push(erster)
       if (art === 'interface') {
         deklaration.interfaces.push(erster.name)
-        while (nimm(',')) deklaration.interfaces.push(typErwarten().name)
+        while (nimm(',')) {
+          const next = typErwarten()
+          deklaration.superTypes!.push(next)
+          deklaration.interfaces.push(next.name)
+        }
       } else {
         deklaration.oberklasse = erster.name
       }
     }
     if (nimm('implements')) {
       do {
-        deklaration.interfaces.push(typErwarten().name)
+        const typ = typErwarten()
+        deklaration.superTypes!.push(typ)
+        deklaration.interfaces.push(typ.name)
       } while (nimm(','))
     }
 
@@ -275,6 +355,7 @@ export function parsen(quelle: string): Programm {
         abstrakt: false,
         sichtbarkeit: mods.sichtbarkeit,
         konstruktor: true,
+        annotations: mods.annotations,
         zeile,
       })
       return
@@ -305,6 +386,7 @@ export function parsen(quelle: string): Programm {
         abstrakt: abstrakt && !rumpf,
         sichtbarkeit: klasse.art === 'interface' ? 'public' : mods.sichtbarkeit,
         konstruktor: false,
+        annotations: mods.annotations,
         zeile,
       })
       return
@@ -326,6 +408,7 @@ export function parsen(quelle: string): Programm {
         final: mods.final || klasse.art === 'interface',
         sichtbarkeit: mods.sichtbarkeit,
         init,
+        annotations: mods.annotations,
         zeile,
       })
     } while (nimm(','))
@@ -345,7 +428,7 @@ export function parsen(quelle: string): Programm {
     const parameter: ParamDekl[] = []
     if (!ist(')')) {
       do {
-        modifikatorenLesen() // final / @Annotation vor Parametern
+        const { annotations } = modifikatorenLesen() // final / @PathVariable … before parameters
         const typ = typErwarten()
         const varargs = nimm('...')
         const name = erwarteName()
@@ -358,6 +441,7 @@ export function parsen(quelle: string): Programm {
           name,
           typ: { ...typ, dimensionen: typ.dimensionen + dimensionen + (varargs ? 1 : 0) },
           varargs,
+          annotations,
         })
       } while (nimm(','))
     }
@@ -430,11 +514,7 @@ export function parsen(quelle: string): Programm {
     let final = false
     while (ist('final') || ist('@')) {
       if (nimm('final')) final = true
-      else {
-        pos++
-        erwarteName()
-        if (ist('(')) klammerUeberspringen()
-      }
+      else readAnnotation() // e.g. @SuppressWarnings - meaningless for local variables
     }
     const typ = typLesen()
     if (!typ || !istName()) {
@@ -730,6 +810,12 @@ export function parsen(quelle: string): Programm {
           // explizite Typargumente beim Aufruf: list.<String>toArray()
           pos++
           while (!schliesseSpitz() && !istEnde()) pos++
+        }
+        // Todo.class - a class literal (needed e.g. by SpringApplication.run)
+        if (ist('class') && wert.art === 'name') {
+          pos++
+          wert = { art: 'classLiteral', className: wert.name, zeile: t.zeile }
+          continue
         }
         const name = ist('new') ? fehler('inner class creation is not supported') : erwarteName()
         if (ist('(')) {

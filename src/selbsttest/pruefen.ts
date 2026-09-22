@@ -10,6 +10,8 @@ import { typenPruefen } from '../lernen/typpruefung'
 import { tsTypenPruefen, tsUebersetzen } from '../lernen/tsLauf'
 import type { Zweisprachig } from '../i18n/SpracheContext'
 import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
+import { SPRING_EXPECTED_FAILURES, springExampleCheck } from '../spring/contents'
+import { DOCKER_EXPECTED_FAILURES, dockerExampleCheck } from '../docker/contents'
 
 /**
  * Selbsttest der Kursinhalte: führt jedes Beispiel, jede Übung und jeden Projektschritt
@@ -22,7 +24,7 @@ import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
  *                          Musterlösung alle kaputten Varianten, der Startcode nicht
  */
 
-export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java'; typen: boolean; vorschau: boolean }
+export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java' | 'spring' | 'dockerfile' | 'compose'; typen: boolean; vorschau: boolean }
 export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; dauer: number }
 
 /**
@@ -31,6 +33,8 @@ export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; 
  */
 export const ERWARTETE_FEHLER: Record<string, string> = {
   ...JAVA_ERWARTETE_FEHLER,
+  ...SPRING_EXPECTED_FAILURES,
+  ...DOCKER_EXPECTED_FAILURES,
   'ts-start-fehler': 'zeigt, dass ein Typfehler das Programm nicht aufhält',
 }
 
@@ -228,11 +232,20 @@ async function testModusPruefen(
 export async function beispielPruefen(
   b: CodeBeispiel,
   m: Modus,
-  extra: { dateien?: ProjektDatei[]; varianten?: { dateien: ProjektDatei[] }[] } = {},
+  extra: { dateien?: ProjektDatei[]; varianten?: { dateien: ProjektDatei[] }[]; id?: string } = {},
 ): Promise<string | null> {
   if (m.modus === 'java') {
     const ergebnis = javaBeispielPruefen('', b)
     return ergebnis.ok ? null : ergebnis.meldung
+  }
+  // Part 8 checks itself as well - Spring runtime and Docker simulator need no DOM.
+  if (m.modus === 'spring') {
+    const result = springExampleCheck(extra.id ?? '', b)
+    return result.ok ? null : result.message
+  }
+  if (m.modus === 'dockerfile' || m.modus === 'compose') {
+    const result = dockerExampleCheck(extra.id ?? '', b, m.modus)
+    return result.ok ? null : result.message
   }
 
   if (m.modus === 'ts') return tsPruefen(b)
@@ -264,7 +277,7 @@ export async function beispielPruefen(
   if (b.loesung && b.tests?.length) {
     // Bei TS-Übungen darf der Startcode alle Verhaltenstests bestehen - er scheitert an den Typen.
     const start = m.typen ? b.loesung : b.code
-    return uebungPruefen(m.modus, start, b.loesung, b.tests, b.vorbereitung)
+    return uebungPruefen(m.modus as 'js' | 'react' | 'java', start, b.loesung, b.tests as Test[] | ReactTest[], b.vorbereitung)
   }
 
   // Beispiel bzw. Übung ohne Tests: läuft ohne Fehler. Bei Übungen zählt nur die Lösung -

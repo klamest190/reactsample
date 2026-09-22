@@ -9,6 +9,9 @@ const LADER: Record<string, () => Promise<{ uebungen: UebungsSammlung }>> = {
   js: () => import('./js'),
   ts: () => import('./ts'),
   java: () => import('./java'),
+  // Part 8 has two chapter prefixes and one exercise file.
+  spring: () => import('./backend'),
+  docker: () => import('./backend'),
   react: () => import('./react'),
   hooks: () => import('./hooks'),
   praxis: () => import('./praxis'),

@@ -1,3 +1,4 @@
+import { backendPlayground } from './backend'
 import { hooksPlayground } from './hooks'
 import { javaPlayground } from './java'
 import { jsPlayground } from './js'
@@ -16,4 +17,5 @@ export const playgrounds: PlaygroundDaten[] = [
   praxisPlayground,
   projektPlayground,
   javaPlayground,
+  backendPlayground,
 ]

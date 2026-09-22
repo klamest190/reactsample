@@ -1,4 +1,4 @@
-import type { CodeBeispiel } from '../lernen/jsSandbox'
+import type { CodeBeispiel, ReactTest, Test } from '../lernen/jsSandbox'
 import { dateien as businessDateien } from '../kurs/praxis/BusinessApp.code'
 import { uebungDateien, uebungVarianten } from '../kurs/praxis/Testen.code'
 import { schrittInhalte } from '../kurs/projekt/schritte'
@@ -24,7 +24,7 @@ const kapitelQuellen = import.meta.glob<string>(['../kurs/**/*.tsx', '!../kurs/*
   import: 'default',
   eager: true,
 })
-const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,ts,react,hooks,praxis,java}.ts', { eager: true })
+const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,ts,react,hooks,praxis,java,backend}.ts', { eager: true })
 
 /** Wie ein Beispiel im Kapitel verwendet wird: <TryIt id="…" modus="react" typen /> */
 function modiAusKapiteln() {
@@ -57,7 +57,7 @@ function auftraegeSammeln(): Auftrag[] {
         continue
       }
       const extra = id === 'praxis-testen-uebung' ? { dateien: uebungDateien, varianten: uebungVarianten } : {}
-      auftraege.push({ id, ort, pruefen: () => beispielPruefen(beispiel, m, extra) })
+      auftraege.push({ id, ort, pruefen: () => beispielPruefen(beispiel, m, { ...extra, id }) })
     }
   }
 
@@ -71,10 +71,10 @@ function auftraegeSammeln(): Auftrag[] {
           id: u.id,
           ort,
           pruefen: () =>
-            u.modus === 'ts'
-              ? beispielPruefen(u, { modus: 'ts', typen: false, vorschau: false })
+            u.modus === 'ts' || u.modus === 'spring' || u.modus === 'dockerfile' || u.modus === 'compose'
+              ? beispielPruefen(u, { modus: u.modus, typen: false, vorschau: false }, { id: u.id })
               : u.tests?.length
-              ? uebungPruefen(u.modus, u.code, u.loesung, u.tests, u.vorbereitung)
+              ? uebungPruefen(u.modus, u.code, u.loesung, u.tests as Test[] | ReactTest[], u.vorbereitung)
               : beispielPruefen({ code: u.code, loesung: u.loesung, vorbereitung: u.vorbereitung }, { modus: u.modus, typen: false, vorschau: Boolean(u.vorschau) }),
         })
       }

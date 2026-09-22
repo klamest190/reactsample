@@ -21,7 +21,24 @@ export const TYP_UNBEKANNT: TypRef = { name: 'var', dimensionen: 0, argumente: [
 
 export type Sichtbarkeit = 'public' | 'protected' | 'private' | 'paket'
 
-export type ParamDekl = { name: string; typ: TypRef; varargs: boolean }
+/**
+ * An annotation such as `@GetMapping("/todos/{id}")` or `@Size(min = 1, max = 80)`.
+ *
+ * The runtime itself does not need them (`@Override` changes nothing at run time) -
+ * they are only kept so that libraries like Spring (src/spring/) can read them.
+ * Real Spring works the same way: it reads the annotations via reflection at startup.
+ */
+export type Annotation = {
+  name: string
+  /** A single unnamed value is stored as `value`: `@GetMapping("/x")` → { value: '/x' }. */
+  values: Record<string, AnnotationValue>
+  line: number
+}
+
+/** Strings, numbers and booleans as such; constants and classes as text (`HttpStatus.CREATED`, `Todo.class` → `Todo`). */
+export type AnnotationValue = string | number | boolean | AnnotationValue[]
+
+export type ParamDekl = { name: string; typ: TypRef; varargs: boolean; annotations?: Annotation[] }
 
 export type FeldDekl = {
   name: string
@@ -30,6 +47,7 @@ export type FeldDekl = {
   final: boolean
   sichtbarkeit: Sichtbarkeit
   init?: Ausdruck
+  annotations?: Annotation[]
   zeile: number
 }
 
@@ -44,6 +62,7 @@ export type MethodenDekl = {
   sichtbarkeit: Sichtbarkeit
   /** Konstruktoren sind Methoden ohne Rückgabetyp, die so heißen wie die Klasse. */
   konstruktor: boolean
+  annotations?: Annotation[]
   zeile: number
 }
 
@@ -53,6 +72,8 @@ export type TypDeklaration = {
   abstrakt: boolean
   oberklasse?: string
   interfaces: string[]
+  /** extends/implements including type arguments: `JpaRepository<Todo, Long>` - for libraries like Spring Data. */
+  superTypes?: TypRef[]
   felder: FeldDekl[]
   methoden: MethodenDekl[]
   /** Nur bei enum: die Konstanten in Reihenfolge. */
@@ -61,6 +82,7 @@ export type TypDeklaration = {
   komponenten?: ParamDekl[]
   /** Bei verschachtelten Klassen: die umgebende Klasse - deren static-Felder sind sichtbar. */
   aeussere?: string
+  annotations?: Annotation[]
   zeile: number
 }
 
@@ -137,5 +159,7 @@ export type Ausdruck =
   | { art: 'lambda'; parameter: string[]; rumpf: Ausdruck | Block; zeile: number }
   | { art: 'methodenRef'; ziel: string; name: string; zeile: number }
   | { art: 'super'; zeile: number }
+  /** `Todo.class` - a Class object, as needed by e.g. `SpringApplication.run(App.class, args)`. */
+  | { art: 'classLiteral'; className: string; zeile: number }
   /** switch als Ausdruck (Java 14+): `int t = switch (tag) { case 1 -> 10; … };` */
   | { art: 'switchAusdruck'; anweisung: Anweisung; zeile: number }

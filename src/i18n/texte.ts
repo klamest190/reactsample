@@ -9,7 +9,7 @@
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java',
+  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot und Docker',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -22,7 +22,7 @@ const de = {
   heroTitel: 'Von JavaScript zu React - ',
   heroTitelBetont: 'Schritt für Schritt',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt.',
+    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container.',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: '🎉 Du hast alle Kapitel abgeschlossen!',
@@ -200,7 +200,7 @@ const de = {
   vorwissen: 'Vorwissen',
   wissensdatenbank: 'Nachschlagen & Anwenden',
   kartenSuche: 'Alles durchsuchen: Kapitel, Begriffe, Projektschritte.',
-  kartenGlossar: 'Rund 40 Begriffe kurz erklärt, mit Links zu den Kapiteln.',
+  kartenGlossar: 'Rund 100 Begriffe kurz erklärt, mit Links zu den Kapiteln.',
   kartenProjekt: 'Eine ToDo-App in 12 Schritten - der rote Faden durch den Kurs.',
   teilUmschalten: 'Teil ein- oder ausklappen',
   lokalCheckliste: 'Checkliste',
@@ -211,7 +211,7 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics through TypeScript and React to Java',
+  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot and Docker',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -223,7 +223,7 @@ const en: Texte = {
   heroTitel: 'From JavaScript to React - ',
   heroTitelBetont: 'step by step',
   heroText:
-    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world.',
+    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers.',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: '🎉 You have completed all chapters!',
@@ -394,7 +394,7 @@ const en: Texte = {
   vorwissen: 'Prerequisites',
   wissensdatenbank: 'Look up & apply',
   kartenSuche: 'Search everything: chapters, terms, project steps.',
-  kartenGlossar: 'About 40 terms explained briefly, with links to the chapters.',
+  kartenGlossar: 'About 100 terms explained briefly, with links to the chapters.',
   kartenProjekt: 'A todo app in 12 steps - the common thread through the course.',
   teilUmschalten: 'Expand or collapse part',
   lokalCheckliste: 'Checklist',
