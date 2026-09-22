@@ -80,6 +80,14 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
   const [anfrage, setAnfrage] = useState('')
   const [auswahl, setAuswahl] = useState(0)
   const listeRef = useRef<HTMLUListElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  // Fokus zurückgeben: wer den Dialog per Tastatur geöffnet hat, steht danach
+  // wieder auf demselben Knopf und nicht am Seitenanfang.
+  useEffect(() => {
+    const vorher = document.activeElement as HTMLElement | null
+    return () => vorher?.focus?.()
+  }, [])
 
   const seiten = [
     { ziel: '', titel: t.uebersicht },
@@ -113,6 +121,20 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
     } else if (e.key === 'Escape') {
       e.preventDefault()
       schliessen()
+    } else if (e.key === 'Tab') {
+      // Fokusfalle: aria-modal blendet den Hintergrund nur für Screenreader aus,
+      // die Tab-Taste kommt trotzdem hinaus. Also hier im Kreis führen.
+      const ziele = dialogRef.current?.querySelectorAll<HTMLElement>('input, button, [href]')
+      if (!ziele?.length) return
+      const erstes = ziele[0]
+      const letztes = ziele[ziele.length - 1]
+      if (e.shiftKey && document.activeElement === erstes) {
+        e.preventDefault()
+        letztes.focus()
+      } else if (!e.shiftKey && document.activeElement === letztes) {
+        e.preventDefault()
+        erstes.focus()
+      }
     }
   }
 
@@ -126,6 +148,7 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/40 p-4 pt-[10vh] backdrop-blur-sm" onMouseDown={schliessen}>
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={t.suche}

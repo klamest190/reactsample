@@ -30,11 +30,33 @@ export const FOKUS =
 export const KLEBT_MD = 'md:sticky md:top-20 md:max-h-[calc(100vh-6rem)] md:overflow-y-auto'
 export const KLEBT_LG = 'lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)]'
 
-/** Ein Unterkapitel mit Überschrift. */
-export function Abschnitt({ titel, children }: { titel: string; children: ReactNode }) {
+/**
+ * Ein Unterkapitel mit Überschrift.
+ *
+ * Die Sprungmarke vergibt nicht der Abschnitt selbst, sondern ein Durchlauf nach
+ * dem Rendern (siehe Gliederung.tsx) - nach Position, also `abschnitt-3`.
+ * Das ist sprachneutral, weil die deutsche und die englische Fassung eines
+ * Kapitels dieselben Abschnitte in derselben Reihenfolge haben.
+ *
+ * `anker` ist der Ausweg für Links, die dauerhaft halten sollen: damit bekommt
+ * der Abschnitt einen festen Namen statt seiner Position.
+ */
+export function Abschnitt({
+  titel,
+  anker,
+  children,
+}: {
+  titel: string
+  anker?: string
+  children: ReactNode
+}) {
   return (
-    <section className="space-y-4">
-      <h2 className="border-b border-slate-200 pb-2 text-xl font-semibold tracking-tight dark:border-slate-800">
+    <section data-anker={anker} className="scroll-mt-24 space-y-4">
+      {/* tabIndex -1: die Überschrift ist kein Tabstopp, kann aber Sprungziel sein. */}
+      <h2
+        tabIndex={-1}
+        className="border-b border-slate-200 pb-2 text-xl font-semibold tracking-tight outline-none dark:border-slate-800"
+      >
         {titel}
       </h2>
       {children}

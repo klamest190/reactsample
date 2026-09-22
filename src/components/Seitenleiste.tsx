@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { kurs } from '../kurs/kurs'
 import { Icon, type IconName } from './Icon'
@@ -60,7 +60,11 @@ export function Seitenleiste({
 }) {
   const { sprache } = useSprache()
   const t = useTexte()
-  const [umgeschaltet, setUmgeschaltet] = useState<Record<string, { offen: boolean; route: string }>>({})
+  // Überdauert das Neuladen - wer zehn Teile zuklappt, will sie nicht wieder offen vorfinden.
+  const [umgeschaltet, setUmgeschaltet] = useLocalStorage<Record<string, { offen: boolean; route: string }>>(
+    'lernpfad-teile',
+    {},
+  )
 
   const seiten: { href: string; aktiv: boolean; label: string; icon: IconName }[] = [
     { href: '#', aktiv: route === '', label: t.uebersicht, icon: 'start' },

@@ -1,5 +1,6 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from '../components/ErrorBoundary'
+import { GliederungMelden, type Abschnittseintrag } from '../components/Gliederung'
 import { Button, KARTE, Platzhalter } from '../components/Ui'
 import { KapitelChip } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
@@ -13,17 +14,32 @@ import { UebungenBereich } from '../lernen/Uebungen'
  */
 export function KapitelSeite({
   kapitel,
+  abschnittZiel,
   istErledigt,
   erledigtSetzen,
   navigieren,
 }: {
   kapitel: KapitelMitTeil
+  abschnittZiel?: string
   istErledigt: boolean
   erledigtSetzen: (wert: boolean) => void
   navigieren: (id: string) => void
 }) {
   const { sprache } = useSprache()
   const t = useTexte()
+  // Die Abschnitte kennt erst das gerenderte Kapitel - siehe Gliederung.tsx.
+  const inhaltRef = useRef<HTMLDivElement>(null)
+  const [gliederung, setGliederung] = useState<Abschnittseintrag[]>([])
+
+  // Sprung zu einem Abschnitt (#/kapitel-id/abschnitt-3).
+  // `gliederung` muss in den Abhängigkeiten stehen: beim Kaltstart trifft das
+  // Ziel ein, bevor das nachgeladene Kapitel da ist - dann greift der Effekt erneut.
+  useEffect(() => {
+    if (!abschnittZiel || gliederung.length === 0) return
+    const el = document.getElementById(abschnittZiel)
+    el?.scrollIntoView({ block: 'start' })
+    el?.querySelector<HTMLElement>(':scope > h2')?.focus({ preventScroll: true })
+  }, [abschnittZiel, gliederung])
 
   const index = alleKapitel.indexOf(kapitel)
   const vorher = alleKapitel[index - 1]
@@ -71,11 +87,38 @@ export function KapitelSeite({
         </div>
       </header>
 
+      {/* Erst ab drei Abschnitten lohnt ein Verzeichnis - darunter sieht man ohnehin alles. */}
+      {gliederung.length > 2 && (
+        <nav aria-labelledby="gliederung-titel" className={`${KARTE} px-4 py-3 text-sm`}>
+          <h2
+            id="gliederung-titel"
+            className="mb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400"
+          >
+            {t.aufDieserSeite}
+          </h2>
+          <ol className="space-y-1">
+            {gliederung.map((abschnitt, i) => (
+              <li key={abschnitt.id} className="flex gap-2">
+                <span className="w-4 shrink-0 text-right text-slate-400 tabular-nums">{i + 1}</span>
+                {/* Eine Route, kein nacktes #fragment - sonst denkt der Hash-Router, die Seite wechselt. */}
+                <a
+                  href={`#/${kapitel.id}/${abschnitt.id}`}
+                  className="text-slate-700 hover:text-brand-600 hover:underline dark:text-slate-300 dark:hover:text-brand-400"
+                >
+                  {abschnitt.titel}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
+
       <ErrorBoundary>
         {/* Kapitel werden per lazy() nachgeladen - solange zeigt Suspense den Platzhalter. */}
         <Suspense fallback={<Platzhalter label={t.kapitelLaedt} />}>
-          <div className="space-y-10">
+          <div ref={inhaltRef} className="space-y-10">
             <Inhalt />
+            <GliederungMelden wurzel={inhaltRef} melden={setGliederung} />
           </div>
         </Suspense>
       </ErrorBoundary>

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
 import { Seitenleiste } from './components/Seitenleiste'
 import { Suche } from './components/Suche'
+import { Platzhalter } from './components/Ui'
 import { useTheme } from './context/ThemeContext'
 import { useHashRoute } from './hooks/useHashRoute'
 import { useLocalStorage } from './hooks/useLocalStorage'
@@ -39,16 +40,20 @@ export default function App() {
   const sucheOeffnen = () => setSucheBeiRoute(route)
   const beiStrgK = useEffectEvent(sucheOeffnen)
 
-  const kapitel = alleKapitel.find((k) => k.id === route)
+  // Die Route hat höchstens zwei Teile: Seite und Ziel darin, z.B.
+  // "hooks-usestate/abschnitt-3" oder "glossar/closure". Keine Kapitel-ID enthält ein "/".
+  const [seite, unterseite] = route.split('/')
+  const kapitel = alleKapitel.find((k) => k.id === seite)
   const prozent = Math.round((erledigt.length / alleKapitel.length) * 100)
 
-  const [seite, unterseite] = route.split('/')
   const glossarZiel = seite === 'glossar' ? unterseite : undefined
+  const abschnittZiel = kapitel ? unterseite : undefined
 
-  // Bei jedem Seitenwechsel nach oben scrollen (Sprünge ins Glossar scrollen selbst).
+  // Bei jedem Seitenwechsel nach oben scrollen - außer wenn ein Ziel
+  // innerhalb der Seite angesprungen wird, das scrollt selbst.
   useEffect(() => {
-    if (!glossarZiel) window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [route, glossarZiel])
+    if (!glossarZiel && !abschnittZiel) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [route, glossarZiel, abschnittZiel])
 
   // Tab-Titel passend zu Seite und Sprache.
   useEffect(() => {
@@ -82,6 +87,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
+      {/* Überspringt die über 70 Einträge der Seitenleiste. Ein Knopf, kein Link:
+          ein <a href="#inhalt"> würde der Hash-Router als Seitenwechsel lesen. */}
+      <button
+        onClick={() => document.getElementById('inhalt')?.focus()}
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+      >
+        {t.zumInhalt}
+      </button>
+
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <button
@@ -159,12 +173,15 @@ export default function App() {
           sucheOeffnen={sucheOeffnen}
         />
 
-        <main className="min-w-0 flex-1">
+        <main id="inhalt" tabIndex={-1} className="min-w-0 flex-1 outline-none">
           {kapitel ? (
             <KapitelSeite
               // key: frischer State (Quiz, Demos) bei jedem Kapitel- und Sprachwechsel.
+              // Der Abschnitt gehört bewusst NICHT in den key - sonst würde ein
+              // Sprung innerhalb des Kapitels es neu aufbauen und das Quiz leeren.
               key={kapitel.id + sprache}
               kapitel={kapitel}
+              abschnittZiel={abschnittZiel}
               istErledigt={erledigt.includes(kapitel.id)}
               erledigtSetzen={(wert) => erledigtSetzen(kapitel.id, wert)}
               navigieren={navigieren}
@@ -174,7 +191,7 @@ export default function App() {
           ) : seite === 'projekt' ? (
             <ProjektUebersicht erledigt={erledigt} />
           ) : seite === 'playground' ? (
-            <Suspense fallback={null}>
+            <Suspense fallback={<Platzhalter label={t.playground} />}>
               <Playground teil={unterseite} />
             </Suspense>
           ) : (
