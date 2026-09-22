@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Button, KARTE, Taste } from '../components/Ui'
+import { useFortschritt } from '../context/FortschrittContext'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { alleKapitel, kurs } from '../kurs/kurs'
 
@@ -204,6 +206,35 @@ export function Startseite({
           </li>
         </ul>
       </section>
+
+      <FortschrittZuruecksetzen />
     </div>
+  )
+}
+
+/**
+ * Zurücksetzen in zwei Schritten statt mit confirm(): der Kurs lehrt confirm()
+ * als Beispiel, in der App selbst wäre es ein schlechtes Vorbild.
+ */
+function FortschrittZuruecksetzen() {
+  const t = useTexte()
+  const { allesZuruecksetzen } = useFortschritt()
+  const [sicher, setSicher] = useState(false)
+
+  return (
+    <section className={`${KARTE} p-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400`}>
+      <h2 className="mb-2 font-semibold text-slate-900 dark:text-slate-100">{t.fortschrittTitel}</h2>
+      <p className="mb-3 max-w-2xl">{t.fortschrittText}</p>
+      <Button
+        variante={sicher ? 'gefahr' : 'sekundaer'}
+        onClick={() => {
+          if (!sicher) return setSicher(true)
+          allesZuruecksetzen()
+          setSicher(false)
+        }}
+      >
+        {sicher ? t.wirklichZuruecksetzen : t.fortschrittZuruecksetzen}
+      </Button>
+    </section>
   )
 }

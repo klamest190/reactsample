@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../components/ErrorBoundary'
+import { useFortschritt } from '../context/FortschrittContext'
 import { useTheme } from '../context/ThemeContext'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { CodeBlock } from './CodeBlock'
@@ -354,11 +355,20 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
   )
 }
 
-export function Testergebnisse({ ergebnisse }: { ergebnisse: TestErgebnis[] | null }) {
+export function Testergebnisse({ id, ergebnisse }: { id?: string; ergebnisse: TestErgebnis[] | null }) {
   const t = useTexte()
+  const { uebungGeloest } = useFortschritt()
+  const bestanden = ergebnisse?.filter((e) => e.ok).length ?? 0
+  const alle = ergebnisse !== null && ergebnisse.length > 0 && bestanden === ergebnisse.length
+
+  // Einmal grün heißt gelöst - das merken wir uns, damit die Übung beim
+  // nächsten Besuch als erledigt zu sehen ist.
+  useEffect(() => {
+    if (id && alle) uebungGeloest(id)
+  }, [id, alle, uebungGeloest])
+
+  // Erst NACH den Hooks aussteigen - die Reihenfolge der Hooks muss konstant bleiben.
   if (!ergebnisse) return null
-  const bestanden = ergebnisse.filter((e) => e.ok).length
-  const alle = bestanden === ergebnisse.length
 
   return (
     <div className="space-y-1.5 px-4 py-3 text-sm">
@@ -574,7 +584,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
           )}
         </div>
       )}
-      <Testergebnisse ergebnisse={alleErgebnisse} />
+      <Testergebnisse id={id} ergebnisse={alleErgebnisse} />
       <Konsole
         zeilen={zeilen}
         leerText={
@@ -664,7 +674,7 @@ function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests,
       markierungen={markierungen}
       ausfuehren={(c) => starten(c ?? code, true)}
     >
-      <Testergebnisse ergebnisse={lauf?.ergebnisse ?? null} />
+      <Testergebnisse id={id} ergebnisse={lauf?.ergebnisse ?? null} />
       <Konsole zeilen={lauf?.zeilen ?? []} leerText={lauf ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
     </Rahmen>
   )
@@ -863,7 +873,7 @@ function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests
       {tests?.length ? (
         <div className="border-t border-slate-200 dark:border-slate-800">
           {ergebnisse ? (
-            <Testergebnisse ergebnisse={ergebnisse} />
+            <Testergebnisse id={id} ergebnisse={ergebnisse} />
           ) : (
             <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
               {testsLaufen ? `⏳ ${t.testsLaufen}` : t.reactUebungStart}
@@ -994,7 +1004,7 @@ function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps, dateie
       )}
       {pruefungen && (
         <div className="border-t border-slate-200 dark:border-slate-800">
-          <Testergebnisse ergebnisse={pruefungen} />
+          <Testergebnisse id={id} ergebnisse={pruefungen} />
         </div>
       )}
       <Konsole zeilen={bericht?.logs.map((text) => ({ typ: 'log' as const, text })) ?? []} />

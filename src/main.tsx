@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { FortschrittProvider } from './context/FortschrittContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { SpracheProvider } from './i18n/SpracheContext'
 import './index.css'
@@ -16,14 +17,18 @@ import './index.css'
  * fehlende Cleanups und unreine Render-Funktionen sofort auf. Im Produktivbau
  * hat StrictMode keinerlei Wirkung.
  *
- * Theme- und Sprach-Provider stehen ganz außen, damit JEDE Komponente useTheme()
- * und useSprache() nutzen kann.
+ * Theme-, Sprach- und Fortschritts-Provider stehen ganz außen, damit JEDE
+ * Komponente useTheme(), useSprache() und useFortschritt() nutzen kann.
+ * Der Fortschritt muss hier oben stehen: die Kapitelseite wird beim Kapitel-
+ * und Sprachwechsel absichtlich neu aufgebaut, der Fortschritt soll das überleben.
  */
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <SpracheProvider>
-        <App />
+        <FortschrittProvider>
+          <App />
+        </FortschrittProvider>
       </SpracheProvider>
     </ThemeProvider>
   </StrictMode>,

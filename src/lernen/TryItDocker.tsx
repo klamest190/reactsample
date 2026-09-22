@@ -163,7 +163,7 @@ function DockerfileEditor({ id, titel, aufgabe, code: startCode, loesung, tipps,
       oben={top}
       ausfuehren={(c) => build(c ?? code, true)}
     >
-      <Testergebnisse ergebnisse={result?.results ?? null} />
+      <Testergebnisse id={id} ergebnisse={result?.results ?? null} />
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs dark:border-slate-800">
         <label className="flex items-center gap-2">
           {t.change}
@@ -388,7 +388,7 @@ function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, te
       startText={t.up}
       ausfuehren={(c) => up(c ?? code, true)}
     >
-      <Testergebnisse ergebnisse={result?.results ?? null} />
+      <Testergebnisse id={id} ergebnisse={result?.results ?? null} />
       {result ? <ComposeView result={result.up} /> : <p className="px-4 py-3 text-sm text-slate-500 italic">{t.exerciseStart}</p>}
     </Rahmen>
   )

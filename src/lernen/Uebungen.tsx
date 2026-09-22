@@ -1,5 +1,7 @@
 import { use, useState } from 'react'
+import { Icon } from '../components/Icon'
 import { Aufklapppfeil, KARTE } from '../components/Ui'
+import { useFortschritt } from '../context/FortschrittContext'
 import { Verweis } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { uebungenFuer } from '../kurs/uebungen'
@@ -25,13 +27,23 @@ const STUFEN_STIL: Record<Stufe, string> = {
 export function UebungenBereich({ kapitelId }: { kapitelId: string }) {
   const liste = use(uebungenFuer(kapitelId))
   const t = useTexte()
+  const { uebungen } = useFortschritt()
   if (liste.length === 0) return null
+
+  // Vorhersage-Aufgaben haben keine Tests, also auch kein „gelöst“ - sie zählen nicht mit.
+  const bewertbar = liste.filter((u) => u.stufe !== 'vorhersage')
+  const geloest = bewertbar.filter((u) => uebungen.includes('uebung-' + u.id)).length
 
   return (
     <section className="space-y-3" aria-labelledby="uebungen-titel">
       <div>
-        <h2 id="uebungen-titel" className="border-b border-slate-200 pb-2 text-xl font-semibold tracking-tight dark:border-slate-800">
+        <h2 id="uebungen-titel" className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-2 text-xl font-semibold tracking-tight dark:border-slate-800">
           {t.uebungenTitel}
+          {bewertbar.length > 0 && (
+            <span className="text-sm font-normal text-slate-500 tabular-nums dark:text-slate-400">
+              {t.uebungenGeloest(geloest, bewertbar.length)}
+            </span>
+          )}
         </h2>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{t.uebungenText}</p>
       </div>
@@ -47,7 +59,9 @@ export function UebungenBereich({ kapitelId }: { kapitelId: string }) {
 function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
   const { sprache } = useSprache()
   const t = useTexte()
+  const { uebungen } = useFortschritt()
   const [offen, setOffen] = useState(false)
+  const istGeloest = uebungen.includes('uebung-' + uebung.id)
 
   return (
     <div className={`${KARTE} overflow-hidden`} data-uebung={uebung.id}>
@@ -61,8 +75,16 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
           {t.stufen[uebung.stufe]}
         </span>
         <span className="min-w-0 flex-1 font-medium">{uebung.titel[sprache]}</span>
+        {istGeloest && (
+          <span className="shrink-0 text-emerald-500">
+            <Icon name="haken" className="size-4" />
+            <span className="sr-only">{t.uebungGeloestKurz}</span>
+          </span>
+        )}
         {uebung.wiederholung && (
-          <span className="hidden shrink-0 text-xs text-slate-500 sm:inline">{t.wiederholung}</span>
+          <span className="hidden shrink-0 text-xs text-slate-500 sm:inline dark:text-slate-400">
+            {t.wiederholung}
+          </span>
         )}
         <Aufklapppfeil offen={offen} />
       </button>

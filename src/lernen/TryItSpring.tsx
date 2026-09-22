@@ -180,7 +180,7 @@ export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipp
       oben={propertiesEditor}
       ausfuehren={(c) => start(c ?? code, true)}
     >
-      <Testergebnisse ergebnisse={run?.results?.map((r) => ({ name: r.name, ok: r.ok, meldung: r.message })) ?? null} />
+      <Testergebnisse id={id} ergebnisse={run?.results?.map((r) => ({ name: r.name, ok: r.ok, meldung: r.message })) ?? null} />
       {run ? (
         <>
           <ServerBar server={run.server} />

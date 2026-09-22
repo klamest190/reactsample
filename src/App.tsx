@@ -2,9 +2,9 @@ import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
 import { Seitenleiste } from './components/Seitenleiste'
 import { Suche } from './components/Suche'
 import { Platzhalter } from './components/Ui'
+import { useFortschritt } from './context/FortschrittContext'
 import { useTheme } from './context/ThemeContext'
 import { useHashRoute } from './hooks/useHashRoute'
-import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSprache, useTexte, type Sprache } from './i18n/SpracheContext'
 import { alleKapitel } from './kurs/kurs'
 import { KapitelSeite } from './seiten/KapitelSeite'
@@ -19,19 +19,21 @@ const Playground = lazy(() => import('./seiten/Playground').then((modul) => ({ d
  * App = Layout + Navigation + Lernfortschritt.
  *
  * Konzepte, die hier stecken:
- *  - "State hochziehen": der Fortschritt lebt hier, weil Kopfzeile, Seitenleiste,
- *    Startseite UND Kapitelseite ihn brauchen.
+ *  - "State hochziehen": der Fortschritt wird hier ausgepackt und als Prop an
+ *    Kopfzeile, Seitenleiste, Startseite und Kapitelseite verteilt. Gelagert wird
+ *    er eine Ebene höher im FortschrittContext, weil die Kapitelseite beim
+ *    Wechsel neu aufgebaut wird und Quizstände das überleben sollen.
  *  - Abgeleitete Werte: aktuelles Kapitel und Prozentzahl werden berechnet,
  *    nicht als eigener State gespeichert.
  *  - Mini-Routing über den URL-Hash (siehe hooks/useHashRoute.ts).
- *  - Sprache und Theme kommen per Context (siehe i18n/ und context/).
+ *  - Sprache, Theme und Fortschritt kommen per Context (siehe i18n/ und context/).
  */
 export default function App() {
   const { theme, toggleTheme } = useTheme()
   const { sprache, setSprache } = useSprache()
   const t = useTexte()
   const [route, navigieren] = useHashRoute()
-  const [erledigt, setErledigt] = useLocalStorage<string[]>('lernpfad-erledigt', [])
+  const { erledigt, kapitelSetzen } = useFortschritt()
   const [menueOffen, setMenueOffen] = useState(false)
   // Die Suche merkt sich, auf welcher Seite sie geöffnet wurde. Wechselt die Seite
   // (z. B. per Zurück-Knopf), ist sie dadurch automatisch zu - ganz ohne Effekt.
@@ -80,10 +82,6 @@ export default function App() {
     window.addEventListener('keydown', tasten)
     return () => window.removeEventListener('keydown', tasten)
   }, [])
-
-  function erledigtSetzen(id: string, wert: boolean) {
-    setErledigt((alt) => (wert ? [...new Set([...alt, id])] : alt.filter((e) => e !== id)))
-  }
 
   return (
     <div className="min-h-screen">
@@ -183,7 +181,7 @@ export default function App() {
               kapitel={kapitel}
               abschnittZiel={abschnittZiel}
               istErledigt={erledigt.includes(kapitel.id)}
-              erledigtSetzen={(wert) => erledigtSetzen(kapitel.id, wert)}
+              erledigtSetzen={(wert) => kapitelSetzen(kapitel.id, wert)}
               navigieren={navigieren}
             />
           ) : seite === 'glossar' ? (

@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { KARTE } from '../components/Ui'
+import { gueltigerQuizStand, useFortschritt } from '../context/FortschrittContext'
+import { useKapitelId } from '../context/KapitelContext'
 import { useTexte } from '../i18n/SpracheContext'
 
 /** Eine Multiple-Choice-Frage. `richtig` ist der Index der richtigen Antwort. */
@@ -12,10 +14,32 @@ export type Frage = {
 
 export function Quiz({ fragen }: { fragen: Frage[] }) {
   const t = useTexte()
+  const kapitelId = useKapitelId()
+  const { quiz, quizSetzen } = useFortschritt()
+
   // Pro Frage die gewählte Antwort (oder undefined). Abgeleitet: Anzahl richtiger.
-  const [gewaehlt, setGewaehlt] = useState<(number | undefined)[]>([])
+  //
+  // Gespeichert werden Antwort-INDIZES. Das geht nur, weil die deutsche und die
+  // englische Fassung eines Kapitels dieselben Antworten in derselben Reihenfolge
+  // haben - wer eine Antwortliste umsortiert, muss das in beiden Sprachen tun.
+  const [gewaehlt, setGewaehlt] = useState<(number | undefined)[]>(() => {
+    const stand = kapitelId ? gueltigerQuizStand(quiz[kapitelId], fragen.length) : undefined
+    return stand ? stand.antworten.map((a) => a ?? undefined) : []
+  })
+
   const beantwortet = gewaehlt.filter((g) => g !== undefined).length
   const richtig = fragen.filter((f, i) => gewaehlt[i] === f.richtig).length
+
+  /** Auswahl übernehmen und zugleich merken, damit sie den Kapitelwechsel überlebt. */
+  function merken(neu: (number | undefined)[]) {
+    setGewaehlt(neu)
+    if (!kapitelId) return
+    quizSetzen(kapitelId, {
+      gesamt: fragen.length,
+      richtig: fragen.filter((f, i) => neu[i] === f.richtig).length,
+      antworten: fragen.map((_, i) => neu[i] ?? null),
+    })
+  }
 
   return (
     <div className={`${KARTE} space-y-4 p-4 shadow-sm`}>
@@ -53,13 +77,11 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
                   <button
                     key={ai}
                     disabled={aufgeloest}
-                    onClick={() =>
-                      setGewaehlt((alt) => {
-                        const neu = [...alt]
-                        neu[fi] = ai
-                        return neu
-                      })
-                    }
+                    onClick={() => {
+                      const neu = [...gewaehlt]
+                      neu[fi] = ai
+                      merken(neu)
+                    }}
                     className={`rounded-lg border px-3 py-2 text-left text-sm transition ${stil}`}
                   >
                     {aufgeloest && istRichtig && '✓ '}
@@ -81,8 +103,8 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
 
       {beantwortet === fragen.length && (
         <button
-          onClick={() => setGewaehlt([])}
-          className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+          onClick={() => merken([])}
+          className="rounded text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
         >
           {t.quizNochmal}
         </button>

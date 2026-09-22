@@ -36,6 +36,11 @@ const de = {
   ],
   derLernpfad: 'Der Lernpfad',
   editorTippsTitel: '⌨️ Tipps für die Editoren',
+  fortschrittTitel: '🗑️ Fortschritt zurücksetzen',
+  fortschrittText:
+    'Löscht abgeschlossene Kapitel, Quizstände und gelöste Übungen. Dein selbst geschriebener Code in den Editoren bleibt erhalten.',
+  fortschrittZuruecksetzen: 'Fortschritt zurücksetzen',
+  wirklichZuruecksetzen: 'Wirklich zurücksetzen?',
   tippAusfuehren: 'führt den Code aus.',
   tippVorschlaege:
     'Beim Tippen erscheinen Vorschläge mit kurzer Erklärung (z. B. zu console.log, Array-Methoden und Hooks). Pfeiltasten wählen, Enter oder Tab fügt ein,',
@@ -174,6 +179,8 @@ const de = {
   daraufAufbauen: 'Darauf bauen auf',
   uebungenTitel: '🏋️ Übungen',
   uebungenText: 'Optional und in Stufen: erst vorhersagen, dann Fehler finden, ergänzen und frei schreiben. Tipps kommen nach und nach, die Lösung ist immer da.',
+  uebungenGeloest: (geloest: number, gesamt: number) => `${geloest}/${gesamt} gelöst`,
+  uebungGeloestKurz: 'gelöst',
   stufen: { vorhersage: 'Vorhersagen', fehler: 'Fehler finden', ergaenzen: 'Ergänzen', frei: 'Frei schreiben' },
   wiederholung: '↺ Wiederholung',
   wiederholungAus: '↺ Wiederholung aus',
@@ -239,6 +246,11 @@ const en: Texte = {
   ],
   derLernpfad: 'The learning path',
   editorTippsTitel: '⌨️ Editor tips',
+  fortschrittTitel: '🗑️ Reset progress',
+  fortschrittText:
+    'Clears completed chapters, quiz results and solved exercises. The code you wrote in the editors stays.',
+  fortschrittZuruecksetzen: 'Reset progress',
+  wirklichZuruecksetzen: 'Really reset?',
   tippAusfuehren: 'runs the code.',
   tippVorschlaege:
     'Suggestions with a short explanation appear while you type (e.g. for console.log, array methods and hooks). Arrow keys select, Enter or Tab inserts,',
@@ -370,6 +382,8 @@ const en: Texte = {
   daraufAufbauen: 'Builds the base for',
   uebungenTitel: '🏋️ Exercises',
   uebungenText: 'Optional and in stages: first predict, then find the bug, complete and write it yourself. Hints come one by one, the solution is always there.',
+  uebungenGeloest: (geloest, gesamt) => `${geloest}/${gesamt} solved`,
+  uebungGeloestKurz: 'solved',
   stufen: { vorhersage: 'Predict', fehler: 'Find the bug', ergaenzen: 'Complete', frei: 'Write it' },
   wiederholung: '↺ Review',
   wiederholungAus: '↺ Review of',
