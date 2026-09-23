@@ -31,8 +31,18 @@ npm run test:sql       # Teil 9: echtes PostgreSQL (PGlite) in Node
 
 Vor jedem Commit: `npx tsc -b`, `npm run lint`, `npm run build` und die betroffenen `test:*`.
 Bei Änderungen an Oberfläche, Editoren oder Laufzeiten zusätzlich `test:seiten` (mit Filter reicht oft).
-Die CI (`.github/workflows/ci.yml`) führt bei jedem Push auf `main` alles aus - nach dem Push
-`gh run watch` bzw. `gh run list` prüfen.
+Die CI (`.github/workflows/ci.yml`) führt bei jedem Push auf `main` alles aus - nach dem Push das
+Ergebnis prüfen. `gh` ist auf diesem Rechner nicht installiert, das Repo ist öffentlich - die API geht ohne Token:
+
+```bash
+curl -s https://api.github.com/repos/klamest190/reactsample/actions/runs?per_page=1     # Status des letzten Laufs
+curl -s https://api.github.com/repos/klamest190/reactsample/actions/runs/<run>/jobs    # Jobs und Schritte
+curl -s https://api.github.com/repos/klamest190/reactsample/check-runs/<job>/annotations  # Befunde
+```
+
+Die Logs selbst brauchen Admin-Rechte. Deshalb schreiben `test:inhalte` und `test:seiten` ihre Befunde
+in der CI als Annotations (`::error::`). `test:seiten` wiederholt Seiten mit Befund einmal einzeln -
+was erst dann grün ist, erscheint als Warnung „instabil“.
 
 ## Struktur
 
