@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
+import { Icon, Logo } from './components/Icon'
 import { Seitenleiste } from './components/Seitenleiste'
 import { Suche } from './components/Suche'
 import { Platzhalter } from './components/Ui'
@@ -14,6 +15,10 @@ import { Startseite } from './seiten/Startseite'
 
 // Der Playground bringt viele Bausteine mit - er wird erst geladen, wenn man ihn öffnet.
 const Playground = lazy(() => import('./seiten/Playground').then((modul) => ({ default: modul.Playground })))
+
+/** Quadratischer Knopf mit Symbol in der Kopfzeile - alle gleich hoch (h-8), damit die Zeile ruhig wirkt. */
+const KOPF_KNOPF =
+  'flex size-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
 
 /**
  * App = Layout + Navigation + Lernfortschritt.
@@ -95,34 +100,36 @@ export default function App() {
       </button>
 
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+        {/* Volle Breite: die Kopfzeile läuft über den ganzen Bildschirm, wie der Inhalt darunter. */}
+        <div className="flex items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
             onClick={() => setMenueOffen((o) => !o)}
-            className="shrink-0 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm md:hidden dark:border-slate-700"
+            className={`${KOPF_KNOPF} md:hidden`}
             aria-expanded={menueOffen}
             aria-controls="kursnavigation"
           >
-            ☰ <span className="sr-only">{t.kapitelMenue}</span>
+            <Icon name={menueOffen ? 'kreuz' : 'menue'} className="size-4.5" />
+            <span className="sr-only">{t.kapitelMenue}</span>
           </button>
 
-          <a href="#" className="min-w-0">
-            <h1 className="truncate text-lg font-bold tracking-tight">
-              <span className="text-brand-600 dark:text-brand-400">⚡</span> {t.appTitel}
-            </h1>
-            <p className="hidden text-xs text-slate-500 sm:block dark:text-slate-400">{t.appUntertitel}</p>
+          <a href="#" className="group flex min-w-0 items-center gap-3 rounded-lg">
+            <Logo className="size-8 transition group-hover:scale-105" />
+            <span className="min-w-0">
+              <h1 className="truncate text-base leading-tight font-semibold tracking-tight">{t.appTitel}</h1>
+              <p className="hidden truncate text-xs text-slate-500 lg:block dark:text-slate-400">{t.appUntertitel}</p>
+            </span>
           </a>
 
-          <button
-            onClick={sucheOeffnen}
-            className="ml-auto shrink-0 rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm hover:bg-slate-100 md:hidden dark:border-slate-700 dark:hover:bg-slate-800"
-            aria-label={t.suche}
-          >
-            🔍
+          <button onClick={sucheOeffnen} className={`${KOPF_KNOPF} ml-auto md:hidden`} aria-label={t.suche}>
+            <Icon name="suche" className="size-4" />
           </button>
 
           <div className="hidden items-center gap-2 sm:flex md:ml-auto" title={t.lernfortschritt}>
-            <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-              <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: prozent + '%' }} />
+            <div className="h-1.5 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+              <div
+                className="h-full rounded-full bg-linear-to-r from-emerald-400 to-emerald-600 transition-all"
+                style={{ width: prozent + '%' }}
+              />
             </div>
             <span className="text-xs text-slate-500 tabular-nums dark:text-slate-400">
               {erledigt.length}/{alleKapitel.length}
@@ -133,7 +140,7 @@ export default function App() {
           <div
             role="group"
             aria-label={t.spracheWaehlen}
-            className="flex shrink-0 overflow-hidden rounded-lg border border-slate-300 text-xs font-semibold dark:border-slate-700"
+            className="flex h-8 shrink-0 overflow-hidden rounded-lg border border-slate-200 text-xs font-semibold dark:border-slate-800"
           >
             {(['de', 'en'] as Sprache[]).map((s) => (
               <button
@@ -141,7 +148,7 @@ export default function App() {
                 onClick={() => setSprache(s)}
                 aria-pressed={sprache === s}
                 lang={s}
-                className={`px-2.5 py-1.5 uppercase transition ${
+                className={`px-2.5 uppercase transition ${
                   sprache === s
                     ? 'bg-brand-600 text-white'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
@@ -152,17 +159,16 @@ export default function App() {
             ))}
           </div>
 
-          <button
-            onClick={toggleTheme}
-            className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-            aria-label={t.farbschemaUmschalten}
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
+          <button onClick={toggleTheme} className={KOPF_KNOPF} aria-label={t.farbschemaUmschalten}>
+            <Icon name={theme === 'dark' ? 'sonne' : 'mond'} className="size-4" />
           </button>
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-8 px-4 py-6">
+      {/* Früher max-w-7xl (1280px) und zentriert - auf breiten Monitoren blieben links
+          und rechts leere Streifen. Jetzt: Seitenleiste am linken Rand, der Inhalt nimmt
+          den Rest. Die Lesebreite hält der Fließtext selbst (max-w-3xl in P und Liste). */}
+      <div className="flex gap-8 px-4 py-6 sm:px-6 lg:gap-12 lg:px-8">
         <Seitenleiste
           route={route}
           erledigt={erledigt}

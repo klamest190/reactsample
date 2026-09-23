@@ -1,8 +1,7 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
-import { kurs } from '../kurs/kurs'
-import { Icon, type IconName } from './Icon'
-import { TEIL_STIL } from './teilStil'
+import { BEREICHE, kurs } from '../kurs/kurs'
+import { Icon, TeilSymbol, type IconName } from './Icon'
 import { Aufklapppfeil, KLEBT_MD, Taste } from './Ui'
 
 /**
@@ -15,12 +14,24 @@ import { Aufklapppfeil, KLEBT_MD, Taste } from './Ui'
  * Beim Wechsel in einen anderen Teil geht dieser wieder auf, auch wenn man ihn vorher zugeklappt hatte.
  *
  * Die Übersichtsseite des ToDo-Projekts steht nicht separat oben, sondern als
- * erster Eintrag im Teil „Projekt“ - so gibt es jeden Eintrag nur einmal.
+ * erster Eintrag im Teil „ToDo-Projekt“ - so gibt es jeden Eintrag nur einmal.
+ *
+ * Die Teile sind in zwei Bereiche gegliedert (Teil.bereich in kurs.ts): Frontend und Backend.
  */
 
-/** Kleiner Fortschrittsring; voll = grüner Haken. */
+/**
+ * Fortschritt eines Teils: noch nichts erledigt = nur die Kapitelzahl (ein leerer Ring
+ * sähe aus wie ein Auswahlknopf), angefangen = Ring, fertig = grüner Haken.
+ */
 function Fortschritt({ fertig, gesamt }: { fertig: number; gesamt: number }) {
   const umfang = 2 * Math.PI * 7
+  if (fertig === 0) {
+    return (
+      <span aria-hidden className="w-4 text-center text-2xs text-slate-400 tabular-nums dark:text-slate-500">
+        {gesamt}
+      </span>
+    )
+  }
   if (gesamt > 0 && fertig === gesamt) {
     return (
       <span className="flex size-4 items-center justify-center rounded-full bg-emerald-500 text-white">
@@ -39,7 +50,7 @@ function Fortschritt({ fertig, gesamt }: { fertig: number; gesamt: number }) {
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeDasharray={`${(fertig / gesamt) * umfang} ${umfang}`}
-        className={fertig ? 'stroke-brand-500' : 'stroke-transparent'}
+        className="stroke-brand-500"
       />
     </svg>
   )
@@ -104,7 +115,7 @@ export function Seitenleiste({
         <Taste>{t.strg} K</Taste>
       </button>
 
-      <ul className="mb-3 space-y-0.5">
+      <ul className="mb-4 space-y-0.5">
         {seiten.map((s) => (
           <li key={s.href}>
             <a
@@ -123,80 +134,86 @@ export function Seitenleiste({
         ))}
       </ul>
 
-      <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
-        {kurs.map((teil) => {
-          const fertig = teil.kapitel.filter((k) => erledigt.includes(k.id)).length
-          const istProjekt = teil.id === 'projekt'
-          const enthaeltAktives = teil.kapitel.some((k) => k.id === route) || (istProjekt && route === 'projekt')
-          const manuell = umgeschaltet[teil.id]
-          const istOffen = manuell && (!enthaeltAktives || manuell.route === route) ? manuell.offen : enthaeltAktives
-          const listenId = 'teil-' + teil.id
-          const stil = TEIL_STIL[teil.id] ?? TEIL_STIL.javascript
+      {/* Zwei Bereiche statt einer langen Liste: erst alles im Browser, dann der Server. */}
+      {BEREICHE.map((bereich) => (
+        <div key={bereich} className="mb-4 border-t border-slate-200 pt-3 dark:border-slate-800">
+          <h2 className="mb-1.5 flex items-baseline justify-between gap-2 px-2.5">
+            <span className="text-2xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+              {t.bereiche[bereich].titel}
+            </span>
+            <span className="truncate text-2xs text-slate-400 dark:text-slate-500">{t.bereiche[bereich].text}</span>
+          </h2>
+          {kurs.filter((teil) => teil.bereich === bereich).map((teil) => {
+            const fertig = teil.kapitel.filter((k) => erledigt.includes(k.id)).length
+            const istProjekt = teil.id === 'projekt'
+            const enthaeltAktives = teil.kapitel.some((k) => k.id === route) || (istProjekt && route === 'projekt')
+            const manuell = umgeschaltet[teil.id]
+            const istOffen = manuell && (!enthaeltAktives || manuell.route === route) ? manuell.offen : enthaeltAktives
+            const listenId = 'teil-' + teil.id
 
-          return (
-            <div key={teil.id} className="mb-0.5">
-              <button
-                onClick={() => setUmgeschaltet((alt) => ({ ...alt, [teil.id]: { offen: !istOffen, route } }))}
-                aria-expanded={istOffen}
-                aria-controls={listenId}
-                title={`${t.teil} ${teil.nummer} · ${teil.titel[sprache]} - ${fertig}/${teil.kapitel.length} ${t.erledigt}`}
-                className="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition hover:bg-slate-200/60 dark:hover:bg-slate-800/60"
-              >
-                <span className={`flex size-6 items-center justify-center rounded-md ${stil.farbe}`}>
-                  <Icon name={stil.icon} className="size-3.5" />
-                </span>
-                <span
-                  className={`flex-1 text-sm ${enthaeltAktives ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-200'}`}
+            return (
+              <div key={teil.id} className="mb-0.5">
+                <button
+                  onClick={() => setUmgeschaltet((alt) => ({ ...alt, [teil.id]: { offen: !istOffen, route } }))}
+                  aria-expanded={istOffen}
+                  aria-controls={listenId}
+                  title={`${t.teil} ${teil.nummer} · ${teil.titel[sprache]} - ${fertig}/${teil.kapitel.length} ${t.erledigt}`}
+                  className="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition hover:bg-slate-200/60 dark:hover:bg-slate-800/60"
                 >
-                  {teil.kurztitel[sprache]}
-                </span>
-                <span className="sr-only">
-                  {fertig}/{teil.kapitel.length} {t.erledigt}
-                </span>
-                <Fortschritt fertig={fertig} gesamt={teil.kapitel.length} />
-                <Aufklapppfeil offen={istOffen} />
-              </button>
+                  <TeilSymbol teil={teil.id} />
+                  <span
+                    className={`flex-1 text-sm ${enthaeltAktives ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-200'}`}
+                  >
+                    {teil.kurztitel[sprache]}
+                  </span>
+                  <span className="sr-only">
+                    {fertig}/{teil.kapitel.length} {t.erledigt}
+                  </span>
+                  <Fortschritt fertig={fertig} gesamt={teil.kapitel.length} />
+                  <Aufklapppfeil offen={istOffen} />
+                </button>
 
-              {istOffen && (
-                <ul id={listenId} className="my-1 ml-5.5 border-l border-slate-200 dark:border-slate-800">
-                  {istProjekt && (
-                    <li>
-                      <a
-                        href="#/projekt"
-                        aria-current={route === 'projekt' ? 'page' : undefined}
-                        className={eintragStil(route === 'projekt')}
-                      >
-                        <Icon name="raster" className="size-3.5 self-center opacity-60" />
-                        <span className="flex-1">{t.uebersicht}</span>
-                      </a>
-                    </li>
-                  )}
-                  {teil.kapitel.map((k, i) => {
-                    const istAktiv = k.id === route
-                    const istErledigt = erledigt.includes(k.id)
-                    return (
-                      <li key={k.id}>
-                        <a href={'#/' + k.id} aria-current={istAktiv ? 'page' : undefined} className={eintragStil(istAktiv)}>
-                          <span className="w-4 shrink-0 text-right text-2xs text-slate-400 tabular-nums dark:text-slate-500">
-                            {i + 1}
-                          </span>
-                          <span className="flex-1">{k.titel[sprache]}</span>
-                          {istErledigt && (
-                            <span className="self-center text-emerald-500">
-                              <Icon name="haken" className="size-3.5" />
-                              <span className="sr-only">{t.erledigt}</span>
-                            </span>
-                          )}
+                {istOffen && (
+                  <ul id={listenId} className="my-1 ml-5.5 border-l border-slate-200 dark:border-slate-800">
+                    {istProjekt && (
+                      <li>
+                        <a
+                          href="#/projekt"
+                          aria-current={route === 'projekt' ? 'page' : undefined}
+                          className={eintragStil(route === 'projekt')}
+                        >
+                          <Icon name="raster" className="size-3.5 self-center opacity-60" />
+                          <span className="flex-1">{t.uebersicht}</span>
                         </a>
                       </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </div>
-          )
-        })}
-      </div>
+                    )}
+                    {teil.kapitel.map((k, i) => {
+                      const istAktiv = k.id === route
+                      const istErledigt = erledigt.includes(k.id)
+                      return (
+                        <li key={k.id}>
+                          <a href={'#/' + k.id} aria-current={istAktiv ? 'page' : undefined} className={eintragStil(istAktiv)}>
+                            <span className="w-4 shrink-0 text-right text-2xs text-slate-400 tabular-nums dark:text-slate-500">
+                              {i + 1}
+                            </span>
+                            <span className="flex-1">{k.titel[sprache]}</span>
+                            {istErledigt && (
+                              <span className="self-center text-emerald-500">
+                                <Icon name="haken" className="size-3.5" />
+                                <span className="sr-only">{t.erledigt}</span>
+                              </span>
+                            )}
+                          </a>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      ))}
     </nav>
   )
 }

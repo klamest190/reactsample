@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Icon } from '../components/Icon'
 import { KARTE } from '../components/Ui'
 import { gueltigerQuizStand, useFortschritt } from '../context/FortschrittContext'
 import { useKapitelId } from '../context/KapitelContext'
@@ -44,7 +45,10 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
   return (
     <div className={`${KARTE} space-y-4 p-4 shadow-sm`}>
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">{t.quizTitel}</h3>
+        <h3 className="flex items-center gap-2 font-semibold">
+          <Icon name="frage" className="size-4.5 text-brand-600 dark:text-brand-400" />
+          {t.quizTitel}
+        </h3>
         {beantwortet > 0 && (
           <span className="text-sm text-slate-500 dark:text-slate-400">
             {t.quizStand(richtig, fragen.length)}

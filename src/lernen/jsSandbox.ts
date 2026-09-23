@@ -15,7 +15,8 @@ import type { ProjectId } from '../docker/projects'
  *   console.log/warn/error  -> { typ: 'log' | 'warn' | 'error', text }
  *   unbehandelter Fehler    -> { typ: 'fehler', text, zeile }
  *   Testergebnisse          -> { typ: 'tests', ergebnisse }
- *   synchroner Teil fertig  -> { typ: 'fertig' }
+ *   synchroner Teil fertig  -> { typ: 'fertig', inhalt }  (inhalt: steht schon etwas im Dokument?)
+ *   später sichtbarer Inhalt -> { typ: 'inhalt' }          (z. B. aus einem Timer oder fetch)
  */
 
 export type Test = {
@@ -84,7 +85,8 @@ export type SandboxNachricht =
   | { tryit: true; lauf: number; typ: 'log' | 'info' | 'warn' | 'error'; text: string }
   | { tryit: true; lauf: number; typ: 'fehler'; text: string; zeile: number | null }
   | { tryit: true; lauf: number; typ: 'tests'; ergebnisse: TestErgebnis[] }
-  | { tryit: true; lauf: number; typ: 'fertig' | 'clear' }
+  | { tryit: true; lauf: number; typ: 'fertig'; inhalt: boolean }
+  | { tryit: true; lauf: number; typ: 'clear' | 'inhalt' }
 
 // Läuft als klassisches Skript VOR dem Code. Alle Namen beginnen mit __,
 // damit sie nicht mit Variablen der Lernenden kollidieren.
@@ -146,6 +148,25 @@ window.addEventListener('submit', (e) => e.preventDefault());
 window.addEventListener('unhandledrejection', (e) => {
   __senden('fehler', __T.promiseFehler + __fmt(e.reason), { zeile: null });
 });
+
+// Hat der Code etwas Sichtbares ins Dokument gebracht? Dann zeigt die Seite die Vorschau,
+// sonst nur die Konsole. Zählt Elemente und Text - außer Skripten, Leerraum und dem leeren <div id="app">.
+const __hatInhalt = () => {
+  for (const k of document.body.childNodes) {
+    if (k.nodeType === 3 ? !k.textContent.trim() : k.nodeType !== 1) continue; // Leerraum, Kommentare
+    if (k.tagName === 'SCRIPT') continue;
+    if (k.id === 'app' && !k.hasChildNodes()) continue;
+    return true;
+  }
+  return false;
+};
+// Inhalt, der erst nach dem ersten Durchlauf kommt (Timer, fetch, Klick), meldet der Beobachter.
+const __beobachter = new MutationObserver(() => {
+  if (!__hatInhalt()) return;
+  __beobachter.disconnect();
+  __senden('inhalt');
+});
+__beobachter.observe(document.body, { childList: true, subtree: true, characterData: true });
 `
 
 // Wird an den Code der Lernenden angehängt - im selben Modul, damit `eval`
@@ -212,10 +233,14 @@ export function sandboxDokument(optionen: {
   const farben = dunkel
     ? 'color:#e2e8f0;background:transparent'
     : 'color:#0f172a;background:transparent'
+  // Dasselbe Farbschema wie die Seite (ThemeContext setzt color-scheme auf <html>).
+  // Weichen die beiden ab, legt der Browser eine deckend weiße Fläche hinter das iframe -
+  // im Dunkelmodus stand dann heller Text auf Weiß.
+  const schema = dunkel ? 'dark' : 'light'
 
   const kopf =
     `<!doctype html><html><head><meta charset="utf-8"><style>` +
-    `body{margin:12px;font:14px/1.5 system-ui,sans-serif;${farben}}` +
+    `:root{color-scheme:${schema}}body{margin:12px;font:14px/1.5 system-ui,sans-serif;${farben}}` +
     `button{font:inherit;padding:2px 10px;margin:2px}input{font:inherit}.done{opacity:.55;text-decoration:line-through}</style></head>` +
     `<body><div id="app"></div>\n` +
     `<script>const __LAUF=${lauf};const __OFFSET=__PLATZHALTER;const __T=${JSON.stringify(SANDBOX_TEXTE[sprache])};\n${BRUECKE}\n${sicher(vorbereitung)}\n</script>\n` +
@@ -235,6 +260,6 @@ export function sandboxDokument(optionen: {
     sicher(code) +
     '\n' +
     testCode +
-    "\n__senden('fertig');\n</script></body></html>"
+    "\n__senden('fertig', undefined, { inhalt: __hatInhalt() });\n</script></body></html>"
   )
 }

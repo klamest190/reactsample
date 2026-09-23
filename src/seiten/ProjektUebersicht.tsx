@@ -1,3 +1,4 @@
+import { Icon, TeilSymbol } from '../components/Icon'
 import { ButtonLink, KARTE } from '../components/Ui'
 import { KapitelChip, Verweis } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
@@ -15,10 +16,14 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
   return (
     <div className="space-y-8">
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight">{t.projektTitel}</h1>
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+          <TeilSymbol teil="projekt" groesse="gross" />
+          {t.projektTitel}
+        </h1>
         <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-400">{t.projektText}</p>
         <ButtonLink href={'#/' + schritte[0].id} groesse="gross">
-          {t.projektStarten} →
+          {t.projektStarten}
+          <Icon name="pfeilRechts" className="size-4" />
         </ButtonLink>
       </header>
 
@@ -37,12 +42,12 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
                 }`}
                 aria-hidden
               >
-                {fertig ? '✓' : i + 1}
+                {fertig ? <Icon name="haken" className="size-3.5" /> : i + 1}
               </span>
               <div className={`${KARTE} p-4`}>
                 <a href={'#/' + schritt.id} className="group block">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {t.schrittNr(i + 1)} · ⏱ {t.dauer(schritt.dauer)}
+                  <span className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                    {t.schrittNr(i + 1)} · <Icon name="uhr" className="size-3" /> {t.dauer(schritt.dauer)}
                   </span>
                   <span className="block font-semibold group-hover:text-brand-600 dark:group-hover:text-brand-400">
                     {schritt.titel[sprache]}
@@ -62,7 +67,8 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
       </ol>
 
       <p className="text-sm text-slate-600 dark:text-slate-400">
-        💻 <Verweis id="praxis-lokal" />
+        <Icon name="laptop" className="mr-1.5 inline size-4 align-[-3px]" />
+        <Verweis id="praxis-lokal" />
         {t.projektLokal}
       </p>
     </div>

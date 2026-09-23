@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Icon } from '../components/Icon'
 import { Eingabe } from '../components/Ui'
 import { KapitelChip } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
@@ -35,7 +36,12 @@ export function Glossar({ ziel }: { ziel?: string }) {
   return (
     <div className="space-y-6">
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight">{t.glossarTitel}</h1>
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-500/10 dark:text-brand-400 dark:ring-brand-500/20">
+            <Icon name="buch" className="size-5" />
+          </span>
+          {t.glossarTitel}
+        </h1>
         <p className="max-w-3xl text-slate-600 dark:text-slate-400">{t.glossarText}</p>
         <Eingabe
           type="search"

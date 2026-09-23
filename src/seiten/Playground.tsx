@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
-import { Icon } from '../components/Icon'
-import { TEIL_STIL } from '../components/teilStil'
+import { Icon, TeilSymbol } from '../components/Icon'
 import { KARTE, KLEBT_LG } from '../components/Ui'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { kurs } from '../kurs/kurs'
@@ -27,12 +26,16 @@ export function Playground({ teil }: { teil?: string }) {
   return (
     <div className="space-y-6">
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight">{t.playgroundKopf}</h1>
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-500/10 dark:text-brand-400 dark:ring-brand-500/20">
+            <Icon name="spielwiese" className="size-5" />
+          </span>
+          {t.playgroundKopf}
+        </h1>
         <p className="max-w-3xl text-slate-600 dark:text-slate-400">{t.playgroundText}</p>
         <nav aria-label={t.playgroundTeile} className="flex flex-wrap gap-2">
           {playgrounds.map((p) => {
             const kursTeil = kurs.find((k) => k.id === p.teil)!
-            const stil = TEIL_STIL[p.teil] ?? TEIL_STIL.javascript
             const aktiv = p === daten
             return (
               <a
@@ -45,9 +48,7 @@ export function Playground({ teil }: { teil?: string }) {
                     : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-600'
                 }`}
               >
-                <span className={`flex size-5 items-center justify-center rounded ${stil.farbe}`}>
-                  <Icon name={stil.icon} className="size-3" />
-                </span>
+                <TeilSymbol teil={p.teil} groesse="klein" />
                 {kursTeil.kurztitel[sprache]}
               </a>
             )
@@ -131,8 +132,9 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
       </section>
 
       {daten.hinweis && (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
-          💡 {daten.hinweis[sprache]}
+        <p className="flex gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          <Icon name="gluehbirne" className="mt-0.5 size-4 opacity-80" />
+          <span>{daten.hinweis[sprache]}</span>
         </p>
       )}
 
@@ -143,8 +145,9 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
           className={`${KARTE} ${KLEBT_LG} lg:flex lg:flex-col`}
         >
           <div className="space-y-2 border-b border-slate-200 p-3 dark:border-slate-800">
-            <h2 id="bausteine-titel" className="text-sm font-semibold">
-              🧩 {t.bausteine}
+            <h2 id="bausteine-titel" className="flex items-center gap-2 text-sm font-semibold">
+              <Icon name="puzzle" className="size-4 text-brand-600 dark:text-brand-400" />
+              {t.bausteine}
             </h2>
             <input
               type="search"

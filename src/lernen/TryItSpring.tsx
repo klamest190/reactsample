@@ -29,7 +29,7 @@ import type { Typfehler } from './typpruefung'
 
 const TEXTS = {
   de: {
-    start: '▶ Starten',
+    start: 'Starten',
     running: (port: number) => `läuft auf http://localhost:${port} (simuliert im Browser)`,
     notRunning: 'nicht gestartet',
     beansAndRoutes: (beans: number, routes: number) => `${beans} Beans · ${routes} Endpunkte`,

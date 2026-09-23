@@ -38,7 +38,10 @@ export function UebungenBereich({ kapitelId }: { kapitelId: string }) {
     <section className="space-y-3" aria-labelledby="uebungen-titel">
       <div>
         <h2 id="uebungen-titel" className="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-200 pb-2 text-xl font-semibold tracking-tight dark:border-slate-800">
-          {t.uebungenTitel}
+          <span className="flex items-center gap-2">
+            <Icon name="hantel" className="size-5 text-brand-600 dark:text-brand-400" />
+            {t.uebungenTitel}
+          </span>
           {bewertbar.length > 0 && (
             <span className="text-sm font-normal text-slate-500 tabular-nums dark:text-slate-400">
               {t.uebungenGeloest(geloest, bewertbar.length)}

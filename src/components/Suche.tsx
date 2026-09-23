@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSprache, useTexte, type Sprache } from '../i18n/SpracheContext'
+import { Icon } from './Icon'
 import { Taste } from './Ui'
 import { glossar } from '../kurs/glossar'
 import { alleKapitel } from '../kurs/kurs'
@@ -156,7 +157,7 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
         className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
       >
         <div className="flex items-center gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
-          <span aria-hidden>🔍</span>
+          <Icon name="suche" className="size-4.5 text-slate-400" />
           <input
             autoFocus
             role="combobox"

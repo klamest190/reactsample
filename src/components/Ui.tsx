@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react'
 import { useTexte } from '../i18n/SpracheContext'
+import { Icon } from './Icon'
 
 /**
  * Kleine, wiederverwendbare Bausteine für alle Kapitel.
@@ -85,7 +86,12 @@ export function Demo({ titel, children }: { titel?: string; children: ReactNode 
   const t = useTexte()
   return (
     <div className={`${KARTE} p-4 shadow-sm`}>
-      <h3 className="mb-3 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+      <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+        {/* Kleiner pulsierender Punkt: hier läuft echter Code, kein Bild. */}
+        <span aria-hidden className="relative flex size-2">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+        </span>
         {t.liveDemo}{titel && ` · ${titel}`}
       </h3>
       <div className="space-y-3">{children}</div>
@@ -169,12 +175,12 @@ export function Hinweis({
       'border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200',
     tipp: 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200',
   }
-  const symbole = { info: 'ℹ️', warnung: '⚠️', tipp: '💡' }
+  const symbole = { info: 'info', warnung: 'warnung', tipp: 'gluehbirne' } as const
 
   return (
-    <div className={`flex gap-2 rounded-lg border px-3 py-2 text-sm leading-relaxed ${stile[variante]}`}>
-      <span aria-hidden>{symbole[variante]}</span>
-      <div>{children}</div>
+    <div className={`flex gap-2.5 rounded-lg border px-3 py-2.5 text-sm leading-relaxed ${stile[variante]}`}>
+      <Icon name={symbole[variante]} className="mt-0.5 size-4 opacity-80" />
+      <div className="min-w-0">{children}</div>
     </div>
   )
 }
@@ -184,7 +190,10 @@ export function Merke({ punkte }: { punkte: ReactNode[] }) {
   const t = useTexte()
   return (
     <div className="rounded-xl border-l-4 border-brand-500 bg-brand-50 px-5 py-4 dark:bg-brand-700/15">
-      <h3 className="mb-2 font-semibold">{t.dasWichtigste}</h3>
+      <h3 className="mb-2 flex items-center gap-2 font-semibold">
+        <Icon name="stern" className="size-4 text-brand-600 dark:text-brand-400" />
+        {t.dasWichtigste}
+      </h3>
       <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
         {punkte.map((p, i) => (
           <li key={i}>{p}</li>

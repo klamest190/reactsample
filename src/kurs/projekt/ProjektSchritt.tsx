@@ -1,3 +1,4 @@
+import { Icon } from '../../components/Icon'
 import { useSprache, useTexte } from '../../i18n/SpracheContext'
 import { Text } from '../../lernen/Text'
 import { TryIt } from '../../lernen/TryIt'
@@ -39,13 +40,14 @@ export function ProjektSchritt({ id }: { id: string }) {
 
       <section className="space-y-4">
         <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 dark:border-amber-900 dark:bg-amber-950/30">
-          <h2 className="mb-2 font-semibold">{t.anforderungen}</h2>
+          <h2 className="mb-2 flex items-center gap-2 font-semibold">
+            <Icon name="liste" className="size-4 text-amber-600 dark:text-amber-400" />
+            {t.anforderungen}
+          </h2>
           <ul className="space-y-1.5 text-sm">
             {inhalt.anforderungen[sprache].map((anforderung, i) => (
               <li key={i} className="flex gap-2">
-                <span className="text-amber-600 dark:text-amber-400" aria-hidden>
-                  ☐
-                </span>
+                <Icon name="kaestchen" className="mt-0.5 size-4 text-amber-500 dark:text-amber-400" />
                 <span>
                   <Text text={anforderung} />
                 </span>

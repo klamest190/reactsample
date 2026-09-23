@@ -40,11 +40,18 @@ export type Kapitel = {
   stichworte?: string[]
 }
 
+export type Bereich = 'frontend' | 'backend'
+
+/** Reihenfolge der Bereiche in Seitenleiste und Startseite. */
+export const BEREICHE: Bereich[] = ['frontend', 'backend']
+
 export type Teil = {
   id: string
   nummer: number
   titel: Zweisprachig
   kurztitel: Zweisprachig
+  /** Frontend (Browser) oder Backend (Server) - danach gliedern Seitenleiste und Startseite. */
+  bereich: Bereich
   icon: string
   beschreibung: Zweisprachig
   kapitel: Kapitel[]
@@ -56,6 +63,7 @@ export const kurs: Teil[] = [
     nummer: 1,
     titel: { de: 'JavaScript-Grundlagen', en: 'JavaScript Fundamentals' },
     kurztitel: { de: 'JavaScript', en: 'JavaScript' },
+    bereich: 'frontend',
     icon: '🟨',
     beschreibung: {
       de: 'Alles, was du für React wirklich brauchst: Variablen, Funktionen, Arrays, Objekte, Referenzen und asynchroner Code.',
@@ -219,6 +227,7 @@ export const kurs: Teil[] = [
     nummer: 2,
     titel: { de: 'TypeScript-Grundlagen', en: 'TypeScript Fundamentals' },
     kurztitel: { de: 'TypeScript', en: 'TypeScript' },
+    bereich: 'frontend',
     icon: '🟦',
     beschreibung: {
       de: 'JavaScript mit Typen: Objekte und Funktionen beschreiben, Unions eingrenzen, Generics und Utility Types - alles mit echter Typprüfung im Editor.',
@@ -368,6 +377,7 @@ export const kurs: Teil[] = [
     nummer: 3,
     titel: { de: 'React-Grundlagen', en: 'React Fundamentals' },
     kurztitel: { de: 'React', en: 'React' },
+    bereich: 'frontend',
     icon: '⚛️',
     beschreibung: {
       de: 'Komponenten, JSX, Props, Events und der erste State: wie React Oberflächen aus Daten baut.',
@@ -449,6 +459,7 @@ export const kurs: Teil[] = [
     nummer: 4,
     titel: { de: 'React Hooks im Detail', en: 'React Hooks in Depth' },
     kurztitel: { de: 'Hooks', en: 'Hooks' },
+    bereich: 'frontend',
     icon: '🪝',
     beschreibung: {
       de: 'Der Schwerpunkt des Kurses: alle wichtigen Hooks mit dem Problem, das sie lösen - von useState bis zu den React-19-Hooks.',
@@ -614,7 +625,8 @@ export const kurs: Teil[] = [
     id: 'praxis',
     nummer: 5,
     titel: { de: 'Praxis & Muster', en: 'Practice & Patterns' },
-    kurztitel: { de: 'Praxis', en: 'Practice' },
+    kurztitel: { de: 'React-Praxis', en: 'React in Practice' },
+    bereich: 'frontend',
     icon: '🛠️',
     beschreibung: {
       de: 'Formulare, Daten laden, Komposition, Fehlerbehandlung, Styling, TypeScript, Routing, Testen und Barrierefreiheit - und zum Schluss eigene Projekte.',
@@ -831,7 +843,8 @@ export const kurs: Teil[] = [
     id: 'projekt',
     nummer: 6,
     titel: { de: 'Projekt: ToDo-App', en: 'Project: Todo App' },
-    kurztitel: { de: 'Projekt', en: 'Project' },
+    kurztitel: { de: 'ToDo-Projekt', en: 'Todo Project' },
+    bereich: 'frontend',
     icon: '🧵',
     beschreibung: {
       de: 'Der rote Faden: eine ToDo-App in 15 Schritten, die mit jedem Kursteil wächst - bis zur Challenge ohne Vorlage.',
@@ -852,6 +865,7 @@ export const kurs: Teil[] = [
     nummer: 7,
     titel: { de: 'Java-Grundlagen', en: 'Java Fundamentals' },
     kurztitel: { de: 'Java', en: 'Java' },
+    bereich: 'backend',
     icon: '☕',
     beschreibung: {
       de: 'Die zweite Welt: eine streng typisierte, objektorientierte Sprache. Java läuft hier in einer eigenen Laufzeit (src/java/) - unabhängig von allem JavaScript und React.',
@@ -1034,7 +1048,8 @@ export const kurs: Teil[] = [
     id: 'backend',
     nummer: 8,
     titel: { de: 'Backend: Spring Boot & Docker', en: 'Backend: Spring Boot & Docker' },
-    kurztitel: { de: 'Backend', en: 'Backend' },
+    kurztitel: { de: 'Spring & Docker', en: 'Spring & Docker' },
+    bereich: 'backend',
     icon: '🍃',
     beschreibung: {
       de: 'Die Serverseite: REST-APIs mit Spring Boot, Dependency Injection, Validierung und Datenbanken - dann alles in Docker-Container verpackt und mit Docker Compose gestartet. Spring läuft hier auf der Java-Laufzeit aus Teil 7, Docker in einem Simulator.',

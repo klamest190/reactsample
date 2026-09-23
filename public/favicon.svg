@@ -1,6 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <!-- Blitz wie in der Kopfzeile der App. Farbe: brand-600 aus src/index.css
-       (oklch(0.52 0.19 255) = #0065d2) - als Hex, weil ein Favicon keine CSS-Variablen kennt. -->
-  <rect width="32" height="32" rx="7" fill="#0065d2" />
-  <path d="M18 4 L8 18 h5.5 l-2 10 L24 14 h-5.5 z" fill="#fff" />
+  <!-- Bildmarke wie in der Kopfzeile (Logo in src/components/Icon.tsx): ein Weg vom
+       offenen Start zum erreichten Ziel. Farben: brand-500 -> brand-700 aus src/index.css
+       als Hex, weil ein Favicon keine CSS-Variablen kennt. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a7cf0" />
+      <stop offset="1" stop-color="#0050a8" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#g)" />
+  <g transform="translate(4 4)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round">
+    <circle cx="6" cy="18.5" r="2.3" />
+    <path d="M6 16.2V14a4 4 0 0 1 4-4h4a4 4 0 0 0 4-4v-.5" />
+    <circle cx="18" cy="5" r="2.6" fill="#fff" stroke="none" />
+  </g>
 </svg>

@@ -12,6 +12,7 @@ import {
 } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../components/ErrorBoundary'
+import { Icon } from '../components/Icon'
 import { useFortschritt } from '../context/FortschrittContext'
 import { useTheme } from '../context/ThemeContext'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
@@ -199,7 +200,7 @@ export function Rahmen({
   kopf?: string
   maxZeilen?: number
   art: keyof typeof ABZEICHEN
-  /** Label of the run button, e.g. "▶ docker build" (default: ▶ Ausführen). */
+  /** Label of the run button, e.g. "docker build" (default: Ausführen). The play icon is added in front. */
   startText?: string
   markierungen?: Typfehler[]
   /** Inhalt zwischen Aufgabe und Editor, z. B. nur lesbare Dateien. */
@@ -226,9 +227,15 @@ export function Rahmen({
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
-        <h3 className="text-sm font-semibold">
-          {kopf ?? (istUebung ? t.uebung : t.probierSelbst)}
-          {titel && <span className="font-normal text-slate-500 dark:text-slate-400"> · {titel}</span>}
+        <h3 className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+          <Icon
+            name={kopf ? 'spielwiese' : istUebung ? 'hantel' : 'kolben'}
+            className="size-4 text-brand-600 dark:text-brand-400"
+          />
+          <span className="min-w-0">
+            {kopf ?? (istUebung ? t.uebung : t.probierSelbst)}
+            {titel && <span className="font-normal text-slate-500 dark:text-slate-400"> · {titel}</span>}
+          </span>
         </h3>
         <span className={`rounded-full px-2 py-0.5 font-mono text-2xs font-semibold ${ABZEICHEN[art].klassen}`}>
           {ABZEICHEN[art].text}
@@ -257,8 +264,9 @@ export function Rahmen({
       <div className="flex flex-wrap items-center gap-2 border-y border-slate-200 px-4 py-2 dark:border-slate-800">
         <button
           onClick={() => ausfuehren()}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
         >
+          <Icon name="abspielen" className="size-3.5" />
           {startText ?? t.ausfuehren}
         </button>
         <button
@@ -267,24 +275,27 @@ export function Rahmen({
             ausfuehren(startCode)
           }}
           disabled={code === startCode}
-          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800"
         >
+          <Icon name="zuruecksetzen" className="size-3.5" />
           {t.zuruecksetzen}
         </button>
         {tippListe.length > 0 && (
           <button
             onClick={() => setTippAnzahl((n) => Math.min(n + 1, tippListe.length))}
             disabled={tippAnzahl >= tippListe.length}
-            className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm text-amber-900 transition hover:bg-amber-100 disabled:opacity-40 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm text-amber-900 transition hover:bg-amber-100 disabled:opacity-40 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
           >
+            <Icon name="gluehbirne" className="size-3.5" />
             {t.tipp(Math.min(tippAnzahl + 1, tippListe.length), tippListe.length)}
           </button>
         )}
         {loesung && (
           <button
             onClick={() => setZeigeLoesung((z) => !z)}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
           >
+            <Icon name="schluessel" className="size-3.5" />
             {zeigeLoesung ? t.loesungVerbergen : t.loesungZeigen}
           </button>
         )}
@@ -297,7 +308,10 @@ export function Rahmen({
         <ol className="space-y-1 border-b border-slate-200 bg-amber-50/60 px-4 py-3 text-sm dark:border-slate-800 dark:bg-amber-950/30">
           {tippListe.slice(0, tippAnzahl).map((tipp, i) => (
             <li key={i} className="flex gap-2">
-              <span className="shrink-0 font-semibold text-amber-700 dark:text-amber-400">💡 {i + 1}.</span>
+              <span className="flex shrink-0 items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
+                <Icon name="gluehbirne" className="size-3.5" />
+                {i + 1}.
+              </span>
               <span>
                 <Text text={tipp} />
               </span>
@@ -345,9 +359,15 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
         <div className="text-slate-500 italic">{leerText}</div>
       ) : (
         zeilen.map((z, i) => (
-          <div key={i} className={`wrap-break-word whitespace-pre-wrap ${farben[z.typ]}`}>
-            {z.typ === 'fehler' ? '⛔ ' : z.typ === 'warn' ? '⚠ ' : '› '}
-            {z.text}
+          <div key={i} className={`flex gap-1.5 ${farben[z.typ]}`}>
+            {z.typ === 'fehler' ? (
+              <Icon name="kreisKreuz" className="mt-0.75 size-3.5" />
+            ) : z.typ === 'warn' ? (
+              <Icon name="warnung" className="mt-0.75 size-3.5" />
+            ) : (
+              <span aria-hidden className="w-3.5 shrink-0 text-center text-slate-500">›</span>
+            )}
+            <span className="min-w-0 wrap-break-word whitespace-pre-wrap">{z.text}</span>
           </div>
         ))
       )}
@@ -373,8 +393,9 @@ export function Testergebnisse({ id, ergebnisse }: { id?: string; ergebnisse: Te
   return (
     <div className="space-y-1.5 px-4 py-3 text-sm">
       <p
-        className={`font-semibold ${alle ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-200'}`}
+        className={`flex items-center gap-1.5 font-semibold ${alle ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-200'}`}
       >
+        {alle && <Icon name="pokal" className="size-4" />}
         {alle
           ? t.alleTestsBestanden(ergebnisse.length)
           : t.testsBestanden(bestanden, ergebnisse.length)}
@@ -382,7 +403,11 @@ export function Testergebnisse({ id, ergebnisse }: { id?: string; ergebnisse: Te
       <ul className="space-y-1">
         {ergebnisse.map((e) => (
           <li key={e.name} className="flex gap-2">
-            <span>{e.ok ? '✅' : '❌'}</span>
+            <Icon
+              name={e.ok ? 'kreisHaken' : 'kreisKreuz'}
+              className={`mt-0.5 size-4 ${e.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}
+            />
+            <span className="sr-only">{e.ok ? t.testOk : t.testFehler}</span>
             <span>
               {e.name}
               {e.meldung && (
@@ -436,6 +461,12 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
   const [laeuft, setLaeuft] = useState(!istUebung)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const testIframeRef = useRef<HTMLIFrameElement>(null)
+  // Die Vorschau erscheint nur, wenn der Code wirklich etwas anzeigt - sonst reicht die Konsole.
+  // Bewusst NICHT bei jedem Start zurückgesetzt: Ein DOM-Beispiel würde sonst bei jedem
+  // Ausführen kurz zusammenklappen. Entschieden wird, sobald der neue Lauf "fertig" meldet.
+  const [vorschauMitInhalt, setVorschauMitInhalt] = useState(false)
+  const inhaltGemeldet = useRef(false)
+  const zeigeVorschau = Boolean(vorschau && vorschauMitInhalt)
   // Tests klicken und tippen im Dokument. Bei sichtbarer Vorschau laufen sie deshalb in
   // einem zweiten, unsichtbaren iframe - sonst würde die Vorschau von den Tests verändert.
   const getrennteTests = Boolean(vorschau && tests)
@@ -506,6 +537,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
   // Nachrichten aus dem iframe einsammeln - nur vom aktuellen Lauf.
   useEffect(() => {
     if (!lauf) return
+    inhaltGemeldet.current = false
     function beiNachricht(e: MessageEvent) {
       const nachricht = e.data as SandboxNachricht
       if (!nachricht?.tryit || nachricht.lauf !== lauf!.nummer) return
@@ -519,6 +551,12 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
       switch (nachricht.typ) {
         case 'fertig':
           setLaeuft(false)
+          if (nachricht.inhalt) inhaltGemeldet.current = true
+          setVorschauMitInhalt(inhaltGemeldet.current)
+          break
+        case 'inhalt':
+          inhaltGemeldet.current = true
+          setVorschauMitInhalt(true)
           break
         case 'clear':
           setZeilen([])
@@ -530,6 +568,8 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
           const ort = nachricht.zeile && nachricht.zeile > 0 ? ' ' + t.zeile(nachricht.zeile) : ''
           setZeilen((alt) => [...alt, { typ: 'fehler', text: nachricht.text + ort }])
           setLaeuft(false)
+          // Ein Fehler bricht den Lauf ab, "fertig" kommt dann nicht mehr.
+          setVorschauMitInhalt(inhaltGemeldet.current)
           break
         }
         default:
@@ -557,8 +597,9 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
     >
       {ts && <Typfehlerliste fehler={typfehler} />}
       {lauf && (
-        <div className={vorschau ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
-          {vorschau && (
+        // Das iframe bleibt immer eingehängt (der Code läuft darin), nur ohne Inhalt eben unsichtbar.
+        <div className={zeigeVorschau ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
+          {zeigeVorschau && (
             <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase">
               {t.vorschau}
             </div>
@@ -569,7 +610,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
             srcDoc={dokument ?? ''}
             sandbox="allow-scripts allow-forms"
             title={t.ausgabe}
-            className={vorschau ? 'h-48 w-full' : 'h-px w-px'}
+            className={zeigeVorschau ? 'h-48 w-full' : 'h-px w-px'}
           />
           {testDokument && (
             <iframe
@@ -590,7 +631,7 @@ function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, t
         leerText={
           istUebung && !lauf
             ? t.uebungStart
-            : vorschau
+            : zeigeVorschau
               ? undefined
               : t.keineAusgabe
         }
@@ -1023,7 +1064,8 @@ function Testausgabe({ bericht, laeuft }: { bericht: TestBericht; laeuft: boolea
       <div className="mb-1 text-2xs tracking-wider text-slate-500 uppercase">{t.deineTests}</div>
       {bericht.fehler ? (
         <div className="text-rose-300">
-          ⛔ {t.testDateiFehler}
+          <Icon name="kreisKreuz" className="mr-1.5 inline size-3.5 align-[-2px]" />
+          {t.testDateiFehler}
           <div className="mt-1 whitespace-pre-wrap">{bericht.fehler}</div>
         </div>
       ) : bericht.faelle.length === 0 ? (
@@ -1053,7 +1095,10 @@ function Testausgabe({ bericht, laeuft }: { bericht: TestBericht; laeuft: boolea
 export function Fehlerkasten({ text, titel }: { text: string; titel: string }) {
   return (
     <div className="rounded-lg border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200">
-      <p className="font-semibold">⛔ {titel}</p>
+      <p className="flex items-center gap-1.5 font-semibold">
+        <Icon name="kreisKreuz" className="size-4" />
+        {titel}
+      </p>
       <pre className="mt-1 font-mono text-xs whitespace-pre-wrap">{text}</pre>
     </div>
   )

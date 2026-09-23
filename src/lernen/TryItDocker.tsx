@@ -23,8 +23,8 @@ import type { Typfehler } from './typpruefung'
 
 const TEXTS = {
   de: {
-    build: '▶ docker build',
-    up: '▶ docker compose up',
+    build: 'docker build',
+    up: 'docker compose up',
     change: 'Danach ändern und neu bauen:',
     changes: { code: 'Quellcode (src/)', dependencies: 'Abhängigkeiten (pom.xml / package.json)', none: 'nichts' } satisfies Record<Change, string>,
     firstBuild: 'Erster Build',
@@ -52,8 +52,8 @@ const TEXTS = {
     line: (n: number) => `Zeile ${n}`,
   },
   en: {
-    build: '▶ docker build',
-    up: '▶ docker compose up',
+    build: 'docker build',
+    up: 'docker compose up',
     change: 'Then change and rebuild:',
     changes: { code: 'source code (src/)', dependencies: 'dependencies (pom.xml / package.json)', none: 'nothing' } satisfies Record<Change, string>,
     firstBuild: 'First build',
