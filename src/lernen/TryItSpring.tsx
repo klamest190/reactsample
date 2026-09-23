@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { Icon, type IconName } from '../components/Icon'
+import { localized } from '../i18n/localized'
 import { useSprache } from '../i18n/SpracheContext'
 import {
   formatJson,
@@ -14,9 +16,10 @@ import {
 } from '../spring'
 import { reason } from '../spring/http'
 import { CodeEditor } from './CodeEditor'
-import { Konsole, Rahmen, Testergebnisse, type SpringProps } from './TryIt'
+import { lineMarkers, useDelayedCheck } from './editorChecks'
+import { Konsole, Rahmen, Testergebnisse } from './Rahmen'
+import type { SpringProps } from './TryIt'
 import { useSavedCode } from './useSavedCode'
-import type { Typfehler } from './typpruefung'
 
 /**
  * The editor for Spring Boot (part 8): Java code with Spring annotations, run by
@@ -58,7 +61,7 @@ const TEXTS = {
     },
   },
   en: {
-    start: '▶ Start',
+    start: 'Start',
     running: (port: number) => `running on http://localhost:${port} (simulated in the browser)`,
     notRunning: 'not started',
     beansAndRoutes: (beans: number, routes: number) => `${beans} beans · ${routes} endpoints`,
@@ -88,14 +91,14 @@ const TEXTS = {
   },
 }
 
-const KIND_ICONS: Record<BeanInfo['kind'], string> = {
-  controller: '🌐',
-  service: '⚙️',
-  repository: '🗄️',
-  component: '🧩',
-  configuration: '🛠️',
-  bean: '🫘',
-  advice: '🚨',
+const KIND_ICONS: Record<BeanInfo['kind'], IconName> = {
+  controller: 'globus',
+  service: 'zahnrad',
+  repository: 'datenbank',
+  component: 'puzzle',
+  configuration: 'werkzeug',
+  bean: 'paket',
+  advice: 'warnung',
 }
 
 type Run = {
@@ -111,7 +114,7 @@ export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipp
   const [code, setCode] = useSavedCode(id, startCode)
   const [properties, setProperties] = useSavedCode(id + ':properties', startProperties ?? '')
   const springTests = useMemo(
-    () => tests?.map((test) => ({ ...test, name: typeof test.name === 'string' ? test.name : test.name[sprache] })),
+    () => tests?.map((test) => ({ ...test, name: localized(test.name, sprache) })),
     [tests, sprache],
   )
 
@@ -132,22 +135,8 @@ export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipp
   }
 
   // Red squiggles like in an IDE, shortly after the last key press.
-  const [markers, setMarkers] = useState<Typfehler[]>()
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const lines = code.split('\n')
-      setMarkers(
-        springCheck(code, sprache).map((m) => ({
-          zeile: m.zeile,
-          spalte: Math.max(0, (lines[m.zeile - 1] ?? '').length - (lines[m.zeile - 1] ?? '').trimStart().length),
-          laenge: (lines[m.zeile - 1] ?? '').trim().length || 1,
-          text: m.text,
-          code: 0,
-        })),
-      )
-    }, 700)
-    return () => clearTimeout(timer)
-  }, [code, sprache])
+  const check = useCallback((source: string) => lineMarkers(source, springCheck(source, sprache)), [sprache])
+  const markers = useDelayedCheck(code, check) ?? undefined
 
   function send(request: HttpRequest) {
     const server = run?.server
@@ -159,7 +148,10 @@ export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipp
   const propertiesEditor =
     startProperties !== undefined ? (
       <details open className="border-b border-slate-200 dark:border-slate-800">
-        <summary className="cursor-pointer px-4 py-1.5 font-mono text-xs text-slate-500 dark:text-slate-400">📄 {t.properties}</summary>
+        <summary className="cursor-pointer px-4 py-1.5 font-mono text-xs text-slate-500 dark:text-slate-400">
+          <Icon name="datei" className="mr-1.5 inline size-3.5 align-[-2px]" />
+          {t.properties}
+        </summary>
         <CodeEditor wert={properties} beiAenderung={setProperties} beiAusfuehren={() => start(code, true)} label={t.propertiesEditor} sprache="properties" maxZeilen={8} />
       </details>
     ) : null
@@ -225,7 +217,7 @@ function ServerBar({ server }: { server: SpringServer | null }) {
           <ul className="space-y-1">
             {beans.map((b) => (
               <li key={b.name} className="leading-snug">
-                <span aria-hidden="true">{KIND_ICONS[b.kind]} </span>
+                <Icon name={KIND_ICONS[b.kind]} className="mr-1.5 inline size-3.5 align-[-2px] text-slate-500 dark:text-slate-400" />
                 <span className="font-mono font-semibold">{b.name}</span>{' '}
                 <span className="text-slate-500 dark:text-slate-400">
                   ({t.kinds[b.kind]}

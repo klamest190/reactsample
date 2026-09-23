@@ -4,6 +4,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import type { Sprache } from '../i18n/SpracheContext'
 import type { ReactTest, TestErgebnis } from './jsSandbox'
 import { formatieren, kompilieren } from './reactKompilieren'
+import { localized } from '../i18n/localized'
 
 /**
  * Automatische Tests für React-Übungen - eine Mini-Variante von Testing Library.
@@ -355,7 +356,7 @@ export function reactTestsAusfuehren(code: string, tests: ReactTest[], sprache: 
 async function ausfuehren(code: string, tests: ReactTest[], sprache: Sprache): Promise<TestErgebnis[]> {
   const m = MELDUNGEN[sprache]
   const logs: string[] = []
-  const namen = tests.map((t) => (typeof t.name === 'string' ? t.name : t.name[sprache]))
+  const namen = tests.map((t) => localized(t.name, sprache))
 
   let kompiliert: Awaited<ReturnType<typeof kompilieren>>
   try {

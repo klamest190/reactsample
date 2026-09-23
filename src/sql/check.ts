@@ -1,6 +1,7 @@
 import type { Zweisprachig } from '../i18n/SpracheContext'
 import type { CodeBeispiel, TestErgebnis } from '../lernen/jsSandbox'
 import type { RunOptions, SqlRun, SqlTable } from './engine'
+import { localized } from '../i18n/localized'
 
 /**
  * Tests for SQL exercises (part 9).
@@ -79,7 +80,7 @@ export function evaluate(tests: SqlTest[], learner: SqlRun, solution: SqlRun, la
   const t = TEXTS[language]
   let check = 0
   return tests.map((test) => {
-    const name = typeof test.name === 'string' ? test.name : test.name[language]
+    const name = localized(test.name, language)
     const result = (meldung = '') => ({ name, ok: !meldung, meldung })
 
     let got: SqlTable | { error: string } | undefined

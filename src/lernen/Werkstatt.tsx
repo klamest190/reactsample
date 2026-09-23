@@ -9,8 +9,9 @@ import { CodeEditor } from './CodeEditor'
 import { hash } from './quelltext'
 import { tailwindFuerVorschau } from './tailwind'
 import { formatieren, kompilierenProjekt, type Protokoll } from './reactKompilieren'
-import { typenPruefenProjekt, type Typfehler } from './typpruefung'
-import { Fehlerkasten, Konsole, Typfehlerliste, type Zeile } from './TryIt'
+import { useDelayedCheck } from './editorChecks'
+import { typenPruefenProjekt } from './typpruefung'
+import { Fehlerkasten, Konsole, Typfehlerliste, type Zeile } from './Rahmen'
 
 /**
  * Werkstatt: ein ganzes React-Projekt aus mehreren Dateien.
@@ -162,16 +163,15 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
   }, [code, rendern])
 
   // Typprüfung der offenen Datei - kurz nach dem letzten Tastendruck, wie in VS Code.
-  const [typpruefung, setTyppruefung] = useState<{ pfad: string; code: string; fehler: Typfehler[] } | null>(null)
-  useEffect(() => {
-    if (!typen) return
-    const timer = setTimeout(() => {
-      const projekt = Object.entries(code).map(([pfad, quelltext]) => ({ pfad, code: quelltext }))
-      void typenPruefenProjekt(projekt, aktiv).then((fehler) => setTyppruefung({ pfad: aktiv, code: code[aktiv], fehler }))
-    }, 700)
-    return () => clearTimeout(timer)
-  }, [code, aktiv, typen])
-  // Bis das neue Ergebnis da ist, bleibt das letzte der offenen Datei stehen - sonst flackert die Anzeige beim Tippen.
+  const pruefen = useCallback(
+    async (dateienJetzt: Record<string, string>) => {
+      const projekt = Object.entries(dateienJetzt).map(([pfad, quelltext]) => ({ pfad, code: quelltext }))
+      return { pfad: aktiv, fehler: await typenPruefenProjekt(projekt, aktiv) }
+    },
+    [aktiv],
+  )
+  const typpruefung = useDelayedCheck(code, typen ? pruefen : null)
+  // A result for another file does not apply to the open one.
   const typfehler = typpruefung?.pfad === aktiv ? typpruefung.fehler : null
 
   // Im Vollbild soll die Lernseite dahinter nicht mitscrollen.
@@ -252,7 +252,12 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
             <p className="px-3 pb-1 text-2xs font-semibold tracking-wider text-slate-500 uppercase">{t.dateien}</p>
             {ordner.map(([name, inhalt]) => (
               <div key={name}>
-                {name && <p className="px-3 pt-2 font-mono text-xs text-slate-500 dark:text-slate-400">📁 {name}</p>}
+                {name && (
+                  <p className="flex items-center gap-1.5 px-3 pt-2 font-mono text-xs text-slate-500 dark:text-slate-400">
+                    <Icon name="ordner" className="size-3.5" />
+                    {name}
+                  </p>
+                )}
                 <ul>
                   {inhalt.map((d) => {
                     const dateiname = d.pfad.slice(d.pfad.lastIndexOf('/') + 1)
@@ -346,7 +351,10 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
           </div>
           {uebersetzungsfehler && (
             <div className="border-b border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-900 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200">
-              <p className="font-semibold">⛔ {t.nichtUebersetzbar}</p>
+              <p className="flex items-center gap-1.5 font-semibold">
+                <Icon name="kreisKreuz" className="size-4" />
+                {t.nichtUebersetzbar}
+              </p>
               <pre className="mt-1 font-mono text-xs whitespace-pre-wrap">{uebersetzungsfehler}</pre>
               <p className="mt-1 text-xs opacity-80">{t.letzterStand}</p>
             </div>

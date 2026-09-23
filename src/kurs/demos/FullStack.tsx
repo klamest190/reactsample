@@ -4,7 +4,7 @@ import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { useSprache } from '../../i18n/SpracheContext'
 import { CodeEditor } from '../../lernen/CodeEditor'
 import { formatieren, kompilieren } from '../../lernen/reactKompilieren'
-import { Konsole, type Zeile } from '../../lernen/TryIt'
+import { Konsole, type Zeile } from '../../lernen/Rahmen'
 import { useSavedCode } from '../../lernen/useSavedCode'
 import { springStart, type SpringServer } from '../../spring'
 

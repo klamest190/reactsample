@@ -175,9 +175,15 @@ src/
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   lernen/                  Die Lern-Bausteine
-    TryIt.tsx              "Probier's selbst"-Editor (JS, React, Test und Java)
-    modi.ts                Alle Modi und Editorsprachen an einer Stelle: Typen, Abzeichen, Hervorhebung, Kommentarzeichen
+    TryIt.tsx              "Probier's selbst": Props aller Modi, wählt den passenden Editor
+    TryItJs.tsx            Editor für JavaScript und TypeScript (Sandbox-iframe)
+    TryItReact.tsx         Editor für React mit Vorschau
+    TryItTest.tsx          Editor für eigene Tests (Vitest + Testing Library)
+    TryItJava.tsx          Editor für Java (Teil 7)
     TryItSql.tsx           SQL-Editor (Teil 9), darüber SqlDatenleiste.tsx mit den Beispieldaten
+    Rahmen.tsx             Was alle Editoren teilen: Rahmen mit Knöpfen, Tipps, Lösung, Konsole, Testergebnisse
+    editorChecks.ts        Prüfung kurz nach dem letzten Tastendruck, rote Linien unter ganzen Zeilen
+    modi.ts                Alle Modi und Editorsprachen an einer Stelle: Typen, Abzeichen, Hervorhebung, Kommentarzeichen
     CodeEditor.tsx         Editor: Textarea über eingefärbtem <pre>, mit Autovervollständigung
     einfuegen.ts           Code-Bausteine mit passender Einrückung einfügen (Playground)
     vorschlaege.ts         Vorschläge (console.log, Array-Methoden, Hooks, JSX …) mit Erklärungen

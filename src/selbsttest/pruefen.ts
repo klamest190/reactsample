@@ -15,6 +15,7 @@ import { DOCKER_EXPECTED_FAILURES, dockerExampleCheck } from '../docker/contents
 import { SQL_EXPECTED_FAILURES, sqlExampleCheck } from '../sql/check'
 import { runSql } from '../sql/client'
 import type { Modus as EditorModus } from '../lernen/modi'
+import { localized } from '../i18n/localized'
 
 /**
  * Selbsttest der Kursinhalte: führt jedes Beispiel, jede Übung und jeden Projektschritt
@@ -43,7 +44,7 @@ export const ERWARTETE_FEHLER: Record<string, string> = {
 }
 
 const warten = (ms: number) => new Promise((r) => setTimeout(r, ms))
-const nameVon = (n: string | Zweisprachig) => (typeof n === 'string' ? n : n.de)
+const nameVon = (n: string | Zweisprachig) => localized(n, 'de')
 
 // ---------------------------------------------------------------------------
 // Ausführen

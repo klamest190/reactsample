@@ -1,6 +1,7 @@
 import type { Zweisprachig } from '../i18n/SpracheContext'
 import type { TestErgebnis } from './jsSandbox'
 import { typenPruefen, type Typfehler } from './typpruefung'
+import { localized } from '../i18n/localized'
 
 /**
  * TypeScript mit Konsole (Teil 2, <TryIt modus="ts">).
@@ -67,7 +68,7 @@ export function typErgebnisse(
       meldung: erster ? `${texte.typfehlerZeile(erster.zeile)}: ${erster.text}` : '',
     },
     ...typTests.map((test, i) => ({
-      name: typeof test.name === 'string' ? test.name : test.name[sprache],
+      name: localized(test.name, sprache),
       ok: pruefung.proTest[i].length === 0,
       meldung: pruefung.proTest[i][0]?.text ?? '',
     })),

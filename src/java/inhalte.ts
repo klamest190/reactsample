@@ -12,6 +12,7 @@
 
 import { javaAusfuehren } from './index'
 import type { CodeBeispiel, Test } from '../lernen/jsSandbox'
+import { localized } from '../i18n/localized'
 
 /** Beispiele, die absichtlich nicht laufen - mit Begründung. */
 export const JAVA_ERWARTETE_FEHLER: Record<string, string> = {
@@ -25,7 +26,7 @@ export type InhaltErgebnis = { id: string; ok: boolean; meldung: string }
 
 const alsJavaTests = (tests: Test[]) =>
   tests.map((test) => ({
-    name: typeof test.name === 'string' ? test.name : test.name.de,
+    name: localized(test.name, 'de'),
     ausdruck: test.ausdruck,
     erwartet: test.erwartet,
   }))

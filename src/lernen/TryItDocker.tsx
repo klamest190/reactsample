@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react'
+import { Icon, type IconName } from '../components/Icon'
+import { localized } from '../i18n/localized'
 import { useSprache } from '../i18n/SpracheContext'
 import { simulateBuild, type BuildResult, type BuildRun, type Change } from '../docker/build'
 import { composeUp, type ComposeResult } from '../docker/compose'
 import { formatSize } from '../docker/images'
 import { PROJECTS } from '../docker/projects'
 import { CodeEditor } from './CodeEditor'
-import { Rahmen, Testergebnisse, type DockerProps } from './TryIt'
+import { lineMarkers } from './editorChecks'
+import { Rahmen, Testergebnisse } from './Rahmen'
+import type { DockerProps } from './TryIt'
 import { useSavedCode } from './useSavedCode'
 import type { TestErgebnis } from './jsSandbox'
-import type { Typfehler } from './typpruefung'
 
 /**
  * The editors for part 8's Docker chapters:
@@ -95,7 +98,7 @@ function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: 
     } catch {
       ok = false
     }
-    return { name: typeof test.name === 'string' ? test.name : test.name[language], ok, meldung: '' }
+    return { name: localized(test.name, language), ok, meldung: '' }
   })
 }
 
@@ -121,25 +124,25 @@ function DockerfileEditor({ id, titel, aufgabe, code: startCode, loesung, tipps,
     setResult(compute(source, withTests, what))
   }
 
-  const markers: Typfehler[] | undefined = useMemo(() => {
+  const markers = useMemo(() => {
     if (!result) return undefined
-    const lines = code.split('\n')
-    const marks = result.build.findings.filter((f) => f.severity !== 'info').map((f) => ({ line: f.line, text: f[sprache] }))
-    if (result.build.first.error) marks.push({ line: result.build.first.error.line, text: result.build.first.error.message })
-    return marks.map((m) => ({
-      zeile: m.line,
-      spalte: Math.max(0, (lines[m.line - 1] ?? '').length - (lines[m.line - 1] ?? '').trimStart().length),
-      laenge: (lines[m.line - 1] ?? '').trim().length || 1,
-      text: m.text,
-      code: 0,
-    }))
+    const marks = result.build.findings.filter((f) => f.severity !== 'info').map((f) => ({ zeile: f.line, text: f[sprache] }))
+    if (result.build.first.error) marks.push({ zeile: result.build.first.error.line, text: result.build.first.error.message })
+    return lineMarkers(code, marks)
   }, [result, code, sprache])
 
   const top = (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-200 px-4 py-1.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-      <span>📁 {t.project(PROJECTS[project].name)}</span>
+      <span className="flex items-center gap-1.5">
+        <Icon name="ordner" className="size-3.5" />
+        {t.project(PROJECTS[project].name)}
+      </span>
       <details className="min-w-0 flex-1">
-        <summary className="cursor-pointer font-mono">📄 {t.ignore}{ignore.trim() ? '' : ' (—)'}</summary>
+        <summary className="cursor-pointer font-mono">
+          <Icon name="datei" className="mr-1.5 inline size-3.5 align-[-2px]" />
+          {t.ignore}
+          {ignore.trim() ? '' : ' (—)'}
+        </summary>
         <div className="mt-1 -mx-4">
           <CodeEditor wert={ignore} beiAenderung={setIgnore} beiAusfuehren={() => build(code, true)} label={t.ignoreEditor} sprache="properties" maxZeilen={6} />
         </div>
@@ -197,7 +200,8 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
     <div className="space-y-4 px-4 py-3 text-sm">
       {result.first.error ? (
         <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-code whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
-          ⛔ {t.failed} ({t.line(result.first.error.line)}):{'\n'}
+          <Icon name="kreisKreuz" className="mr-1.5 inline size-3.5 align-[-2px]" />
+          {t.failed} ({t.line(result.first.error.line)}):{'\n'}
           {result.first.error.message}
         </div>
       ) : null}
@@ -213,7 +217,10 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
       {image && (
         <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span className="font-semibold">🐳 {t.image}</span>
+            <span className="flex items-center gap-1.5 self-center font-semibold">
+              <Icon name="paket" className="size-4 text-cyan-600 dark:text-cyan-400" />
+              {t.image}
+            </span>
             <span>
               {t.size}: <strong>{formatSize(image.sizeMb)}</strong>
             </span>
@@ -239,7 +246,7 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
           <ul className="space-y-1.5">
             {result.findings.map((f, i) => (
               <li key={i} className="flex gap-2 text-code">
-                <span aria-hidden="true">{f.severity === 'error' ? '⛔' : f.severity === 'warning' ? '⚠️' : '💡'}</span>
+                <SeverityIcon severity={f.severity} />
                 <span>
                   <span className="text-xs text-slate-500">
                     {t.severities[f.severity]} · {t.line(f.line)}
@@ -276,7 +283,10 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
     <div className="min-w-0">
       <h4 className="mb-1 flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
         <span>{title}</span>
-        <span className="font-mono text-slate-700 normal-case dark:text-slate-200">⏱ {t.seconds(run.seconds)}</span>
+        <span className="flex items-center gap-1 font-mono text-slate-700 normal-case dark:text-slate-200">
+          <Icon name="uhr" className="size-3" />
+          {t.seconds(run.seconds)}
+        </span>
       </h4>
       <ol className="overflow-hidden rounded-lg border border-slate-200 font-mono text-xs dark:border-slate-800">
         {run.steps.map((s, i) => (
@@ -328,6 +338,18 @@ function LayerBar({ image, title }: { image: NonNullable<BuildResult['image']>; 
   )
 }
 
+const SEVERITY_ICONS = {
+  error: { icon: 'kreisKreuz', color: 'text-rose-600 dark:text-rose-400' },
+  warning: { icon: 'warnung', color: 'text-amber-600 dark:text-amber-400' },
+  info: { icon: 'gluehbirne', color: 'text-sky-600 dark:text-sky-400' },
+} as const satisfies Record<string, { icon: IconName; color: string }>
+
+/** Error, warning or tip in front of a hint. */
+function SeverityIcon({ severity }: { severity: keyof typeof SEVERITY_ICONS }) {
+  const { icon, color } = SEVERITY_ICONS[severity]
+  return <Icon name={icon} className={`mt-0.5 size-3.5 ${color}`} />
+}
+
 /** `text` with `code` parts - the hints use backticks. */
 function InlineCode({ text }: { text: string }) {
   return text.split(/(`[^`]+`)/).map((part, i) =>
@@ -359,18 +381,10 @@ function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, te
     setResult(compute(source, withTests))
   }
 
-  const markers: Typfehler[] | undefined = useMemo(() => {
+  const markers = useMemo(() => {
     if (!result) return undefined
-    const lines = code.split('\n')
-    return result.up.findings
-      .filter((f) => f.severity === 'error')
-      .map((f) => ({
-        zeile: f.line,
-        spalte: Math.max(0, (lines[f.line - 1] ?? '').length - (lines[f.line - 1] ?? '').trimStart().length),
-        laenge: (lines[f.line - 1] ?? '').trim().length || 1,
-        text: f[sprache],
-        code: 0,
-      }))
+    const errors = result.up.findings.filter((f) => f.severity === 'error')
+    return lineMarkers(code, errors.map((f) => ({ zeile: f.line, text: f[sprache] })))
   }, [result, code, sprache])
 
   return (
@@ -394,7 +408,17 @@ function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, te
   )
 }
 
-const SERVICE_ICONS: Record<string, string> = { spring: '🍃', react: '⚛️', postgres: '🐘', redis: '🧱', nginx: '🌐', other: '📦' }
+const SERVICE_ICONS: Record<string, IconName> = { spring: 'blatt', react: 'atom', postgres: 'datenbank', redis: 'datenbank', nginx: 'globus', other: 'paket' }
+
+/** One line of a service card: ports, start order or volumes. */
+function ServiceLine({ icon, className, children }: { icon: IconName; className: string; children: string }) {
+  return (
+    <div className={`flex items-center gap-1 ${className}`}>
+      <Icon name={icon} className="size-3" />
+      <span className="min-w-0 break-all">{children}</span>
+    </div>
+  )
+}
 
 function ComposeView({ result }: { result: ComposeResult }) {
   const { sprache } = useSprache()
@@ -419,14 +443,26 @@ function ComposeView({ result }: { result: ComposeResult }) {
                 }`}
               >
                 <div className="flex items-center gap-1.5 font-semibold">
-                  <span aria-hidden="true">{SERVICE_ICONS[s.kind]}</span>
+                  <Icon name={SERVICE_ICONS[s.kind]} className="size-3.5" />
                   <span className="font-mono">{s.name}</span>
                   <span className={`ml-auto size-2 rounded-full ${running ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-label={container?.status} />
                 </div>
                 <div className="mt-1 font-mono text-slate-500 dark:text-slate-400">{s.image ?? `build: ${s.build}`}</div>
-                {s.ports.length > 0 && <div className="font-mono">🔌 {s.ports.map((p) => (p.host ? `${p.host}→${p.container}` : p.container)).join(', ')}</div>}
-                {s.dependsOn.length > 0 && <div className="text-slate-500 dark:text-slate-400">⏳ {s.dependsOn.map((d) => d.service + (d.condition === 'service_healthy' ? ' (healthy)' : '')).join(', ')}</div>}
-                {s.volumes.length > 0 && <div className="font-mono text-slate-500 dark:text-slate-400">💾 {s.volumes.map((v) => v.source).join(', ')}</div>}
+                {s.ports.length > 0 && (
+                  <ServiceLine icon="stecker" className="font-mono">
+                    {s.ports.map((p) => (p.host ? `${p.host}→${p.container}` : p.container)).join(', ')}
+                  </ServiceLine>
+                )}
+                {s.dependsOn.length > 0 && (
+                  <ServiceLine icon="uhr" className="text-slate-500 dark:text-slate-400">
+                    {s.dependsOn.map((d) => d.service + (d.condition === 'service_healthy' ? ' (healthy)' : '')).join(', ')}
+                  </ServiceLine>
+                )}
+                {s.volumes.length > 0 && (
+                  <ServiceLine icon="festplatte" className="font-mono text-slate-500 dark:text-slate-400">
+                    {s.volumes.map((v) => v.source).join(', ')}
+                  </ServiceLine>
+                )}
                 <div className="mt-1 font-medium">{container?.status}</div>
               </div>
             )
@@ -438,7 +474,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
         <ul className="space-y-1.5">
           {result.findings.map((f, i) => (
             <li key={i} className="flex gap-2 text-code">
-              <span aria-hidden="true">{f.severity === 'error' ? '⛔' : f.severity === 'warning' ? '⚠️' : '💡'}</span>
+              <SeverityIcon severity={f.severity} />
               <span>
                 <span className="text-xs text-slate-500">{t.line(f.line)}:</span> <InlineCode text={f[sprache]} />
               </span>
@@ -492,8 +528,11 @@ function ComposeView({ result }: { result: ComposeResult }) {
           <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.browser}</h4>
           <ul className="space-y-0.5 font-mono text-xs">
             {result.urls.map((u) => (
-              <li key={u.url} className={u.ok ? '' : 'text-rose-600 dark:text-rose-400'}>
-                {u.ok ? '✅' : '❌'} {u.url} → {u.answer}
+              <li key={u.url} className={`flex gap-1.5 ${u.ok ? '' : 'text-rose-600 dark:text-rose-400'}`}>
+                <Icon name={u.ok ? 'kreisHaken' : 'kreisKreuz'} className={`mt-0.5 size-3.5 ${u.ok ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                <span className="min-w-0">
+                  {u.url} → {u.answer}
+                </span>
               </li>
             ))}
           </ul>

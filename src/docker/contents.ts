@@ -10,6 +10,7 @@
 import type { CodeBeispiel, DockerTest } from '../lernen/jsSandbox'
 import { simulateBuild } from './build'
 import { composeUp } from './compose'
+import { localized } from '../i18n/localized'
 
 /** Examples that fail on purpose - with the reason. */
 export const DOCKER_EXPECTED_FAILURES: Record<string, string> = {
@@ -21,7 +22,7 @@ export type DockerContentResult = { id: string; ok: boolean; message: string }
 export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'dockerfile' | 'compose'): DockerContentResult {
   const result = (message = ''): DockerContentResult => ({ id, ok: !message, message })
   const tests = example.tests as DockerTest[] | undefined
-  const name = (t: DockerTest) => (typeof t.name === 'string' ? t.name : t.name.de)
+  const name = (t: DockerTest) => localized(t.name, 'de')
 
   const evaluate = (code: string) => {
     if (mode === 'dockerfile') {

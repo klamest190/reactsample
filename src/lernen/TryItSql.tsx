@@ -6,7 +6,8 @@ import { onSqlReady, runSql, SqlTimeout, sqlReady, startSql } from '../sql/clien
 import type { SqlError, SqlRun, SqlTable } from '../sql/engine'
 import type { TestErgebnis } from './jsSandbox'
 import { SqlDatenleiste } from './SqlDatenleiste'
-import { Rahmen, Testergebnisse, type SqlProps } from './TryIt'
+import { Rahmen, Testergebnisse } from './Rahmen'
+import type { SqlProps } from './TryIt'
 import type { Typfehler } from './typpruefung'
 import { useSavedCode } from './useSavedCode'
 

@@ -12,6 +12,7 @@
 import type { CodeBeispiel, SpringTestSpec } from '../lernen/jsSandbox'
 import { parseHttp, requestText } from './http'
 import { springRun } from './index'
+import { localized } from '../i18n/localized'
 
 /** Examples that fail on purpose - with the reason. */
 export const SPRING_EXPECTED_FAILURES: Record<string, string> = {
@@ -22,7 +23,7 @@ export const SPRING_EXPECTED_FAILURES: Record<string, string> = {
 
 export type ContentResult = { id: string; ok: boolean; message: string }
 
-const asTests = (tests: SpringTestSpec[]) => tests.map((t) => ({ ...t, name: typeof t.name === 'string' ? t.name : t.name.de }))
+const asTests = (tests: SpringTestSpec[]) => tests.map((t) => ({ ...t, name: localized(t.name, 'de') }))
 
 export function springExampleCheck(id: string, example: CodeBeispiel): ContentResult {
   const result = (message = ''): ContentResult => ({ id, ok: !message, message })

@@ -246,6 +246,58 @@ const PFADE = {
   ),
   kaestchen: <rect x="4" y="4" width="16" height="16" rx="3" />,
   abspielen: <path d="M7 4.5v15a.5.5 0 0 0 .8.4l11.4-7.5a.5.5 0 0 0 0-.8L7.8 4.1a.5.5 0 0 0-.8.4z" fill="currentColor" />,
+
+  // --- Editors of parts 8 and 9: files, services, beans --------------------------
+  ordner: <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />,
+  datei: (
+    <>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5" />
+    </>
+  ),
+  // A Docker image, a bean - something packed and ready to use.
+  paket: (
+    <>
+      <path d="M21 8 12 3 3 8v8l9 5 9-5z" />
+      <path d="m3 8 9 5 9-5M12 13v8" />
+    </>
+  ),
+  globus: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" />
+    </>
+  ),
+  // Published ports of a container.
+  stecker: (
+    <>
+      <path d="M9 2v5M15 2v5" />
+      <path d="M6 7h12v4a6 6 0 0 1-12 0z" />
+      <path d="M12 17v5" />
+    </>
+  ),
+  // Volumes of a container.
+  festplatte: (
+    <>
+      <path d="M22 13H2l3.4-7.2A2 2 0 0 1 7.2 4.6h9.6a2 2 0 0 1 1.8 1.2z" />
+      <rect x="2" y="13" width="20" height="7" rx="2" />
+      <path d="M6 16.5h.01M10 16.5h.01" />
+    </>
+  ),
+  zahnrad: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="12" cy="12" r="7" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" />
+    </>
+  ),
+  // Spring's leaf.
+  blatt: (
+    <>
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z" />
+      <path d="M2 21c0-3 1.9-5.4 5.2-6.1 2.4-.5 4.9-2 5.8-3.9" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof PFADE
