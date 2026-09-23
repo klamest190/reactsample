@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { Icon } from '../components/Icon'
@@ -60,10 +61,13 @@ export function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps
         aufraeumenRef.current()
         aufraeumenRef.current = aufraeumen
         // key={nummer}: jeder Lauf startet mit frischem State.
-        root.render(
-          <ErrorBoundary key={nummer} fallback={(f) => <Fehlerkasten text={`${f.name}: ${f.message}`} titel={t.fehlerBeimRendern} />}>
-            <App />
-          </ErrorBoundary>,
+        // flushSync: the old preview is gone before the tests start (see ausfuehren).
+        flushSync(() =>
+          root.render(
+            <ErrorBoundary key={nummer} fallback={(f) => <Fehlerkasten text={`${f.name}: ${f.message}`} titel={t.fehlerBeimRendern} />}>
+              <App />
+            </ErrorBoundary>,
+          ),
         )
       } catch (fehler) {
         if (nummer !== laufRef.current || rootRef.current !== root) return
@@ -80,13 +84,16 @@ export function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps
 
   function ausfuehren(quelltext: string) {
     setZeilen([])
-    void rendern(quelltext)
+    const vorschau = rendern(quelltext)
     if (!tests?.length) return
 
     const nummer = ++testLaufRef.current
     setErgebnisse(null)
     setTestsLaufen(true)
-    void Promise.all([reactTestsAusfuehren(quelltext, tests, sprache), typen ? typenPruefen(quelltext) : null]).then(
+    // The tests start once the new preview is in place. Before that, the old one may still be
+    // running - and a test that mocks fetch would count its requests, too.
+    const testlauf = vorschau.then(() => reactTestsAusfuehren(quelltext, tests, sprache))
+    void Promise.all([testlauf, typen ? typenPruefen(quelltext) : null]).then(
       ([neu, fehler]) => {
         if (nummer !== testLaufRef.current) return // inzwischen neu gestartet
         // Bei TypeScript-Übungen gehören saubere Typen dazu - als zusätzlicher Test.

@@ -100,6 +100,8 @@ type Umgebung = {
   m: (typeof MELDUNGEN)['de']
   aufraeumen: (() => void)[]
   fehler: { wert: unknown }
+  /** The `fetch` the code under test sees - mockFetch swaps it (see ausfuehren). */
+  fetch: { current: typeof fetch }
 }
 
 /** Alle Helfer, die im Testcode als Variablen verfügbar sind. */
@@ -299,9 +301,9 @@ function helferErstellen(u: Umgebung) {
   }
 
   function mockFetch(antwort: (url: string, init?: RequestInit) => unknown) {
-    const original = window.fetch
+    const original = u.fetch.current
     const calls: { url: string; signal?: AbortSignal | null }[] = []
-    window.fetch = (async (eingabe: RequestInfo | URL, init?: RequestInit) => {
+    u.fetch.current = (async (eingabe: RequestInfo | URL, init?: RequestInit) => {
       const url = String(eingabe instanceof Request ? eingabe.url : eingabe)
       calls.push({ url, signal: init?.signal })
       await new Promise<void>((resolve, reject) => {
@@ -317,7 +319,7 @@ function helferErstellen(u: Umgebung) {
       const body = ergebnis && typeof ergebnis === 'object' && 'status' in ergebnis ? ergebnis.body : ergebnis
       return new Response(JSON.stringify(body ?? null), { status, headers: { 'content-type': 'application/json' } })
     }) as typeof fetch
-    u.aufraeumen.push(() => (window.fetch = original))
+    u.aufraeumen.push(() => (u.fetch.current = original))
     return { calls }
   }
 
@@ -358,9 +360,14 @@ async function ausfuehren(code: string, tests: ReactTest[], sprache: Sprache): P
   const logs: string[] = []
   const namen = tests.map((t) => localized(t.name, sprache))
 
+  // The code under test gets a `fetch` of its own. mockFetch replaces only that one - replacing
+  // window.fetch would also count the requests of the preview and every other example on the page.
+  const testFetch: Umgebung['fetch'] = { current: (...args) => window.fetch(...args) }
   let kompiliert: Awaited<ReturnType<typeof kompilieren>>
   try {
-    kompiliert = await kompilieren(code, (_typ, text) => logs.push(text), sprache)
+    kompiliert = await kompilieren(code, (_typ, text) => logs.push(text), sprache, {
+      fetch: (...args: Parameters<typeof fetch>) => testFetch.current(...args),
+    })
   } catch (fehler) {
     return namen.map((name) => ({ name, ok: false, meldung: formatieren(fehler) }))
   }
@@ -368,7 +375,7 @@ async function ausfuehren(code: string, tests: ReactTest[], sprache: Sprache): P
   const ergebnisse: TestErgebnis[] = []
   for (const [i, test] of tests.entries()) {
     logs.length = 0
-    const u: Umgebung = { App: kompiliert.App, code, logs, m, aufraeumen: [], fehler: { wert: null } }
+    const u: Umgebung = { App: kompiliert.App, code, logs, m, aufraeumen: [], fehler: { wert: null }, fetch: testFetch }
 
     // --- Isolation vorbereiten ---
     const speicher = Object.entries(localStorage)

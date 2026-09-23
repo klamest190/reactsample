@@ -1,3 +1,5 @@
+import React from 'react'
+import { flushSync } from 'react-dom'
 import { formatieren, projektAusfuehren, type ProjektDatei } from './reactKompilieren'
 
 /**
@@ -314,7 +316,35 @@ export function testsAusfuehren(dateien: ProjektDatei[], einstieg: string, sprac
   return lauf
 }
 
+/**
+ * React 19 ships `act` only in its development build. Testing Library wraps every render
+ * and event in it - in the published (production) build every test would fail with
+ * "act is not a function". This stand-in does what the tests rely on: updates inside the
+ * callback are applied right away, an async callback is awaited plus one task, so the
+ * state updates it caused have run.
+ * It must be in place before Testing Library loads - that looks for `React.act` once.
+ */
+function installActFallback() {
+  // The types always declare `act` - at runtime the production build has none.
+  const react = React as unknown as { act?: (callback: () => unknown) => unknown }
+  if (typeof react.act === 'function') return
+  react.act = (callback: () => unknown) => {
+    let result: unknown
+    flushSync(() => {
+      result = callback()
+    })
+    if (result instanceof Promise) {
+      return result.then(async (value) => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+        return value
+      })
+    }
+    return result
+  }
+}
+
 async function ausfuehren(dateien: ProjektDatei[], einstieg: string, sprache: 'de' | 'en'): Promise<TestBericht> {
+  installActFallback()
   const [rtl, userEvent] = await Promise.all([import('@testing-library/react'), import('@testing-library/user-event')])
 
   // Eigener Container außerhalb des Bildschirms, aber sichtbar für Testing Library.
