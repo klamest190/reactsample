@@ -5,12 +5,10 @@ import { useFortschritt } from '../context/FortschrittContext'
 import { Verweis } from '../components/Verweis'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { uebungenFuer } from '../kurs/uebungen'
-import type { Stufe, Uebung, Vorhersage } from '../kurs/uebungen/typen'
+import type { CodeUebung, Stufe, Uebung, Vorhersage } from '../kurs/uebungen/typen'
 import { CodeBlock } from './CodeBlock'
-import type { DockerTest, ReactTest, SpringTestSpec, Test } from './jsSandbox'
-import type { SqlTest } from '../sql/check'
 import { Text } from './Text'
-import { TryIt } from './TryIt'
+import { TryIt, type TryItProps } from './TryIt'
 
 /**
  * Zusätzliche Übungen am Ende eines Kapitels. Alle sind frei zugänglich, aber
@@ -102,79 +100,29 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
           )}
           {uebung.stufe === 'vorhersage' ? (
             <VorhersageAufgabe uebung={uebung} />
-          ) : uebung.modus === 'react' ? (
-            <TryIt
-              modus="react"
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as ReactTest[] | undefined}
-            />
-          ) : uebung.modus === 'spring' ? (
-            <TryIt
-              modus="spring"
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as SpringTestSpec[] | undefined}
-              properties={uebung.properties}
-              requests={uebung.requests}
-            />
-          ) : uebung.modus === 'dockerfile' || uebung.modus === 'compose' ? (
-            <TryIt
-              modus={uebung.modus}
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as DockerTest[] | undefined}
-              project={uebung.project}
-              ignore={uebung.ignore}
-            />
-          ) : uebung.modus === 'sql' ? (
-            <TryIt
-              modus="sql"
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as SqlTest[] | undefined}
-            />
-          ) : uebung.modus === 'java' ? (
-            <TryIt
-              modus="java"
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as Test[] | undefined}
-              vorbereitung={uebung.vorbereitung}
-            />
           ) : (
-            <TryIt
-              id={'uebung-' + uebung.id}
-              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
-              code={uebung.code}
-              loesung={uebung.loesung}
-              tipps={uebung.tipps}
-              tests={uebung.tests as Test[] | undefined}
-              vorbereitung={uebung.vorbereitung}
-              vorschau={uebung.vorschau}
-              modus={uebung.modus}
-              typTests={uebung.typTests}
-            />
+            <UebungEditor uebung={uebung} />
           )}
         </div>
       )}
     </div>
   )
+}
+
+/**
+ * Der Editor einer Übung. Jede Übung bringt genau die Felder mit, die ihr Modus braucht
+ * (`properties` bei Spring, `project` bei Dockerfiles, `typTests` bei TypeScript …) -
+ * deshalb reicht ein Aufruf für alle Modi. Der Titel steht schon auf der Karte.
+ */
+function UebungEditor({ uebung }: { uebung: CodeUebung }) {
+  const { sprache } = useSprache()
+  const props = {
+    ...uebung,
+    titel: undefined,
+    id: 'uebung-' + uebung.id,
+    aufgabe: <Text text={uebung.aufgabe[sprache]} />,
+  } as TryItProps
+  return <TryIt {...props} />
 }
 
 function VorhersageAufgabe({ uebung }: { uebung: Vorhersage }) {
@@ -190,7 +138,7 @@ function VorhersageAufgabe({ uebung }: { uebung: Vorhersage }) {
       <p className="text-sm font-medium">
         <Text text={uebung.frage[sprache]} />
       </p>
-      <CodeBlock code={uebung.code} />
+      <CodeBlock code={uebung.code} sprache={uebung.hervorhebung} />
       <div className="grid gap-2 sm:grid-cols-2">
         {antworten.map((antwort, i) => {
           const stil = !aufgeloest

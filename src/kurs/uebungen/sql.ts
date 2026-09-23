@@ -16,6 +16,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-start-vorhersage-limit',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('Welche Zeilen kommen zurück?', 'Which rows come back?'),
       frage: t(
         'Die Produkte kosten 9.90, 14.90, 29.90, 34.90, 39.50 … Was liefert diese Abfrage?',
@@ -85,6 +86,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-where-vorhersage-null',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('Wie viele Zeilen?', 'How many rows?'),
       frage: t(
         '12 Kunden, bei einem ist `city` NULL, zwei wohnen in London. Wie viele Zeilen liefert die Abfrage?',
@@ -160,6 +162,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-gruppieren-vorhersage-count',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('Drei Zählungen', 'Three counts'),
       frage: t(
         '16 Produkte, 5 davon ohne Lagerbestand (`stock` ist NULL), 5 Kategorien. Was kommt heraus?',
@@ -232,6 +235,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-joins-vorhersage-left',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('LEFT JOIN zählen', 'Counting a LEFT JOIN'),
       frage: t(
         '12 Kunden, 20 Bestellungen, 2 Kunden ohne Bestellung. Wie viele Zeilen liefert die Abfrage?',
@@ -313,6 +317,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-aendern-vorhersage-rollback',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('Was bleibt übrig?', 'What is left?'),
       frage: t('Der Shop hat 16 Produkte. Was zeigt das letzte SELECT?', 'The shop has 16 products. What does the last SELECT show?'),
       code: sql`
@@ -388,6 +393,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-tabellen-vorhersage-default',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('DEFAULT oder NULL?', 'DEFAULT or NULL?'),
       frage: t('Was zeigt das SELECT?', 'What does the SELECT show?'),
       code: sql`
@@ -493,6 +499,7 @@ export const uebungen: UebungsSammlung = {
     {
       id: 'sql-profi-vorhersage-rank',
       stufe: 'vorhersage',
+      hervorhebung: 'sql',
       titel: t('rank und row_number', 'rank and row_number'),
       frage: t(
         'Die Bestellungen 108 und 118 haben beide den höchsten Wert nach 103. Welche Plätze vergibt `rank()` für 103, 108, 118, 113?',

@@ -18,7 +18,7 @@ import { useTheme } from '../context/ThemeContext'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { CodeBlock } from './CodeBlock'
 import { CodeEditor, type EditorSteuerung } from './CodeEditor'
-import type { EditorSprache } from './vorschlaege'
+import { ARTEN, EDITOR_SPRACHEN, type Art } from './modi'
 import { useSavedCode } from './useSavedCode'
 import { Text } from './Text'
 import { sandboxDokument, type ReactTest, type SandboxNachricht, type Test, type TestErgebnis } from './jsSandbox'
@@ -139,7 +139,10 @@ export type SqlProps = Gemeinsam & {
   tests?: SqlTest[]
 }
 
-export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps | SqlProps) {
+/** Die Props aller Modi - `modus` entscheidet, welcher Editor erscheint. */
+export type TryItProps = JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps | SqlProps
+
+export function TryIt(props: TryItProps) {
   if (props.modus === 'react') return <TryItReact {...props} />
   if (props.modus === 'test') return <TryItTest {...props} />
   if (props.modus === 'java') return <TryItJava {...props} />
@@ -161,31 +164,7 @@ function Laedt() {
 
 export type Zeile = { typ: 'log' | 'info' | 'warn' | 'error' | 'fehler'; text: string }
 
-const ABZEICHEN = {
-  JavaScript: { text: 'JS', klassen: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' },
-  Java: { text: 'JAVA', klassen: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300' },
-  React: { text: 'JSX', klassen: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300' },
-  TypeScript: { text: 'TSX', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
-  TS: { text: 'TS', klassen: 'bg-blue-600 text-white dark:bg-blue-500' },
-  Test: { text: 'TEST', klassen: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' },
-  Spring: { text: 'SPRING', klassen: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' },
-  Docker: { text: 'DOCKERFILE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
-  Compose: { text: 'COMPOSE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
-  SQL: { text: 'SQL', klassen: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300' },
-}
-
-const EDITOR_SPRACHE: Record<keyof typeof ABZEICHEN, EditorSprache> = {
-  JavaScript: 'js',
-  Java: 'java',
-  TS: 'ts',
-  React: 'react',
-  TypeScript: 'react',
-  Test: 'react',
-  Spring: 'spring',
-  Docker: 'docker',
-  Compose: 'yaml',
-  SQL: 'sql',
-}
+// Abzeichen und Editorsprache je Art stehen in modi.ts (ARTEN).
 
 // Gespeichert wird pro id - siehe useSavedCode.ts (auch von den Editoren aus Teil 8 benutzt).
 const useGespeicherterCode = useSavedCode
@@ -212,7 +191,7 @@ export function Rahmen({
   editorRef?: Ref<EditorSteuerung>
   kopf?: string
   maxZeilen?: number
-  art: keyof typeof ABZEICHEN
+  art: Art
   /** Label of the run button, e.g. "docker build" (default: Ausführen). The play icon is added in front. */
   startText?: string
   markierungen?: Typfehler[]
@@ -250,8 +229,8 @@ export function Rahmen({
             {titel && <span className="font-normal text-slate-500 dark:text-slate-400"> · {titel}</span>}
           </span>
         </h3>
-        <span className={`rounded-full px-2 py-0.5 font-mono text-2xs font-semibold ${ABZEICHEN[art].klassen}`}>
-          {ABZEICHEN[art].text}
+        <span className={`rounded-full px-2 py-0.5 font-mono text-2xs font-semibold ${ARTEN[art].klassen}`}>
+          {ARTEN[art].text}
         </span>
       </div>
 
@@ -268,7 +247,7 @@ export function Rahmen({
         beiAenderung={setCode}
         beiAusfuehren={(c) => ausfuehren(c)}
         label={`${t.codeEditor}${titel ? ': ' + titel : ''}`}
-        sprache={EDITOR_SPRACHE[art]}
+        sprache={ARTEN[art].sprache}
         markierungen={markierungen}
         steuerung={editorRef}
         maxZeilen={maxZeilen}
@@ -335,7 +314,7 @@ export function Rahmen({
 
       {zeigeLoesung && loesung && (
         <div className="space-y-2 border-b border-slate-200 p-4 dark:border-slate-800">
-          <CodeBlock code={loesung} titel={t.musterloesung} sprache={art === 'SQL' ? 'sql' : art === 'Docker' || art === 'Compose' ? 'konfig' : 'code'} />
+          <CodeBlock code={loesung} titel={t.musterloesung} sprache={EDITOR_SPRACHEN[ARTEN[art].sprache].hervorhebung} />
           <button
             onClick={() => {
               setCode(loesung)

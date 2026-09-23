@@ -1,9 +1,9 @@
 import { sql } from '../../lernen/quelltext'
-import type { SqlTest } from '../../sql/check'
+import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.3 - Counting & grouping. */
 
-export const beispiele: Record<string, { code: string; loesung?: string; tests?: SqlTest[] }> = {
+export const beispiele: Record<string, SqlBeispiel> = {
   'sql-gruppieren-einstieg': {
     code: sql`
       -- One row per category - with the number of products and the average price
@@ -108,6 +108,10 @@ export const beispiele: Record<string, { code: string; loesung?: string; tests?:
       { name: { de: 'Eine Zeile pro Bestellung über 400 €, mit der Summe', en: 'One row per order over 400 €, with the total' } },
       { name: { de: 'Höchster Wert zuerst, bei Gleichstand nach order_id', en: 'Highest value first, ties by order_id' }, reihenfolge: true },
     ],
+    tipps: {
+      de: ['Eine Zeile pro Bestellung: `GROUP BY order_id` und `sum(quantity * unit_price)`.', 'Die Bedingung betrifft die Summe - sie gehört in `HAVING`, nicht in `WHERE`.', '`ORDER BY total DESC, order_id`'],
+      en: ['One row per order: `GROUP BY order_id` and `sum(quantity * unit_price)`.', 'The condition is about the sum - it belongs in `HAVING`, not in `WHERE`.', '`ORDER BY total DESC, order_id`'],
+    },
   },
 }
 

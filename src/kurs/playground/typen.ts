@@ -1,4 +1,5 @@
 import type { Zweisprachig } from '../../i18n/SpracheContext'
+import type { PlaygroundModus } from '../../lernen/modi'
 
 /**
  * Datenmodell der Playgrounds - ein Playground pro Kursteil.
@@ -49,7 +50,7 @@ export type Vorlage = { titel: Zweisprachig; info: Zweisprachig; code: string }
 export type PlaygroundDaten = {
   /** id des Kursteils (kurs.ts), steht auch in der URL: #/playground/<teil> */
   teil: string
-  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'sql'
+  modus: PlaygroundModus
   /** Startcode - die erste Vorlage. */
   vorlagen: Vorlage[]
   gruppen: BausteinGruppe[]

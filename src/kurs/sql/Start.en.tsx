@@ -155,10 +155,6 @@ export function Start() {
               <Code>name</Code> and <Code>price</Code>, the most expensive first.
             </p>
           }
-          tipps={{
-            de: ['Wähle die zwei Spalten statt `*`.', 'Sortiere mit `ORDER BY price DESC`.', 'Begrenze mit `LIMIT 5` - das steht ganz am Ende.'],
-            en: ['Select the two columns instead of `*`.', 'Sort with `ORDER BY price DESC`.', 'Limit with `LIMIT 5` - that goes at the very end.'],
-          }}
         />
       </Abschnitt>
 

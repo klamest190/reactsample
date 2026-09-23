@@ -1,5 +1,5 @@
 import { sql } from '../../lernen/quelltext'
-import type { SqlTest } from '../../sql/check'
+import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.7 - Subqueries, CTEs & window functions. */
 
@@ -14,7 +14,7 @@ const REVENUE = sql`
   )
 `
 
-export const beispiele: Record<string, { code: string; loesung?: string; tests?: SqlTest[] }> = {
+export const beispiele: Record<string, SqlBeispiel> = {
   'sql-profi-einstieg': {
     code: sql`
       -- Products more expensive than the average - the inner query runs first
@@ -132,6 +132,18 @@ export const beispiele: Record<string, { code: string; loesung?: string; tests?:
       { name: { de: 'Pro Land genau ein Kunde - der mit dem höchsten Umsatz', en: 'Exactly one customer per country - the one with the highest revenue' } },
       { name: { de: 'Nach Land sortiert', en: 'Sorted by country' }, reihenfolge: true },
     ],
+    tipps: {
+      de: [
+        'Nummeriere die Kunden innerhalb jedes Landes: `rank() OVER (PARTITION BY country ORDER BY revenue DESC)`.',
+        'Eine Window Function darf nicht im WHERE stehen (das läuft vorher). Leg deshalb einen zweiten Schritt an: `WITH revenue AS (…), ranked AS (SELECT …, rank() OVER (…) AS place FROM revenue)`.',
+        'Zum Schluss: `SELECT country, name, revenue FROM ranked WHERE place = 1 ORDER BY country`.',
+      ],
+      en: [
+        'Number the customers within every country: `rank() OVER (PARTITION BY country ORDER BY revenue DESC)`.',
+        'A window function must not be in WHERE (that runs before). So add a second step: `WITH revenue AS (…), ranked AS (SELECT …, rank() OVER (…) AS place FROM revenue)`.',
+        'Finally: `SELECT country, name, revenue FROM ranked WHERE place = 1 ORDER BY country`.',
+      ],
+    },
   },
 }
 

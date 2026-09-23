@@ -14,6 +14,7 @@ import { SPRING_EXPECTED_FAILURES, springExampleCheck } from '../spring/contents
 import { DOCKER_EXPECTED_FAILURES, dockerExampleCheck } from '../docker/contents'
 import { SQL_EXPECTED_FAILURES, sqlExampleCheck } from '../sql/check'
 import { runSql } from '../sql/client'
+import type { Modus as EditorModus } from '../lernen/modi'
 
 /**
  * Selbsttest der Kursinhalte: führt jedes Beispiel, jede Übung und jeden Projektschritt
@@ -26,7 +27,7 @@ import { runSql } from '../sql/client'
  *                          Musterlösung alle kaputten Varianten, der Startcode nicht
  */
 
-export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java' | 'spring' | 'dockerfile' | 'compose' | 'sql'; typen: boolean; vorschau: boolean }
+export type Modus = { modus: EditorModus; typen: boolean; vorschau: boolean }
 export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; dauer: number }
 
 /**

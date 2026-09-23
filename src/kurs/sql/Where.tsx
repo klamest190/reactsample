@@ -118,10 +118,6 @@ export function Where() {
               Gleichstand nach Name. Produkte ohne Lagerbestand (Software, Services) gehören nicht dazu.
             </p>
           }
-          tipps={{
-            de: ['Die Bedingung heißt `stock < 10`.', 'Und NULL? `NULL < 10` ist nicht wahr - diese Zeilen fallen von selbst heraus.', 'Sortieren: `ORDER BY stock, name`.'],
-            en: ['The condition is `stock < 10`.', 'And NULL? `NULL < 10` is not true - these rows drop out by themselves.', 'Sort: `ORDER BY stock, name`.'],
-          }}
         />
       </Abschnitt>
 

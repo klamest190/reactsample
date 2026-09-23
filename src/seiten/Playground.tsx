@@ -7,7 +7,7 @@ import { playgrounds } from '../kurs/playground'
 import { bausteinSchritte } from '../kurs/playground/orte'
 import type { Baustein, PlaygroundDaten } from '../kurs/playground/typen'
 import type { EditorSteuerung } from '../lernen/CodeEditor'
-import { TryIt } from '../lernen/TryIt'
+import { TryIt, type TryItProps } from '../lernen/TryIt'
 
 /**
  * Playground: frei programmieren - ein Editor pro Kursteil, ohne Aufgabe und ohne Tests.
@@ -211,19 +211,8 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
 
         {/* Editor mit Ausgabe */}
         <div className="min-w-0">
-          {daten.modus === 'react' ? (
-            <TryIt {...gemeinsam} modus="react" />
-          ) : daten.modus === 'java' ? (
-            <TryIt {...gemeinsam} modus="java" />
-          ) : daten.modus === 'spring' ? (
-            <TryIt {...gemeinsam} modus="spring" />
-          ) : daten.modus === 'sql' ? (
-            <TryIt {...gemeinsam} modus="sql" />
-          ) : daten.modus === 'ts' ? (
-            <TryIt {...gemeinsam} modus="ts" />
-          ) : (
-            <TryIt {...gemeinsam} vorschau />
-          )}
+          {/* Ein Editor für jeden Modus; JavaScript zeigt dazu die Vorschau, damit DOM-Code sichtbar wird. */}
+          <TryIt {...({ ...gemeinsam, modus: daten.modus, vorschau: daten.modus === 'js' || undefined } as TryItProps)} />
         </div>
       </div>
     </div>

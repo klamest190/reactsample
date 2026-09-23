@@ -16,7 +16,8 @@ import { einfuegungenPlanen, type Schritt } from './einfuegen'
 import { HervorgehobenerCode } from './hervorheben'
 import type { Typfehler } from './typpruefung'
 import { klassenWort, tailwindMotor } from './tailwind'
-import { suchen, vorschlaegeFuer, type EditorSprache, type Vorschlag, type VorschlagArt } from './vorschlaege'
+import { EDITOR_SPRACHEN, type EditorSprache } from './modi'
+import { suchen, vorschlaegeFuer, type Vorschlag, type VorschlagArt } from './vorschlaege'
 
 /**
  * Kleiner Code-Editor ohne Bibliothek.
@@ -217,9 +218,9 @@ export function CodeEditor({
     }
     tailwindAnfrage.current++
 
-    // Spring: `@GetMapping` counts as one word. Dockerfile and YAML comments start with `#`, SQL comments with `--`.
+    // Spring: `@GetMapping` counts as one word. The comment sign depends on the language (modi.ts).
     const wort = zeile.match(sprache === 'spring' ? /@?[\w$.]*$/ : /[\w$.]*$/)![0]
-    const kommentarZeichen = sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? '#' : sprache === 'sql' ? '--' : '//'
+    const kommentarZeichen = EDITOR_SPRACHEN[sprache].kommentar
     const imKommentar = zeile.slice(0, zeile.length - wort.length).includes(kommentarZeichen)
     if ((!vonHand && (!wort || /^\d/.test(wort))) || imKommentar || feld.selectionStart !== feld.selectionEnd) {
       setPopup(null)
@@ -383,7 +384,7 @@ export function CodeEditor({
           aria-hidden
           className="pointer-events-none absolute inset-0 m-0 overflow-hidden p-3 whitespace-pre"
         >
-          <HervorgehobenerCode code={wert} sprache={sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? 'konfig' : sprache === 'sql' ? 'sql' : 'code'} />
+          <HervorgehobenerCode code={wert} sprache={EDITOR_SPRACHEN[sprache].hervorhebung} />
           {/* Unterschlängelung: Die Schrift ist monospace, 1ch = ein Zeichen. */}
           {markierungen.map((m, i) => (
             <span

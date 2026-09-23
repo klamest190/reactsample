@@ -21,6 +21,15 @@ export type SqlTest = {
   spalten?: boolean
 }
 
+/** An example or exercise in a chapter's .code.ts (part 9) - spread into <TryIt modus="sql">. */
+export type SqlBeispiel = {
+  code: string
+  loesung?: string
+  tests?: SqlTest[]
+  /** Tips of an exercise - in both languages, shown one after the other. */
+  tipps?: Zweisprachig<string[]>
+}
+
 export type SqlRunner = (script: string, options?: RunOptions) => Promise<SqlRun>
 
 type Language = 'de' | 'en'

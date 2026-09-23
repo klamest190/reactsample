@@ -1,9 +1,9 @@
 import { js, sql } from '../../lernen/quelltext'
-import type { SqlTest } from '../../sql/check'
+import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.1 - Tables & SELECT. Runs on real PostgreSQL (src/sql/). */
 
-export const beispiele: Record<string, { code: string; loesung?: string; tests?: SqlTest[] }> = {
+export const beispiele: Record<string, SqlBeispiel> = {
   'sql-start-einstieg': {
     code: sql`
       -- Your first query: three columns of all customers, sorted by name.
@@ -62,6 +62,10 @@ export const beispiele: Record<string, { code: string; loesung?: string; tests?:
       { name: { de: 'Genau die fünf teuersten Produkte, mit Name und Preis', en: 'Exactly the five most expensive products, with name and price' } },
       { name: { de: 'Das teuerste steht oben', en: 'The most expensive one comes first' }, reihenfolge: true },
     ],
+    tipps: {
+      de: ['Wähle die zwei Spalten statt `*`.', 'Sortiere mit `ORDER BY price DESC`.', 'Begrenze mit `LIMIT 5` - das steht ganz am Ende.'],
+      en: ['Select the two columns instead of `*`.', 'Sort with `ORDER BY price DESC`.', 'Limit with `LIMIT 5` - that goes at the very end.'],
+    },
   },
 }
 

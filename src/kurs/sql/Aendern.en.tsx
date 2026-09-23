@@ -123,18 +123,6 @@ export function Aendern() {
               the full price. The other products must not change.
             </p>
           }
-          tipps={{
-            de: [
-              '10 % günstiger heißt `price * 0.9` - nur für `WHERE category = \'books\'`.',
-              'Die Reihenfolge zählt: Erst das UPDATE, dann das INSERT - sonst wird das neue Buch mit reduziert.',
-              '`INSERT INTO products (name, category, price, stock) VALUES (…)`',
-            ],
-            en: [
-              '10 % cheaper means `price * 0.9` - only for `WHERE category = \'books\'`.',
-              'The order matters: first the UPDATE, then the INSERT - otherwise the new book is reduced too.',
-              '`INSERT INTO products (name, category, price, stock) VALUES (…)`',
-            ],
-          }}
         />
       </Abschnitt>
 

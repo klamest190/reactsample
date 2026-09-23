@@ -118,10 +118,6 @@ export function Gruppieren() {
               den höchsten Wert zuerst, bei Gleichstand nach <Code>order_id</Code>.
             </p>
           }
-          tipps={{
-            de: ['Eine Zeile pro Bestellung: `GROUP BY order_id` und `sum(quantity * unit_price)`.', 'Die Bedingung betrifft die Summe - sie gehört in `HAVING`, nicht in `WHERE`.', '`ORDER BY total DESC, order_id`'],
-            en: ['One row per order: `GROUP BY order_id` and `sum(quantity * unit_price)`.', 'The condition is about the sum - it belongs in `HAVING`, not in `WHERE`.', '`ORDER BY total DESC, order_id`'],
-          }}
         />
       </Abschnitt>
 

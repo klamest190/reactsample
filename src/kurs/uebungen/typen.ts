@@ -3,6 +3,8 @@ import type { DockerTest, ReactTest, SpringTestSpec, Test } from '../../lernen/j
 import type { SqlTest } from '../../sql/check'
 import type { ProjectId } from '../../docker/projects'
 import type { TypTest } from '../../lernen/tsLauf'
+import type { HighlightMode } from '../../lernen/hervorheben'
+import type { UebungsModus } from '../../lernen/modi'
 
 /**
  * Zusätzliche Übungen pro Kapitel - in vier Stufen:
@@ -34,12 +36,14 @@ export type Vorhersage = Basis & {
   antworten: string[] | Zweisprachig<string[]>
   richtig: number
   erklaerung: Zweisprachig
+  /** Einfärbung von `code`, wenn es kein Programmcode ist (z. B. 'sql' in Teil 9). */
+  hervorhebung?: HighlightMode
 }
 
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
   aufgabe: Zweisprachig
-  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'dockerfile' | 'compose' | 'sql'
+  modus: UebungsModus
   code: string
   loesung: string
   vorbereitung?: string

@@ -113,18 +113,6 @@ export function Profi() {
               <Code>revenue</Code>, nach Land sortiert.
             </p>
           }
-          tipps={{
-            de: [
-              'Nummeriere die Kunden innerhalb jedes Landes: `rank() OVER (PARTITION BY country ORDER BY revenue DESC)`.',
-              'Eine Window Function darf nicht im WHERE stehen (das läuft vorher). Leg deshalb einen zweiten Schritt an: `WITH revenue AS (…), ranked AS (SELECT …, rank() OVER (…) AS place FROM revenue)`.',
-              'Zum Schluss: `SELECT country, name, revenue FROM ranked WHERE place = 1 ORDER BY country`.',
-            ],
-            en: [
-              'Number the customers within every country: `rank() OVER (PARTITION BY country ORDER BY revenue DESC)`.',
-              'A window function must not be in WHERE (that runs before). So add a second step: `WITH revenue AS (…), ranked AS (SELECT …, rank() OVER (…) AS place FROM revenue)`.',
-              'Finally: `SELECT country, name, revenue FROM ranked WHERE place = 1 ORDER BY country`.',
-            ],
-          }}
         />
       </Abschnitt>
 

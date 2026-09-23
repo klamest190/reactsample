@@ -1,9 +1,9 @@
 import { sql } from '../../lernen/quelltext'
-import type { SqlTest } from '../../sql/check'
+import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.4 - Joining tables: JOIN. */
 
-export const beispiele: Record<string, { code: string; loesung?: string; tests?: SqlTest[] }> = {
+export const beispiele: Record<string, SqlBeispiel> = {
   'sql-joins-einstieg': {
     code: sql`
       -- orders only knows the customer_id - the JOIN fetches the name
@@ -94,6 +94,18 @@ export const beispiele: Record<string, { code: string; loesung?: string; tests?:
       { name: { de: 'Genau die Produkte, die nie bestellt wurden', en: 'Exactly the products that were never ordered' } },
       { name: { de: 'Nach Name sortiert', en: 'Sorted by name' }, reihenfolge: true },
     ],
+    tipps: {
+      de: [
+        'Bestellt heißt: Es gibt eine Zeile in `order_items` mit dieser `product_id`.',
+        '`LEFT JOIN order_items i ON i.product_id = p.id` behält auch Produkte ohne Position.',
+        'Übrig bleiben sollen die Zeilen, bei denen rechts nichts gefunden wurde: `WHERE i.product_id IS NULL`.',
+      ],
+      en: [
+        'Ordered means: there is a row in `order_items` with this `product_id`.',
+        '`LEFT JOIN order_items i ON i.product_id = p.id` also keeps products without a line item.',
+        'What should remain are the rows where nothing was found on the right: `WHERE i.product_id IS NULL`.',
+      ],
+    },
   },
 }
 

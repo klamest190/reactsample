@@ -121,18 +121,6 @@ export function Joins() {
               <Code>category</Code>, sorted by name.
             </p>
           }
-          tipps={{
-            de: [
-              'Bestellt heißt: Es gibt eine Zeile in `order_items` mit dieser `product_id`.',
-              '`LEFT JOIN order_items i ON i.product_id = p.id` behält auch Produkte ohne Position.',
-              'Übrig bleiben sollen die Zeilen, bei denen rechts nichts gefunden wurde: `WHERE i.product_id IS NULL`.',
-            ],
-            en: [
-              'Ordered means: there is a row in `order_items` with this `product_id`.',
-              '`LEFT JOIN order_items i ON i.product_id = p.id` also keeps products without a line item.',
-              'What should remain are the rows where nothing was found on the right: `WHERE i.product_id IS NULL`.',
-            ],
-          }}
         />
       </Abschnitt>
 

@@ -1,9 +1,9 @@
 import { java, sql } from '../../lernen/quelltext'
-import type { SqlTest } from '../../sql/check'
+import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.6 - Designing tables: CREATE TABLE. */
 
-export const beispiele: Record<string, { code: string; loesung?: string; tests?: SqlTest[] }> = {
+export const beispiele: Record<string, SqlBeispiel> = {
   'sql-tabellen-einstieg': {
     code: sql`
       -- A new table for product reviews - with rules the database enforces
@@ -110,6 +110,18 @@ export const beispiele: Record<string, { code: string; loesung?: string; tests?:
         abfrage: `SELECT customer_id, product_id, added = current_date FROM wishlist`,
       },
     ],
+    tipps: {
+      de: [
+        'Eine Spalte mit Fremdschlüssel: `customer_id integer NOT NULL REFERENCES customers (id)`.',
+        'Das heutige Datum als Standard: `DEFAULT current_date`.',
+        'Ein Schlüssel aus zwei Spalten steht als eigene Zeile am Ende: `PRIMARY KEY (customer_id, product_id)`.',
+      ],
+      en: [
+        'A column with a foreign key: `customer_id integer NOT NULL REFERENCES customers (id)`.',
+        'Today’s date as the default: `DEFAULT current_date`.',
+        'A key made of two columns is a separate line at the end: `PRIMARY KEY (customer_id, product_id)`.',
+      ],
+    },
   },
 }
 

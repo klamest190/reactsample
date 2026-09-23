@@ -151,18 +151,6 @@ export function Tabellen() {
               <p className="mt-1">Then record that Ada (1) wishes for the headphones (6).</p>
             </>
           }
-          tipps={{
-            de: [
-              'Eine Spalte mit Fremdschlüssel: `customer_id integer NOT NULL REFERENCES customers (id)`.',
-              'Das heutige Datum als Standard: `DEFAULT current_date`.',
-              'Ein Schlüssel aus zwei Spalten steht als eigene Zeile am Ende: `PRIMARY KEY (customer_id, product_id)`.',
-            ],
-            en: [
-              'A column with a foreign key: `customer_id integer NOT NULL REFERENCES customers (id)`.',
-              'Today’s date as the default: `DEFAULT current_date`.',
-              'A key made of two columns is a separate line at the end: `PRIMARY KEY (customer_id, product_id)`.',
-            ],
-          }}
         />
       </Abschnitt>
 

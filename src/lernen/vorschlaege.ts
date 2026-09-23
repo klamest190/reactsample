@@ -1,5 +1,6 @@
 import type { Sprache, Zweisprachig } from '../i18n/SpracheContext'
 import { COMPOSE, DOCKERFILE, SPRING } from './backendSuggestions'
+import type { EditorSprache } from './modi'
 import { SQL } from './sqlSuggestions'
 
 /**
@@ -37,8 +38,6 @@ export type Eintrag = {
   art: VorschlagArt
   info: Zweisprachig
 }
-
-export type EditorSprache = 'js' | 'ts' | 'react' | 'java' | 'spring' | 'docker' | 'yaml' | 'properties' | 'sql'
 
 const JAVASCRIPT: Eintrag[] = [
   // --- Konsole -------------------------------------------------------------

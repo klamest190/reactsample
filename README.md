@@ -176,6 +176,8 @@ src/
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   lernen/                  Die Lern-Bausteine
     TryIt.tsx              "Probier's selbst"-Editor (JS, React, Test und Java)
+    modi.ts                Alle Modi und Editorsprachen an einer Stelle: Typen, Abzeichen, Hervorhebung, Kommentarzeichen
+    TryItSql.tsx           SQL-Editor (Teil 9), darüber SqlDatenleiste.tsx mit den Beispieldaten
     CodeEditor.tsx         Editor: Textarea über eingefärbtem <pre>, mit Autovervollständigung
     einfuegen.ts           Code-Bausteine mit passender Einrückung einfügen (Playground)
     vorschlaege.ts         Vorschläge (console.log, Array-Methoden, Hooks, JSX …) mit Erklärungen
@@ -447,6 +449,11 @@ Tabellenliste über den Editoren zur echten Datenbank passt.
 zeigt. Die wichtigsten Meta-Befehle von psql (`\dt`, `\d tabelle`, `\di`) beantwortet `engine.ts` aus
 dem Systemkatalog.
 
+**Die Daten neben dem Code** (`src/lernen/SqlDatenleiste.tsx`): Über jedem SQL-Editor stehen die
+Tabellen, die im Code vorkommen, mit ihren Zeilen - bei einem JOIN beide Seiten, die benutzten Spalten
+hervorgehoben. Ein Klick auf eine Tabelle blendet sie ein oder aus, „Daten ausblenden“ gilt für alle
+Editoren und wird gemerkt. Die Daten kommen einmal pro Seite aus der echten Datenbank.
+
 **Übungen** brauchen keine von Hand geschriebenen Erwartungswerte: Die Musterlösung läuft auf ihrer
 eigenen frischen Datenbank, und das Ergebnis der Lernenden muss dazu passen. Stimmt es nicht, kann man
 das erwartete Ergebnis aufklappen.
@@ -490,6 +497,13 @@ tests: [
 
 Navigation, Startseite, Nummerierung und Fortschritt ergeben sich automatisch. Die `id` jedes
 `TryIt` muss kursweit eindeutig sein.
+
+**Tipps einer Übung** stehen wie Code und Tests nur einmal in der `.code.ts` (`tipps: { de: […], en: […] }`),
+nicht in den beiden Kapiteldateien.
+
+**Ein neuer Modus** (eine neue Sprache für `<TryIt>`) wird in `src/lernen/modi.ts` eingetragen - die Typen
+der Übungen, Playgrounds und des Selbsttests, Abzeichen, Hervorhebung und Kommentarzeichen leiten sich
+davon ab. Dazu kommen nur noch der Editor selbst (`TryIt…tsx`) und seine Prüfung in `src/selbsttest/pruefen.ts`.
 
 Für ein **Java-Kapitel** zusätzlich: im `.code.ts` den Tag `java\`…\`` statt `js\`…\`` verwenden und an
 jedes `<TryIt>` ein `modus="java"` schreiben - daran erkennen beide Selbsttests, welche Sprache

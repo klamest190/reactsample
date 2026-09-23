@@ -3,9 +3,9 @@ import { Icon } from '../components/Icon'
 import { useSprache } from '../i18n/SpracheContext'
 import { checkQueries, evaluate, lastTable } from '../sql/check'
 import { onSqlReady, runSql, SqlTimeout, sqlReady, startSql } from '../sql/client'
-import { SHOP_TABELLEN } from '../sql/dataset'
 import type { SqlError, SqlRun, SqlTable } from '../sql/engine'
 import type { TestErgebnis } from './jsSandbox'
+import { SqlDatenleiste } from './SqlDatenleiste'
 import { Rahmen, Testergebnisse, type SqlProps } from './TryIt'
 import type { Typfehler } from './typpruefung'
 import { useSavedCode } from './useSavedCode'
@@ -42,8 +42,6 @@ const TEXTS = {
     crashed: (m: string) => `PostgreSQL ist abgestürzt: ${m}`,
     stopped: (n: number) => (n === 1 ? 'Die Anweisung danach wurde nicht mehr ausgeführt.' : `Die ${n} Anweisungen danach wurden nicht mehr ausgeführt.`),
     expected: 'Erwartetes Ergebnis anzeigen',
-    database: 'Beispieldatenbank',
-    fresh: 'Jeder Lauf startet mit frischen Tabellen - du kannst nichts kaputt machen.',
     ms: (ms: number) => `${ms} ms`,
   },
   en: {
@@ -65,8 +63,6 @@ const TEXTS = {
     crashed: (m: string) => `PostgreSQL crashed: ${m}`,
     stopped: (n: number) => (n === 1 ? 'The statement after it was not run.' : `The ${n} statements after it were not run.`),
     expected: 'Show the expected result',
-    database: 'Example database',
-    fresh: 'Every run starts with fresh tables - you cannot break anything.',
     ms: (ms: number) => `${ms} ms`,
   },
 }
@@ -138,7 +134,7 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
       tipps={tipps}
       markierungen={markers}
       laeuft={running}
-      oben={<Tabellenleiste />}
+      oben={<SqlDatenleiste code={code} />}
       ausfuehren={(c) => {
         setRunning(true)
         void start(c ?? code, true)
@@ -164,48 +160,6 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
         </details>
       )}
     </Rahmen>
-  )
-}
-
-/** The tables of the example database, folded away above the editor. */
-function Tabellenleiste() {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  return (
-    <details className="group border-b border-slate-200 px-4 py-1.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-2 gap-y-0.5">
-        <Icon name="datenbank" className="size-3.5" />
-        <span className="font-medium">{t.database}:</span>
-        {SHOP_TABELLEN.map((tabelle) => (
-          <code key={tabelle.name} className="font-mono text-slate-600 dark:text-slate-300">
-            {tabelle.name}
-          </code>
-        ))}
-        <span className="ml-auto text-slate-400 transition group-open:rotate-90" aria-hidden>
-          ▸
-        </span>
-      </summary>
-      <p className="mt-2 mb-1.5">{t.fresh}</p>
-      <div className="grid gap-2 pb-1.5 sm:grid-cols-2">
-        {SHOP_TABELLEN.map((tabelle) => (
-          <div key={tabelle.name} className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 dark:border-slate-800 dark:bg-slate-950/40">
-            <p className="flex items-baseline justify-between gap-2">
-              <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{tabelle.name}</code>
-              <span className="tabular-nums">{TEXTS[sprache].rows(tabelle.zeilen)}</span>
-            </p>
-            <ul className="mt-0.5 font-mono leading-5">
-              {tabelle.spalten.map((spalte) => (
-                <li key={spalte.name} className="flex flex-wrap gap-x-2">
-                  <span className="text-slate-700 dark:text-slate-200">{spalte.name}</span>
-                  <span className="text-slate-400">{spalte.typ}</span>
-                  {spalte.schluessel && <span className="text-amber-700 dark:text-amber-400">{spalte.schluessel}</span>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </details>
   )
 }
 
