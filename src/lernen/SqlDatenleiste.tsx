@@ -5,6 +5,7 @@ import { useSprache } from '../i18n/SpracheContext'
 import { runSql } from '../sql/client'
 import { SHOP_TABELLEN } from '../sql/dataset'
 import type { SqlTable } from '../sql/engine'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
  * Die Beispieldaten direkt über jedem SQL-Editor (Teil 9) - damit man eine Abfrage
@@ -146,7 +147,7 @@ export function SqlDatenleiste({ code }: { code: string }) {
         ) : fehler ? (
           <p className="mt-1.5 text-rose-600 dark:text-rose-400">{t.failed}</p>
         ) : !daten ? (
-          <p className="mt-1.5 text-slate-500 italic">{t.loading}</p>
+          <p className="mt-1.5 text-slate-500 italic dark:text-slate-400">{t.loading}</p>
         ) : (
           <>
             <div className="mt-2 flex flex-wrap items-start gap-3">
@@ -154,7 +155,7 @@ export function SqlDatenleiste({ code }: { code: string }) {
                 <DatenTabelle key={name} name={name} tabelle={daten[name]} code={code} />
               ))}
             </div>
-            <p className="mt-1.5 text-slate-400 dark:text-slate-500">{t.start}</p>
+            <p className="mt-1.5 text-slate-500 dark:text-slate-400">{t.start}</p>
           </>
         ))}
     </div>
@@ -174,7 +175,7 @@ function DatenTabelle({ name, tabelle, code }: { name: string; tabelle: SqlTable
       <figcaption className="mb-1 text-slate-500 dark:text-slate-400" title={info.info[sprache]}>
         <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{name}</code> · {t.rows(tabelle.rows.length)}
       </figcaption>
-      <div className="max-h-44 overflow-auto rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+      <div ref={focusableWhenScrolling} className="max-h-44 overflow-auto rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
         <table className="border-collapse font-mono text-2xs">
           <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800">
             <tr>
@@ -191,7 +192,7 @@ function DatenTabelle({ name, tabelle, code }: { name: string; tabelle: SqlTable
                     }`}
                   >
                     <span className={`block font-semibold ${benutzt ? 'text-brand-800 dark:text-brand-200' : 'text-slate-700 dark:text-slate-200'}`}>{spalte}</span>
-                    <span className="block text-slate-400">
+                    <span className="block text-slate-600 dark:text-slate-400">
                       {meta?.typ}
                       {meta?.schluessel && <span className="text-amber-700 dark:text-amber-400"> {meta.schluessel}</span>}
                     </span>
@@ -205,7 +206,7 @@ function DatenTabelle({ name, tabelle, code }: { name: string; tabelle: SqlTable
               <tr key={r} className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-900/40">
                 {zeile.map((wert, c) => (
                   <td key={c} className={`px-2 py-0.5 whitespace-nowrap ${zahl[c] ? 'text-right tabular-nums' : ''}`}>
-                    {wert === null ? <span className="text-slate-400 italic dark:text-slate-500">NULL</span> : wert}
+                    {wert === null ? <span className="text-slate-500 italic dark:text-slate-400">NULL</span> : wert}
                   </td>
                 ))}
               </tr>

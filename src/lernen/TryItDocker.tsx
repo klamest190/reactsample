@@ -12,6 +12,7 @@ import { Rahmen, Testergebnisse } from './Rahmen'
 import type { DockerProps } from './TryIt'
 import { useSavedCode } from './useSavedCode'
 import type { TestErgebnis } from './jsSandbox'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
  * The editors for part 8's Docker chapters:
@@ -187,7 +188,7 @@ function DockerfileEditor({ id, titel, aufgabe, code: startCode, loesung, tipps,
           </select>
         </label>
       </div>
-      {result ? <BuildView result={result.build} change={change} /> : <p className="px-4 py-3 text-sm text-slate-500 italic">{t.exerciseStart}</p>}
+      {result ? <BuildView result={result.build} change={change} /> : <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.exerciseStart}</p>}
     </Rahmen>
   )
 }
@@ -242,13 +243,13 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
 
       {result.findings.length > 0 && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.hints}</h4>
+          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.hints}</h4>
           <ul className="space-y-1.5">
             {result.findings.map((f, i) => (
               <li key={i} className="flex gap-2 text-code">
                 <SeverityIcon severity={f.severity} />
                 <span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     {t.severities[f.severity]} · {t.line(f.line)}
                     {/^DL\d/.test(f.rule) ? ` · ${f.rule}` : ''}:
                   </span>{' '}
@@ -281,7 +282,7 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
   const t = TEXTS[sprache]
   return (
     <div className="min-w-0">
-      <h4 className="mb-1 flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+      <h4 className="mb-1 flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
         <span>{title}</span>
         <span className="flex items-center gap-1 font-mono text-slate-700 normal-case dark:text-slate-200">
           <Icon name="uhr" className="size-3" />
@@ -301,7 +302,7 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
             {s.cached ? (
               <span className="shrink-0 rounded bg-emerald-100 px-1 text-3xs font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{t.cached}</span>
             ) : (
-              <span className="shrink-0 text-slate-500">{s.seconds.toFixed(1)}s</span>
+              <span className="shrink-0 text-slate-500 dark:text-slate-400">{s.seconds.toFixed(1)}s</span>
             )}
           </li>
         ))}
@@ -315,7 +316,7 @@ function LayerBar({ image, title }: { image: NonNullable<BuildResult['image']>; 
   const total = parts.reduce((sum, p) => sum + p.sizeMb, 0) || 1
   return (
     <div className="mt-3">
-      <div className="mb-1 text-xs text-slate-500">{title}</div>
+      <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">{title}</div>
       <div className="flex h-5 overflow-hidden rounded-md border border-slate-200 dark:border-slate-700" role="img" aria-label={title}>
         {parts.map((p, i) => (
           <div
@@ -403,7 +404,7 @@ function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, te
       ausfuehren={(c) => up(c ?? code, true)}
     >
       <Testergebnisse id={id} ergebnisse={result?.results ?? null} />
-      {result ? <ComposeView result={result.up} /> : <p className="px-4 py-3 text-sm text-slate-500 italic">{t.exerciseStart}</p>}
+      {result ? <ComposeView result={result.up} /> : <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.exerciseStart}</p>}
     </Rahmen>
   )
 }
@@ -445,21 +446,21 @@ function ComposeView({ result }: { result: ComposeResult }) {
                 <div className="flex items-center gap-1.5 font-semibold">
                   <Icon name={SERVICE_ICONS[s.kind]} className="size-3.5" />
                   <span className="font-mono">{s.name}</span>
-                  <span className={`ml-auto size-2 rounded-full ${running ? 'bg-emerald-500' : 'bg-rose-500'}`} aria-label={container?.status} />
+                  <span className={`ml-auto size-2 rounded-full ${running ? 'bg-emerald-500' : 'bg-rose-500'}`} role="img" aria-label={container?.status} />
                 </div>
-                <div className="mt-1 font-mono text-slate-500 dark:text-slate-400">{s.image ?? `build: ${s.build}`}</div>
+                <div className="mt-1 font-mono text-slate-600 dark:text-slate-400">{s.image ?? `build: ${s.build}`}</div>
                 {s.ports.length > 0 && (
                   <ServiceLine icon="stecker" className="font-mono">
                     {s.ports.map((p) => (p.host ? `${p.host}→${p.container}` : p.container)).join(', ')}
                   </ServiceLine>
                 )}
                 {s.dependsOn.length > 0 && (
-                  <ServiceLine icon="uhr" className="text-slate-500 dark:text-slate-400">
+                  <ServiceLine icon="uhr" className="text-slate-600 dark:text-slate-400">
                     {s.dependsOn.map((d) => d.service + (d.condition === 'service_healthy' ? ' (healthy)' : '')).join(', ')}
                   </ServiceLine>
                 )}
                 {s.volumes.length > 0 && (
-                  <ServiceLine icon="festplatte" className="font-mono text-slate-500 dark:text-slate-400">
+                  <ServiceLine icon="festplatte" className="font-mono text-slate-600 dark:text-slate-400">
                     {s.volumes.map((v) => v.source).join(', ')}
                   </ServiceLine>
                 )}
@@ -476,7 +477,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
             <li key={i} className="flex gap-2 text-code">
               <SeverityIcon severity={f.severity} />
               <span>
-                <span className="text-xs text-slate-500">{t.line(f.line)}:</span> <InlineCode text={f[sprache]} />
+                <span className="text-xs text-slate-500 dark:text-slate-400">{t.line(f.line)}:</span> <InlineCode text={f[sprache]} />
               </span>
             </li>
           ))}
@@ -486,7 +487,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
       {result.log.length > 0 && (
         <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-xs leading-5 dark:bg-black/40">
           <div className="border-b border-slate-700 px-3 py-1 text-2xs tracking-wider text-slate-400 uppercase">$ docker compose up</div>
-          <div className="max-h-96 overflow-auto px-3 py-2">
+          <div ref={focusableWhenScrolling} className="max-h-96 overflow-auto px-3 py-2">
             {result.log.map((l, i) => (
               <div key={i} className={`whitespace-pre-wrap ${l.kind === 'error' ? 'text-rose-300' : l.kind === 'warn' ? 'text-amber-300' : l.kind === 'ok' && !l.service ? 'text-emerald-300' : 'text-slate-200'}`}>
                 {l.service && <span className={serviceColor(l.service)}>{(l.service + '-1').padEnd(8)}| </span>}
@@ -498,10 +499,10 @@ function ComposeView({ result }: { result: ComposeResult }) {
       )}
 
       {result.containers.length > 0 && (
-        <div className="overflow-x-auto">
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">$ {t.containers}</h4>
+        <div ref={focusableWhenScrolling} className="overflow-x-auto">
+          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">$ {t.containers}</h4>
           <table className="w-full min-w-md text-left font-mono text-xs">
-            <thead className="text-slate-500">
+            <thead className="text-slate-500 dark:text-slate-400">
               <tr>
                 <th className="pr-3 font-normal">NAME</th>
                 <th className="pr-3 font-normal">SERVICE</th>
@@ -525,7 +526,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
 
       {result.urls.length > 0 && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.browser}</h4>
+          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.browser}</h4>
           <ul className="space-y-0.5 font-mono text-xs">
             {result.urls.map((u) => (
               <li key={u.url} className={`flex gap-1.5 ${u.ok ? '' : 'text-rose-600 dark:text-rose-400'}`}>

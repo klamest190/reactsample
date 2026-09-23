@@ -1,3 +1,8 @@
+/* Layer order. "vorschau" holds the utilities that tailwindMotor.ts builds at runtime for
+   classes in the editors. It sits below "utilities": the page's own classes (and their dark:
+   variants) always win - otherwise a preview using bg-white would turn the page light in dark mode. */
+@layer theme, base, components, vorschau, utilities;
+
 /* Tailwind v4: ein einziger Import zieht Preflight (CSS-Reset) + alle Utilities rein. */
 @import "tailwindcss";
 

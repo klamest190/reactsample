@@ -10,6 +10,7 @@ import { Rahmen, Testergebnisse } from './Rahmen'
 import type { SqlProps } from './TryIt'
 import type { Typfehler } from './typpruefung'
 import { useSavedCode } from './useSavedCode'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
  * The SQL editor of part 9: real PostgreSQL (PGlite) on the example shop database.
@@ -150,7 +151,7 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
       ) : outcome?.run ? (
         <SqlOutput run={outcome.run} />
       ) : (
-        <p className="px-4 py-3 text-sm text-slate-500 italic">{!ready && (running || !tests) ? t.starting : tests ? t.exerciseStart : t.running}</p>
+        <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{!ready && (running || !tests) ? t.starting : tests ? t.exerciseStart : t.running}</p>
       )}
       {outcome?.expected && (
         <details className="border-t border-slate-200 px-4 py-3 dark:border-slate-800">
@@ -167,20 +168,20 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
 function SqlOutput({ run }: { run: SqlRun }) {
   const { sprache } = useSprache()
   const t = TEXTS[sprache]
-  if (!run.results.length && !run.error) return <p className="px-4 py-3 text-sm text-slate-500 italic">{t.empty}</p>
+  if (!run.results.length && !run.error) return <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.empty}</p>
 
   return (
     <div className="space-y-3 px-4 py-3">
       {run.results.map((result, i) => (
         <div key={i} className="space-y-1">
           <p className="flex items-baseline gap-2 font-mono text-2xs text-slate-500 dark:text-slate-400">
-            <span className="shrink-0 text-slate-400 tabular-nums">{t.line(result.line)}</span>
+            <span className="shrink-0 text-slate-500 tabular-nums dark:text-slate-400">{t.line(result.line)}</span>
             <span className="min-w-0 truncate">{result.label}</span>
           </p>
           {result.hasRows ? (
             <>
               <ResultTable table={result} />
-              {t.affected[result.command] && <p className="text-xs text-slate-500">{t.affected[result.command](result.affected)}</p>}
+              {t.affected[result.command] && <p className="text-xs text-slate-500 dark:text-slate-400">{t.affected[result.command](result.affected)}</p>}
             </>
           ) : (
             <p className="flex items-center gap-1.5 text-sm text-emerald-700 dark:text-emerald-400">
@@ -192,7 +193,7 @@ function SqlOutput({ run }: { run: SqlRun }) {
         </div>
       ))}
       {run.error && <ErrorBox error={run.error} />}
-      {run.results.length > 0 && <p className="text-right text-2xs text-slate-400 tabular-nums">{t.ms(run.ms)}</p>}
+      {run.results.length > 0 && <p className="text-right text-2xs text-slate-500 tabular-nums dark:text-slate-400">{t.ms(run.ms)}</p>}
     </div>
   )
 }
@@ -202,7 +203,7 @@ function ErrorBox({ error }: { error: SqlError }) {
   const t = TEXTS[sprache]
   return (
     <div className="space-y-1 rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-code whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
-      <p className="text-2xs text-rose-600/80 dark:text-rose-400/80">
+      <p className="text-2xs text-rose-700 dark:text-rose-400/80">
         {t.line(error.line)} · {error.label}
       </p>
       <p>
@@ -226,7 +227,7 @@ export function ResultTable({ table }: { table: SqlTable }) {
 
   return (
     <div>
-      <div className="max-h-80 overflow-auto rounded-lg border border-slate-200 dark:border-slate-700">
+      <div ref={focusableWhenScrolling} className="max-h-80 overflow-auto rounded-lg border border-slate-200 dark:border-slate-700">
         <table className="w-full border-collapse font-mono text-code">
           <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800">
             <tr>
@@ -246,7 +247,7 @@ export function ResultTable({ table }: { table: SqlTable }) {
               <tr key={r} className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-900/40">
                 {row.map((value, c) => (
                   <td key={c} className={`px-2.5 py-0.5 align-top whitespace-pre ${numeric[c] ? 'text-right tabular-nums' : ''}`}>
-                    {value === null ? <span className="text-slate-400 italic dark:text-slate-500">NULL</span> : value}
+                    {value === null ? <span className="text-slate-500 italic dark:text-slate-400">NULL</span> : value}
                   </td>
                 ))}
               </tr>
@@ -254,7 +255,7 @@ export function ResultTable({ table }: { table: SqlTable }) {
           </tbody>
         </table>
       </div>
-      <p className="mt-1 text-xs text-slate-500 tabular-nums">
+      <p className="mt-1 text-xs text-slate-500 tabular-nums dark:text-slate-400">
         ({t.rows(total)})
         {table.truncated ? ' ' + t.more(table.truncated) : ''}
       </p>

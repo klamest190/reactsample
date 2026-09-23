@@ -38,7 +38,7 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
                 className={`absolute top-3 -left-[35px] flex size-6 items-center justify-center rounded-full border-2 text-xs font-bold ${
                   fertig
                     ? 'border-emerald-500 bg-emerald-500 text-white'
-                    : 'border-slate-300 bg-white text-slate-500 dark:border-slate-700 dark:bg-slate-950'
+                    : 'border-slate-300 bg-white text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400'
                 }`}
                 aria-hidden
               >

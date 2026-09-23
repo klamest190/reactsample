@@ -57,7 +57,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
               <a
                 key={b}
                 href={'#/glossar/' + sortiert.find((e) => e.begriff[0].toUpperCase() === b)!.id}
-                className="rounded px-1.5 py-0.5 font-mono text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+                className="rounded px-1.5 py-0.5 font-mono text-slate-500 hover:bg-slate-200 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white dark:text-slate-400"
               >
                 {b}
               </a>

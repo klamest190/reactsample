@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTexte } from '../i18n/SpracheContext'
 import { HervorgehobenerCode, type HighlightMode } from './hervorheben'
 import { hervorhebungFuerTitel } from './modi'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /** Statisches, eingefärbtes Codebeispiel mit Kopieren-Knopf. */
 export function CodeBlock({ code, titel, sprache }: { code: string; titel?: string; sprache?: HighlightMode }) {
@@ -23,7 +24,7 @@ export function CodeBlock({ code, titel, sprache }: { code: string; titel?: stri
           {titel}
         </figcaption>
       )}
-      <pre className="overflow-x-auto p-4 font-mono text-code leading-5">
+      <pre ref={focusableWhenScrolling} className="overflow-x-auto p-4 font-mono text-code leading-5">
         <code>
           <HervorgehobenerCode code={code} sprache={modus} />
         </code>
@@ -31,7 +32,7 @@ export function CodeBlock({ code, titel, sprache }: { code: string; titel?: stri
       <button
         onClick={kopieren}
         // Dauerhaft sichtbar, nur dezent - auf Touch-Geräten gibt es kein Hover.
-        className="absolute top-2 right-2 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-600 opacity-60 transition hover:opacity-100 focus-visible:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+        className="absolute top-2 right-2 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-600 opacity-90 transition hover:opacity-100 focus-visible:opacity-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
       >
         {kopiert ? t.kopiert : t.kopieren}
       </button>

@@ -290,7 +290,7 @@ export function ComposeNetwork() {
   return (
     <Figure label={t.composeLabel}>
       <div className="mb-2 text-center text-sm font-semibold">💻 {t.yourPc}</div>
-      <div className="mb-2 text-center font-mono text-xs text-slate-500" aria-hidden="true">
+      <div className="mb-2 text-center font-mono text-xs text-slate-500 dark:text-slate-400" aria-hidden="true">
         localhost:3000 ↓ &nbsp;&nbsp;&nbsp; localhost:8080 ↓
       </div>
       <div className="rounded-lg border-2 border-dashed border-cyan-300 p-3 dark:border-cyan-800">

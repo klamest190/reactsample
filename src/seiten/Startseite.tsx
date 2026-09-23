@@ -153,7 +153,7 @@ export function Startseite({
           </li>
           <li>
             {t.tippSprung}{' '}
-            <a href={'#/' + react.kapitel[0].id} className="text-brand-600 hover:underline dark:text-brand-400">
+            <a href={'#/' + react.kapitel[0].id} className="text-brand-700 underline decoration-brand-300 underline-offset-2 hover:decoration-solid dark:text-brand-400">
               {t.teil} {react.nummer} · {react.kurztitel[sprache]}
             </a>
             .
@@ -196,7 +196,7 @@ function TeilKarte({ teil, erledigt }: { teil: Teil; erledigt: string[] }) {
               href={'#/' + k.id}
               className="flex gap-2 rounded-md px-2 py-1 text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <span className="w-8 shrink-0 text-slate-400 tabular-nums">
+              <span className="w-8 shrink-0 text-slate-500 tabular-nums dark:text-slate-400">
                 {teil.nummer}.{i + 1}
               </span>
               <span className="flex-1">{k.titel[sprache]}</span>
@@ -220,7 +220,7 @@ function ProjektLeiste({ projekt, erledigt }: { projekt: Teil; erledigt: string[
         <h4 className="flex items-center gap-3 text-lg font-bold">
           <TeilSymbol teil="projekt" groesse="gross" />
           <span>
-            <span className="block text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            <span className="block text-xs font-semibold tracking-wide text-slate-600 uppercase dark:text-slate-400">
               {t.teil} {projekt.nummer} · {t.roterFaden}
             </span>
             {projekt.titel[sprache]}

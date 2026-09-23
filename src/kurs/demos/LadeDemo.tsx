@@ -104,7 +104,7 @@ export function LadeDemo() {
               className="flex justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
             >
               <span>{b.name}</span>
-              <span className="text-slate-500">{b.ort}</span>
+              <span className="text-slate-500 dark:text-slate-400">{b.ort}</span>
             </li>
           ))}
         </ul>

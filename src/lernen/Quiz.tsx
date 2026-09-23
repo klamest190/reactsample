@@ -61,7 +61,8 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
         const aufgeloest = auswahl !== undefined
 
         return (
-          <fieldset key={fi} className="space-y-2">
+          // min-w-0: a fieldset is at least as wide as its content by default - long code answers would widen the page.
+          <fieldset key={fi} className="min-w-0 space-y-2">
             <legend className="mb-2 text-sm font-medium">
               {fi + 1}. {f.frage}
             </legend>
@@ -86,7 +87,7 @@ export function Quiz({ fragen }: { fragen: Frage[] }) {
                       neu[fi] = ai
                       merken(neu)
                     }}
-                    className={`rounded-lg border px-3 py-2 text-left text-sm transition ${stil}`}
+                    className={`rounded-lg border px-3 py-2 text-left text-sm wrap-anywhere transition ${stil}`}
                   >
                     {aufgeloest && istRichtig && '✓ '}
                     {aufgeloest && istGewaehlt && !istRichtig && '✗ '}

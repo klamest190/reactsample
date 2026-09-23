@@ -350,6 +350,7 @@ async function ausfuehren(dateien: ProjektDatei[], einstieg: string, sprache: 'd
   // Eigener Container außerhalb des Bildschirms, aber sichtbar für Testing Library.
   const bereich = document.createElement('div')
   bereich.className = 'vorschau'
+  bereich.dataset.vorschau = ''
   Object.assign(bereich.style, { position: 'fixed', left: '-10000px', top: '0', width: '720px' })
   document.body.appendChild(bereich)
 

@@ -36,7 +36,7 @@ export function KapitelChip({ id }: { id: string }) {
       href={'#/' + kapitel.id}
       className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-700 transition hover:border-brand-500 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:text-brand-400"
     >
-      <span className="text-slate-400 tabular-nums">{kapitel.nummer}</span>
+      <span className="text-slate-500 tabular-nums dark:text-slate-400">{kapitel.nummer}</span>
       {kapitel.titel[sprache]}
     </a>
   )

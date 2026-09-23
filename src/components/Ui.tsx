@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react'
 import { useTexte } from '../i18n/SpracheContext'
 import { Icon } from './Icon'
+import { focusableWhenScrolling } from './scrollFocus'
 
 /**
  * Kleine, wiederverwendbare Bausteine für alle Kapitel.
@@ -130,16 +131,21 @@ export function Tabelle({
       .join(' ')
 
   return (
-    <div className="overflow-x-auto">
+    <div ref={focusableWhenScrolling} className="overflow-x-auto">
       <table className={`w-full text-left text-sm ${breit ? '' : 'max-w-3xl'}`}>
         {kopf && (
           <thead className="border-b border-slate-300 dark:border-slate-700">
             <tr>
-              {kopf.map((inhalt, i) => (
-                <th key={i} className={zelle(i, kopf.length)}>
-                  {inhalt}
-                </th>
-              ))}
+              {kopf.map((inhalt, i) =>
+                // An empty corner cell is no header - a <th> without text confuses screen readers.
+                inhalt === '' ? (
+                  <td key={i} className={zelle(i, kopf.length)} />
+                ) : (
+                  <th key={i} className={zelle(i, kopf.length)}>
+                    {inhalt}
+                  </th>
+                ),
+              )}
             </tr>
           </thead>
         )}
@@ -227,7 +233,7 @@ function knopfKlassen(variante: Variante, groesse: Groesse, className: string) {
     sekundaer:
       'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
     gefahr: 'bg-rose-600 text-white hover:bg-rose-700',
-    erfolg: 'bg-emerald-600 text-white hover:bg-emerald-700',
+    erfolg: 'bg-emerald-700 text-white hover:bg-emerald-800',
   }
 
   return `${basis} ${groessen[groesse]} ${varianten[variante]} ${className}`
@@ -285,9 +291,10 @@ export function Platzhalter({ label, bloecke = 3 }: { label: string; bloecke?: n
 }
 
 /** Inline-Code, z.B. für Hook-Namen im Fließtext. */
+// wrap-anywhere: long calls like createRoot(document.getElementById('root')) break on a phone instead of widening the page.
 export function Code({ children }: { children: ReactNode }) {
   return (
-    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-brand-700 dark:bg-slate-800 dark:text-brand-400">
+    <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] wrap-anywhere text-brand-700 dark:bg-slate-800 dark:text-brand-400">
       {children}
     </code>
   )
@@ -297,7 +304,7 @@ export function Code({ children }: { children: ReactNode }) {
 export function Wert({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="rounded-lg bg-slate-100 px-3 py-2 font-mono text-sm dark:bg-slate-800">
-      <span className="text-slate-500 dark:text-slate-400">{label}: </span>
+      <span className="text-slate-600 dark:text-slate-400">{label}: </span>
       <span className="font-semibold">{children}</span>
     </div>
   )

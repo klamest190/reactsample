@@ -67,7 +67,8 @@ export function Rahmen({
   const istUebung = Boolean(aufgabe)
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    // data-laeuft: lets the page test (scripts/seiten-testen.mjs) wait for running editors.
+    <div data-laeuft={laeuft || undefined} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
         <h3 className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <Icon
@@ -106,7 +107,7 @@ export function Rahmen({
       <div className="flex flex-wrap items-center gap-2 border-y border-slate-200 px-4 py-2 dark:border-slate-800">
         <button
           onClick={() => ausfuehren()}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800"
         >
           <Icon name="abspielen" className="size-3.5" />
           {startText ?? t.ausfuehren}
@@ -141,7 +142,7 @@ export function Rahmen({
             {zeigeLoesung ? t.loesungVerbergen : t.loesungZeigen}
           </button>
         )}
-        <span className="ml-auto hidden text-xs text-slate-400 sm:inline">
+        <span className="ml-auto hidden text-xs text-slate-500 sm:inline dark:text-slate-400">
           {laeuft ? t.laeuft : t.tastenHinweis}
         </span>
       </div>
@@ -196,9 +197,9 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
 
   return (
     <div className="bg-slate-900 px-4 py-3 font-mono text-code leading-5 dark:bg-black/40">
-      <div className="mb-1 text-2xs tracking-wider text-slate-500 uppercase">{t.konsole}</div>
+      <div className="mb-1 text-2xs tracking-wider text-slate-400 uppercase">{t.konsole}</div>
       {zeilen.length === 0 ? (
-        <div className="text-slate-500 italic">{leerText}</div>
+        <div className="text-slate-400 italic">{leerText}</div>
       ) : (
         zeilen.map((z, i) => (
           <div key={i} className={`flex gap-1.5 ${farben[z.typ]}`}>
@@ -207,7 +208,7 @@ export function Konsole({ zeilen, leerText }: { zeilen: Zeile[]; leerText?: stri
             ) : z.typ === 'warn' ? (
               <Icon name="warnung" className="mt-0.75 size-3.5" />
             ) : (
-              <span aria-hidden className="w-3.5 shrink-0 text-center text-slate-500">›</span>
+              <span aria-hidden className="w-3.5 shrink-0 text-center text-slate-500 dark:text-slate-400">›</span>
             )}
             <span className="min-w-0 wrap-break-word whitespace-pre-wrap">{z.text}</span>
           </div>
@@ -233,7 +234,8 @@ export function Testergebnisse({ id, ergebnisse }: { id?: string; ergebnisse: Te
   if (!ergebnisse) return null
 
   return (
-    <div className="space-y-1.5 px-4 py-3 text-sm">
+    // data-testergebnis: read by the page test - every exercise must turn green with its solution.
+    <div data-testergebnis={alle ? 'gruen' : 'rot'} className="space-y-1.5 px-4 py-3 text-sm">
       <p
         className={`flex items-center gap-1.5 font-semibold ${alle ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-200'}`}
       >
@@ -290,14 +292,14 @@ export function Typfehlerliste({ fehler }: { fehler: Typfehler[] | null }) {
       <ul className="mt-1 space-y-1">
         {fehler.map((f, i) => (
           <li key={i} className="flex gap-2 font-mono text-xs leading-5 text-rose-900 dark:text-rose-200">
-            <span className="shrink-0 text-rose-500 tabular-nums">{t.typfehlerZeile(f.zeile)}</span>
+            <span className="shrink-0 text-rose-700 tabular-nums dark:text-rose-500">{t.typfehlerZeile(f.zeile)}</span>
             <span className="whitespace-pre-wrap">
-              {f.text} <span className="text-rose-400">TS{f.code}</span>
+              {f.text} <span className="text-slate-600 dark:text-rose-400">TS{f.code}</span>
             </span>
           </li>
         ))}
       </ul>
-      <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">{t.typfehlerHinweis}</p>
+      <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-400">{t.typfehlerHinweis}</p>
     </div>
   )
 }

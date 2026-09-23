@@ -361,7 +361,7 @@ export function CodeEditor({
       <div
         ref={nummernRef}
         aria-hidden
-        className="overflow-hidden border-r border-slate-200 py-3 pr-2 pl-3 text-right text-slate-400 select-none dark:border-slate-800 dark:text-slate-600"
+        className="overflow-hidden border-r border-slate-200 py-3 pr-2 pl-3 text-right text-slate-500 select-none dark:border-slate-800 dark:text-slate-400"
         style={{ height: hoehe }}
       >
         {Array.from({ length: zeilen }, (_, i) => {
@@ -370,7 +370,7 @@ export function CodeEditor({
             <div
               key={i}
               title={fehler.map((m) => m.text).join('\n') || undefined}
-              className={fehler.length ? 'font-semibold text-rose-600 dark:text-rose-400' : undefined}
+              className={fehler.length ? 'font-semibold text-rose-700 dark:text-rose-400' : undefined}
             >
               {i + 1}
             </div>
@@ -413,9 +413,9 @@ export function CodeEditor({
             }
           }}
           aria-label={label}
-          role="combobox"
+          // A textarea stays a textbox (role combobox is only allowed on <input>). The suggestion
+          // list is announced through aria-autocomplete, aria-controls and aria-activedescendant.
           aria-autocomplete="list"
-          aria-expanded={istOffen}
           aria-controls={istOffen ? listenId : undefined}
           aria-activedescendant={aktiveOptionId}
           spellCheck={false}
@@ -525,7 +525,7 @@ function VorschlagsListe({
             {vorschau}
           </pre>
         )}
-        <p className="text-2xs text-slate-400">{t.vorschlagHinweis}</p>
+        <p className="text-2xs text-slate-500 dark:text-slate-400">{t.vorschlagHinweis}</p>
       </div>
     </div>
   )

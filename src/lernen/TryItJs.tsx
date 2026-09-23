@@ -178,7 +178,7 @@ export function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, t
         // Das iframe bleibt immer eingehängt (der Code läuft darin), nur ohne Inhalt eben unsichtbar.
         <div className={zeigeVorschau ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
           {zeigeVorschau && (
-            <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase">
+            <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">
               {t.vorschau}
             </div>
           )}

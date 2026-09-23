@@ -27,7 +27,7 @@ function Fortschritt({ fertig, gesamt }: { fertig: number; gesamt: number }) {
   const umfang = 2 * Math.PI * 7
   if (fertig === 0) {
     return (
-      <span aria-hidden className="w-4 text-center text-2xs text-slate-400 tabular-nums dark:text-slate-500">
+      <span aria-hidden className="w-4 text-center text-2xs text-slate-500 tabular-nums dark:text-slate-400">
         {gesamt}
       </span>
     )
@@ -141,7 +141,7 @@ export function Seitenleiste({
             <span className="text-2xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
               {t.bereiche[bereich].titel}
             </span>
-            <span className="truncate text-2xs text-slate-400 dark:text-slate-500">{t.bereiche[bereich].text}</span>
+            <span className="truncate text-2xs text-slate-500 dark:text-slate-400">{t.bereiche[bereich].text}</span>
           </h2>
           {kurs.filter((teil) => teil.bereich === bereich).map((teil) => {
             const fertig = teil.kapitel.filter((k) => erledigt.includes(k.id)).length
@@ -193,7 +193,7 @@ export function Seitenleiste({
                       return (
                         <li key={k.id}>
                           <a href={'#/' + k.id} aria-current={istAktiv ? 'page' : undefined} className={eintragStil(istAktiv)}>
-                            <span className="w-4 shrink-0 text-right text-2xs text-slate-400 tabular-nums dark:text-slate-500">
+                            <span className="w-4 shrink-0 text-right text-2xs text-slate-600 tabular-nums dark:text-slate-400">
                               {i + 1}
                             </span>
                             <span className="flex-1">{k.titel[sprache]}</span>

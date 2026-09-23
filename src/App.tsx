@@ -1,20 +1,24 @@
 import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
 import { Icon, Logo } from './components/Icon'
 import { Seitenleiste } from './components/Seitenleiste'
-import { Suche } from './components/Suche'
 import { Platzhalter } from './components/Ui'
 import { useFortschritt } from './context/FortschrittContext'
 import { useTheme } from './context/ThemeContext'
 import { useHashRoute } from './hooks/useHashRoute'
 import { useSprache, useTexte, type Sprache } from './i18n/SpracheContext'
 import { alleKapitel } from './kurs/kurs'
-import { KapitelSeite } from './seiten/KapitelSeite'
-import { Glossar } from './seiten/Glossar'
-import { ProjektUebersicht } from './seiten/ProjektUebersicht'
 import { Startseite } from './seiten/Startseite'
 
 // Der Playground bringt viele Bausteine mit - er wird erst geladen, wenn man ihn öffnet.
 const Playground = lazy(() => import('./seiten/Playground').then((modul) => ({ default: modul.Playground })))
+// Only the start page is part of the first download. A chapter page brings the editors along,
+// the glossary and the search bring the glossary data - loaded when needed (the chapter page
+// already while the browser is idle, see below).
+const ladeKapitelSeite = () => import('./seiten/KapitelSeite')
+const KapitelSeite = lazy(() => ladeKapitelSeite().then((modul) => ({ default: modul.KapitelSeite })))
+const Glossar = lazy(() => import('./seiten/Glossar').then((modul) => ({ default: modul.Glossar })))
+const ProjektUebersicht = lazy(() => import('./seiten/ProjektUebersicht').then((modul) => ({ default: modul.ProjektUebersicht })))
+const Suche = lazy(() => import('./components/Suche').then((modul) => ({ default: modul.Suche })))
 
 /** Quadratischer Knopf mit Symbol in der Kopfzeile - alle gleich hoch (h-8), damit die Zeile ruhig wirkt. */
 const KOPF_KNOPF =
@@ -55,6 +59,17 @@ export default function App() {
 
   const glossarZiel = seite === 'glossar' ? unterseite : undefined
   const abschnittZiel = kapitel ? unterseite : undefined
+
+  // The next click probably opens a chapter: fetch its page while the browser has nothing to do.
+  useEffect(() => {
+    const bereit = () => void ladeKapitelSeite()
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(bereit, { timeout: 3000 })
+      return () => cancelIdleCallback(id)
+    }
+    const id = setTimeout(bereit, 1500)
+    return () => clearTimeout(id)
+  }, [])
 
   // Bei jedem Seitenwechsel nach oben scrollen - außer wenn ein Ziel
   // innerhalb der Seite angesprungen wird, das scrollt selbst.
@@ -99,7 +114,7 @@ export default function App() {
         {t.zumInhalt}
       </button>
 
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
         {/* Volle Breite: die Kopfzeile läuft über den ganzen Bildschirm, wie der Inhalt darunter. */}
         <div className="flex items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <button
@@ -116,7 +131,7 @@ export default function App() {
             <Logo className="size-8 transition group-hover:scale-105" />
             <span className="min-w-0">
               <h1 className="truncate text-base leading-tight font-semibold tracking-tight">{t.appTitel}</h1>
-              <p className="hidden truncate text-xs text-slate-500 lg:block dark:text-slate-400">{t.appUntertitel}</p>
+              <p className="hidden truncate text-xs text-slate-600 lg:block dark:text-slate-400">{t.appUntertitel}</p>
             </span>
           </a>
 
@@ -131,7 +146,7 @@ export default function App() {
                 style={{ width: prozent + '%' }}
               />
             </div>
-            <span className="text-xs text-slate-500 tabular-nums dark:text-slate-400">
+            <span className="text-xs text-slate-600 tabular-nums dark:text-slate-400">
               {erledigt.length}/{alleKapitel.length}
             </span>
           </div>
@@ -178,33 +193,37 @@ export default function App() {
         />
 
         <main id="inhalt" tabIndex={-1} className="min-w-0 flex-1 outline-none">
-          {kapitel ? (
-            <KapitelSeite
-              // key: frischer State (Quiz, Demos) bei jedem Kapitel- und Sprachwechsel.
-              // Der Abschnitt gehört bewusst NICHT in den key - sonst würde ein
-              // Sprung innerhalb des Kapitels es neu aufbauen und das Quiz leeren.
-              key={kapitel.id + sprache}
-              kapitel={kapitel}
-              abschnittZiel={abschnittZiel}
-              istErledigt={erledigt.includes(kapitel.id)}
-              erledigtSetzen={(wert) => kapitelSetzen(kapitel.id, wert)}
-              navigieren={navigieren}
-            />
-          ) : seite === 'glossar' ? (
-            <Glossar ziel={glossarZiel} />
-          ) : seite === 'projekt' ? (
-            <ProjektUebersicht erledigt={erledigt} />
-          ) : seite === 'playground' ? (
-            <Suspense fallback={<Platzhalter label={t.playground} />}>
+          <Suspense fallback={<Platzhalter label={kapitel ? kapitel.titel[sprache] : seite === 'playground' ? t.playground : t.laeuft} />}>
+            {kapitel ? (
+              <KapitelSeite
+                // key: frischer State (Quiz, Demos) bei jedem Kapitel- und Sprachwechsel.
+                // Der Abschnitt gehört bewusst NICHT in den key - sonst würde ein
+                // Sprung innerhalb des Kapitels es neu aufbauen und das Quiz leeren.
+                key={kapitel.id + sprache}
+                kapitel={kapitel}
+                abschnittZiel={abschnittZiel}
+                istErledigt={erledigt.includes(kapitel.id)}
+                erledigtSetzen={(wert) => kapitelSetzen(kapitel.id, wert)}
+                navigieren={navigieren}
+              />
+            ) : seite === 'glossar' ? (
+              <Glossar ziel={glossarZiel} />
+            ) : seite === 'projekt' ? (
+              <ProjektUebersicht erledigt={erledigt} />
+            ) : seite === 'playground' ? (
               <Playground teil={unterseite} />
-            </Suspense>
-          ) : (
-            <Startseite erledigt={erledigt} navigieren={navigieren} sucheOeffnen={sucheOeffnen} />
-          )}
+            ) : (
+              <Startseite erledigt={erledigt} navigieren={navigieren} sucheOeffnen={sucheOeffnen} />
+            )}
+          </Suspense>
         </main>
       </div>
 
-      <Suche offen={sucheOffen} schliessen={() => setSucheBeiRoute(null)} navigieren={navigieren} />
+      {sucheOffen && (
+        <Suspense fallback={null}>
+          <Suche offen schliessen={() => setSucheBeiRoute(null)} navigieren={navigieren} />
+        </Suspense>
+      )}
     </div>
   )
 }

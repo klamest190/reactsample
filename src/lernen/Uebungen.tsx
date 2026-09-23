@@ -72,7 +72,7 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
         aria-expanded={offen}
         className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
       >
-        <span className="w-5 shrink-0 text-sm text-slate-400 tabular-nums">{nummer}</span>
+        <span className="w-5 shrink-0 text-sm text-slate-500 tabular-nums dark:text-slate-400">{nummer}</span>
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-2xs font-semibold ${STUFEN_STIL[uebung.stufe]}`}>
           {t.stufen[uebung.stufe]}
         </span>
@@ -154,7 +154,7 @@ function VorhersageAufgabe({ uebung }: { uebung: Vorhersage }) {
               disabled={aufgeloest}
               onClick={() => setGewaehlt(i)}
               // Sprachneutrale Antworten sind Code-Ausgaben (monospace), übersetzte sind Fließtext.
-              className={`rounded-lg border px-3 py-2 text-left text-sm transition ${istCode ? 'font-mono' : ''} ${stil}`}
+              className={`min-w-0 rounded-lg border px-3 py-2 text-left text-sm wrap-anywhere transition ${istCode ? 'font-mono' : ''} ${stil}`}
             >
               {aufgeloest && i === uebung.richtig && '✓ '}
               {aufgeloest && i === gewaehlt && i !== uebung.richtig && '✗ '}

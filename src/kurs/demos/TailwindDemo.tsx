@@ -43,14 +43,14 @@ export function TailwindDemo() {
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {t.raster.map((text) => (
-          <div key={text} className="rounded-lg bg-brand-500 px-3 py-2 text-center text-sm text-white">
+          <div key={text} className="rounded-lg bg-brand-600 px-3 py-2 text-center text-sm text-white">
             {text}
           </div>
         ))}
       </div>
       <div className="group flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 p-3 transition hover:border-brand-500 dark:border-slate-700">
         <span className="text-2xl transition group-hover:scale-125">🎯</span>
-        <span className="text-sm text-slate-500 transition group-hover:text-brand-600">{t.group}</span>
+        <span className="text-sm text-slate-500 transition group-hover:text-brand-600 dark:text-slate-400">{t.group}</span>
       </div>
       <div className="flex items-center gap-2">
         <Button variante="sekundaer" onClick={() => setAktiv((a) => !a)}>
@@ -61,7 +61,7 @@ export function TailwindDemo() {
           className={`rounded-lg px-3 py-2 text-sm transition ${
             aktiv
               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200'
-              : 'bg-slate-100 text-slate-500 dark:bg-slate-800'
+              : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
           }`}
         >
           {t.status}: {aktiv ? t.aktiv : t.inaktiv}

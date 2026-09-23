@@ -12,6 +12,7 @@ import { formatieren, kompilierenProjekt, type Protokoll } from './reactKompilie
 import { useDelayedCheck } from './editorChecks'
 import { typenPruefenProjekt } from './typpruefung'
 import { Fehlerkasten, Konsole, Typfehlerliste, type Zeile } from './Rahmen'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
  * Werkstatt: ein ganzes React-Projekt aus mehreren Dateien.
@@ -249,7 +250,7 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
             </select>
           </label>
           <div className="hidden py-2 md:block">
-            <p className="px-3 pb-1 text-2xs font-semibold tracking-wider text-slate-500 uppercase">{t.dateien}</p>
+            <p className="px-3 pb-1 text-2xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.dateien}</p>
             {ordner.map(([name, inhalt]) => (
               <div key={name}>
                 {name && (
@@ -305,7 +306,7 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-300">{aktiveDatei.text[sprache]}</p>
             {aktiveDatei.kapitel.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 {t.mehrDazu}
                 {aktiveDatei.kapitel.map((k) => (
                   <KapitelChip key={k} id={k} />
@@ -326,7 +327,7 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
             />
           </div>
           {typen && <Typfehlerliste fehler={typfehler} />}
-          <p className="border-t border-slate-200 px-4 py-1.5 text-xs text-slate-400 dark:border-slate-800">
+          <p className="border-t border-slate-200 px-4 py-1.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
             {t.werkstattHinweis}
           </p>
         </div>
@@ -359,8 +360,8 @@ export function Werkstatt({ id, titel, dateien, einstieg, typen }: Props) {
               <p className="mt-1 text-xs opacity-80">{t.letzterStand}</p>
             </div>
           )}
-          <div ref={containerRef} className={vollbild ? 'h-144 lg:h-auto lg:min-h-0 lg:flex-1' : 'h-144'} />
-          <div className={vollbild ? 'max-h-40 shrink-0 overflow-y-auto' : 'max-h-40 overflow-y-auto'}>
+          <div ref={containerRef} data-vorschau className={vollbild ? 'h-144 lg:h-auto lg:min-h-0 lg:flex-1' : 'h-144'} />
+          <div ref={focusableWhenScrolling} className={vollbild ? 'max-h-40 shrink-0 overflow-y-auto' : 'max-h-40 overflow-y-auto'}>
             <Konsole zeilen={zeilen} />
           </div>
         </div>

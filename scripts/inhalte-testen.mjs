@@ -4,11 +4,16 @@
  * Startet den Vite-Dev-Server, öffnet selbsttest.html im installierten Chrome
  * (playwright-core, kein Browser-Download nötig) und wartet, bis alle Beispiele,
  * Übungen und Projektschritte geprüft sind. Beendet sich mit Code 1, wenn etwas fehlschlägt.
+ *
+ * `-- --build`: against a production build instead of the dev server (as in CI) - some bugs
+ * exist only there. Both can be combined: `npm run test:inhalte -- --build praxis-`.
  */
-import { chromium } from 'playwright-core'
-import { createLogger, createServer } from 'vite'
+import { createLogger } from 'vite'
+import { launchBrowser, startServer } from './test-server.mjs'
 
-const nur = process.argv[2] ?? ''
+const argumente = process.argv.slice(2)
+const produktion = argumente.includes('--build')
+const nur = argumente.find((a) => !a.startsWith('--')) ?? ''
 
 // Viele Beispiele zeigen absichtlich Fehler. Vite reicht sie aus dem Browser durch -
 // hier werden diese Zeilen ausgeblendet, damit nur der Testbericht übrig bleibt.
@@ -29,24 +34,10 @@ const filter = (schreiben) => (text, ...rest) => {
 }
 process.stdout.write = filter(process.stdout.write.bind(process.stdout))
 process.stderr.write = filter(process.stderr.write.bind(process.stderr))
-const server = await createServer({ server: { port: 5197, strictPort: false }, customLogger: logger })
-await server.listen()
-const adresse = server.resolvedUrls.local[0]
-
-// Installierter Chrome, sonst Edge (auf Windows immer vorhanden).
-let browser
-for (const channel of ['chrome', 'msedge']) {
-  try {
-    browser = await chromium.launch({ channel })
-    break
-  } catch {
-    // nächsten Browser versuchen
-  }
-}
-if (!browser) {
-  console.error('Kein Chrome oder Edge gefunden.')
-  process.exit(2)
-}
+if (produktion) console.log('Produktions-Build …')
+const server = await startServer({ production: produktion, pages: ['index.html', 'selbsttest.html'], logger })
+const adresse = server.url
+const browser = await launchBrowser()
 
 const seite = await browser.newPage()
 const seitenfehler = []

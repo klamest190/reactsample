@@ -126,7 +126,7 @@ export function DockerTerminal({
           </button>
         </div>
         <div ref={outputRef} className="max-h-80 min-h-40 overflow-y-auto px-3 py-2" onClick={() => inputRef.current?.focus()} role="log" aria-live="polite">
-          {lines.length === 0 && <p className="text-slate-500">{t.welcome}</p>}
+          {lines.length === 0 && <p className="text-slate-400">{t.welcome}</p>}
           {lines.map((l, i) => (
             <div
               key={i}
@@ -168,7 +168,7 @@ export function DockerTerminal({
         <div className="mt-3">
           <h4 className="mb-1.5 flex items-center justify-between text-sm font-semibold">
             {t.tasks}
-            <span className="text-xs font-normal text-slate-500 tabular-nums">{t.progress(done.filter(Boolean).length, tasks.length)}</span>
+            <span className="text-xs font-normal text-slate-500 tabular-nums dark:text-slate-400">{t.progress(done.filter(Boolean).length, tasks.length)}</span>
           </h4>
           <ol className="space-y-1.5">
             {tasks.map((task, i) => (
@@ -176,7 +176,7 @@ export function DockerTerminal({
                 <span aria-hidden="true" className="w-5 shrink-0">
                   {done[i] ? '✅' : `${i + 1}.`}
                 </span>
-                <span className={`min-w-0 flex-1 ${done[i] ? 'text-slate-400' : ''}`}>
+                <span className={`min-w-0 flex-1 ${done[i] ? 'text-slate-500' : ''}`}>
                   <Text text={task.text[sprache]} />
                   {task.command && !done[i] && (
                     <button
@@ -184,7 +184,7 @@ export function DockerTerminal({
                         setInput(task.command!)
                         inputRef.current?.focus()
                       }}
-                      className="ml-2 rounded border border-slate-300 px-1 font-mono text-2xs text-slate-500 hover:border-brand-400 hover:text-brand-600 dark:border-slate-700"
+                      className="ml-2 rounded border border-slate-300 px-1 font-mono text-2xs text-slate-500 hover:border-brand-400 hover:text-brand-600 dark:border-slate-700 dark:text-slate-400"
                       title={task.command}
                     >
                       {t.use}

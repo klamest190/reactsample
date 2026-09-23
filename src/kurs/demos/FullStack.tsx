@@ -7,6 +7,7 @@ import { formatieren, kompilieren } from '../../lernen/reactKompilieren'
 import { Konsole, type Zeile } from '../../lernen/Rahmen'
 import { useSavedCode } from '../../lernen/useSavedCode'
 import { springStart, type SpringServer } from '../../spring'
+import { focusableWhenScrolling } from '../../components/scrollFocus'
 
 /**
  * The full-stack workshop (part 8): the React todo app on the right, a Spring Boot
@@ -138,7 +139,7 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-4 py-2 dark:border-slate-800">
-        <button onClick={() => void start()} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-700">
+        <button onClick={() => void start()} className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-emerald-800">
           {t.run}
         </button>
         <button
@@ -160,26 +161,26 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
 
       <div className="grid lg:grid-cols-2">
         <div className="min-w-0 border-b border-slate-200 lg:border-r lg:border-b-0 dark:border-slate-800">
-          <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800">🍃 {t.backend}</div>
+          <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">🍃 {t.backend}</div>
           <CodeEditor wert={backend} beiAenderung={setBackend} beiAusfuehren={(c) => void start(c, frontend)} label={t.editorBackend} sprache="spring" maxZeilen={22} />
         </div>
         <div className="min-w-0">
-          <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800">⚛️ {t.frontend}</div>
+          <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">⚛️ {t.frontend}</div>
           <CodeEditor wert={frontend} beiAenderung={setFrontend} beiAusfuehren={(c) => void start(backend, c)} label={t.editorFrontend} sprache="react" maxZeilen={22} />
         </div>
       </div>
 
       <div className="grid border-t border-slate-200 lg:grid-cols-2 dark:border-slate-800">
         <div className="min-w-0 border-b border-slate-200 lg:border-r lg:border-b-0 dark:border-slate-800">
-          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.preview}</div>
-          <div ref={previewRef} className="vorschau min-h-40 px-4 pb-4" />
+          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.preview}</div>
+          <div ref={previewRef} data-vorschau className="vorschau min-h-40 px-4 pb-4" />
           <Konsole zeilen={browserLines} />
         </div>
         <div className="min-w-0">
-          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.network}</div>
-          <div className="max-h-56 overflow-auto px-4 pb-3">
+          <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.network}</div>
+          <div ref={focusableWhenScrolling} className="max-h-56 overflow-auto px-4 pb-3">
             {network.length === 0 ? (
-              <p className="text-xs text-slate-500 italic">{t.noRequests}</p>
+              <p className="text-xs text-slate-500 italic dark:text-slate-400">{t.noRequests}</p>
             ) : (
               <table className="w-full font-mono text-xs">
                 <tbody>
@@ -188,10 +189,10 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
                       <td className="pr-2 font-bold">{n.method}</td>
                       <td className="pr-2 break-all">
                         {n.url}
-                        {n.body && <span className="block text-2xs text-slate-500">{n.body}</span>}
+                        {n.body && <span className="block text-2xs text-slate-500 dark:text-slate-400">{n.body}</span>}
                       </td>
                       <td className="pr-2">{n.status ?? 'failed'}</td>
-                      <td className="text-right text-slate-500">{n.millis} ms</td>
+                      <td className="text-right text-slate-500 dark:text-slate-400">{n.millis} ms</td>
                     </tr>
                   ))}
                 </tbody>
@@ -199,7 +200,7 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
             )}
           </div>
           <details>
-            <summary className="cursor-pointer px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase">{t.serverLog}</summary>
+            <summary className="cursor-pointer px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.serverLog}</summary>
             <Konsole zeilen={serverLines} />
           </details>
         </div>

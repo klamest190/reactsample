@@ -76,7 +76,7 @@ export function KapitelSeite({
               {t.teil} {kapitel.teil.nummer} · {kapitel.teil.titel[sprache]}
             </p>
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="mr-2 text-slate-400 tabular-nums">{kapitel.nummer}</span>
+              <span className="mr-2 text-slate-500 tabular-nums dark:text-slate-400">{kapitel.nummer}</span>
               {kapitel.titel[sprache]}
             </h1>
             <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-400">{kapitel.kurz[sprache]}</p>
@@ -120,7 +120,7 @@ export function KapitelSeite({
               <ol className="space-y-1">
                 {gliederung.map((abschnitt, i) => (
                   <li key={abschnitt.id} className="flex gap-2">
-                    <span className="w-4 shrink-0 text-right text-slate-400 tabular-nums">{i + 1}</span>
+                    <span className="w-4 shrink-0 text-right text-slate-500 tabular-nums dark:text-slate-400">{i + 1}</span>
                     {/* Eine Route, kein nacktes #fragment - sonst denkt der Hash-Router, die Seite wechselt. */}
                     <a
                       href={`#/${kapitel.id}/${abschnitt.id}`}

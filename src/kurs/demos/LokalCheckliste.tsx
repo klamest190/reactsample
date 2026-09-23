@@ -53,7 +53,7 @@ export function LokalCheckliste() {
           <li key={i}>
             <label className="flex cursor-pointer items-start gap-2 text-sm">
               <input type="checkbox" checked={erledigt.includes(i)} onChange={() => umschalten(i)} className="mt-1 accent-emerald-600" />
-              <span className={erledigt.includes(i) ? 'text-slate-400 line-through' : ''}>{punkt}</span>
+              <span className={erledigt.includes(i) ? 'text-slate-500 line-through dark:text-slate-400' : ''}>{punkt}</span>
             </label>
           </li>
         ))}
@@ -62,9 +62,9 @@ export function LokalCheckliste() {
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
           <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: (erledigt.length / t.punkte.length) * 100 + '%' }} />
         </div>
-        <span className="text-slate-500 tabular-nums">{t.fertig(erledigt.length, t.punkte.length)}</span>
+        <span className="text-slate-500 tabular-nums dark:text-slate-400">{t.fertig(erledigt.length, t.punkte.length)}</span>
         {erledigt.length > 0 && (
-          <button onClick={() => setErledigt([])} className="text-slate-500 hover:underline">
+          <button onClick={() => setErledigt([])} className="text-slate-500 hover:underline dark:text-slate-400">
             {t.zuruecksetzen}
           </button>
         )}

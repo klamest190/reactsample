@@ -27,6 +27,7 @@ const TEXTE = {
     erledigteLoeschen: 'Erledigte löschen',
     leer: 'Nichts zu sehen.',
     loeschen: 'Aufgabe löschen: ',
+    erledigt: 'Erledigt: ',
     offen: 'offen',
   },
   en: {
@@ -38,6 +39,7 @@ const TEXTE = {
     erledigteLoeschen: 'Clear completed',
     leer: 'Nothing to see.',
     loeschen: 'Delete task: ',
+    erledigt: 'Done: ',
     offen: 'open',
   },
 }
@@ -132,19 +134,20 @@ export function AufgabenDemo() {
               type="checkbox"
               checked={a.erledigt}
               onChange={() => dispatch({ type: 'umgeschaltet', id: a.id })}
+              aria-label={t.erledigt + a.text}
               className="size-4 accent-brand-600"
             />
             <span className={a.erledigt ? 'line-through opacity-60' : ''}>{a.text}</span>
             <button
               onClick={() => dispatch({ type: 'geloescht', id: a.id })}
-              className="ml-auto text-slate-400 hover:text-rose-600"
+              className="ml-auto text-slate-500 hover:text-rose-600 dark:text-slate-400"
               aria-label={t.loeschen + a.text}
             >
               ×
             </button>
           </li>
         ))}
-        {sichtbar.length === 0 && <li className="px-3 py-2 text-sm text-slate-500">{t.leer}</li>}
+        {sichtbar.length === 0 && <li className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">{t.leer}</li>}
       </ul>
       <Wert label={t.offen}>{state.aufgaben.filter((a) => !a.erledigt).length}</Wert>
     </Demo>

@@ -72,7 +72,7 @@ function TableCard({ name }: { name: string }) {
     <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-indigo-300 bg-white text-xs dark:border-indigo-800 dark:bg-slate-900">
       <div className="flex items-baseline justify-between gap-2 border-b border-indigo-200 bg-indigo-50 px-2.5 py-1.5 dark:border-indigo-900 dark:bg-indigo-950/50">
         <span className="font-mono font-semibold text-indigo-900 dark:text-indigo-200">{table.name}</span>
-        <span className="text-2xs text-slate-500 tabular-nums">{TEXTS[sprache].rows(table.zeilen)}</span>
+        <span className="text-2xs text-slate-600 tabular-nums dark:text-slate-400">{TEXTS[sprache].rows(table.zeilen)}</span>
       </div>
       <ul className="px-2.5 py-1.5 font-mono leading-5">
         {table.spalten.map((c) => (
@@ -145,7 +145,7 @@ export function EvaluationOrder() {
           <ol className="space-y-1 text-xs">
             {EVALUATED.map((w, i) => (
               <li key={w} className={`flex items-baseline gap-2 rounded border px-2 py-0.5 ${w === 'SELECT' ? 'border-indigo-300 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-950/50' : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900'}`}>
-                <span className="w-4 shrink-0 text-slate-400 tabular-nums">{i + 1}.</span>
+                <span className="w-4 shrink-0 text-slate-600 tabular-nums dark:text-slate-400">{i + 1}.</span>
                 <span className="w-20 shrink-0 font-mono">{w}</span>
                 <span className="text-slate-600 dark:text-slate-300">{t.steps[w]}</span>
               </li>
@@ -184,7 +184,7 @@ export function JoinComparison() {
           {rows.map(([name, order], i) => (
             <tr key={i} className={order === null ? 'bg-amber-50 dark:bg-amber-950/30' : ''}>
               <td className="px-2 py-0.5">{name}</td>
-              <td className="px-2 py-0.5 text-right">{order ?? <span className="text-slate-400 italic">NULL</span>}</td>
+              <td className="px-2 py-0.5 text-right">{order ?? <span className="text-slate-500 italic dark:text-slate-400">NULL</span>}</td>
             </tr>
           ))}
         </tbody>

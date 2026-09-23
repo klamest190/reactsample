@@ -20,6 +20,7 @@ import { lineMarkers, useDelayedCheck } from './editorChecks'
 import { Konsole, Rahmen, Testergebnisse } from './Rahmen'
 import type { SpringProps } from './TryIt'
 import { useSavedCode } from './useSavedCode'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
  * The editor for Spring Boot (part 8): Java code with Spring annotations, run by
@@ -195,7 +196,7 @@ function ServerBar({ server }: { server: SpringServer | null }) {
   const t = TEXTS[sprache]
   if (!server) {
     return (
-      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-800">
+      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
         <span className="size-2 rounded-full bg-rose-500" aria-hidden="true" /> {t.notRunning}
       </div>
     )
@@ -235,7 +236,7 @@ function ServerBar({ server }: { server: SpringServer | null }) {
         <div>
           <h4 className="mb-1 font-semibold">{t.routes}</h4>
           {routes.length === 0 ? (
-            <p className="text-slate-500">{t.noRoutes}</p>
+            <p className="text-slate-500 dark:text-slate-400">{t.noRoutes}</p>
           ) : (
             <ul className="space-y-1 font-mono">
               {routes.map((r) => (
@@ -286,11 +287,11 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
   }
 
   return (
-    <section aria-label={t.http} className="space-y-3 border-t border-slate-200 bg-slate-50/60 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
+    <div role="group" aria-label={t.http} className="space-y-3 border-t border-slate-200 bg-slate-50/60 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
       <div className="flex items-center justify-between gap-2">
-        <h4 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">{t.http}</h4>
+        <h4 className="text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.http}</h4>
         {exchanges.length > 0 && (
-          <button onClick={onClear} className="text-xs text-slate-500 hover:underline">
+          <button onClick={onClear} className="text-xs text-slate-500 hover:underline dark:text-slate-400">
             {t.clear}
           </button>
         )}
@@ -351,7 +352,7 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
         </div>
         {withBody && (
           <label className="block">
-            <span className="text-xs text-slate-500">{t.body}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t.body}</span>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -362,7 +363,7 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
           </label>
         )}
       </form>
-    </section>
+    </div>
   )
 }
 
@@ -389,13 +390,13 @@ function ExchangeView({ exchange }: { exchange: Exchange }) {
         <span className={`rounded px-1.5 py-px text-2xs font-bold ${color}`}>
           {status} {reason(status)}
         </span>
-        <span className="text-2xs text-slate-400">{response.millis} ms</span>
+        <span className="text-2xs text-slate-500 dark:text-slate-400">{response.millis} ms</span>
       </div>
-      {request.body && <pre className="overflow-x-auto border-b border-slate-100 px-3 py-1.5 text-slate-500 dark:border-slate-800">{compact(request.body)}</pre>}
-      <pre className="max-h-64 overflow-auto px-3 py-2">
-        {body.kind === 'json' ? formatJson(body.value) : body.kind === 'text' ? body.text : <span className="text-slate-400 italic">{t.empty}</span>}
+      {request.body && <pre ref={focusableWhenScrolling} className="overflow-x-auto border-b border-slate-100 px-3 py-1.5 text-slate-500 dark:border-slate-800 dark:text-slate-400">{compact(request.body)}</pre>}
+      <pre ref={focusableWhenScrolling} className="max-h-64 overflow-auto px-3 py-2">
+        {body.kind === 'json' ? formatJson(body.value) : body.kind === 'text' ? body.text : <span className="text-slate-500 italic dark:text-slate-400">{t.empty}</span>}
       </pre>
-      {response.headers.Location && <p className="px-3 pb-2 font-mono text-2xs text-slate-500">Location: {response.headers.Location}</p>}
+      {response.headers.Location && <p className="px-3 pb-2 font-mono text-2xs text-slate-500 dark:text-slate-400">Location: {response.headers.Location}</p>}
       {mismatch && (
         <p className="border-t border-rose-200 bg-rose-50 px-3 py-1.5 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
           {t.expectationFailed} {mismatch[sprache]}

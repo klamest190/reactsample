@@ -162,8 +162,8 @@ export function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps
       markierungen={typfehler ?? undefined}
     >
       {typen && <Typfehlerliste fehler={typfehler} />}
-      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase">{t.vorschau}</div>
-      <div ref={containerRef} className="vorschau min-h-16 px-4 pt-1 pb-4" />
+      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.vorschau}</div>
+      <div ref={containerRef} data-vorschau className="vorschau min-h-16 px-4 pt-1 pb-4" />
       {tests?.length ? (
         <div className="border-t border-slate-200 dark:border-slate-800">
           {ergebnisse ? (

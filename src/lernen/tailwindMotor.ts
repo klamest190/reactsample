@@ -107,7 +107,9 @@ let stil: HTMLStyleElement | null = null
  * Ungültige Kandidaten (normale Wörter aus dem Code) ignoriert Tailwind einfach.
  */
 export function cssFuerVorschau(kandidaten: string[]) {
-  const css = compiler.build(kandidaten)
+  // Into the layer "vorschau" below the page's utilities (see index.css): a class the page
+  // already has keeps the page's rules - including its dark: variants.
+  const css = compiler.build(kandidaten).replaceAll('@layer utilities', '@layer vorschau')
   if (!stil) {
     stil = document.createElement('style')
     stil.dataset.tailwindVorschau = ''

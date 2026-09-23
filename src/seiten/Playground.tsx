@@ -114,7 +114,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
           <h2 id="vorlagen-titel" className="text-sm font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
             {t.vorlagen}
           </h2>
-          <p className="text-xs text-slate-400">{t.vorlageHinweis}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t.vorlageHinweis}</p>
         </div>
         <ul className="flex flex-wrap gap-2">
           {daten.vorlagen.map((v) => (
@@ -161,7 +161,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
           </div>
 
           <div className="max-h-96 overflow-y-auto p-2 lg:max-h-none lg:flex-1">
-            {gruppen.length === 0 && <p className="p-2 text-sm text-slate-500">{t.keineBausteine}</p>}
+            {gruppen.length === 0 && <p className="p-2 text-sm text-slate-500 dark:text-slate-400">{t.keineBausteine}</p>}
             {gruppen.map((g, i) => (
               // Beim Filtern alle Treffer zeigen, sonst nur die erste Gruppe offen.
               <details key={g.titel.en + (suche ? ':suche' : '')} open={Boolean(suche) || i === 0} className="group mb-1">
@@ -170,7 +170,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
                     ▸
                   </span>
                   <span className="flex-1">{g.titel[sprache]}</span>
-                  <span className="text-xs text-slate-400 tabular-nums">{g.bausteine.length}</span>
+                  <span className="text-xs text-slate-500 tabular-nums dark:text-slate-400">{g.bausteine.length}</span>
                 </summary>
                 <ul className="mt-1 space-y-1 pl-1">
                   {g.bausteine.map((b) => (
@@ -183,7 +183,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
                         <span className="flex flex-wrap items-center gap-1.5">
                           <span className="font-mono text-code font-semibold">{b.titel[sprache]}</span>
                           {t.orte[b.ort] && (
-                            <span className="rounded bg-slate-100 px-1 text-3xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                            <span className="rounded bg-slate-100 px-1 text-3xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                               {t.orte[b.ort]}
                               {b.nutzung ? ' ' + t.mitNutzung : ''}
                             </span>

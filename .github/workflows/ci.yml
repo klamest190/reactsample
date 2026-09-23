@@ -1,0 +1,48 @@
+# Checks every push to main and every pull request.
+#   code:    lint, type check + production build, the runtimes of parts 7-9 in Node
+#   browser: course contents on the production build, then every page (scripts/seiten-testen.mjs)
+# The browser tests use the Google Chrome that GitHub's Ubuntu runners come with (playwright-core,
+# no browser download).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run test:java
+      - run: npm run test:backend
+      - run: npm run test:sql
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Kursinhalte (Produktions-Build)
+        run: npm run test:inhalte -- --build
+      - name: Alle Seiten
+        run: npm run test:seiten

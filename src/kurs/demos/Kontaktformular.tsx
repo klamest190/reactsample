@@ -1,6 +1,7 @@
 import { useId, useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { Button, Demo } from '../../components/Ui'
 import { useSprache, type Sprache } from '../../i18n/SpracheContext'
+import { focusableWhenScrolling } from '../../components/scrollFocus'
 
 /** Live-Demo (Kapitel 5.1): Kontaktformular mit einem State-Objekt und abgeleiteter Validierung. */
 
@@ -138,7 +139,7 @@ export function Kontaktformular() {
       </form>
 
       {gesendet && (
-        <pre className="overflow-x-auto rounded-lg bg-slate-100 p-3 text-xs dark:bg-slate-800">
+        <pre ref={focusableWhenScrolling} className="overflow-x-auto rounded-lg bg-slate-100 p-3 text-xs dark:bg-slate-800">
           {JSON.stringify(gesendet, null, 2)}
         </pre>
       )}

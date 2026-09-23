@@ -175,15 +175,15 @@ function tokenizeSql(code: string): Token[] {
 
 // Vollständige Klassennamen, damit der Tailwind-Scanner sie findet.
 const FARBEN: Record<TokenTyp, string> = {
-  kommentar: 'text-slate-400 italic dark:text-slate-500',
+  kommentar: 'text-slate-500 italic dark:text-slate-400',
   string: 'text-emerald-700 dark:text-emerald-400',
   keyword: 'text-violet-700 dark:text-violet-400',
   literal: 'text-amber-700 dark:text-amber-400',
   zahl: 'text-amber-700 dark:text-amber-400',
-  tag: 'text-rose-600 dark:text-rose-400',
+  tag: 'text-rose-700 dark:text-rose-400',
   funktion: 'text-sky-700 dark:text-sky-400',
   komponente: 'text-teal-700 dark:text-teal-300',
-  annotation: 'text-amber-600 dark:text-amber-300',
+  annotation: 'text-amber-700 dark:text-amber-300',
   text: '',
 }
 

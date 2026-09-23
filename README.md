@@ -41,7 +41,10 @@ npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projekts
 npm run test:java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
 npm run test:backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
 npm run test:sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Beispiele auf echtem PostgreSQL (ohne Browser)
+npm run test:seiten   # jede Seite im Produktions-Build: Fehler, Musterlösungen, Barrierefreiheit, Handy, App-Funktionen
 ```
+
+Bei jedem Push auf `main` laufen alle Prüfungen in GitHub Actions (`.github/workflows/ci.yml`).
 
 ### Selbsttest der Inhalte
 
@@ -54,6 +57,22 @@ npm run test:sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Bei
 - selbst geschriebene Tests erkennen jede eingebaute Fehler-Variante (Mutationstest).
 
 Einzelne Teile prüfen: `npm run test:inhalte -- praxis-` (alles, dessen ID so beginnt).
+Mit `-- --build` läuft derselbe Test auf dem Produktions-Build - manche Fehler gibt es nur dort.
+
+### Seitentest
+
+`npm run test:seiten` baut die App wie `npm run build` und öffnet jede Seite (Start, Glossar, Projekt,
+alle Kapitel und Playgrounds) im installierten Chrome:
+
+- keine JavaScript-Fehler auf der Seite,
+- jede Zusatzübung aufgeklappt, jede Musterlösung übernommen - alle Tests grün, kein Editor hängt,
+- keine Verstöße gegen Barrierefreiheit laut [axe-core](https://github.com/dequelabs/axe-core)
+  (hell und dunkel), ein `<main>`, keine übersprungenen Überschriften,
+- auf Handybreite (390 px) kein seitliches Scrollen,
+- die App selbst: Sprache und Farbschema umschalten, Suche, gespeicherter Code, Fortschritt, Playground.
+
+Vorschauen mit dem Code der Lernenden (`data-vorschau`) sind von den Barrierefreiheits-Regeln
+ausgenommen - Beispielcode darf ein eigenes `<main>` oder `<h1>` haben.
 
 ## Aufbau eines Kapitels
 

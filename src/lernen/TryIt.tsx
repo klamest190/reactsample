@@ -131,5 +131,5 @@ export function TryIt(props: TryItProps) {
 /** Placeholder while an editor of part 8 or 9 is loading. */
 function Laedt() {
   const t = useTexte()
-  return <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800">{t.laeuft}</div>
+  return <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">{t.laeuft}</div>
 }

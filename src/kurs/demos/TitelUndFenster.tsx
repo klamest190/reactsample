@@ -11,12 +11,14 @@ const TEXTE = {
     start: 'Mein neuer Tab-Titel',
     hinweis: 'Schau auf den Browser-Tab: Der Titel ändert sich mit.',
     fenster: 'Fenstergröße (useWindowSize)',
+    feld: 'Tab-Titel',
   },
   en: {
     titel: 'Effect with dependency & event listener',
     start: 'My new tab title',
     hinweis: 'Look at the browser tab: the title changes as you type.',
     fenster: 'Window size (useWindowSize)',
+    feld: 'Tab title',
   },
 }
 
@@ -36,7 +38,7 @@ export function TitelUndFenster() {
 
   return (
     <Demo titel={t.titel}>
-      <Eingabe value={titel} onChange={(e) => setTitel(e.target.value)} />
+      <Eingabe aria-label={t.feld} value={titel} onChange={(e) => setTitel(e.target.value)} />
       <p className="text-sm text-slate-600 dark:text-slate-400">{t.hinweis}</p>
       <Wert label={t.fenster}>
         {groesse.breite} × {groesse.hoehe}

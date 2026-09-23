@@ -20,12 +20,19 @@ npm run preview        # dist/ ausliefern - zum Prüfen des Produktions-Builds
 npm run lint           # oxlint (muss ohne Warnung durchlaufen)
 npm run test:inhalte   # alle Beispiele, Übungen, Projektschritte im Browser (Chrome/Edge via playwright-core)
 npm run test:inhalte -- praxis-   # nur IDs mit diesem Anfang
+npm run test:inhalte -- --build   # dasselbe auf dem Produktions-Build (so läuft es in der CI)
+npm run test:seiten    # jede Seite im Produktions-Build: Seitenfehler, alle Musterlösungen grün,
+                       # axe-core (hell + dunkel), Handybreite, App-Funktionen (~4 min, 4 Seiten parallel)
+npm run test:seiten -- js-        # nur Routen mit diesem Anfang (--parallel=N für mehr/weniger gleichzeitig)
 npm run test:java      # Teil 7 in Node (jiti)
 npm run test:backend   # Teil 8: Spring-Laufzeit, Docker-Simulator, Beispiele (Node)
 npm run test:sql       # Teil 9: echtes PostgreSQL (PGlite) in Node
 ```
 
 Vor jedem Commit: `npx tsc -b`, `npm run lint`, `npm run build` und die betroffenen `test:*`.
+Bei Änderungen an Oberfläche, Editoren oder Laufzeiten zusätzlich `test:seiten` (mit Filter reicht oft).
+Die CI (`.github/workflows/ci.yml`) führt bei jedem Push auf `main` alles aus - nach dem Push
+`gh run watch` bzw. `gh run list` prüfen.
 
 ## Struktur
 
@@ -34,14 +41,20 @@ CLAUDE.md README.md          diese Karte / ausführliche Doku (Deutsch)
 index.html                   App-Einstieg
 selbsttest.html              Einstieg für test:inhalte (src/selbsttest/main.ts)
 vite.config.ts               Tailwind, React, optimizeDeps.exclude für PGlite
+.github/workflows/ci.yml     CI: Job "code" (lint, build, Node-Tests), Job "browser" (test:inhalte --build, test:seiten)
 public/favicon.svg           Bildmarke "Lernpfad"
 scripts/
-  inhalte-testen.mjs         test:inhalte - startet Vite, öffnet selbsttest.html, wertet aus
+  test-server.mjs            gemeinsam: Dev-Server oder Produktions-Build + Vorschau-Server, Chrome/Edge starten
+  inhalte-testen.mjs         test:inhalte - öffnet selbsttest.html, wertet aus (--build: Produktions-Build)
+  seiten-testen.mjs          test:seiten - jede Seite im Produktions-Build (siehe oben)
   java-testen.ts             test:java
   backend-test.ts            test:backend (Spring + Docker)
   sql-test.ts                test:sql
 src/
-  main.tsx App.tsx           Einstieg; Layout, Hash-Routing, Seitenwahl, Sprachumschalter
+  main.tsx App.tsx           Einstieg; Layout, Hash-Routing, Seitenwahl, Sprachumschalter.
+                             Im ersten Download: Kopfzeile, Seitenleiste, Startseite. KapitelSeite, Glossar,
+                             Projekt, Playground und Suche (mit Glossar-Daten) werden nachgeladen,
+                             die KapitelSeite schon im Leerlauf (requestIdleCallback)
   index.css                  Tailwind, Design-Tokens (brand-*), Dark Mode, Vorschau-Styles
   i18n/
     SpracheContext.tsx       Sprache de/en, useSprache(), useTexte(), Typ Zweisprachig
@@ -50,6 +63,7 @@ src/
   components/                App-Oberfläche
     Icon.tsx                 alle SVG-Icons (Strichstil) + Logo + TeilSymbol - keine Emoji in der UI
     teilStil.ts              Icon/Kürzel/Farbe je Kursteil
+    scrollFocus.ts           focusableWhenScrolling: Scroll-Container per Tastatur erreichbar, solange sie scrollen
     Ui.tsx                   Abschnitt, P, Hinweis, Merke, Button, KARTE, Aufklapppfeil …
     Seitenleiste.tsx Suche.tsx Gliederung.tsx Verweis.tsx ErrorBoundary.tsx
   context/                   ThemeContext, FortschrittContext (gelöste Übungen, Kapitel), KapitelContext
@@ -116,21 +130,42 @@ Node laufen (`test:java`, `test:backend`, `test:sql`). Die Tür nach außen ist 
   Kursinhalte (Kapiteltexte, Beispielcode, simulierte Terminalausgaben) dürfen Emoji haben.
 - Tailwind-Klassen als ganze Strings (der Scanner findet keine zusammengesetzten).
 - Farben/Theme: `brand-*` Tokens, jede Fläche mit `dark:`-Variante.
+- **Kontrast (WCAG AA 4,5:1)**, von `test:seiten` geprüft. Text auf Weiß/`slate-50`: mindestens
+  `text-slate-500`, auf getönten Flächen (`slate-100`, `brand-50` …) `text-slate-600`; im Dunkeln
+  `dark:text-slate-400` - also nie `text-slate-400` für Text im hellen Design und nie `slate-500`/`600`
+  ohne `dark:`-Variante. Weiße Schrift erst ab `-600`/`-700`-Hintergrund (`bg-emerald-700`).
+- **Barrierefreiheit**: Eingabefelder brauchen ein Label (`<label>` oder `aria-label`), scrollbare
+  Bereiche `ref={focusableWhenScrolling}`, Links im Fließtext eine Unterstreichung, Statuspunkte
+  `role="img"` + `aria-label`. Nur ein `<main>` (App.tsx) und keine übersprungenen Überschriften.
+- **Vorschau-Container** (gerenderter Code der Lernenden) tragen `data-vorschau` - die Prüfungen lassen
+  sie aus, denn Beispielcode darf ein eigenes `<main>` oder `<h1>` haben.
+- **Test-Attribute**: `data-laeuft` am Rahmen eines laufenden Editors, `data-testergebnis="gruen|rot"`
+  an Testergebnissen, `data-uebung` an Übungskarten - daran orientiert sich `test:seiten`.
 - Git: direkt auf `main` committen und pushen, Branches/PRs nur auf Wunsch.
 
 ## Stolperfallen
 
-- **`test:inhalte` läuft auf dem Dev-Server.** Fehler, die nur im Produktions-Build auftreten, sieht
-  es nicht. Beispiel: React 19 hat `act` nur im Dev-Build - deshalb installiert `testLauf.ts` einen
-  Ersatz, bevor die Testing Library lädt. Bei Änderungen an Editoren oder Laufzeiten auch
-  `npm run build && npm run preview` im Browser prüfen.
+- **Dev- und Produktions-Build verhalten sich verschieden.** Beispiel: React 19 hat `act` nur im
+  Dev-Build - deshalb installiert `testLauf.ts` einen Ersatz, bevor die Testing Library lädt.
+  `test:inhalte` ohne `--build` sieht solche Fehler nicht; `test:seiten` und die CI laufen auf dem
+  Produktions-Build.
+- **Tailwind zur Laufzeit** (`tailwindMotor.ts`) erzeugt CSS für Klassen im Editor-Code. Es liegt in der
+  Ebene `vorschau` unter `utilities` (`@layer`-Reihenfolge in `index.css`). Ohne das hat eine Vorschau
+  mit `bg-white` die `dark:`-Klassen der Seite überschrieben - die Seitenleiste wurde im Dunkeln hell.
 - **Alle Editoren einer Seite teilen sich `window`.** Tests dürfen keine Globalen ersetzen, die
   Vorschauen und andere Beispiele mitbenutzen: `mockFetch` tauscht deshalb nur das `fetch`, das
   `kompilieren` dem getesteten Code als Globale gibt. React-Übungen starten ihre Tests erst,
   wenn die neue Vorschau steht (`TryItReact.ausfuehren`).
 - `test:inhalte` prüft ohne Vorschau - Wechselwirkungen zwischen Vorschau und Test fallen nur im
   echten Editor auf.
+- Eine Demo kann das Farbschema umschalten: Prüfskripte laden jede Seite frisch (`goto` + `reload`),
+  statt nur den Hash zu wechseln - sonst misst man im falschen Design.
+- axe misst halbtransparente Hintergründe (`dark:bg-black/40`) falsch, wenn sich das Farbschema während
+  des Laufs ändert - Kontrastfehler im Dunkeln erst an einer frisch geladenen Seite bestätigen.
+- Playground-IDs (`teil: '…'`) stehen in den Dateien unter `kurs/playground/`, nicht in `index.ts`.
 - Kapitel-Imports in `kurs.ts` müssen existieren, sonst bricht Vite ab (beim Anlegen zuerst die Dateien).
 - PGlite ist in `optimizeDeps.exclude` - nicht entfernen, sonst lädt die WASM-Datei nicht.
 - Git Bash wandelt Argumente wie `/sql-start` in Windows-Pfade um - Routen ohne führenden `/` übergeben.
 - Shell-Heredocs verschlucken Backslashes - Dateien mit `\` über Editor-Tools oder Node-Skripte schreiben.
+- **Erster Download klein halten:** Was `App.tsx` fest importiert, lädt jede Seite beim Start. Neue
+  Seiten und alles mit Editoren oder großen Daten per `lazy()` einbinden (Stand: ~110 kB JS gzip).

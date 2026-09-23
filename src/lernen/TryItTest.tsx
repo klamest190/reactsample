@@ -108,7 +108,7 @@ function Testausgabe({ bericht, laeuft }: { bericht: TestBericht; laeuft: boolea
 
   return (
     <div className={`bg-slate-900 px-4 py-3 font-mono text-code leading-5 text-slate-200 transition-opacity dark:bg-black/40 ${laeuft ? 'opacity-60' : ''}`}>
-      <div className="mb-1 text-2xs tracking-wider text-slate-500 uppercase">{t.deineTests}</div>
+      <div className="mb-1 text-2xs tracking-wider text-slate-400 uppercase">{t.deineTests}</div>
       {bericht.fehler ? (
         <div className="text-rose-300">
           <Icon name="kreisKreuz" className="mr-1.5 inline size-3.5 align-[-2px]" />
@@ -123,7 +123,7 @@ function Testausgabe({ bericht, laeuft }: { bericht: TestBericht; laeuft: boolea
             {bericht.faelle.map((f, i) => (
               <li key={i}>
                 <span className={f.ok ? 'text-emerald-400' : 'text-rose-400'}>{f.ok ? '✓' : '✗'}</span> {f.name}{' '}
-                <span className="text-slate-500">{f.dauer}ms</span>
+                <span className="text-slate-400">{f.dauer}ms</span>
                 {f.meldung && <div className="mb-1 ml-4 whitespace-pre-wrap text-rose-300">→ {f.meldung}</div>}
               </li>
             ))}

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useDeferredValue, useMemo, useState, useTransition } from 'react'
 import { Button, Code, Demo, Eingabe, Wert } from '../../components/Ui'
 import { useSprache } from '../../i18n/SpracheContext'
+import { focusableWhenScrolling } from '../../components/scrollFocus'
 
 /** Live-Demos (Kapitel 4.8): useDeferredValue, useTransition, lazy + Suspense. */
 
@@ -33,7 +34,7 @@ function GrosseListe({ filter, eintrag }: { filter: string; eintrag: string }) {
   return (
     <>
       <Wert label={TEXTE[sprache].treffer}>{gefiltert.length}</Wert>
-      <ul className="max-h-40 overflow-y-auto rounded-lg border border-slate-200 text-sm dark:border-slate-700">
+      <ul ref={focusableWhenScrolling} className="max-h-40 overflow-y-auto rounded-lg border border-slate-200 text-sm dark:border-slate-700">
         {gefiltert.slice(0, 200).map((e) => (
           <li key={e} className="border-b border-slate-100 px-3 py-1 last:border-0 dark:border-slate-800">
             {e}
@@ -73,7 +74,7 @@ export function NebenlaeufigkeitsDemo() {
               Tab {tabName.toUpperCase()}
             </Button>
           ))}
-          {istAmArbeiten && <span className="text-sm text-slate-500">{t.wirdGerendert}</span>}
+          {istAmArbeiten && <span className="text-sm text-slate-500 dark:text-slate-400">{t.wirdGerendert}</span>}
         </div>
         <GrosseListe filter={tab === 'a' ? '1' : '99'} eintrag={t.eintrag} />
       </Demo>
