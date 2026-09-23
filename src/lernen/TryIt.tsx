@@ -33,10 +33,13 @@ import type { ProjektDatei } from './reactKompilieren'
 import type { Zweisprachig } from '../i18n/SpracheContext'
 import type { DockerTest, SpringTestSpec } from './jsSandbox'
 import type { ProjectId } from '../docker/projects'
+import type { SqlTest } from '../sql/check'
 
 // Part 8 - loaded only when such an editor appears (they bring the Spring runtime and the Docker simulator).
 const TryItSpring = lazy(() => import('./TryItSpring').then((m) => ({ default: m.TryItSpring })))
 const TryItDocker = lazy(() => import('./TryItDocker').then((m) => ({ default: m.TryItDocker })))
+// Part 9 - brings PostgreSQL (PGlite) along, see src/sql/.
+const TryItSql = lazy(() => import('./TryItSql').then((m) => ({ default: m.TryItSql })))
 
 /**
  * "Probier's selbst" - ein Editor mit Ausführen-Knopf.
@@ -52,6 +55,7 @@ const TryItDocker = lazy(() => import('./TryItDocker').then((m) => ({ default: m
  *   <TryIt id="…" code={…} modus="spring" />   Spring Boot on top of the Java runtime, see src/spring/ (part 8)
  *   <TryIt id="…" code={…} modus="dockerfile" />  a simulated docker build, see src/docker/ (part 8)
  *   <TryIt id="…" code={…} modus="compose" />  a simulated docker compose up (part 8)
+ *   <TryIt id="…" code={…} modus="sql" />      real PostgreSQL on the example database, see src/sql/ (part 9)
  *
  * Der Code wird pro `id` im localStorage gespeichert, damit Eingaben einen
  * Kapitelwechsel überleben.
@@ -129,16 +133,23 @@ type DockerBase = Gemeinsam & {
 // Two types instead of `modus: 'dockerfile' | 'compose'` - so TypeScript can tell all modes apart.
 export type DockerProps = (DockerBase & { modus: 'dockerfile' }) | (DockerBase & { modus: 'compose' })
 
-export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps) {
+export type SqlProps = Gemeinsam & {
+  modus: 'sql'
+  /** Compared with the result of the solution - see src/sql/check.ts. */
+  tests?: SqlTest[]
+}
+
+export function TryIt(props: JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps | SqlProps) {
   if (props.modus === 'react') return <TryItReact {...props} />
   if (props.modus === 'test') return <TryItTest {...props} />
   if (props.modus === 'java') return <TryItJava {...props} />
   if (props.modus === 'spring') return <Suspense fallback={<Laedt />}><TryItSpring {...props} /></Suspense>
   if (props.modus === 'dockerfile' || props.modus === 'compose') return <Suspense fallback={<Laedt />}><TryItDocker {...props} /></Suspense>
+  if (props.modus === 'sql') return <Suspense fallback={<Laedt />}><TryItSql {...props} /></Suspense>
   return <TryItJs {...props} />
 }
 
-/** Placeholder while an editor of part 8 is loading. */
+/** Placeholder while an editor of part 8 or 9 is loading. */
 function Laedt() {
   const t = useTexte()
   return <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800">{t.laeuft}</div>
@@ -160,6 +171,7 @@ const ABZEICHEN = {
   Spring: { text: 'SPRING', klassen: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' },
   Docker: { text: 'DOCKERFILE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
   Compose: { text: 'COMPOSE', klassen: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300' },
+  SQL: { text: 'SQL', klassen: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300' },
 }
 
 const EDITOR_SPRACHE: Record<keyof typeof ABZEICHEN, EditorSprache> = {
@@ -172,6 +184,7 @@ const EDITOR_SPRACHE: Record<keyof typeof ABZEICHEN, EditorSprache> = {
   Spring: 'spring',
   Docker: 'docker',
   Compose: 'yaml',
+  SQL: 'sql',
 }
 
 // Gespeichert wird pro id - siehe useSavedCode.ts (auch von den Editoren aus Teil 8 benutzt).
@@ -322,7 +335,7 @@ export function Rahmen({
 
       {zeigeLoesung && loesung && (
         <div className="space-y-2 border-b border-slate-200 p-4 dark:border-slate-800">
-          <CodeBlock code={loesung} titel={t.musterloesung} />
+          <CodeBlock code={loesung} titel={t.musterloesung} sprache={art === 'SQL' ? 'sql' : art === 'Docker' || art === 'Compose' ? 'konfig' : 'code'} />
           <button
             onClick={() => {
               setCode(loesung)

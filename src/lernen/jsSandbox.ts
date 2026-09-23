@@ -2,6 +2,7 @@ import type { TypTest } from './tsLauf'
 import type { BuildResult } from '../docker/build'
 import type { ComposeResult } from '../docker/compose'
 import type { ProjectId } from '../docker/projects'
+import type { SqlTest } from '../sql/check'
 
 /**
  * Baut das HTML-Dokument, in dem JavaScript-Übungen laufen.
@@ -36,7 +37,7 @@ export type CodeBeispiel = {
   code: string
   loesung?: string
   vorbereitung?: string
-  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[]
+  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[] | SqlTest[]
   /** Nur TypeScript (modus="ts"): Code, der mit dem Code der Lernenden fehlerfrei kompilieren muss. */
   typTests?: TypTest[]
   tipps?: { de: string[]; en: string[] }

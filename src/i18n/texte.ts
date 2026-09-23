@@ -11,7 +11,7 @@ import type { IconName } from '../components/Icon'
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot und Docker',
+  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot, Docker und PostgreSQL',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -28,7 +28,7 @@ const de = {
   heroTitel: 'Von JavaScript zu React - ',
   heroTitelBetont: 'Schritt für Schritt',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container.',
+    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container. Dazu SQL mit einer echten PostgreSQL-Datenbank im Browser.',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: 'Du hast alle Kapitel abgeschlossen!',
@@ -228,7 +228,7 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot and Docker',
+  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot, Docker and PostgreSQL',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -244,7 +244,7 @@ const en: Texte = {
   heroTitel: 'From JavaScript to React - ',
   heroTitelBetont: 'step by step',
   heroText:
-    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers.',
+    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers. Plus SQL with a real PostgreSQL database in the browser.',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: 'You have completed all chapters!',

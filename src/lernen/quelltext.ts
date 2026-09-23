@@ -46,3 +46,6 @@ export const docker = js
 export const yaml = js
 export const http = js
 export const properties = js
+
+/** Part 9: SQL scripts - the same function, the name says what is inside. */
+export const sql = js

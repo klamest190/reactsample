@@ -88,7 +88,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
               <p>
                 <Text text={eintrag.erklaerung[sprache]} />
               </p>
-              {eintrag.code && <CodeBlock code={eintrag.code} />}
+              {eintrag.code && <CodeBlock code={eintrag.code} sprache={eintrag.sprache} />}
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-xs text-slate-500 dark:text-slate-400">{t.glossarMehr}</span>
                 {eintrag.kapitel.map((id) => (

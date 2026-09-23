@@ -12,6 +12,8 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
 import { JAVA_ERWARTETE_FEHLER, javaBeispielPruefen } from '../java/inhalte'
 import { SPRING_EXPECTED_FAILURES, springExampleCheck } from '../spring/contents'
 import { DOCKER_EXPECTED_FAILURES, dockerExampleCheck } from '../docker/contents'
+import { SQL_EXPECTED_FAILURES, sqlExampleCheck } from '../sql/check'
+import { runSql } from '../sql/client'
 
 /**
  * Selbsttest der Kursinhalte: führt jedes Beispiel, jede Übung und jeden Projektschritt
@@ -24,7 +26,7 @@ import { DOCKER_EXPECTED_FAILURES, dockerExampleCheck } from '../docker/contents
  *                          Musterlösung alle kaputten Varianten, der Startcode nicht
  */
 
-export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java' | 'spring' | 'dockerfile' | 'compose'; typen: boolean; vorschau: boolean }
+export type Modus = { modus: 'js' | 'ts' | 'react' | 'test' | 'java' | 'spring' | 'dockerfile' | 'compose' | 'sql'; typen: boolean; vorschau: boolean }
 export type Ergebnis = { id: string; ort: string; ok: boolean; meldung: string; dauer: number }
 
 /**
@@ -35,6 +37,7 @@ export const ERWARTETE_FEHLER: Record<string, string> = {
   ...JAVA_ERWARTETE_FEHLER,
   ...SPRING_EXPECTED_FAILURES,
   ...DOCKER_EXPECTED_FAILURES,
+  ...SQL_EXPECTED_FAILURES,
   'ts-start-fehler': 'zeigt, dass ein Typfehler das Programm nicht aufhält',
 }
 
@@ -245,6 +248,12 @@ export async function beispielPruefen(
   }
   if (m.modus === 'dockerfile' || m.modus === 'compose') {
     const result = dockerExampleCheck(extra.id ?? '', b, m.modus)
+    return result.ok ? null : result.message
+  }
+
+  // Part 9: real PostgreSQL in the same worker the editors use.
+  if (m.modus === 'sql') {
+    const result = await sqlExampleCheck(extra.id ?? '', b, runSql)
     return result.ok ? null : result.message
   }
 

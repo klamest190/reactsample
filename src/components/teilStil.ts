@@ -51,4 +51,9 @@ export const TEIL_STIL: Record<string, { icon: IconName; kuerzel?: string; farbe
     farbe:
       'bg-linear-to-br from-emerald-100 to-green-200/70 text-emerald-700 ring-emerald-500/25 dark:from-emerald-400/25 dark:to-green-500/10 dark:text-emerald-200 dark:ring-emerald-300/20',
   },
+  sql: {
+    icon: 'datenbank',
+    farbe:
+      'bg-linear-to-br from-indigo-100 to-indigo-200/70 text-indigo-700 ring-indigo-500/25 dark:from-indigo-400/25 dark:to-indigo-500/10 dark:text-indigo-200 dark:ring-indigo-300/20',
+  },
 }

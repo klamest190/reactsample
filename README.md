@@ -13,6 +13,11 @@ kleine Nachbildung (`src/spring/`) auf der Java-Laufzeit, Docker als Simulator (
 ohne Server und ohne Netzwerk, aber mit denselben Regeln und Meldungen wie das Original. Mehr unter
 [Der Backend-Teil](#der-backend-teil).
 
+**Teil 9: Datenbanken mit PostgreSQL** bringt SQL bei - und hier läuft kein Nachbau, sondern **echtes
+PostgreSQL 18**, als WebAssembly im Browser ([PGlite](https://pglite.dev)). Zum Experimentieren gibt es
+eine fertige Shop-Datenbank, die bei jedem Lauf frisch startet. Mehr unter
+[Der Datenbank-Teil](#der-datenbank-teil).
+
 **Alles ist frei erreichbar** - es gibt keine Level und nichts wird freigeschaltet. Den roten Faden
 liefern Querverweise („Baut auf“, „Darauf bauen auf“) und ein durchgehendes **ToDo-App-Projekt**, das
 mit den Kapiteln wächst.
@@ -35,6 +40,7 @@ npm run lint    # oxlint
 npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
 npm run test:java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
 npm run test:backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
+npm run test:sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Beispiele auf echtem PostgreSQL (ohne Browser)
 ```
 
 ### Selbsttest der Inhalte
@@ -80,10 +86,13 @@ Der Fortschritt („Kapitel abschließen“) und der Code in den Editoren werden
 | **6 · Projekt: ToDo-App** | Datenmodell als Funktionen · DOM-Version · Komponenten & Props · State & Events · Datenfluss & Filter · `useReducer` · Speichern mit `useEffect` & eigenem Hook · Fokus mit `useRef` · Context · Validierung · Startdaten laden · **Challenge: von null** |
 | **7 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
 | **8 · Backend: Spring Boot & Docker** 🍃 | Hallo Spring Boot · Beans & Dependency Injection · REST-APIs · Validierung & Fehlerbehandlung · Spring Data JPA · Konfiguration, Profile & Tests · **React trifft Spring Boot** (Full-Stack-Werkstatt) · Container & Images · Dockerfile · **Docker Compose** |
+| **9 · Datenbanken: SQL mit PostgreSQL** 🐘 | Tabellen & SELECT · Filtern mit WHERE · Zählen & Gruppieren · JOIN · Daten ändern & Transaktionen · Tabellen entwerfen (CREATE TABLE, Indizes) · Unterabfragen, CTEs & Window Functions |
 
 Teil 7 ist **eigenständig**: Er setzt keinen der Teile 1-6 voraus und benutzt nichts daraus. Die
 Querverweise dorthin sind Vergleiche, keine Voraussetzungen. Teil 8 setzt Teil 7 voraus (Klassen,
 Records, Collections) und für das Kapitel „React trifft Spring Boot“ auch `fetch` aus Teil 5.
+Teil 9 steht wieder für sich: SQL braucht keine Programmiersprache. Die Verweise auf Spring Data und
+Docker zeigen nur, wo das Wissen im Backend gebraucht wird.
 
 Zum Nachschlagen gibt es außerdem:
 
@@ -135,6 +144,12 @@ src/
     dockerfile.ts yaml.ts  Parser für Dockerfile und compose.yaml
     images.ts projects.ts  bekannte Images mit Größen, die Kursprojekte als Build-Kontext
     selftest.ts contents.ts  Simulator-Selbsttest und Prüfung der Kapitelbeispiele
+  sql/                   🐘 Teil 9: echtes PostgreSQL (PGlite) - kein React, kein DOM
+    dataset.ts             Die Beispieldatenbank (Shop) als SQL + Tabellenliste für die Anzeige
+    statements.ts          Skript → Anweisungen (Strings, Kommentare, $$-Quotes, psql-Befehle wie \dt)
+    engine.ts              Datenbank zurücksetzen, Anweisungen einzeln ausführen, \d und \dt, Fehler → Zeile
+    worker.ts client.ts    PostgreSQL im Web Worker; Warteschlange und 10-s-Abbruch im Browser
+    check.ts               Tests der Übungen (Vergleich mit der Musterlösung) und Prüfung der Kapitelbeispiele
   main.tsx                 Einstiegspunkt: createRoot, StrictMode, ThemeProvider
   App.tsx                  Layout, Routing über den URL-Hash, Lernfortschritt, Sprachumschalter
   i18n/
@@ -156,6 +171,7 @@ src/
       Name.code.ts         Codebeispiele, Tests und Lösungen - gemeinsam für beide Sprachen
     java/                ☕ Teil 7, gleicher Aufbau - der Code in den .code.ts ist Java
     backend/             🍃 Teil 8, gleicher Aufbau - Java mit Spring, Dockerfiles, compose.yaml
+    sql/                 🐘 Teil 9, gleicher Aufbau - der Code in den .code.ts ist SQL
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   lernen/                  Die Lern-Bausteine
@@ -272,6 +288,9 @@ sie braucht.
 Editoren (`src/lernen/TryItSpring.tsx`, `TryItDocker.tsx`), die erst nachgeladen werden, wenn sie gebraucht
 werden - siehe [Der Backend-Teil](#der-backend-teil).
 
+**SQL** (`modus="sql"`, Teil 9) hat einen eigenen Editor (`src/lernen/TryItSql.tsx`), der PostgreSQL im
+Web Worker startet - siehe [Der Datenbank-Teil](#der-datenbank-teil).
+
 **Autovervollständigung:** Beim Tippen schlägt der Editor passende Einträge aus
 `src/lernen/vorschlaege.ts` vor, dazu Namen, die schon im Code stehen. Jeder Vorschlag hat eine kurze
 Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt die Cursorposition), Esc
@@ -281,7 +300,7 @@ Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` �
 ## Der Playground
 
 Für jeden Teil gibt es einen Editor zum freien Programmieren - ohne Aufgabe und ohne Tests
-(`#/playground/javascript`, `/typescript`, `/react`, `/hooks`, `/praxis`, `/projekt`, `/java`, `/backend`). Erreichbar über
+(`#/playground/javascript`, `/typescript`, `/react`, `/hooks`, `/praxis`, `/projekt`, `/java`, `/backend`, `/sql`). Erreichbar über
 die Seitenleiste (ein Eintrag oben, gewechselt wird über die Teil-Leiste auf der Seite), die Startseite und einen Hinweis am Ende
 jedes Kapitels. Damit man nicht vor einem leeren Blatt sitzt:
 
@@ -403,6 +422,47 @@ der Vite-Proxy im echten Projekt.
 
 **Geprüft wird alles zweifach:** `npm run test:backend` (ohne Browser) und `npm run test:inhalte`.
 
+## Der Datenbank-Teil
+
+Teil 9 baut SQL **nicht** nach: [PGlite](https://pglite.dev) ist PostgreSQL 18, nach WebAssembly
+übersetzt. Abfragen, Fehlermeldungen, `EXPLAIN`-Pläne und Constraints sind also die echten. Die
+Datenbank (rund 3 MB komprimiert) wird erst geladen, wenn ein SQL-Editor erscheint, und läuft in einem
+**Web Worker** (`src/sql/worker.ts`): Eine Abfrage, die nicht endet, friert die Seite nicht ein -
+`client.ts` beendet den Worker nach 10 Sekunden und startet einen neuen. Alle Editoren einer Seite
+teilen sich eine Datenbank und kommen der Reihe nach dran.
+
+**Jeder Lauf startet frisch.** Vor jedem Skript setzt `resetDatabase` (`engine.ts`) die Sitzung zurück
+(`ROLLBACK`, `DISCARD ALL`), wirft alle Schemas weg und lädt die Beispieldatenbank neu - das dauert nur
+wenige Millisekunden. Lernende können also `DELETE` und `DROP` nach Belieben ausprobieren.
+
+**Die Beispieldatenbank** (`dataset.ts`) ist ein kleiner Shop: `customers` (dieselben Kunden wie in der
+Business-App aus Teil 5), `products`, `orders` und `order_items`. Sie hat absichtliche Lücken, an denen
+SQL interessant wird: Kunden ohne Bestellung (LEFT JOIN), NULL in `email`, `city` und `stock`, nie
+bestellte Produkte, geänderte Preise, eine stornierte Bestellung. `npm run test:sql` prüft, dass die
+Tabellenliste über den Editoren zur echten Datenbank passt.
+
+**Ausgeführt wird Anweisung für Anweisung** (`statements.ts` zerlegt das Skript) - wie `psql` mit
+`ON_ERROR_STOP`: Jede Anweisung bekommt ihr eigenes Ergebnis, der erste Fehler beendet den Lauf und wird
+über die Position aus PostgreSQL im Editor unterstrichen. Werte kommen als Text zurück, so wie psql sie
+zeigt. Die wichtigsten Meta-Befehle von psql (`\dt`, `\d tabelle`, `\di`) beantwortet `engine.ts` aus
+dem Systemkatalog.
+
+**Übungen** brauchen keine von Hand geschriebenen Erwartungswerte: Die Musterlösung läuft auf ihrer
+eigenen frischen Datenbank, und das Ergebnis der Lernenden muss dazu passen. Stimmt es nicht, kann man
+das erwartete Ergebnis aufklappen.
+
+```ts
+tests: [
+  // das letzte Ergebnis des Skripts; reihenfolge: true prüft auch ORDER BY, spalten: true die Namen (AS)
+  { name: { de: 'Die fünf teuersten Produkte', en: 'The five most expensive products' }, reihenfolge: true },
+  // eine Prüfabfrage NACH dem Skript - für INSERT, UPDATE, DELETE und CREATE TABLE
+  { name: { de: 'Die Bücher sind günstiger', en: 'The books are cheaper' }, abfrage: `SELECT name, price FROM products WHERE category = 'books'` },
+]
+```
+
+**Geprüft wird alles zweifach:** `npm run test:sql` (mit PGlite in Node, ohne Browser) und
+`npm run test:inhalte` (im Browser über denselben Worker wie die Editoren).
+
 ## Zweisprachigkeit
 
 - **Oberfläche:** Texte stehen in `src/i18n/texte.ts`. Der Typ des englischen Objekts wird aus dem
@@ -445,3 +505,7 @@ Im `.code.ts` gehören zu einem Spring-Beispiel optional `properties` und `reque
 Dockerfile `project` (`'spring'` oder `'react'`) und `ignore` (die `.dockerignore`). Beispiele, die absichtlich
 nicht starten, stehen mit Begründung in `SPRING_EXPECTED_FAILURES` (`src/spring/contents.ts`) bzw.
 `DOCKER_EXPECTED_FAILURES` (`src/docker/contents.ts`).
+
+Für ein Kapitel aus **Teil 9** an jedes `<TryIt>` `modus="sql"` schreiben und im `.code.ts` den Tag
+`sql\`…\`` verwenden. Beispiele, die absichtlich einen Fehler zeigen, stehen mit Begründung in
+`SQL_EXPECTED_FAILURES` (`src/sql/check.ts`).

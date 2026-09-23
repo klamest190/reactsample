@@ -217,9 +217,9 @@ export function CodeEditor({
     }
     tailwindAnfrage.current++
 
-    // Spring: `@GetMapping` counts as one word. Dockerfile and YAML comments start with `#`.
+    // Spring: `@GetMapping` counts as one word. Dockerfile and YAML comments start with `#`, SQL comments with `--`.
     const wort = zeile.match(sprache === 'spring' ? /@?[\w$.]*$/ : /[\w$.]*$/)![0]
-    const kommentarZeichen = sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? '#' : '//'
+    const kommentarZeichen = sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? '#' : sprache === 'sql' ? '--' : '//'
     const imKommentar = zeile.slice(0, zeile.length - wort.length).includes(kommentarZeichen)
     if ((!vonHand && (!wort || /^\d/.test(wort))) || imKommentar || feld.selectionStart !== feld.selectionEnd) {
       setPopup(null)
@@ -383,7 +383,7 @@ export function CodeEditor({
           aria-hidden
           className="pointer-events-none absolute inset-0 m-0 overflow-hidden p-3 whitespace-pre"
         >
-          <HervorgehobenerCode code={wert} sprache={sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? 'konfig' : 'code'} />
+          <HervorgehobenerCode code={wert} sprache={sprache === 'docker' || sprache === 'yaml' || sprache === 'properties' ? 'konfig' : sprache === 'sql' ? 'sql' : 'code'} />
           {/* Unterschlängelung: Die Schrift ist monospace, 1ch = ein Zeichen. */}
           {markierungen.map((m, i) => (
             <span

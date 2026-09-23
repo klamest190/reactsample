@@ -4,10 +4,12 @@ import { HervorgehobenerCode, type HighlightMode } from './hervorheben'
 
 /** Files that are no program code get the config highlighting (# comments, keys, instructions). */
 const CONFIG_TITLE = /Dockerfile|\.dockerignore|\.ya?ml$|\.properties$|\.http$|\.env$|Terminal/i
+/** Part 9: SQL scripts and psql sessions. */
+const SQL_TITLE = /\.sql$|^SQL\b|^psql\b/i
 
 /** Statisches, eingefärbtes Codebeispiel mit Kopieren-Knopf. */
 export function CodeBlock({ code, titel, sprache }: { code: string; titel?: string; sprache?: HighlightMode }) {
-  const modus = sprache ?? (titel && CONFIG_TITLE.test(titel) ? 'konfig' : 'code')
+  const modus = sprache ?? (titel && SQL_TITLE.test(titel) ? 'sql' : titel && CONFIG_TITLE.test(titel) ? 'konfig' : 'code')
   const t = useTexte()
   const [kopiert, setKopiert] = useState(false)
 

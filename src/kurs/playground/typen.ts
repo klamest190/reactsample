@@ -49,7 +49,7 @@ export type Vorlage = { titel: Zweisprachig; info: Zweisprachig; code: string }
 export type PlaygroundDaten = {
   /** id des Kursteils (kurs.ts), steht auch in der URL: #/playground/<teil> */
   teil: string
-  modus: 'js' | 'ts' | 'react' | 'java' | 'spring'
+  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'sql'
   /** Startcode - die erste Vorlage. */
   vorlagen: Vorlage[]
   gruppen: BausteinGruppe[]

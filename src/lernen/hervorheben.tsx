@@ -12,6 +12,9 @@
  * Part 8 adds a second mode, `konfig`, for files that are not program code:
  * Dockerfiles, compose.yaml, application.properties, `.http` requests and
  * terminal commands - `#` comments, instructions, keys and values.
+ *
+ * Part 9 adds `sql`: keywords in any case, `--` and block comments, 'strings',
+ * "quoted names" and psql meta commands like `\dt`.
  */
 
 type TokenTyp =
@@ -28,7 +31,7 @@ type TokenTyp =
 
 type Token = { typ: TokenTyp; text: string }
 
-export type HighlightMode = 'code' | 'konfig'
+export type HighlightMode = 'code' | 'konfig' | 'sql'
 
 const KEYWORDS = new Set(
   (
@@ -132,6 +135,44 @@ function tokenizeConfig(code: string): Token[] {
   return tokens
 }
 
+// --- SQL (part 9) --------------------------------------------------------------------------
+
+const SQL_KEYWORDS = new Set(
+  (
+    'select from where and or not in is null as order by asc desc limit offset distinct group having join inner left right full outer cross on using ' +
+    'insert into values update set delete returning create table alter add column drop rename to index view materialized primary key foreign references ' +
+    'unique check default constraint cascade restrict begin commit rollback transaction savepoint union all intersect except case when then else end ' +
+    'exists between like ilike with recursive over partition window filter explain analyze if conflict do nothing generated always identity nulls first last ' +
+    'integer int bigint smallint serial bigserial numeric decimal real double precision text varchar char boolean date time timestamp timestamptz interval jsonb json uuid'
+  ).split(' '),
+)
+const SQL_LITERALS = new Set(['true', 'false', 'null', 'current_date', 'current_timestamp'])
+
+// Groups: 1 comment · 2 string · 3 quoted name · 4 meta command · 5 number · 6 word
+const SQL_PATTERN = /(--[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|([eE]?'(?:''|[^'])*'?|\$\$[\s\S]*?(?:\$\$|$))|("[^"\n]*"?)|(^[ \t]*\\\S+)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][\w$]*)/gm
+
+function tokenizeSql(code: string): Token[] {
+  const tokens: Token[] = []
+  let position = 0
+  for (const match of code.matchAll(SQL_PATTERN)) {
+    if (match.index > position) tokens.push({ typ: 'text', text: code.slice(position, match.index) })
+    const [text, comment, string, quoted, meta, number, word] = match
+    position = match.index + text.length
+    if (comment) tokens.push({ typ: 'kommentar', text })
+    else if (string) tokens.push({ typ: 'string', text })
+    else if (quoted) tokens.push({ typ: 'komponente', text })
+    else if (meta) tokens.push({ typ: 'annotation', text })
+    else if (number) tokens.push({ typ: 'zahl', text })
+    else if (word) {
+      const lower = word.toLowerCase()
+      const next = code.slice(position).match(/^\s*(.)/)?.[1]
+      tokens.push({ typ: SQL_LITERALS.has(lower) ? 'literal' : SQL_KEYWORDS.has(lower) ? 'keyword' : next === '(' ? 'funktion' : 'text', text: word })
+    }
+  }
+  if (position < code.length) tokens.push({ typ: 'text', text: code.slice(position) })
+  return tokens
+}
+
 // Vollständige Klassennamen, damit der Tailwind-Scanner sie findet.
 const FARBEN: Record<TokenTyp, string> = {
   kommentar: 'text-slate-400 italic dark:text-slate-500',
@@ -148,7 +189,7 @@ const FARBEN: Record<TokenTyp, string> = {
 
 /** Rendert Code als eingefärbte <span>s - für CodeBlock und CodeEditor. */
 export function HervorgehobenerCode({ code, sprache = 'code' }: { code: string; sprache?: HighlightMode }) {
-  return (sprache === 'konfig' ? tokenizeConfig(code) : tokenisieren(code)).map((t, i) =>
+  return (sprache === 'konfig' ? tokenizeConfig(code) : sprache === 'sql' ? tokenizeSql(code) : tokenisieren(code)).map((t, i) =>
     t.typ === 'text' ? (
       t.text
     ) : (

@@ -10,9 +10,11 @@
     "preview": "vite preview",
     "test:inhalte": "node scripts/inhalte-testen.mjs",
     "test:java": "jiti scripts/java-testen.ts",
-    "test:backend": "jiti scripts/backend-test.ts"
+    "test:backend": "jiti scripts/backend-test.ts",
+    "test:sql": "jiti scripts/sql-test.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

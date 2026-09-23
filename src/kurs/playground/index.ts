@@ -5,6 +5,7 @@ import { jsPlayground } from './js'
 import { praxisPlayground } from './praxis'
 import { projektPlayground } from './projekt'
 import { reactPlayground } from './react'
+import { sqlPlayground } from './sql'
 import { tsPlayground } from './ts'
 import type { PlaygroundDaten } from './typen'
 
@@ -18,4 +19,5 @@ export const playgrounds: PlaygroundDaten[] = [
   projektPlayground,
   javaPlayground,
   backendPlayground,
+  sqlPlayground,
 ]

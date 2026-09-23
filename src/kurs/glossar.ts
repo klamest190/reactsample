@@ -1,5 +1,6 @@
 import type { Zweisprachig } from '../i18n/SpracheContext'
-import { js } from '../lernen/quelltext'
+import type { HighlightMode } from '../lernen/hervorheben'
+import { js, sql } from '../lernen/quelltext'
 
 /**
  * Glossar: kurze Erklärungen mit Link auf die Kapitel, in denen der Begriff ausführlich vorkommt.
@@ -13,6 +14,8 @@ export type GlossarEintrag = {
   deutsch?: string
   erklaerung: Zweisprachig
   code?: string
+  /** Highlighting of `code` - SQL examples (part 9) say so, everything else is code. */
+  sprache?: HighlightMode
   kapitel: string[]
 }
 
@@ -1062,5 +1065,130 @@ numbers.add(5);        // int → Integer`,
       en: 'Describes all containers of an application in a `compose.yaml` and starts them with `docker compose up`. The containers reach each other by their service names (`db:5432`).',
     },
     kapitel: ['docker-compose'],
+  },
+  {
+    id: 'sql',
+    begriff: 'SQL',
+    erklaerung: {
+      de: 'Structured Query Language - die Sprache relationaler Datenbanken wie PostgreSQL, MySQL oder SQLite. **Deklarativ**: Man beschreibt das gewünschte Ergebnis, die Datenbank sucht den Weg.',
+      en: 'Structured Query Language - the language of relational databases like PostgreSQL, MySQL or SQLite. **Declarative**: you describe the result you want, the database finds the way.',
+    },
+    code: sql`SELECT name, price FROM products WHERE price < 50 ORDER BY price;`,
+    sprache: 'sql',
+    kapitel: ['sql-start', 'sql-where'],
+  },
+  {
+    id: 'postgresql',
+    begriff: 'PostgreSQL',
+    erklaerung: {
+      de: 'Eine freie, sehr verbreitete relationale Datenbank („Postgres“). Im Kurs läuft sie als PGlite direkt im Browser; auf dem Rechner meist per Docker, bedient mit `psql` oder einem grafischen Werkzeug.',
+      en: 'A free and very widely used relational database (“Postgres”). In the course it runs as PGlite right in the browser; on your machine usually via Docker, used with `psql` or a graphical tool.',
+    },
+    code: js`docker run -d --name db -p 5432:5432 -e POSTGRES_PASSWORD=secret postgres:17`,
+    kapitel: ['sql-start', 'docker-start'],
+  },
+  {
+    id: 'primary-key',
+    begriff: 'Primary key',
+    deutsch: 'Primärschlüssel',
+    erklaerung: {
+      de: 'Die Spalte (oder Spalten), die jede Zeile einer Tabelle eindeutig macht - nie NULL, nie doppelt. Meist eine automatisch hochgezählte `id`.',
+      en: 'The column (or columns) that makes every row of a table unique - never NULL, never twice. Usually an automatically counted `id`.',
+    },
+    code: sql`id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY`,
+    sprache: 'sql',
+    kapitel: ['sql-start', 'sql-tabellen'],
+  },
+  {
+    id: 'foreign-key',
+    begriff: 'Foreign key',
+    deutsch: 'Fremdschlüssel',
+    erklaerung: {
+      de: 'Eine Spalte, die auf den Primärschlüssel einer anderen Tabelle verweist (`orders.customer_id` → `customers.id`). Die Datenbank sorgt dafür, dass der Verweis immer gültig ist.',
+      en: 'A column that points to the primary key of another table (`orders.customer_id` → `customers.id`). The database makes sure the reference is always valid.',
+    },
+    code: sql`customer_id integer NOT NULL REFERENCES customers (id)`,
+    sprache: 'sql',
+    kapitel: ['sql-joins', 'sql-tabellen'],
+  },
+  {
+    id: 'null-sql',
+    begriff: 'NULL (SQL)',
+    erklaerung: {
+      de: '„Unbekannt“ oder „nicht vorhanden“ - weder 0 noch leerer Text. Jeder Vergleich mit NULL ergibt wieder NULL, deshalb fragt man mit `IS NULL` und ersetzt mit `coalesce`.',
+      en: '“Unknown” or “not there” - neither 0 nor empty text. Every comparison with NULL yields NULL again, so you ask with `IS NULL` and replace with `coalesce`.',
+    },
+    code: sql`SELECT name, coalesce(email, '-') FROM customers WHERE city IS NULL;`,
+    sprache: 'sql',
+    kapitel: ['sql-where'],
+  },
+  {
+    id: 'aggregate',
+    begriff: 'Aggregate function',
+    deutsch: 'Aggregatfunktion',
+    erklaerung: {
+      de: 'Macht aus vielen Werten einen: `count`, `sum`, `avg`, `min`, `max`. Mit `GROUP BY` einmal pro Gruppe, `HAVING` filtert die Gruppen.',
+      en: 'Turns many values into one: `count`, `sum`, `avg`, `min`, `max`. With `GROUP BY` once per group, `HAVING` filters the groups.',
+    },
+    code: sql`SELECT category, count(*) FROM products GROUP BY category HAVING count(*) > 2;`,
+    sprache: 'sql',
+    kapitel: ['sql-gruppieren'],
+  },
+  {
+    id: 'join',
+    begriff: 'JOIN',
+    erklaerung: {
+      de: 'Verbindet zusammengehörige Zeilen zweier Tabellen über eine Bedingung (`ON`). `JOIN` liefert nur Zeilen mit Partner, `LEFT JOIN` alle Zeilen der linken Tabelle.',
+      en: 'Connects matching rows of two tables through a condition (`ON`). `JOIN` returns only rows with a partner, `LEFT JOIN` every row of the left table.',
+    },
+    code: sql`SELECT o.id, c.name FROM orders o JOIN customers c ON c.id = o.customer_id;`,
+    sprache: 'sql',
+    kapitel: ['sql-joins'],
+  },
+  {
+    id: 'transaction',
+    begriff: 'Transaction',
+    deutsch: 'Transaktion',
+    erklaerung: {
+      de: 'Mehrere Änderungen, die nur gemeinsam gelten: `BEGIN` … `COMMIT`. Geht etwas schief, macht `ROLLBACK` alles rückgängig. In Spring per `@Transactional`.',
+      en: 'Several changes that only count together: `BEGIN` … `COMMIT`. If something goes wrong, `ROLLBACK` undoes everything. In Spring via `@Transactional`.',
+    },
+    code: sql`BEGIN; UPDATE products SET stock = stock - 1 WHERE id = 5; COMMIT;`,
+    sprache: 'sql',
+    kapitel: ['sql-aendern'],
+  },
+  {
+    id: 'index-sql',
+    begriff: 'Index (database)',
+    deutsch: 'Index (Datenbank)',
+    erklaerung: {
+      de: 'Eine sortierte Hilfsstruktur, über die die Datenbank passende Zeilen findet, ohne die ganze Tabelle zu lesen. Beschleunigt Suchen, verlangsamt Schreiben etwas. `EXPLAIN` zeigt, ob er benutzt wird.',
+      en: 'A sorted helper structure that lets the database find matching rows without reading the whole table. Speeds up searching, slows writing a little. `EXPLAIN` shows whether it is used.',
+    },
+    code: sql`CREATE INDEX ON orders (customer_id);`,
+    sprache: 'sql',
+    kapitel: ['sql-tabellen'],
+  },
+  {
+    id: 'cte',
+    begriff: 'CTE (WITH)',
+    erklaerung: {
+      de: 'Common Table Expression: eine benannte Zwischenabfrage mit `WITH name AS (…)`. Macht lange Abfragen in Schritten lesbar.',
+      en: 'Common table expression: a named intermediate query with `WITH name AS (…)`. Makes long queries readable in steps.',
+    },
+    code: sql`WITH totals AS (SELECT order_id, sum(quantity * unit_price) AS total FROM order_items GROUP BY order_id) SELECT avg(total) FROM totals;`,
+    sprache: 'sql',
+    kapitel: ['sql-profi'],
+  },
+  {
+    id: 'window-function',
+    begriff: 'Window function',
+    erklaerung: {
+      de: 'Rechnet über mehrere Zeilen, ohne sie zusammenzufassen - erkennbar an `OVER (…)`. Für Ranglisten, laufende Summen und Vergleiche mit der Vorzeile.',
+      en: 'Computes over several rows without collapsing them - recognisable by `OVER (…)`. For rankings, running totals and comparisons with the previous row.',
+    },
+    code: sql`SELECT name, rank() OVER (PARTITION BY category ORDER BY price DESC) FROM products;`,
+    sprache: 'sql',
+    kapitel: ['sql-profi'],
   },
 ]

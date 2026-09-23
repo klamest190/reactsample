@@ -12,6 +12,7 @@ const LADER: Record<string, () => Promise<{ uebungen: UebungsSammlung }>> = {
   // Part 8 has two chapter prefixes and one exercise file.
   spring: () => import('./backend'),
   docker: () => import('./backend'),
+  sql: () => import('./sql'),
   react: () => import('./react'),
   hooks: () => import('./hooks'),
   praxis: () => import('./praxis'),

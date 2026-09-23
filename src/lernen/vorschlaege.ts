@@ -1,5 +1,6 @@
 import type { Sprache, Zweisprachig } from '../i18n/SpracheContext'
 import { COMPOSE, DOCKERFILE, SPRING } from './backendSuggestions'
+import { SQL } from './sqlSuggestions'
 
 /**
  * Die Vorschläge für die Autovervollständigung im Editor.
@@ -37,7 +38,7 @@ export type Eintrag = {
   info: Zweisprachig
 }
 
-export type EditorSprache = 'js' | 'ts' | 'react' | 'java' | 'spring' | 'docker' | 'yaml' | 'properties'
+export type EditorSprache = 'js' | 'ts' | 'react' | 'java' | 'spring' | 'docker' | 'yaml' | 'properties' | 'sql'
 
 const JAVASCRIPT: Eintrag[] = [
   // --- Konsole -------------------------------------------------------------
@@ -303,6 +304,7 @@ export function vorschlaegeFuer(editor: EditorSprache, sprache: Sprache): Vorsch
       : editor === 'docker' ? DOCKERFILE
       : editor === 'yaml' ? COMPOSE
       : editor === 'properties' ? []
+      : editor === 'sql' ? SQL
       : editor === 'react' ? [...REACT, ...JAVASCRIPT]
       : editor === 'ts' ? [...TYPESCRIPT, ...JAVASCRIPT]
       : JAVASCRIPT

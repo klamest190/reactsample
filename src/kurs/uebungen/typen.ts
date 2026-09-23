@@ -1,5 +1,6 @@
 import type { Zweisprachig } from '../../i18n/SpracheContext'
 import type { DockerTest, ReactTest, SpringTestSpec, Test } from '../../lernen/jsSandbox'
+import type { SqlTest } from '../../sql/check'
 import type { ProjectId } from '../../docker/projects'
 import type { TypTest } from '../../lernen/tsLauf'
 
@@ -38,12 +39,12 @@ export type Vorhersage = Basis & {
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
   aufgabe: Zweisprachig
-  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'dockerfile' | 'compose'
+  modus: 'js' | 'ts' | 'react' | 'java' | 'spring' | 'dockerfile' | 'compose' | 'sql'
   code: string
   loesung: string
   vorbereitung?: string
   vorschau?: boolean
-  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[]
+  tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[] | SqlTest[]
   /** Part 8: application.properties and requests (spring), project and .dockerignore (dockerfile). */
   properties?: string
   requests?: string

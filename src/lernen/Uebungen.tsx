@@ -8,6 +8,7 @@ import { uebungenFuer } from '../kurs/uebungen'
 import type { Stufe, Uebung, Vorhersage } from '../kurs/uebungen/typen'
 import { CodeBlock } from './CodeBlock'
 import type { DockerTest, ReactTest, SpringTestSpec, Test } from './jsSandbox'
+import type { SqlTest } from '../sql/check'
 import { Text } from './Text'
 import { TryIt } from './TryIt'
 
@@ -134,6 +135,16 @@ function UebungKarte({ uebung, nummer }: { uebung: Uebung; nummer: number }) {
               tests={uebung.tests as DockerTest[] | undefined}
               project={uebung.project}
               ignore={uebung.ignore}
+            />
+          ) : uebung.modus === 'sql' ? (
+            <TryIt
+              modus="sql"
+              id={'uebung-' + uebung.id}
+              aufgabe={<Text text={uebung.aufgabe[sprache]} />}
+              code={uebung.code}
+              loesung={uebung.loesung}
+              tipps={uebung.tipps}
+              tests={uebung.tests as SqlTest[] | undefined}
             />
           ) : uebung.modus === 'java' ? (
             <TryIt
