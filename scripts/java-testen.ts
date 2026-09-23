@@ -28,7 +28,7 @@ const melden = (ok: boolean, name: string, meldung = '') => {
 }
 
 console.log('── Laufzeit ' + '─'.repeat(50))
-for (const e of javaLaufzeitPruefen()) melden(e.ok, e.name, e.meldung)
+for (const e of javaLaufzeitPruefen()) melden(e.ok, e.name, e.message)
 
 /**
  * Welche Beispiele laufen als Java? Das steht im `modus` des <TryIt> im
@@ -61,7 +61,7 @@ for (const datei of readdirSync(ordner).filter((d) => d.endsWith('.code.ts'))) {
       continue
     }
     const ergebnis = javaBeispielPruefen(id, beispiel)
-    melden(ergebnis.ok, `${ergebnis.id}  (${datei})`, ergebnis.meldung)
+    melden(ergebnis.ok, `${ergebnis.id}  (${datei})`, ergebnis.message)
   }
 }
 
@@ -71,7 +71,7 @@ for (const liste of Object.values(uebungen)) {
   for (const uebung of liste) {
     if (uebung.stufe === 'vorhersage') continue // Multiple Choice, nichts auszuführen
     const ergebnis = javaBeispielPruefen(uebung.id, uebung)
-    melden(ergebnis.ok, `${ergebnis.id}  (uebungen/java.ts)`, ergebnis.meldung)
+    melden(ergebnis.ok, `${ergebnis.id}  (uebungen/java.ts)`, ergebnis.message)
   }
 }
 

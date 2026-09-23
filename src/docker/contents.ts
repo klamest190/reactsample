@@ -11,16 +11,16 @@ import type { CodeBeispiel, DockerTest } from '../lernen/jsSandbox'
 import { simulateBuild } from './build'
 import { composeUp } from './compose'
 import { localized } from '../i18n/localized'
+import { contentResult, type ContentResult } from '../selbsttest/results'
 
 /** Examples that fail on purpose - with the reason. */
 export const DOCKER_EXPECTED_FAILURES: Record<string, string> = {
   'docker-compose-localhost': 'shows the classic localhost mistake',
 }
 
-export type DockerContentResult = { id: string; ok: boolean; message: string }
 
-export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'dockerfile' | 'compose'): DockerContentResult {
-  const result = (message = ''): DockerContentResult => ({ id, ok: !message, message })
+export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'dockerfile' | 'compose'): ContentResult {
+  const result = contentResult(id)
   const tests = example.tests as DockerTest[] | undefined
   const name = (t: DockerTest) => localized(t.name, 'de')
 

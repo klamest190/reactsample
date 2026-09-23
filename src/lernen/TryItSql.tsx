@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Icon } from '../components/Icon'
 import { useSprache } from '../i18n/SpracheContext'
 import { checkQueries, evaluate, lastTable } from '../sql/check'
@@ -9,7 +9,7 @@ import { SqlDatenleiste } from './SqlDatenleiste'
 import { Rahmen, Testergebnisse } from './Rahmen'
 import type { SqlProps } from './TryIt'
 import type { Typfehler } from './typpruefung'
-import { useSavedCode } from './useSavedCode'
+import { useEditor, useOnMount } from './useEditor'
 import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
@@ -71,12 +71,13 @@ const TEXTS = {
 
 type Outcome = { run: SqlRun | null; results: TestErgebnis[] | null; expected: SqlTable | null; failure: string | null }
 
-export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, ...playground }: SqlProps) {
+export function TryItSql(props: SqlProps) {
+  const { id, loesung, tests } = props
   const { sprache } = useSprache()
   const t = TEXTS[sprache]
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   const [outcome, setOutcome] = useState<Outcome | null>(null)
-  // Examples start running right away (see firstRun), exercises wait for the button.
+  // Examples start running right away (see useOnMount below), exercises wait for the button.
   const [running, setRunning] = useState(!tests)
   const ready = useSyncExternalStore(onSqlReady, sqlReady)
   // Only the newest run may show its result - an older one can finish later.
@@ -110,13 +111,10 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
   }
 
   // Examples run right away, exercises on the button. Either way PostgreSQL starts now.
-  const firstRun = useEffectEvent(() => {
+  useOnMount(() => {
     startSql()
     if (!tests) void start(code, false)
   })
-  useEffect(() => {
-    firstRun()
-  }, [])
 
   const markers: Typfehler[] | undefined = useMemo(() => {
     const error = outcome?.run?.error
@@ -125,15 +123,8 @@ export function TryItSql({ id, titel, aufgabe, code: startCode, loesung, tipps, 
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="SQL"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       markierungen={markers}
       laeuft={running}
       oben={<SqlDatenleiste code={code} />}

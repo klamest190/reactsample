@@ -13,6 +13,7 @@ import type { CodeBeispiel, SpringTestSpec } from '../lernen/jsSandbox'
 import { parseHttp, requestText } from './http'
 import { springRun } from './index'
 import { localized } from '../i18n/localized'
+import { contentResult, type ContentResult } from '../selbsttest/results'
 
 /** Examples that fail on purpose - with the reason. */
 export const SPRING_EXPECTED_FAILURES: Record<string, string> = {
@@ -21,12 +22,11 @@ export const SPRING_EXPECTED_FAILURES: Record<string, string> = {
   'spring-beans-kreis': 'shows the report for a dependency cycle',
 }
 
-export type ContentResult = { id: string; ok: boolean; message: string }
 
 const asTests = (tests: SpringTestSpec[]) => tests.map((t) => ({ ...t, name: localized(t.name, 'de') }))
 
 export function springExampleCheck(id: string, example: CodeBeispiel): ContentResult {
-  const result = (message = ''): ContentResult => ({ id, ok: !message, message })
+  const result = contentResult(id)
   const tests = example.tests as SpringTestSpec[] | undefined
   const options = { language: 'de' as const, properties: example.properties, requests: example.requests }
 

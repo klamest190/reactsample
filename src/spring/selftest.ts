@@ -11,6 +11,7 @@
 
 import { check, parseHttp, requestText } from './http'
 import { springStart } from './index'
+import { runCases, type RuntimeResult } from '../selbsttest/results'
 
 type Case = {
   name: string
@@ -650,12 +651,9 @@ interface TodoRepository extends JpaRepository<Todo, Long> {}`,
 
 // ---------------------------------------------------------------------------
 
-export type RuntimeResult = { name: string; ok: boolean; message: string }
-
 /** Runs all cases - without DOM or React, so it works on the command line too. */
 export function springRuntimeCheck(): RuntimeResult[] {
-  return cases.map((c) => {
-    const fail = (message: string): RuntimeResult => ({ name: c.name, ok: false, message })
+  return runCases(cases, (c) => {
     const started = springStart(c.code, { language: 'en', properties: c.properties })
     const problems: string[] = []
 
@@ -679,6 +677,6 @@ export function springRuntimeCheck(): RuntimeResult[] {
     }
     for (const unwanted of c.notInOutput ?? []) if (output.includes(unwanted)) problems.push(`output must not contain ${JSON.stringify(unwanted)}`)
 
-    return problems.length ? fail(problems.join(' · ') + '\n--- output ---\n' + output) : { name: c.name, ok: true, message: '' }
+    return problems.length ? problems.join(' · ') + '\n--- output ---\n' + output : null
   })
 }

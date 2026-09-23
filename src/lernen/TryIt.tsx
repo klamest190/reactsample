@@ -37,7 +37,7 @@ const TryItSql = lazy(() => import('./TryItSql').then((m) => ({ default: m.TryIt
  * Kapitelwechsel überleben.
  */
 
-type Gemeinsam = {
+export type Gemeinsam = {
   /** Eindeutig im ganzen Kurs - Schlüssel für den gespeicherten Code. */
   id: string
   titel?: string

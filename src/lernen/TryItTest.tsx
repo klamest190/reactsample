@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import { CodeBlock } from './CodeBlock'
@@ -6,16 +6,17 @@ import type { TestErgebnis } from './jsSandbox'
 import { Konsole, Rahmen, Testergebnisse } from './Rahmen'
 import { testsAusfuehren, type TestBericht } from './testLauf'
 import type { TestProps } from './TryIt'
-import { useSavedCode } from './useSavedCode'
+import { useEditor, useOnMount } from './useEditor'
 
 /** Writing tests - Vitest and React Testing Library, run in the browser (see testLauf.ts). */
 
 const TESTDATEI = 'App.test.jsx'
 
-export function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps, dateien = [], varianten, ...playground }: TestProps) {
+export function TryItTest(props: TestProps) {
+  const { id, dateien = [], varianten } = props
   const { sprache } = useSprache()
   const t = useTexte()
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   const [bericht, setBericht] = useState<TestBericht | null>(null)
   const [pruefungen, setPruefungen] = useState<TestErgebnis[] | null>(null)
   const [laeuft, setLaeuft] = useState(false)
@@ -57,23 +58,14 @@ export function TryItTest({ id, titel, aufgabe, code: startCode, loesung, tipps,
   }
 
   // Beispiele laufen sofort, Übungen erst auf Knopfdruck - wie bei den anderen Editoren.
-  const ersterLauf = useEffectEvent(() => void ausfuehren(code))
-  useEffect(() => {
-    // oxlint-disable-next-line react/set-state-in-effect -- startet den externen Testlauf; „läuft“ muss sofort sichtbar sein.
-    if (!istUebung) ersterLauf()
-  }, [istUebung])
+  useOnMount(() => {
+    if (!istUebung) void ausfuehren(code)
+  })
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="Test"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       laeuft={laeuft}
       ausfuehren={(c) => void ausfuehren(c ?? code)}
       oben={dateien.map((d) => (

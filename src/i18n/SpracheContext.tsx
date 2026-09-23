@@ -9,7 +9,7 @@ import { texte, type Texte } from './texte'
  *
  *  - Die gewählte Sprache lebt in einem Context und im localStorage.
  *  - Oberflächentexte kommen aus texte.ts: useTexte().ausfuehren
- *  - Kapitel gibt es als eigene Komponente pro Sprache (siehe kurs/kurs.ts),
+ *  - Kapitel gibt es als eigene Komponente pro Sprache (siehe kurs/teile/),
  *    weil sich dort nicht nur Texte, sondern auch die Codebeispiele unterscheiden.
  */
 

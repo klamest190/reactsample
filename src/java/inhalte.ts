@@ -13,6 +13,7 @@
 import { javaAusfuehren } from './index'
 import type { CodeBeispiel, Test } from '../lernen/jsSandbox'
 import { localized } from '../i18n/localized'
+import { contentResult, type ContentResult } from '../selbsttest/results'
 
 /** Beispiele, die absichtlich nicht laufen - mit Begründung. */
 export const JAVA_ERWARTETE_FEHLER: Record<string, string> = {
@@ -22,8 +23,6 @@ export const JAVA_ERWARTETE_FEHLER: Record<string, string> = {
   'java-fehler-ungefangen': 'zeigt absichtlich einen Absturz mit Stacktrace',
 }
 
-export type InhaltErgebnis = { id: string; ok: boolean; meldung: string }
-
 const alsJavaTests = (tests: Test[]) =>
   tests.map((test) => ({
     name: localized(test.name, 'de'),
@@ -31,8 +30,8 @@ const alsJavaTests = (tests: Test[]) =>
     erwartet: test.erwartet,
   }))
 
-export function javaBeispielPruefen(id: string, beispiel: CodeBeispiel): InhaltErgebnis {
-  const ok = (meldung = ''): InhaltErgebnis => ({ id, ok: !meldung, meldung })
+export function javaBeispielPruefen(id: string, beispiel: CodeBeispiel): ContentResult {
+  const ok = contentResult(id)
   const tests = beispiel.tests as Test[] | undefined
 
   if (tests?.length) {

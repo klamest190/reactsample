@@ -10,6 +10,7 @@
 import { simulateBuild, type BuildResult } from './build'
 import { execute, newState } from './cli'
 import { composeUp, type ComposeResult } from './compose'
+import { runCases, type RuntimeResult } from '../selbsttest/results'
 
 type Case = { name: string; check: () => string | null }
 
@@ -184,16 +185,6 @@ const cases: Case[] = [
   },
 ]
 
-export type DockerRuntimeResult = { name: string; ok: boolean; message: string }
-
-export function dockerRuntimeCheck(): DockerRuntimeResult[] {
-  return cases.map((c) => {
-    let problem: string | null
-    try {
-      problem = c.check()
-    } catch (error) {
-      problem = 'crashed: ' + String(error instanceof Error ? error.stack : error)
-    }
-    return { name: c.name, ok: !problem, message: problem ?? '' }
-  })
+export function dockerRuntimeCheck(): RuntimeResult[] {
+  return runCases(cases, (c) => c.check())
 }

@@ -1,0 +1,9 @@
+{
+  // The Node test scripts (run with jiti, which does not check types) - checked by `tsc -b` like the app.
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.scripts.tsbuildinfo",
+    "types": ["node", "vite/client"]
+  },
+  "include": ["scripts/*.ts"]
+}

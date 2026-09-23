@@ -12,14 +12,15 @@ import { reactTestsAusfuehren } from './reactTests'
 import { tailwindFuerVorschau } from './tailwind'
 import type { ReactProps } from './TryIt'
 import { typenPruefen } from './typpruefung'
-import { useSavedCode } from './useSavedCode'
+import { useEditor } from './useEditor'
 
 /** React - the JSX is compiled and rendered into a root of its own (see reactKompilieren.ts). */
 
-export function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, typen, ...playground }: ReactProps) {
+export function TryItReact(props: ReactProps) {
+  const { id, tests, typen } = props
   const { sprache } = useSprache()
   const t = useTexte()
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
 
   // Typprüfung kurz nach dem letzten Tastendruck - wie die roten Schlangenlinien in VS Code.
   const typfehler = useDelayedCheck(code, typen ? typenPruefen : null)
@@ -148,15 +149,8 @@ export function TryItReact({ id, titel, aufgabe, code: startCode, loesung, tipps
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art={typen ? 'TypeScript' : 'React'}
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       laeuft={testsLaufen}
       ausfuehren={(c) => ausfuehren(c ?? code)}
       markierungen={typfehler ?? undefined}

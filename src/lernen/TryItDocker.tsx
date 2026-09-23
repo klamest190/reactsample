@@ -10,6 +10,7 @@ import { CodeEditor } from './CodeEditor'
 import { lineMarkers } from './editorChecks'
 import { Rahmen, Testergebnisse } from './Rahmen'
 import type { DockerProps } from './TryIt'
+import { useEditor } from './useEditor'
 import { useSavedCode } from './useSavedCode'
 import type { TestErgebnis } from './jsSandbox'
 import { focusableWhenScrolling } from '../components/scrollFocus'
@@ -107,10 +108,11 @@ function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: 
 // Dockerfile
 // ---------------------------------------------------------------------------
 
-function DockerfileEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, project = 'spring', ignore: startIgnore, ...playground }: DockerProps) {
+function DockerfileEditor(props: DockerProps) {
+  const { id, tests, project = 'spring', ignore: startIgnore } = props
   const { sprache } = useSprache()
   const t = TEXTS[sprache]
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   const [ignore, setIgnore] = useSavedCode(id + ':ignore', startIgnore ?? '')
   const [change, setChange] = useState<Change>('code')
 
@@ -153,15 +155,8 @@ function DockerfileEditor({ id, titel, aufgabe, code: startCode, loesung, tipps,
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="Docker"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       markierungen={markers}
       startText={t.build}
       oben={top}
@@ -368,10 +363,11 @@ function InlineCode({ text }: { text: string }) {
 // Compose
 // ---------------------------------------------------------------------------
 
-function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, ...playground }: DockerProps) {
+function ComposeEditor(props: DockerProps) {
+  const { id, tests } = props
   const { sprache } = useSprache()
   const t = TEXTS[sprache]
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   function compute(source: string, withTests: boolean) {
     const started = composeUp(source)
     return { up: started, results: withTests ? testResults(tests, sprache, (test) => Boolean(test.compose?.(started))) : null }
@@ -390,15 +386,8 @@ function ComposeEditor({ id, titel, aufgabe, code: startCode, loesung, tipps, te
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="Compose"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       markierungen={markers}
       startText={t.up}
       ausfuehren={(c) => up(c ?? code, true)}

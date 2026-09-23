@@ -1,11 +1,11 @@
-import { useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { localized } from '../i18n/localized'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
 import type { JavaLauf } from '../java'
 import { lineMarkers, useDelayedCheck } from './editorChecks'
 import { Konsole, Rahmen, Testergebnisse } from './Rahmen'
 import type { JavaProps } from './TryIt'
-import { useSavedCode } from './useSavedCode'
+import { useEditor, useOnMount } from './useEditor'
 
 /**
  * Anders als JavaScript braucht Java keinen iframe: Der Code läuft nie im
@@ -16,10 +16,11 @@ import { useSavedCode } from './useSavedCode'
  *  - Beim Tippen prüft `javaPruefen` im Hintergrund (rote Schlangenlinien).
  *  - Erst wenn es keine Fehler mehr gibt, startet das Programm überhaupt.
  */
-export function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, vorbereitung, ...playground }: JavaProps) {
+export function TryItJava(props: JavaProps) {
+  const { id, tests, vorbereitung } = props
   const { sprache } = useSprache()
   const t = useTexte()
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   // Die Laufzeit wird erst beim ersten Java-Kapitel geladen (siehe javaHolen).
   const [java, setJava] = useState(javaModul)
 
@@ -37,12 +38,9 @@ export function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps,
   }
 
   // Beispiele laufen sofort, Übungen erst auf Knopfdruck.
-  const ersterLauf = useEffectEvent(() => {
+  useOnMount(() => {
     if (!tests) starten(code, false)
   })
-  useEffect(() => {
-    ersterLauf()
-  }, [])
 
   // Die Fehlerprüfung läuft wie in einer IDE kurz nach dem letzten Tastendruck.
   const pruefen = useMemo(
@@ -53,15 +51,8 @@ export function TryItJava({ id, titel, aufgabe, code: startCode, loesung, tipps,
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="Java"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       markierungen={markierungen}
       ausfuehren={(c) => starten(c ?? code, true)}
     >

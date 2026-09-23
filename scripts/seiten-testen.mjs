@@ -28,17 +28,19 @@ const filter = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? ''
 const PARALLEL = Number(process.argv.find((a) => a.startsWith('--parallel='))?.split('=')[1] ?? Math.min(4, os.availableParallelism()))
 const axeSource = fs.readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8')
 
-const kurs = fs.readFileSync(path.join(root, 'src/kurs/kurs.ts'), 'utf8')
-// One playground per part - each file names its part (teil: 'javascript').
-const playgroundDir = path.join(root, 'src/kurs/playground')
-const playgrounds = fs.readdirSync(playgroundDir).map((f) => fs.readFileSync(path.join(playgroundDir, f), 'utf8')).join('\n')
-const routes = [
-  '',
-  'glossar',
-  'projekt',
-  ...[...kurs.matchAll(/^ {8}id: '([a-z0-9-]+)'/gm)].map((m) => m[1]),
-  ...[...new Set([...playgrounds.matchAll(/^ {2}teil: '([a-z0-9-]+)'/gm)].map((m) => m[1]))].map((teil) => 'playground/' + teil),
-].filter((route) => route.startsWith(filter))
+const readAll = (dir) => fs.readdirSync(path.join(root, dir)).map((f) => fs.readFileSync(path.join(root, dir, f), 'utf8')).join('\n')
+const ids = (text, pattern) => [...new Set([...text.matchAll(pattern)].map((m) => m[1]))]
+// Chapters: one file per part (src/kurs/teile/), a chapter's id at six spaces. Project steps
+// have their own list, playgrounds name their part (teil: 'javascript').
+const chapters = ids(readAll('src/kurs/teile'), /^ {6}id: '([a-z0-9-]+)'/gm)
+const steps = ids(fs.readFileSync(path.join(root, 'src/kurs/projekt/meta.ts'), 'utf8'), /^ {4}id: '(projekt-[a-z0-9-]+)'/gm)
+const playgrounds = ids(readAll('src/kurs/playground'), /^ {2}teil: '([a-z0-9-]+)'/gm)
+const routes = ['', 'glossar', 'projekt', ...chapters, ...steps, ...playgrounds.map((teil) => 'playground/' + teil)].filter((route) =>
+  route.startsWith(filter),
+)
+if (!filter && (chapters.length < 50 || steps.length < 10 || playgrounds.length < 9)) {
+  throw new Error(`Routen nicht gefunden (${chapters.length} Kapitel, ${steps.length} Projektschritte, ${playgrounds.length} Playgrounds) - hat sich die Ablage geändert?`)
+}
 
 // Page-level rules axe cannot limit to a part of the page - checked by hand without previews.
 const PAGE_RULES = ['landmark-no-duplicate-main', 'landmark-main-is-top-level', 'landmark-unique', 'heading-order']

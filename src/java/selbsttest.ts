@@ -9,6 +9,7 @@
  */
 
 import { javaAusfuehren, type JavaTest } from './index'
+import { runCases, type RuntimeResult } from '../selbsttest/results'
 
 type Fall = { name: string; code: string; erwartet: string[]; tests?: JavaTest[] }
 
@@ -513,28 +514,20 @@ class Auto implements Fahrzeug {
 
 // ---------------------------------------------------------------------------
 
-export type LaufzeitErgebnis = { name: string; ok: boolean; meldung: string }
-
 /**
  * Führt alle Fälle aus. Läuft ohne DOM und ohne React - deshalb sowohl auf der
  * Kommandozeile (scripts/java-testen.ts) als auch in der Selbsttest-Seite.
  */
-export function javaLaufzeitPruefen(): LaufzeitErgebnis[] {
-  return faelle.map((fall) => {
+export function javaLaufzeitPruefen(): RuntimeResult[] {
+  return runCases(faelle, (fall) => {
     const lauf = javaAusfuehren(fall.code, { sprache: 'de', tests: fall.tests })
     const bekommen = lauf.zeilen.map((z) => z.text)
     const testFehler = (lauf.ergebnisse ?? []).filter((e) => !e.ok)
 
     if (bekommen.length !== fall.erwartet.length || bekommen.some((z, i) => z !== fall.erwartet[i])) {
-      return {
-        name: fall.name,
-        ok: false,
-        meldung: `erwartet ${JSON.stringify(fall.erwartet)}, bekommen ${JSON.stringify(bekommen)}`,
-      }
+      return `erwartet ${JSON.stringify(fall.erwartet)}, bekommen ${JSON.stringify(bekommen)}`
     }
-    if (testFehler.length) {
-      return { name: fall.name, ok: false, meldung: testFehler.map((e) => `„${e.name}“: ${e.meldung}`).join(' · ') }
-    }
-    return { name: fall.name, ok: true, meldung: '' }
+    if (testFehler.length) return testFehler.map((e) => `„${e.name}“: ${e.meldung}`).join(' · ')
+    return null
   })
 }

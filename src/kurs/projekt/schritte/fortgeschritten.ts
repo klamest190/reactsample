@@ -1,6 +1,5 @@
-import type { Zweisprachig } from '../../i18n/SpracheContext'
-import { js } from '../../lernen/quelltext'
-import type { SchrittInhalt } from './schritte'
+import { js } from '../../../lernen/quelltext'
+import { t, type SchrittInhalt } from './typen'
 
 /**
  * Die drei Schritte vor der Challenge: TypeScript, Routing und eigene Tests.
@@ -9,7 +8,6 @@ import type { SchrittInhalt } from './schritte'
  * die unveränderten Teile, und geänderte Teile stehen genau einmal da.
  */
 
-const t = (de: string, en: string): Zweisprachig => ({ de, en })
 
 // --- Bausteine der TypeScript-Fassung ---------------------------------------------------
 

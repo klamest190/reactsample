@@ -2,6 +2,7 @@ import type { Zweisprachig } from '../i18n/SpracheContext'
 import type { CodeBeispiel, TestErgebnis } from '../lernen/jsSandbox'
 import type { RunOptions, SqlRun, SqlTable } from './engine'
 import { localized } from '../i18n/localized'
+import { contentResult, type ContentResult } from '../selbsttest/results'
 
 /**
  * Tests for SQL exercises (part 9).
@@ -161,14 +162,13 @@ export const SQL_EXPECTED_FAILURES: Record<string, string> = {
   'sql-tabellen-check': 'a rating outside CHECK (rating BETWEEN 1 AND 5)',
 }
 
-export type SqlContentResult = { id: string; ok: boolean; message: string }
 
 /**
  *   example without tests   runs without errors (the solution too, if there is one)
  *   exercise with tests     the solution passes all tests, the start code does NOT
  */
-export async function sqlExampleCheck(id: string, example: CodeBeispiel, run: SqlRunner): Promise<SqlContentResult> {
-  const result = (message = ''): SqlContentResult => ({ id, ok: !message, message })
+export async function sqlExampleCheck(id: string, example: CodeBeispiel, run: SqlRunner): Promise<ContentResult> {
+  const result = contentResult(id)
   const tests = example.tests as SqlTest[] | undefined
 
   if (tests?.length) {

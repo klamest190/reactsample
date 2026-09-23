@@ -164,7 +164,7 @@ async function uebungPruefen(
   // Java prüft sich selbst - die Laufzeit in src/java/ braucht weder DOM noch iframe.
   if (modus === 'java') {
     const ergebnis = javaBeispielPruefen('', { code: start, loesung, tests: tests as Test[], vorbereitung })
-    return ergebnis.ok ? null : ergebnis.meldung
+    return ergebnis.ok ? null : ergebnis.message
   }
   if (modus === 'react') {
     const mitLoesung = await reactTestsAusfuehren(loesung, tests as ReactTest[], 'de')
@@ -241,7 +241,7 @@ export async function beispielPruefen(
 ): Promise<string | null> {
   if (m.modus === 'java') {
     const ergebnis = javaBeispielPruefen('', b)
-    return ergebnis.ok ? null : ergebnis.meldung
+    return ergebnis.ok ? null : ergebnis.message
   }
   // Part 8 checks itself as well - Spring runtime and Docker simulator need no DOM.
   if (m.modus === 'spring') {

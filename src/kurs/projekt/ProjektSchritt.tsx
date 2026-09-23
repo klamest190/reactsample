@@ -25,7 +25,7 @@ export function ProjektSchritt({ id }: { id: string }) {
     code: inhalt.start ?? schrittInhalte[projektSchritte[index - 1].id].loesung,
     loesung: inhalt.loesung,
     tipps: inhalt.tipps,
-    aufgabe: <p className="text-xs text-slate-500 dark:text-slate-400">{startHinweis}</p>,
+    aufgabe: <p className="text-xs text-slate-600 dark:text-slate-400">{startHinweis}</p>,
   }
 
   return (

@@ -51,6 +51,7 @@ CLAUDE.md README.md          diese Karte / ausführliche Doku (Deutsch)
 index.html                   App-Einstieg
 selbsttest.html              Einstieg für test:inhalte (src/selbsttest/main.ts)
 vite.config.ts               Tailwind, React, optimizeDeps.exclude für PGlite
+tsconfig.*.json              app (src), node (vite.config), scripts (Test-Skripte - jiti prüft keine Typen, tsc -b schon)
 .github/workflows/ci.yml     CI: Job "code" (lint, build, Node-Tests), Job "browser" (test:inhalte --build, test:seiten)
 public/favicon.svg           Bildmarke "Lernpfad"
 scripts/
@@ -80,8 +81,9 @@ src/
   hooks/                     useHashRoute, useLocalStorage, useAktiverAbschnitt, useDebounce …
   seiten/                    Startseite, KapitelSeite, Glossar, ProjektUebersicht, Playground
   kurs/                      INHALTE
-    kurs.ts                  Teile → Kapitel (id, titel, lernziele, lazy Komponente de/en),
-                             GRUNDLAGEN (Voraussetzungen), STICHWORTE (Suche), alleKapitel
+    kurs.ts                  Reihenfolge der Teile, GRUNDLAGEN (roter Faden, bewusst zentral), alleKapitel
+    teile/                   ein Teil pro Datei: Kapitel (id, titel, lernziele, stichworte, lazy Komponente de/en);
+                             typen.ts: Teil, Kapitel, laden()
     glossar.ts               Glossar-Einträge
     js/ typescript/ react/ hooks/ praxis/ java/ backend/ sql/
       Name.tsx               Kapiteltext DE  ┐ gleiche benannte Export-Komponente
@@ -90,7 +92,8 @@ src/
     praxis/businessApp/      Beispiel-App (Seiten, Komponenten, Store) für das BusinessApp-Kapitel
     uebungen/                Zusatzübungen je Teil (index.ts lädt pro Teil nach), typen.ts
     playground/              Vorlagen + Bausteine je Teil, orte.ts, typen.ts
-    projekt/                 ToDo-Projekt: meta.ts, schritte.ts, schritteFortgeschritten.ts, ProjektSchritt.tsx
+    projekt/                 ToDo-Projekt: meta.ts (Titel, Vorwissen), ProjektSchritt.tsx, schritte/ (Inhalte:
+                             code.ts, tests.ts, grundlagen.ts 1-5, hooks.ts 6-11, fortgeschritten.ts 12-14, challenge.ts 15)
     demos/                   interaktive Demo-Komponenten der Kapitel (Diagramme, Terminal, FullStack …)
   lernen/                    LERNBAUSTEINE (Editoren und ihre Laufzeiten im Browser)
     TryIt.tsx                Props aller Modi + Auswahl des Editors nach `modus` (Spring/Docker/SQL lazy)
@@ -105,6 +108,7 @@ src/
     TryItSql.tsx             SQL über src/sql, darüber SqlDatenleiste.tsx (Beispieldaten)
     Werkstatt.tsx            Mehrdatei-Editor (Full-Stack-Kapitel, BusinessApp)
     modi.ts                  Register: MODI, EDITOR_SPRACHEN, ARTEN (Abzeichen), hervorhebungFuerTitel
+    useEditor.ts             useEditor(props): gespeicherter Code + Props für <Rahmen>; useOnMount (erster Lauf)
     editorChecks.ts          useDelayedCheck (Prüfen nach Tipp-Pause), lineMarkers (rote Linie je Zeile)
     CodeEditor.tsx           Textarea über eingefärbtem <pre>, Autovervollständigung
     hervorheben.tsx          Syntax-Highlighter (code, konfig, sql)
@@ -118,7 +122,8 @@ src/
   spring/                    Spring Boot auf der Java-Laufzeit - kein React
   docker/                    Docker-Simulator (build, compose, cli) - kein React
   sql/                       PostgreSQL via PGlite im Worker (engine, client, check, dataset) - kein React
-  selbsttest/                main.ts (Seite für test:inhalte), pruefen.ts (Prüfung je Modus)
+  selbsttest/                main.ts (Seite für test:inhalte), pruefen.ts (Prüfung je Modus),
+                             results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten)
 ```
 
 Laufzeiten (`java/`, `spring/`, `docker/`, `sql/`) kennen kein React und kein DOM, damit sie auch in
@@ -131,11 +136,13 @@ Node laufen (`test:java`, `test:backend`, `test:sql`). Die Tür nach außen ist 
   (`Rahmen`, `ausfuehren`, `laeuft`) - beim Verschieben nicht umbenennen, nur Neues englisch schreiben.
   Texte für Lernende immer zweisprachig (`{ de, en }` bzw. `texte.ts`).
 - **Kapitel = drei Dateien**: `.tsx` (DE), `.en.tsx` (EN), `.code.ts` (Code einmal, Englisch).
-  Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `kurs.ts`.
+  Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `kurs/teile/<teil>.ts`,
+  Voraussetzungen in `GRUNDLAGEN` (`kurs.ts`).
   Ablauf: README → "Ein Kapitel hinzufügen".
 - **`TryIt`-IDs** sind kursweit eindeutig (Schlüssel für gespeicherten Code und Fortschritt).
 - **Neuer Editor-Modus**: in `lernen/modi.ts` eintragen, Props in `TryIt.tsx`, Editor als
-  `TryIt<Name>.tsx` (nutzt `Rahmen`), Prüfung in `selbsttest/pruefen.ts`.
+  `TryIt<Name>.tsx` - `const { code, rahmen } = useEditor(props)`, dann `<Rahmen {...rahmen} art=… ausfuehren=…>`;
+  Prüfung in `selbsttest/pruefen.ts`. Eine neue Laufzeit liefert `RuntimeResult`/`ContentResult` aus `selbsttest/results.ts`.
 - **Keine Emoji in der Oberfläche** - Icons aus `components/Icon.tsx` (fehlende dort ergänzen).
   Kursinhalte (Kapiteltexte, Beispielcode, simulierte Terminalausgaben) dürfen Emoji haben.
 - Tailwind-Klassen als ganze Strings (der Scanner findet keine zusammengesetzten).
@@ -173,7 +180,7 @@ Node laufen (`test:java`, `test:backend`, `test:sql`). Die Tür nach außen ist 
 - axe misst halbtransparente Hintergründe (`dark:bg-black/40`) falsch, wenn sich das Farbschema während
   des Laufs ändert - Kontrastfehler im Dunkeln erst an einer frisch geladenen Seite bestätigen.
 - Playground-IDs (`teil: '…'`) stehen in den Dateien unter `kurs/playground/`, nicht in `index.ts`.
-- Kapitel-Imports in `kurs.ts` müssen existieren, sonst bricht Vite ab (beim Anlegen zuerst die Dateien).
+- Kapitel-Imports in `kurs/teile/*.ts` müssen existieren, sonst bricht Vite ab (beim Anlegen zuerst die Dateien).
 - PGlite ist in `optimizeDeps.exclude` - nicht entfernen, sonst lädt die WASM-Datei nicht.
 - Git Bash wandelt Argumente wie `/sql-start` in Windows-Pfade um - Routen ohne führenden `/` übergeben.
 - Shell-Heredocs verschlucken Backslashes - Dateien mit `\` über Editor-Tools oder Node-Skripte schreiben.

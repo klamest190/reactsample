@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { localized } from '../i18n/localized'
 import { useSprache, useTexte } from '../i18n/SpracheContext'
@@ -7,18 +7,19 @@ import { sandboxDokument, type SandboxNachricht, type TestErgebnis } from './jsS
 import { Konsole, Rahmen, Testergebnisse, Typfehlerliste, type Zeile } from './Rahmen'
 import type { JsProps } from './TryIt'
 import { tsTypenPruefen, tsUebersetzen, typErgebnisse } from './tsLauf'
-import { useSavedCode } from './useSavedCode'
+import { useEditor, useOnMount } from './useEditor'
 
 /** JavaScript and TypeScript - the code runs in a sandboxed iframe (see jsSandbox.ts and tsLauf.ts). */
 
 /** Type errors in the code itself - the markers while typing. */
 const typeErrorsInCode = async (code: string) => (await tsTypenPruefen(code)).imCode
 
-export function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, typTests, vorbereitung, vorschau, modus, ...playground }: JsProps) {
+export function TryItJs(props: JsProps) {
+  const { id, tests, typTests, vorbereitung, vorschau, modus } = props
   const { theme } = useTheme()
   const { sprache } = useSprache()
   const t = useTexte()
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   const ts = modus === 'ts'
   const istUebung = Boolean(tests || typTests)
 
@@ -95,12 +96,9 @@ export function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, t
   }
 
   // TypeScript-Beispiele laufen wie JS-Beispiele sofort - nur eben nach dem Übersetzen.
-  const ersterLauf = useEffectEvent(() => {
+  useOnMount(() => {
     if (ts && !istUebung) tsStarten(code, theme === 'dark')
   })
-  useEffect(() => {
-    ersterLauf()
-  }, [])
 
   // Bei TypeScript-Übungen zählen die Typen mit: erst wenn beides da ist, gibt es ein Ergebnis.
   const alleErgebnisse =
@@ -160,15 +158,8 @@ export function TryItJs({ id, titel, aufgabe, code: startCode, loesung, tipps, t
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art={ts ? 'TS' : 'JavaScript'}
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       laeuft={laeuft}
       ausfuehren={(c) => ausfuehren(c ?? code)}
       markierungen={typfehler ?? undefined}

@@ -61,7 +61,7 @@ Mit `-- --build` läuft derselbe Test auf dem Produktions-Build - manche Fehler 
 
 ### Seitentest
 
-`npm run test:seiten` baut die App wie `npm run build` und öffnet jede Seite (Start, Glossar, Projekt,
+`npm run test:seiten` baut die App wie `npm run build` und öffnet jede Seite (Start, Glossar, Projekt, Projektschritte,
 alle Kapitel und Playgrounds) im installierten Chrome:
 
 - keine JavaScript-Fehler auf der Seite,
@@ -176,13 +176,17 @@ src/
     texte.ts               Alle Oberflächentexte in beiden Sprachen (typgeprüft)
   index.css                Tailwind, Dark Mode, Design-Tokens, Styles für die Editor-Vorschau
   kurs/
-    kurs.ts                Kursstruktur als Daten (Teile, Kapitel, Lernziele) + roter Faden (GRUNDLAGEN, STICHWORTE)
+    kurs.ts                Reihenfolge der Teile, roter Faden (GRUNDLAGEN), alleKapitel
+    teile/                 Ein Teil pro Datei: Kapitel mit Titel, Lernzielen, Suchbegriffen, Komponente
+      typen.ts             Teil, Kapitel, laden() für nachgeladene Kapitel
     glossar.ts             Glossar-Einträge (zweisprachig, Code Englisch, Kapitel-Links)
     uebungen/              Zusätzliche gestufte Übungen pro Kapitel, pro Teil nachgeladen
       typen.ts             Vorhersage | CodeUebung (fehler, ergaenzen, frei)
     projekt/
-      meta.ts              Die 12 Projektschritte: Titel, Vorwissen, Stichworte
-      schritte.ts          Einleitung, Anforderungen, Start, Lösung, Tests und Tipps pro Schritt
+      meta.ts              Die 15 Projektschritte: Titel, Vorwissen, Stichworte
+      schritte/            Einleitung, Anforderungen, Start, Lösung, Tests und Tipps pro Schritt
+        code.ts tests.ts   Code-Bausteine der Lösungen und gemeinsame Tests
+        grundlagen.ts hooks.ts fortgeschritten.ts challenge.ts   Schritte 1-5, 6-11, 12-14, 15
       ProjektSchritt.tsx   Eine Seite für alle Schritte
     js/ typescript/ react/ hooks/ praxis/
       Name.tsx             Kapiteltext Deutsch
@@ -517,8 +521,10 @@ tests: [
 2. `MeinKapitel.tsx` (Deutsch) und `MeinKapitel.en.tsx` (Englisch) mit derselben benannten
    Export-Komponente anlegen, die den Code per `{...beispiele['id']}` einbinden
    (Vorlage: ein beliebiges vorhandenes Kapitel).
-3. In `src/kurs/kurs.ts` eintragen - `titel`, `kurz` und `lernziele` jeweils mit `de` und `en`, dazu
-   `Komponente: { de: laden(() => import('./<teil>/MeinKapitel'), 'MeinKapitel'), en: laden(() => import('./<teil>/MeinKapitel.en'), 'MeinKapitel') }`.
+3. In `src/kurs/teile/<teil>.ts` eintragen - `titel`, `kurz` und `lernziele` jeweils mit `de` und `en`,
+   optional `stichworte` für die Suche, dazu
+   `Komponente: { de: laden(() => import('../<teil>/MeinKapitel'), 'MeinKapitel'), en: laden(() => import('../<teil>/MeinKapitel.en'), 'MeinKapitel') }`.
+   Was das Kapitel voraussetzt, steht zentral in `GRUNDLAGEN` in `src/kurs/kurs.ts`.
 
 Navigation, Startseite, Nummerierung und Fortschritt ergeben sich automatisch. Die `id` jedes
 `TryIt` muss kursweit eindeutig sein.

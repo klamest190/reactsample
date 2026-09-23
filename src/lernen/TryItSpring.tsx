@@ -19,6 +19,7 @@ import { CodeEditor } from './CodeEditor'
 import { lineMarkers, useDelayedCheck } from './editorChecks'
 import { Konsole, Rahmen, Testergebnisse } from './Rahmen'
 import type { SpringProps } from './TryIt'
+import { useEditor } from './useEditor'
 import { useSavedCode } from './useSavedCode'
 import { focusableWhenScrolling } from '../components/scrollFocus'
 
@@ -109,10 +110,11 @@ type Run = {
   server: SpringServer | null
 }
 
-export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipps, tests, properties: startProperties, requests, ...playground }: SpringProps) {
+export function TryItSpring(props: SpringProps) {
+  const { id, tests, properties: startProperties, requests } = props
   const { sprache } = useSprache()
   const t = TEXTS[sprache]
-  const [code, setCode] = useSavedCode(id, startCode)
+  const { code, rahmen } = useEditor(props)
   const [properties, setProperties] = useSavedCode(id + ':properties', startProperties ?? '')
   const springTests = useMemo(
     () => tests?.map((test) => ({ ...test, name: localized(test.name, sprache) })),
@@ -159,15 +161,8 @@ export function TryItSpring({ id, titel, aufgabe, code: startCode, loesung, tipp
 
   return (
     <Rahmen
-      {...playground}
+      {...rahmen}
       art="Spring"
-      titel={titel}
-      aufgabe={aufgabe}
-      code={code}
-      setCode={setCode}
-      startCode={startCode}
-      loesung={loesung}
-      tipps={tipps}
       markierungen={markers}
       startText={t.start}
       oben={propertiesEditor}

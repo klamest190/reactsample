@@ -88,16 +88,16 @@ for (const list of Object.values(uebungen)) {
   const p = sqlPlayground
   for (const [i, v] of p.vorlagen.entries()) {
     const r = await run(v.code)
-    report(!r.error, `playground template ${i + 1}: ${v.titel.en}`, r.error && `line ${r.error.line}: ${r.error.message}`)
+    report(!r.error, `playground template ${i + 1}: ${v.titel.en}`, r.error ? `line ${r.error.line}: ${r.error.message}` : undefined)
   }
   const all = p.gruppen.flatMap((g) => g.bausteine)
   for (const b of all) {
     const r = await run(p.vorlagen[0].code + '\n' + b.code.replace('$0', ''))
-    report(!r.error, `playground block: ${b.titel.en}`, r.error && `line ${r.error.line}: ${r.error.message}`)
+    report(!r.error, `playground block: ${b.titel.en}`, r.error ? `line ${r.error.line}: ${r.error.message}` : undefined)
   }
   const together = all.reduce((code, b) => code + '\n' + b.code.replace('$0', ''), p.vorlagen[0].code)
   const r = await run(together)
-  report(!r.error, 'playground: all blocks together', r.error && `line ${r.error.line}: ${r.error.message}`)
+  report(!r.error, 'playground: all blocks together', r.error ? `line ${r.error.line}: ${r.error.message}` : undefined)
 }
 
 console.log(failed ? `\n${failed} failed` : '\nall ok')
