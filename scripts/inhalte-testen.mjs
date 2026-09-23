@@ -74,6 +74,11 @@ if (seitenfehler.length) {
   console.log(`Hinweis: ${seitenfehler.length} unbehandelte Fehler aus Beispielcode: ${[...new Set(seitenfehler)].join(' · ')}`)
 }
 
+// In GitHub Actions: failures as annotations - visible on the commit without access to the logs.
+if (process.env.GITHUB_ACTIONS) {
+  for (const e of fehlgeschlagen) console.log(`::error title=Inhaltstest ${e.id}::${e.ort}: ${e.meldung.replace(/\n/g, ' ')}`)
+}
+
 await browser.close()
 await server.close()
 process.exit(fehlgeschlagen.length ? 1 : 0)

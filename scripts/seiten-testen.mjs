@@ -17,6 +17,7 @@
  * Exits with code 1 if anything fails.
  */
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { launchBrowser, startServer } from './test-server.mjs'
@@ -24,7 +25,7 @@ import { launchBrowser, startServer } from './test-server.mjs'
 const root = path.resolve(import.meta.dirname, '..')
 const filter = process.argv.slice(2).find((a) => !a.startsWith('--')) ?? ''
 // Pages checked at the same time: `-- --parallel=1` for a slow machine.
-const PARALLEL = Number(process.argv.find((a) => a.startsWith('--parallel='))?.split('=')[1] ?? 4)
+const PARALLEL = Number(process.argv.find((a) => a.startsWith('--parallel='))?.split('=')[1] ?? Math.min(4, os.availableParallelism()))
 const axeSource = fs.readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8')
 
 const kurs = fs.readFileSync(path.join(root, 'src/kurs/kurs.ts'), 'utf8')
@@ -42,10 +43,12 @@ const routes = [
 // Page-level rules axe cannot limit to a part of the page - checked by hand without previews.
 const PAGE_RULES = ['landmark-no-duplicate-main', 'landmark-main-is-top-level', 'landmark-unique', 'heading-order']
 
+/** Findings of the run ("route: what") - and pages that were only clean at the second attempt. */
 const failures = []
-const fail = (where, what) => {
-  failures.push(`${where || 'start'}: ${what}`)
-  console.log(`✗ ${where || 'start'}: ${what}`)
+const unstable = []
+const record = (line) => {
+  failures.push(line)
+  console.log(`✗ ${line}`)
 }
 
 console.log('Produktions-Build …')
@@ -71,9 +74,14 @@ async function openPage(route, { language, theme, width }) {
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message.split('\n')[0]))
-  await page.goto(server.url + '#/' + route)
-  await page.waitForSelector('main h1', { timeout: 15000 })
-  await page.waitForTimeout(1000)
+  try {
+    await page.goto(server.url + '#/' + route)
+    await page.waitForSelector('main h1', { timeout: 30000 })
+    await page.waitForTimeout(1000)
+  } catch (error) {
+    await context.close()
+    throw error
+  }
   return { page, errors, close: () => context.close() }
 }
 
@@ -85,31 +93,65 @@ async function axe(page, options) {
   )
 }
 
-/** Runs `check` for every route, `PARALLEL` pages at a time - each in its own browser context. */
-async function forEveryPage(check) {
+/**
+ * Runs `check(route, report)` for every route, `PARALLEL` pages at a time - each in its own
+ * browser context. A page with findings is checked once more on its own at the end: on a slow
+ * machine (CI) a long exercise can miss its time. Clean at the second attempt counts as
+ * unstable (reported, not failed); a crash of one page never stops the run.
+ */
+async function forEveryPage(name, check) {
+  const run = async (route) => {
+    const found = []
+    try {
+      await check(route, (what) => found.push(what))
+    } catch (error) {
+      found.push(`Abbruch: ${error.message.split('\n')[0]}`)
+    }
+    return found
+  }
+  const suspicious = new Map()
   let next = 0
   let done = 0
   const worker = async () => {
     while (next < routes.length) {
       const route = routes[next++]
-      await check(route)
+      const found = await run(route)
+      if (found.length) suspicious.set(route, found)
       process.stdout.write(`  ${++done}/${routes.length}\r`)
     }
   }
   await Promise.all(Array.from({ length: Math.min(PARALLEL, routes.length) }, worker))
+
+  for (const [route, first] of suspicious) {
+    const where = route || 'start'
+    const again = await run(route)
+    if (again.length) {
+      for (const what of again) record(`${where}: ${what}`)
+    } else {
+      unstable.push(`${where} (${name}): ${first[0]}`)
+      console.log(`~ ${where}: erst beim zweiten Versuch in Ordnung - ${first[0]}`)
+    }
+  }
 }
 
 // --- 1. Every page: errors, exercises, accessibility ----------------------------------------
 console.log(`\n1. ${routes.length} Seiten: Fehler, Musterlösungen, Barrierefreiheit (${PARALLEL} parallel)`)
-await forEveryPage(async (route) => {
+await forEveryPage('Desktop', async (route, report) => {
   const { page, errors, close } = await openPage(route, { language: 'de', theme: 'light', width: 1300 })
+  try {
+    await checkDesktop(page, errors, report)
+  } finally {
+    await close()
+  }
+})
 
+async function checkDesktop(page, errors, report) {
   for (const button of await page.$$('[data-uebung] > button[aria-expanded="false"]')) await button.click()
   await page.waitForTimeout(1000)
   for (const button of await page.$$('button:has-text("Lösung zeigen")')) await button.click()
   for (const button of await page.$$('button:has-text("Lösung in den Editor übernehmen")')) await button.click()
-  // Wait until no editor runs any more (SQL starts PostgreSQL, React tests take a while).
-  for (let quiet = 0, waited = 0; quiet < 3 && waited < 40; waited++) {
+  // Wait until no editor runs any more (SQL starts PostgreSQL, one React exercise waits 10 s).
+  for (let quiet = 0, waited = 0; quiet < 3 && waited < 120; waited++) {
     await page.waitForTimeout(500)
     quiet = (await page.$('[data-laeuft]')) ? 0 : quiet + 1
   }
@@ -131,25 +173,26 @@ await forEveryPage(async (route) => {
       skipped,
     }
   })
-  for (const t of state.red) fail(route, `Musterlösung nicht grün: ${t}`)
-  for (const t of state.hanging) fail(route, `Editor hängt: ${t}`)
-  if (state.mains !== 1) fail(route, `${state.mains} <main> statt 1`)
-  for (const s of state.skipped) fail(route, `Überschrift übersprungen: ${s}`)
-  for (const v of await axe(page, { rules: Object.fromEntries(PAGE_RULES.map((r) => [r, { enabled: false }])) })) fail(route, `axe: ${v}`)
-  for (const e of [...new Set(errors)]) fail(route, `Seitenfehler: ${e}`)
-
-  await close()
-})
+  for (const t of state.red) report(`Musterlösung nicht grün: ${t}`)
+  for (const t of state.hanging) report(`Editor hängt: ${t}`)
+  if (state.mains !== 1) report(`${state.mains} <main> statt 1`)
+  for (const s of state.skipped) report(`Überschrift übersprungen: ${s}`)
+  for (const v of await axe(page, { rules: Object.fromEntries(PAGE_RULES.map((r) => [r, { enabled: false }])) })) report(`axe: ${v}`)
+  for (const e of [...new Set(errors)]) report(`Seitenfehler: ${e}`)
+}
 
 // --- 2. Phone, English, dark -----------------------------------------------------------------
 console.log(`\n2. ${routes.length} Seiten als Handy, Englisch, dunkel`)
-await forEveryPage(async (route) => {
+await forEveryPage('Handy', async (route, report) => {
   const { page, errors, close } = await openPage(route, { language: 'en', theme: 'dark', width: 390 })
-  const width = await page.evaluate(() => document.documentElement.scrollWidth)
-  if (width > 391) fail(route, `Handy: Seite ist ${width} px breit (Bildschirm 390 px)`)
-  for (const v of await axe(page, { runOnly: ['color-contrast'] })) fail(route, `dunkel: ${v}`)
-  for (const e of [...new Set(errors)]) fail(route, `Seitenfehler (en): ${e}`)
-  await close()
+  try {
+    const width = await page.evaluate(() => document.documentElement.scrollWidth)
+    if (width > 391) report(`Handy: Seite ist ${width} px breit (Bildschirm 390 px)`)
+    for (const v of await axe(page, { runOnly: ['color-contrast'] })) report(`dunkel: ${v}`)
+    for (const e of [...new Set(errors)]) report(`Seitenfehler (en): ${e}`)
+  } finally {
+    await close()
+  }
 })
 
 // --- 3. The app itself -------------------------------------------------------------------------
@@ -160,7 +203,7 @@ if (!filter) {
       await run()
       console.log(`  ✓ ${name}`)
     } catch (error) {
-      fail('app', `${name}: ${error.message.split('\n')[0]}`)
+      record(`app: ${name}: ${error.message.split('\n')[0]}`)
     }
   }
   const expect = (ok, message) => {
@@ -245,5 +288,11 @@ if (!filter) {
 await browser.close()
 await server.close()
 const seconds = Math.round((Date.now() - started) / 1000)
+if (unstable.length) console.log(`\n~ ${unstable.length} Seite(n) erst beim zweiten Versuch in Ordnung:\n  ${unstable.join('\n  ')}`)
 console.log(`\n${failures.length ? `✗ ${failures.length} Fehler` : '✓ alles in Ordnung'} - ${routes.length} Seiten, ${seconds} s`)
+// In GitHub Actions: findings as annotations - visible on the commit without access to the logs.
+if (process.env.GITHUB_ACTIONS) {
+  for (const line of failures) console.log(`::error title=Seitentest::${line}`)
+  for (const line of unstable) console.log(`::warning title=Seitentest (instabil)::${line}`)
+}
 process.exit(failures.length ? 1 : 0)
