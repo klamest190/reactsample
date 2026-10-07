@@ -11,7 +11,7 @@
  */
 
 import type { Interpreter } from './interpreter'
-import type { NativWert, Wert } from './werte'
+import type { NativWert, Wert } from './values'
 
 export type Extension = {
   /** Classes that can be used without declaring them: `ResponseEntity`, `HttpStatus` … */

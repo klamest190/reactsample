@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import { FortschrittProvider } from './context/FortschrittContext'
+import { FortschrittProvider } from './context/ProgressContext'
 import { ThemeProvider } from './context/ThemeContext'
-import { SpracheProvider } from './i18n/SpracheContext'
+import { SpracheProvider } from './i18n/LanguageContext'
 import './index.css'
 
 /**

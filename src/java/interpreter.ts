@@ -36,7 +36,7 @@ import {
   type Klasse,
   type NativWert,
   type Wert,
-} from './werte'
+} from './values'
 import {
   EINGEBAUTE_KLASSEN,
   istAusnahmeKlasse,
@@ -48,7 +48,7 @@ import {
   statischerAufruf,
   statischesFeld,
   stringMethode,
-} from './bibliothek'
+} from './library'
 import type { Extension } from './extension'
 
 // ---------------------------------------------------------------------------

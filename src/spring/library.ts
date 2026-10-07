@@ -11,7 +11,7 @@
  */
 
 import type { Extension } from '../java/extension'
-import { NULL, neuerString, wahrheit, zahl, type NativWert, type Wert } from '../java/werte'
+import { NULL, neuerString, wahrheit, zahl, type NativWert, type Wert } from '../java/values'
 
 export interface LibraryHost {
   /** `SpringApplication.run(App.class, args)` - starts the context and returns it. */

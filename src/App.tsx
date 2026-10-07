@@ -1,24 +1,24 @@
 import { lazy, Suspense, useEffect, useEffectEvent, useState } from 'react'
 import { Icon, Logo } from './components/Icon'
-import { Seitenleiste } from './components/Seitenleiste'
+import { Seitenleiste } from './components/Sidebar'
 import { Platzhalter } from './components/Ui'
-import { useFortschritt } from './context/FortschrittContext'
+import { useFortschritt } from './context/ProgressContext'
 import { useTheme } from './context/ThemeContext'
 import { useHashRoute } from './hooks/useHashRoute'
-import { useSprache, useTexte, type Sprache } from './i18n/SpracheContext'
-import { alleKapitel } from './kurs/kurs'
-import { Startseite } from './seiten/Startseite'
+import { useSprache, useTexte, type Sprache } from './i18n/LanguageContext'
+import { alleKapitel } from './course/course'
+import { Startseite } from './pages/HomePage'
 
 // Der Playground bringt viele Bausteine mit - er wird erst geladen, wenn man ihn öffnet.
-const Playground = lazy(() => import('./seiten/Playground').then((modul) => ({ default: modul.Playground })))
+const Playground = lazy(() => import('./pages/Playground').then((modul) => ({ default: modul.Playground })))
 // Only the start page is part of the first download. A chapter page brings the editors along,
 // the glossary and the search bring the glossary data - loaded when needed (the chapter page
 // already while the browser is idle, see below).
-const ladeKapitelSeite = () => import('./seiten/KapitelSeite')
+const ladeKapitelSeite = () => import('./pages/ChapterPage')
 const KapitelSeite = lazy(() => ladeKapitelSeite().then((modul) => ({ default: modul.KapitelSeite })))
-const Glossar = lazy(() => import('./seiten/Glossar').then((modul) => ({ default: modul.Glossar })))
-const ProjektUebersicht = lazy(() => import('./seiten/ProjektUebersicht').then((modul) => ({ default: modul.ProjektUebersicht })))
-const Suche = lazy(() => import('./components/Suche').then((modul) => ({ default: modul.Suche })))
+const Glossar = lazy(() => import('./pages/GlossaryPage').then((modul) => ({ default: modul.Glossar })))
+const ProjektUebersicht = lazy(() => import('./pages/ProjectOverview').then((modul) => ({ default: modul.ProjektUebersicht })))
+const Suche = lazy(() => import('./components/Search').then((modul) => ({ default: modul.Suche })))
 
 /** Quadratischer Knopf mit Symbol in der Kopfzeile - alle gleich hoch (h-8), damit die Zeile ruhig wirkt. */
 const KOPF_KNOPF =

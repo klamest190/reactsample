@@ -39,18 +39,18 @@ npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
 npm test              # Vitest: Unit-Tests, Hooks/Komponenten (jsdom) und alle Beispiele der Teile 7-9 in Node
 npm run test:coverage # dasselbe mit Abdeckungsbericht (coverage/)
-npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
+npm run e2e:content  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
 npm test -- java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
 npm test -- backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
 npm test -- sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Beispiele auf echtem PostgreSQL (ohne Browser)
-npm run test:seiten   # jede Seite im Produktions-Build: Fehler, Musterlösungen, Barrierefreiheit, Handy, App-Funktionen
+npm run e2e:pages   # jede Seite im Produktions-Build: Fehler, Musterlösungen, Barrierefreiheit, Handy, App-Funktionen
 ```
 
 Bei jedem Push auf `main` laufen alle Prüfungen in GitHub Actions (`.github/workflows/ci.yml`).
 
 ### Selbsttest der Inhalte
 
-`npm run test:inhalte` startet den Dev-Server, öffnet `selbsttest.html` im installierten Chrome
+`npm run e2e:content` startet den Dev-Server, öffnet `selftest.html` im installierten Chrome
 (oder Edge) und prüft mit denselben Funktionen wie die Editoren der App:
 
 - jedes Beispiel läuft ohne Fehler,
@@ -58,12 +58,12 @@ Bei jedem Push auf `main` laufen alle Prüfungen in GitHub Actions (`.github/wor
 - TypeScript-Beispiele haben keine Typfehler,
 - selbst geschriebene Tests erkennen jede eingebaute Fehler-Variante (Mutationstest).
 
-Einzelne Teile prüfen: `npm run test:inhalte -- praxis-` (alles, dessen ID so beginnt).
+Einzelne Teile prüfen: `npm run e2e:content -- praxis-` (alles, dessen ID so beginnt).
 Mit `-- --build` läuft derselbe Test auf dem Produktions-Build - manche Fehler gibt es nur dort.
 
 ### Seitentest
 
-`npm run test:seiten` baut die App wie `npm run build` und öffnet jede Seite (Start, Glossar, Projekt, Projektschritte,
+`npm run e2e:pages` baut die App wie `npm run build` und öffnet jede Seite (Start, Glossar, Projekt, Projektschritte,
 alle Kapitel und Playgrounds) im installierten Chrome:
 
 - keine JavaScript-Fehler auf der Seite,
@@ -177,7 +177,7 @@ src/
     SpracheContext.tsx     Sprache (de/en) als Context + localStorage, useSprache(), useTexte()
     texte.ts               Alle Oberflächentexte in beiden Sprachen (typgeprüft)
   index.css                Tailwind, Dark Mode, Design-Tokens, Styles für die Editor-Vorschau
-  kurs/
+  course/
     kurs.ts                Reihenfolge der Teile, roter Faden (GRUNDLAGEN), alleKapitel
     teile/                 Ein Teil pro Datei: Kapitel mit Titel, Lernzielen, Suchbegriffen, Komponente
       typen.ts             Teil, Kapitel, laden() für nachgeladene Kapitel
@@ -199,7 +199,7 @@ src/
     sql/                 🐘 Teil 9, gleicher Aufbau - der Code in den .code.ts ist SQL
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
-  lernen/                  Die Lern-Bausteine
+  learning/                  Die Lern-Bausteine
     TryIt.tsx              "Probier's selbst": Props aller Modi, wählt den passenden Editor
     TryItJs.tsx            Editor für JavaScript und TypeScript (Sandbox-iframe)
     TryItReact.tsx         Editor für React mit Vorschau
@@ -265,11 +265,11 @@ und können gestufte Tipps mitbringen (`tipps: { de: [...], en: [...] }`), die m
 
 **TypeScript** (`modus="ts"`, Teil 2) läuft in derselben Sandbox wie JavaScript. Vorher entfernt
 sucrase die Typen (wie Vite, die Zeilennummern bleiben gleich), und nebenher prüft der echte
-TypeScript-Compiler im Web Worker (`src/lernen/typpruefung.worker.ts`) mit `strict` - Fehler erscheinen
+TypeScript-Compiler im Web Worker (`src/learning/typeCheck.worker.ts`) mit `strict` - Fehler erscheinen
 rot unterschlängelt und in einer Liste unter dem Editor, das Programm läuft trotzdem. Übungen können
 zusätzlich **Typ-Tests** mitbringen: TypeScript-Code, der hinter den Code der Lernenden gehängt und nur
 geprüft wird. Mit `// @ts-expect-error` testet man so auch, dass etwas *verboten* ist
-(`src/lernen/tsLauf.ts`):
+(`src/learning/tsRunner.ts`):
 
 ```ts
 typTests: [
@@ -283,7 +283,7 @@ typTests: [
 React-Wurzel. Alle Hooks sind ohne Import verfügbar, `import … from 'react'` funktioniert aber
 auch. Timer aus dem Editor-Code werden beim nächsten Lauf automatisch gestoppt.
 
-**Automatische Tests für React-Übungen** (`src/lernen/reactTests.ts`) funktionieren wie eine kleine
+**Automatische Tests für React-Übungen** (`src/learning/reactTestKit.ts`) funktionieren wie eine kleine
 Testing Library: Jeder Test rendert `App` frisch in einen unsichtbaren Container und bedient sie. Die
 Tests stehen mit zweisprachigen Namen in `Name.code.ts` und laufen, sobald man auf ▶ Ausführen klickt:
 
@@ -306,7 +306,7 @@ Verfügbar sind u. a. `render`, `remount`, `click`, `type`, `check`, `blur`, `pr
 `toContain`, `toMatch`, `toHaveLength`, `toBeDisabled` … auch mit `.not`), `logs`, `title`, `code`
 (Quelltext) und `mockFetch`. localStorage, `document.title`, `fetch` und `confirm` werden pro Test isoliert.
 
-**Tailwind in den React-Editoren** (`src/lernen/tailwind.ts`, `tailwindMotor.ts`): Das Seiten-CSS enthält
+**Tailwind in den React-Editoren** (`src/learning/tailwind.ts`, `tailwindMotor.ts`): Das Seiten-CSS enthält
 nur Klassen, die irgendwo im Projekt vorkommen. Deshalb läuft für die Vorschau zusätzlich die Tailwind-Engine
 selbst im Browser (Paket `tailwindcss`, mit dem Theme und den Brand-Farben aus `index.css`) und erzeugt
 CSS für genau die Klassen im Editor-Code - so wirkt jede Klasse. Dieselbe Engine liefert die
@@ -318,14 +318,14 @@ sie braucht.
 `src/java/` - siehe [Der Java-Teil](#der-java-teil).
 
 **Spring, Dockerfile, Compose** (`modus="spring"`, `"dockerfile"`, `"compose"`, Teil 8) haben eigene
-Editoren (`src/lernen/TryItSpring.tsx`, `TryItDocker.tsx`), die erst nachgeladen werden, wenn sie gebraucht
+Editoren (`src/learning/TryItSpring.tsx`, `TryItDocker.tsx`), die erst nachgeladen werden, wenn sie gebraucht
 werden - siehe [Der Backend-Teil](#der-backend-teil).
 
-**SQL** (`modus="sql"`, Teil 9) hat einen eigenen Editor (`src/lernen/TryItSql.tsx`), der PostgreSQL im
+**SQL** (`modus="sql"`, Teil 9) hat einen eigenen Editor (`src/learning/TryItSql.tsx`), der PostgreSQL im
 Web Worker startet - siehe [Der Datenbank-Teil](#der-datenbank-teil).
 
 **Autovervollständigung:** Beim Tippen schlägt der Editor passende Einträge aus
-`src/lernen/vorschlaege.ts` vor, dazu Namen, die schon im Code stehen. Jeder Vorschlag hat eine kurze
+`src/learning/suggestions.ts` vor, dazu Namen, die schon im Code stehen. Jeder Vorschlag hat eine kurze
 Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt die Cursorposition), Esc
 schließt, Strg+Leertaste öffnet die Liste von Hand. Nach einem Punkt erscheinen Methoden wie `map` oder `filter`.
 Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` …) statt der JavaScript-Vorschläge.
@@ -349,12 +349,12 @@ wie bei jedem Editor im `localStorage` gespeichert (einmal pro Teil).
 
 | Datei | Aufgabe |
 |-------|---------|
-| `src/kurs/playground/<teil>.ts` | Vorlagen und Bausteine eines Teils (Code Englisch, Texte zweisprachig) |
-| `src/kurs/playground/orte.ts` | Wohin ein Baustein ohne Cursor kommt (`ende`, `oben`, `komponente`, `jsx`, `main`, `methode`, `klasse`) |
-| `src/lernen/einfuegen.ts` | Einfügen mit passender Einrückung - von Editor und Selbsttest gemeinsam genutzt |
-| `src/seiten/Playground.tsx` | Die Seite: Teil-Auswahl, Vorlagen, Bausteinleiste, Editor |
+| `src/course/playground/<teil>.ts` | Vorlagen und Bausteine eines Teils (Code Englisch, Texte zweisprachig) |
+| `src/course/playground/locations.ts` | Wohin ein Baustein ohne Cursor kommt (`ende`, `oben`, `komponente`, `jsx`, `main`, `methode`, `klasse`) |
+| `src/learning/insertion.ts` | Einfügen mit passender Einrückung - von Editor und Selbsttest gemeinsam genutzt |
+| `src/pages/Playground.tsx` | Die Seite: Teil-Auswahl, Vorlagen, Bausteinleiste, Editor |
 
-`npm run test:inhalte -- playground-` prüft jede Vorlage, jeden Baustein an seiner automatischen Stelle
+`npm run e2e:content -- playground-` prüft jede Vorlage, jeden Baustein an seiner automatischen Stelle
 und alle Bausteine eines Teils zusammen (findet doppelte Variablennamen und falsche Einfügestellen).
 
 ## Der Java-Teil
@@ -408,8 +408,8 @@ tests: [
 Braucht ein Test `try/catch` oder eine Schleife, kommt eine unsichtbare Hilfsklasse in
 `vorbereitung` dazu - sie wird hinter den Code der Lernenden gehängt.
 
-**Geprüft wird alles zweifach:** `npm test -- java` (schnell, ohne Browser) und `npm run test:inhalte`
-(im Browser, zusammen mit allen anderen Kapiteln). `src/java/selbsttest.ts` enthält dafür über 40
+**Geprüft wird alles zweifach:** `npm test -- java` (schnell, ohne Browser) und `npm run e2e:content`
+(im Browser, zusammen mit allen anderen Kapiteln). `src/java/selftest.ts` enthält dafür über 40
 Java-Programme mit genau der Ausgabe, die eine echte JVM liefern würde.
 
 ## Der Backend-Teil
@@ -449,11 +449,11 @@ Build-Kontext, Schicht-Cache, Multi-Stage, `.dockerignore`, Lint-Hinweisen wie h
 `localhost`-Falle) und ein Terminal mit den Alltagsbefehlen. Die Tests der Übungen sind Funktionen über das
 Ergebnis: `{ name, dockerfile: (r) => r.image!.sizeMb < 350 }`.
 
-Die **Full-Stack-Werkstatt** (`src/kurs/demos/FullStack.tsx`) verbindet beides mit React: Das `fetch` der
+Die **Full-Stack-Werkstatt** (`src/course/demos/FullStack.tsx`) verbindet beides mit React: Das `fetch` der
 React-App wird durch eine Brücke ersetzt, die `/api/…` an die Spring-Anwendung im selben Tab schickt - wie
 der Vite-Proxy im echten Projekt.
 
-**Geprüft wird alles zweifach:** `npm test -- backend` (ohne Browser) und `npm run test:inhalte`.
+**Geprüft wird alles zweifach:** `npm test -- backend` (ohne Browser) und `npm run e2e:content`.
 
 ## Der Datenbank-Teil
 
@@ -480,7 +480,7 @@ Tabellenliste über den Editoren zur echten Datenbank passt.
 zeigt. Die wichtigsten Meta-Befehle von psql (`\dt`, `\d tabelle`, `\di`) beantwortet `engine.ts` aus
 dem Systemkatalog.
 
-**Die Daten neben dem Code** (`src/lernen/SqlDatenleiste.tsx`): Über jedem SQL-Editor stehen die
+**Die Daten neben dem Code** (`src/learning/SqlDataPanel.tsx`): Über jedem SQL-Editor stehen die
 Tabellen, die im Code vorkommen, mit ihren Zeilen - bei einem JOIN beide Seiten, die benutzten Spalten
 hervorgehoben. Ein Klick auf eine Tabelle blendet sie ein oder aus, „Daten ausblenden“ gilt für alle
 Editoren und wird gemerkt. Die Daten kommen einmal pro Seite aus der echten Datenbank.
@@ -499,11 +499,11 @@ tests: [
 ```
 
 **Geprüft wird alles zweifach:** `npm test -- sql` (mit PGlite in Node, ohne Browser) und
-`npm run test:inhalte` (im Browser über denselben Worker wie die Editoren).
+`npm run e2e:content` (im Browser über denselben Worker wie die Editoren).
 
 ## Zweisprachigkeit
 
-- **Oberfläche:** Texte stehen in `src/i18n/texte.ts`. Der Typ des englischen Objekts wird aus dem
+- **Oberfläche:** Texte stehen in `src/i18n/messages.ts`. Der Typ des englischen Objekts wird aus dem
   deutschen abgeleitet - fehlt eine Übersetzung, meldet TypeScript einen Fehler. In Komponenten:
   `const t = useTexte()`, dann `t.ausfuehren`.
 - **Code ist immer Englisch** und existiert nur einmal: `Name.code.ts` enthält für jedes `TryIt`
@@ -512,21 +512,21 @@ tests: [
 - **Kapiteltext:** eine Datei pro Sprache (`Name.tsx`, `Name.en.tsx`), beide exportieren dieselbe
   Komponente und binden den Code so ein: `<TryIt id="…" {...beispiele['…']} />`. Code-Namen im
   deutschen Fließtext (z. B. in `<Code>`) sind ebenfalls die englischen.
-- **Demos** (`src/kurs/demos/`) gibt es nur einmal; ihre Texte liegen in einem `TEXTE`-Objekt mit `de` und `en`.
+- **Demos** (`src/course/demos/`) gibt es nur einmal; ihre Texte liegen in einem `TEXTE`-Objekt mit `de` und `en`.
 - **Editor:** Die Autovervollständigung fügt englischen Code ein, ihre Erklärungen sowie Test- und
   Fehlermeldungen der Sandbox sind zweisprachig.
 - Die Startsprache richtet sich nach der Browsersprache, die Auswahl wird im `localStorage` gespeichert.
 
 ## Ein Kapitel hinzufügen
 
-1. `src/kurs/<teil>/MeinKapitel.code.ts` mit den (englischen) Codebeispielen anlegen.
+1. `src/course/<part>/MeinKapitel.code.ts` mit den (englischen) Codebeispielen anlegen.
 2. `MeinKapitel.tsx` (Deutsch) und `MeinKapitel.en.tsx` (Englisch) mit derselben benannten
    Export-Komponente anlegen, die den Code per `{...beispiele['id']}` einbinden
    (Vorlage: ein beliebiges vorhandenes Kapitel).
-3. In `src/kurs/teile/<teil>.ts` eintragen - `titel`, `kurz` und `lernziele` jeweils mit `de` und `en`,
+3. In `src/course/parts/<teil>.ts` eintragen - `titel`, `kurz` und `lernziele` jeweils mit `de` und `en`,
    optional `stichworte` für die Suche, dazu
    `Komponente: { de: laden(() => import('../<teil>/MeinKapitel'), 'MeinKapitel'), en: laden(() => import('../<teil>/MeinKapitel.en'), 'MeinKapitel') }`.
-   Was das Kapitel voraussetzt, steht zentral in `GRUNDLAGEN` in `src/kurs/kurs.ts`.
+   Was das Kapitel voraussetzt, steht zentral in `GRUNDLAGEN` in `src/course/course.ts`.
 
 Navigation, Startseite, Nummerierung und Fortschritt ergeben sich automatisch. Die `id` jedes
 `TryIt` muss kursweit eindeutig sein.
@@ -534,18 +534,18 @@ Navigation, Startseite, Nummerierung und Fortschritt ergeben sich automatisch. D
 **Tipps einer Übung** stehen wie Code und Tests nur einmal in der `.code.ts` (`tipps: { de: […], en: […] }`),
 nicht in den beiden Kapiteldateien.
 
-**Ein neuer Modus** (eine neue Sprache für `<TryIt>`) wird in `src/lernen/modi.ts` eingetragen - die Typen
+**Ein neuer Modus** (eine neue Sprache für `<TryIt>`) wird in `src/learning/modes.ts` eingetragen - die Typen
 der Übungen, Playgrounds und des Selbsttests, Abzeichen, Hervorhebung und Kommentarzeichen leiten sich
-davon ab. Dazu kommen nur noch der Editor selbst (`TryIt…tsx`) und seine Prüfung in `src/selbsttest/pruefen.ts`.
+davon ab. Dazu kommen nur noch der Editor selbst (`TryIt…tsx`) und seine Prüfung in `src/selftest/checks.ts`.
 
 Für ein **Java-Kapitel** zusätzlich: im `.code.ts` den Tag `java\`…\`` statt `js\`…\`` verwenden und an
 jedes `<TryIt>` ein `modus="java"` schreiben - daran erkennen beide Selbsttests, welche Sprache
 ausgeführt werden soll. Beispiele, die absichtlich einen Fehler zeigen, kommen mit Begründung in
-`JAVA_ERWARTETE_FEHLER` (`src/java/inhalte.ts`).
+`JAVA_ERWARTETE_FEHLER` (`src/java/contents.ts`).
 
 Für ein **TypeScript-Kapitel** (Teil 2) an jedes `<TryIt>` ein `modus="ts"` schreiben. Beispiele
 müssen dann ohne Typfehler kompilieren; eines, das absichtlich einen Typfehler zeigt, kommt mit
-Begründung in `ERWARTETE_FEHLER` (`src/selbsttest/pruefen.ts`).
+Begründung in `ERWARTETE_FEHLER` (`src/selftest/checks.ts`).
 
 Für ein Kapitel aus **Teil 8** an jedes `<TryIt>` `modus="spring"`, `"dockerfile"` oder `"compose"` schreiben.
 Im `.code.ts` gehören zu einem Spring-Beispiel optional `properties` und `requests` (`.http`-Notation), zu einem

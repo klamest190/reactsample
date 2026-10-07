@@ -1,4 +1,4 @@
-import { TEIL_STIL } from './teilStil'
+import { TEIL_STIL } from './partStyle'
 
 /**
  * Schlichte Linien-Icons als Inline-SVG (Stil wie Lucide), ohne Bibliothek.

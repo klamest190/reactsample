@@ -1,4 +1,4 @@
-import type { Sprache, Zweisprachig } from './SpracheContext'
+import type { Sprache, Zweisprachig } from './LanguageContext'
 
 /**
  * A text that is either the same in both languages (a test named after the code it

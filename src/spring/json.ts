@@ -16,7 +16,7 @@
 
 import type { Annotation, TypRef } from '../java/ast'
 import type { Interpreter } from '../java/interpreter'
-import { NULL, komma, neuerString, wahrheit, zeichen, type JavaObjekt, type Klasse, type Wert } from '../java/werte'
+import { NULL, komma, neuerString, wahrheit, zeichen, type JavaObjekt, type Klasse, type Wert } from '../java/values'
 import { find, text } from './annotations'
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json }

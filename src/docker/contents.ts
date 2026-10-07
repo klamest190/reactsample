@@ -7,11 +7,11 @@
  * No DOM, no React - used by the browser self-test and by `npm test -- backend`.
  */
 
-import type { CodeBeispiel, DockerTest } from '../lernen/jsSandbox'
+import type { CodeBeispiel, DockerTest } from '../learning/jsSandbox'
 import { simulateBuild } from './build'
 import { composeUp } from './compose'
 import { localized } from '../i18n/localized'
-import { contentResult, type ContentResult } from '../selbsttest/results'
+import { contentResult, type ContentResult } from '../selftest/results'
 
 /** Examples that fail on purpose - with the reason. */
 export const DOCKER_EXPECTED_FAILURES: Record<string, string> = {

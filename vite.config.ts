@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config'
 // - plugin-react: JSX-Transform + Fast Refresh (Hot Reload im Browser)
 // - tailwindcss: Tailwind v4 laeuft als Vite-Plugin, es gibt keine tailwind.config.js mehr.
 //   Konfiguriert wird direkt in src/index.css per @theme.
-// - worker.format 'es': Die Typprüfung (src/lernen/typpruefung.worker.ts) ist ein ES-Modul-Worker.
+// - worker.format 'es': Die Typprüfung (src/learning/typeCheck.worker.ts) ist ein ES-Modul-Worker.
 // - optimizeDeps.exclude: PGlite (PostgreSQL für Teil 9, src/sql/worker.ts) findet seine
 //   .wasm- und .data-Dateien über import.meta.url - das Vorbündeln im Dev-Server würde die Pfade brechen.
 // - test: Vitest in three projects
@@ -43,7 +43,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/kurs/**', 'src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/**/*.worker.ts', 'src/selbsttest/main.ts', 'src/test/**'],
+      exclude: ['src/course/**', 'src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/**/*.worker.ts', 'src/selftest/main.ts', 'src/test/**'],
       reporter: ['text-summary', 'html', 'json-summary', 'lcov'],
       // A few points below the measured values - coverage may only go up.
       thresholds: { statements: 50, branches: 44, functions: 40, lines: 52 },

@@ -1,6 +1,6 @@
 # Checks every push to main and every pull request.
 #   code:    lint, type check + production build, Vitest (unit, dom, content) with coverage
-#   browser: course contents on the production build, then every page (scripts/seiten-testen.mjs)
+#   browser: course contents on the production build, then every page (scripts/e2e-pages.mjs)
 # The browser tests use the Google Chrome that GitHub's Ubuntu runners come with (playwright-core,
 # no browser download).
 name: CI
@@ -29,8 +29,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      - name: Lint
+        run: npm run lint
+      - name: Type check + production build
+        run: npm run build
       - name: Tests (Vitest) with coverage
         run: npm run test:coverage
       - name: Coverage summary
@@ -53,7 +55,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Kursinhalte (Produktions-Build)
-        run: npm run test:inhalte -- --build
-      - name: Alle Seiten
-        run: npm run test:seiten
+      - name: Course contents (production build)
+        run: npm run e2e:content -- --build
+      - name: Every page (errors, solutions, axe, mobile)
+        run: npm run e2e:pages

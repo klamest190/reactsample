@@ -19,7 +19,7 @@
 
 import type { Annotation, MethodenDekl, Programm, TypRef } from '../java/ast'
 import { Interpreter, JavaAbbruch, JavaAusnahme } from '../java/interpreter'
-import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/werte'
+import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
 import { STEREOTYPES, beanNameOf, find, has, text } from './annotations'
 import { Config, PlaceholderError, kebab } from './config'
 import { REPOSITORY_TYPES, Repository, RepositoryError, repositoryEntity } from './data'

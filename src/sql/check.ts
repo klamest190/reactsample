@@ -1,8 +1,8 @@
-import type { Zweisprachig } from '../i18n/SpracheContext'
-import type { CodeBeispiel, TestErgebnis } from '../lernen/jsSandbox'
+import type { Zweisprachig } from '../i18n/LanguageContext'
+import type { CodeBeispiel, TestErgebnis } from '../learning/jsSandbox'
 import type { RunOptions, SqlRun, SqlTable } from './engine'
 import { localized } from '../i18n/localized'
-import { contentResult, type ContentResult } from '../selbsttest/results'
+import { contentResult, type ContentResult } from '../selftest/results'
 
 /**
  * Tests for SQL exercises (part 9).

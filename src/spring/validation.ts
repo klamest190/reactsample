@@ -13,7 +13,7 @@
 
 import type { Annotation, TypRef } from '../java/ast'
 import type { Interpreter } from '../java/interpreter'
-import { alsZahl, istZahl, type JavaObjekt, type Klasse, type Wert } from '../java/werte'
+import { alsZahl, istZahl, type JavaObjekt, type Klasse, type Wert } from '../java/values'
 import { number, text } from './annotations'
 import type { FieldErrorInfo } from './library'
 

@@ -10,7 +10,7 @@
 import { simulateBuild, type BuildResult } from './build'
 import { execute, newState } from './cli'
 import { composeUp, type ComposeResult } from './compose'
-import { runCases, type RuntimeResult } from '../selbsttest/results'
+import { runCases, type RuntimeResult } from '../selftest/results'
 
 type Case = { name: string; check: () => string | null }
 

@@ -15,7 +15,7 @@
 
 import type { Annotation, MethodenDekl, ParamDekl, TypRef } from '../java/ast'
 import { JavaAbbruch, JavaAusnahme } from '../java/interpreter'
-import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/werte'
+import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
 import { MAPPINGS, constantName, find, has, text, texts } from './annotations'
 import type { SpringApp } from './context'
 import { reason, type HttpMethod, type HttpRequest, type HttpResponse } from './http'

@@ -20,7 +20,7 @@
 
 import type { FeldDekl, MethodenDekl, TypDeklaration, TypRef } from '../java/ast'
 import type { Interpreter } from '../java/interpreter'
-import { NULL, alsZahl, inhaltGleich, istZahl, wahrheit, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/werte'
+import { NULL, alsZahl, inhaltGleich, istZahl, wahrheit, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
 import { find, has, text } from './annotations'
 
 export const REPOSITORY_TYPES = ['JpaRepository', 'CrudRepository', 'ListCrudRepository', 'PagingAndSortingRepository', 'Repository']

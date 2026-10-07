@@ -1,5 +1,5 @@
-import type { Zweisprachig } from '../i18n/SpracheContext'
-import { sql } from '../lernen/quelltext'
+import type { Zweisprachig } from '../i18n/LanguageContext'
+import { sql } from '../learning/source'
 
 /**
  * The ready-made example database of part 9: a small shop.

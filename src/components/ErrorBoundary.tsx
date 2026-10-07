@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { useTexte } from '../i18n/SpracheContext'
+import { useTexte } from '../i18n/LanguageContext'
 
 /**
  * KONZEPT: Error Boundary.

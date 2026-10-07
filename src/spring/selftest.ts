@@ -11,7 +11,7 @@
 
 import { check, parseHttp, requestText } from './http'
 import { springStart } from './index'
-import { runCases, type RuntimeResult } from '../selbsttest/results'
+import { runCases, type RuntimeResult } from '../selftest/results'
 
 type Case = {
   name: string

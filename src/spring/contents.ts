@@ -9,11 +9,11 @@
  * No DOM, no React - used by the browser self-test and by `npm test -- backend`.
  */
 
-import type { CodeBeispiel, SpringTestSpec } from '../lernen/jsSandbox'
+import type { CodeBeispiel, SpringTestSpec } from '../learning/jsSandbox'
 import { parseHttp, requestText } from './http'
 import { springRun } from './index'
 import { localized } from '../i18n/localized'
-import { contentResult, type ContentResult } from '../selbsttest/results'
+import { contentResult, type ContentResult } from '../selftest/results'
 
 /** Examples that fail on purpose - with the reason. */
 export const SPRING_EXPECTED_FAILURES: Record<string, string> = {

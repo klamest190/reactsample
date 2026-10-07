@@ -13,9 +13,9 @@
 
 import { JavaSyntaxFehler } from './lexer'
 import { parsen } from './parser'
-import { pruefen } from './pruefer'
+import { pruefen } from './typeChecker'
 import { Interpreter, JavaAbbruch, JavaAusnahme, type AusgabeZeile } from './interpreter'
-import { alsZahl, doubleText, type Wert } from './werte'
+import { alsZahl, doubleText, type Wert } from './values'
 
 export type JavaSprache = 'de' | 'en'
 

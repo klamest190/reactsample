@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from 'react'
-import { useTexte } from '../i18n/SpracheContext'
+import { useTexte } from '../i18n/LanguageContext'
 import { Icon } from './Icon'
 import { focusableWhenScrolling } from './scrollFocus'
 

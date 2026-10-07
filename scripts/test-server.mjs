@@ -1,5 +1,5 @@
 /**
- * Shared by the browser tests (inhalte-testen.mjs, seiten-testen.mjs): a server for the app and
+ * Shared by the browser tests (e2e-content.mjs, e2e-pages.mjs): a server for the app and
  * the installed Chrome (or Edge) via playwright-core - no browser download needed.
  *
  * `production: true` builds the app like `npm run build` and serves it like `npm run preview`.

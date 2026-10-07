@@ -7,7 +7,7 @@
   },
   "overrides": [
     {
-      "files": ["src/kurs/praxis/businessApp/**"],
+      "files": ["src/course/practice/businessApp/**"],
       "rules": {
         "react/only-export-components": "off"
       }
