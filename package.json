@@ -1,7 +1,30 @@
 {
   "name": "reactsample",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Interactive, bilingual (EN/DE) learning path for JavaScript, TypeScript, React, Java, Spring Boot, Docker and SQL - every example runs in the browser.",
+  "license": "MIT",
+  "author": "klamest190 (https://github.com/klamest190)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klamest190/reactsample.git"
+  },
+  "homepage": "https://github.com/klamest190/reactsample#readme",
+  "keywords": [
+    "react",
+    "typescript",
+    "vite",
+    "tailwindcss",
+    "learning",
+    "interpreter",
+    "java",
+    "postgresql",
+    "pglite",
+    "accessibility"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

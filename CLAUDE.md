@@ -48,11 +48,14 @@ was erst dann grün ist, erscheint als Warnung „instabil“.
 
 ```
 CLAUDE.md README.md          diese Karte / ausführliche Doku (Deutsch)
+LICENSE                      MIT
+.editorconfig .nvmrc         Editor-Grundeinstellungen (LF, 2 Leerzeichen) / Node-Version für CI und nvm
 index.html                   App-Einstieg
 selbsttest.html              Einstieg für test:inhalte (src/selbsttest/main.ts)
 vite.config.ts               Tailwind, React, optimizeDeps.exclude für PGlite
 tsconfig.*.json              app (src), node (vite.config), scripts (Test-Skripte - jiti prüft keine Typen, tsc -b schon)
 .github/workflows/ci.yml     CI: Job "code" (lint, build, Node-Tests), Job "browser" (test:inhalte --build, test:seiten)
+.github/dependabot.yml       Abhängigkeiten: npm wöchentlich (minor/patch gebündelt), Actions monatlich
 public/favicon.svg           Bildmarke "Lernpfad"
 scripts/
   test-server.mjs            gemeinsam: Dev-Server oder Produktions-Build + Vorschau-Server, Chrome/Edge starten
