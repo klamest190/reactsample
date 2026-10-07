@@ -140,7 +140,7 @@ export type Tabelle = { name: string; zeilen: number; info: Zweisprachig; spalte
 
 /**
  * The tables for the table browser above every SQL editor and for the schema diagram.
- * `npm run test:sql` checks that this list matches what PostgreSQL reports.
+ * `npm test -- sql` checks that this list matches what PostgreSQL reports.
  */
 export const SHOP_TABELLEN: Tabelle[] = [
   {

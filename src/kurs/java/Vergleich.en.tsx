@@ -137,7 +137,7 @@ export function Vergleich() {
           The runtime covers the fundamentals, not all of Java. Missing are threads, file access,{' '}
           <Code>Scanner</Code> (there is no keyboard input), packages across several files and
           anonymous classes. For everything in this part it behaves like a real JVM though - verified
-          by <Code>npm run test:java</Code>.
+          by <Code>npm test -- java</Code>.
         </Hinweis>
       </Abschnitt>
 

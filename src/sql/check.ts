@@ -151,7 +151,7 @@ function show(row: (string | null)[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Self-test of the course content (browser self-test and npm run test:sql)
+// Self-test of the course content (browser self-test and npm test -- sql)
 // ---------------------------------------------------------------------------
 
 /** Examples that fail on purpose - with the reason. */

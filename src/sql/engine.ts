@@ -6,7 +6,7 @@ import { lineAndColumn, splitStatements, stripComments, type Statement } from '.
  * Runs an SQL script against PGlite - real PostgreSQL compiled to WebAssembly.
  *
  * Knows nothing about React or workers: the browser calls it inside a web worker
- * (worker.ts), `npm run test:sql` directly in Node.
+ * (worker.ts), `npm test -- sql` directly in Node.
  *
  * Every run starts from a fresh copy of the example database (resetDatabase), then
  * executes the statements one by one - like psql with ON_ERROR_STOP: the first error

@@ -37,10 +37,12 @@ npm run dev     # Entwicklungsserver auf http://localhost:5173
 npm run build   # Produktionsbuild nach dist/
 npm run preview # Produktionsbuild lokal ansehen
 npm run lint    # oxlint
+npm test              # Vitest: Unit-Tests, Hooks/Komponenten (jsdom) und alle Beispiele der Teile 7-9 in Node
+npm run test:coverage # dasselbe mit Abdeckungsbericht (coverage/)
 npm run test:inhalte  # Selbsttest: führt alle Beispiele, Übungen und Projektschritte aus
-npm run test:java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
-npm run test:backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
-npm run test:sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Beispiele auf echtem PostgreSQL (ohne Browser)
+npm test -- java     # nur Teil 7: die Java-Laufzeit und alle Java-Beispiele (ohne Browser)
+npm test -- backend  # nur Teil 8: Spring-Laufzeit, Docker-Simulator und alle Beispiele (ohne Browser)
+npm test -- sql      # nur Teil 9: SQL-Laufzeit, Beispieldatenbank und alle Beispiele auf echtem PostgreSQL (ohne Browser)
 npm run test:seiten   # jede Seite im Produktions-Build: Fehler, Musterlösungen, Barrierefreiheit, Handy, App-Funktionen
 ```
 
@@ -367,7 +369,7 @@ javaPruefen(quelltext, sprache)                              // → [{ zeile, te
 ```
 
 Die Laufzeit kennt weder React noch das DOM, und die Komponenten kennen keine Syntaxbäume. Deshalb
-läuft derselbe Code im Browser **und** auf der Kommandozeile (`npm run test:java`).
+läuft derselbe Code im Browser **und** auf der Kommandozeile (`npm test -- java`).
 
 **Die vier Schritte** - dieselben, die `javac` und die JVM gehen:
 
@@ -406,7 +408,7 @@ tests: [
 Braucht ein Test `try/catch` oder eine Schleife, kommt eine unsichtbare Hilfsklasse in
 `vorbereitung` dazu - sie wird hinter den Code der Lernenden gehängt.
 
-**Geprüft wird alles zweifach:** `npm run test:java` (schnell, ohne Browser) und `npm run test:inhalte`
+**Geprüft wird alles zweifach:** `npm test -- java` (schnell, ohne Browser) und `npm run test:inhalte`
 (im Browser, zusammen mit allen anderen Kapiteln). `src/java/selbsttest.ts` enthält dafür über 40
 Java-Programme mit genau der Ausgabe, die eine echte JVM liefern würde.
 
@@ -451,7 +453,7 @@ Die **Full-Stack-Werkstatt** (`src/kurs/demos/FullStack.tsx`) verbindet beides m
 React-App wird durch eine Brücke ersetzt, die `/api/…` an die Spring-Anwendung im selben Tab schickt - wie
 der Vite-Proxy im echten Projekt.
 
-**Geprüft wird alles zweifach:** `npm run test:backend` (ohne Browser) und `npm run test:inhalte`.
+**Geprüft wird alles zweifach:** `npm test -- backend` (ohne Browser) und `npm run test:inhalte`.
 
 ## Der Datenbank-Teil
 
@@ -469,7 +471,7 @@ wenige Millisekunden. Lernende können also `DELETE` und `DROP` nach Belieben au
 **Die Beispieldatenbank** (`dataset.ts`) ist ein kleiner Shop: `customers` (dieselben Kunden wie in der
 Business-App aus Teil 5), `products`, `orders` und `order_items`. Sie hat absichtliche Lücken, an denen
 SQL interessant wird: Kunden ohne Bestellung (LEFT JOIN), NULL in `email`, `city` und `stock`, nie
-bestellte Produkte, geänderte Preise, eine stornierte Bestellung. `npm run test:sql` prüft, dass die
+bestellte Produkte, geänderte Preise, eine stornierte Bestellung. `npm test -- sql` prüft, dass die
 Tabellenliste über den Editoren zur echten Datenbank passt.
 
 **Ausgeführt wird Anweisung für Anweisung** (`statements.ts` zerlegt das Skript) - wie `psql` mit
@@ -496,7 +498,7 @@ tests: [
 ]
 ```
 
-**Geprüft wird alles zweifach:** `npm run test:sql` (mit PGlite in Node, ohne Browser) und
+**Geprüft wird alles zweifach:** `npm test -- sql` (mit PGlite in Node, ohne Browser) und
 `npm run test:inhalte` (im Browser über denselben Worker wie die Editoren).
 
 ## Zweisprachigkeit

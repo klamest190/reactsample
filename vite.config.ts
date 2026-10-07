@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 // Vite-Konfiguration.
 // - plugin-react: JSX-Transform + Fast Refresh (Hot Reload im Browser)
@@ -9,8 +9,42 @@ import { defineConfig } from 'vite'
 // - worker.format 'es': Die Typprüfung (src/lernen/typpruefung.worker.ts) ist ein ES-Modul-Worker.
 // - optimizeDeps.exclude: PGlite (PostgreSQL für Teil 9, src/sql/worker.ts) findet seine
 //   .wasm- und .data-Dateien über import.meta.url - das Vorbündeln im Dev-Server würde die Pfade brechen.
+// - test: Vitest in three projects
+//     unit     pure logic in Node            src/**/*.test.ts
+//     dom      hooks and components (jsdom)  src/**/*.test.tsx
+//     content  every course example on the runtimes of parts 7-9 (Java, Spring, Docker, PostgreSQL)
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   worker: { format: 'es' },
   optimizeDeps: { exclude: ['@electric-sql/pglite'] },
+  test: {
+    projects: [
+      {
+        extends: true,
+        test: { name: 'unit', environment: 'node', include: ['src/**/*.test.ts'], exclude: ['src/**/*.content.test.ts'] },
+      },
+      {
+        extends: true,
+        test: { name: 'dom', environment: 'jsdom', include: ['src/**/*.test.tsx'] },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'content',
+          environment: 'node',
+          include: ['src/**/*.content.test.ts'],
+          // PGlite (WASM) is more reliable in child processes than in worker threads.
+          pool: 'forks',
+          testTimeout: 60_000,
+          hookTimeout: 60_000,
+        },
+      },
+    ],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/kurs/**', 'src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/**/*.worker.ts', 'src/selbsttest/main.ts'],
+      reporter: ['text-summary', 'html', 'json-summary', 'lcov'],
+    },
+  },
 })

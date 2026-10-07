@@ -6,7 +6,7 @@
  *                           expectation (`→ 200 …`) gets exactly that answer
  *   exercise with tests     the solution passes all tests, the start code does NOT
  *
- * No DOM, no React - used by the browser self-test and by `npm run test:backend`.
+ * No DOM, no React - used by the browser self-test and by `npm test -- backend`.
  */
 
 import type { CodeBeispiel, SpringTestSpec } from '../lernen/jsSandbox'

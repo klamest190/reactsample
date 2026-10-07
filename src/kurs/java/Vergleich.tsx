@@ -133,7 +133,7 @@ export function Vergleich() {
           Die Laufzeit deckt die Grundlagen ab, nicht ganz Java. Es fehlen unter anderem Threads,
           Dateizugriff, <Code>Scanner</Code> (es gibt keine Tastatureingabe), Pakete über mehrere
           Dateien und anonyme Klassen. Für alles, was in diesem Teil steht, verhält sie sich aber wie
-          eine echte JVM - geprüft von <Code>npm run test:java</Code>.
+          eine echte JVM - geprüft von <Code>npm test -- java</Code>.
         </Hinweis>
       </Abschnitt>
 

@@ -1,0 +1,10 @@
+{
+  // The Vitest tests (src/**/*.test.ts[x]) - checked by `tsc -b` like the app, but with Node types.
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "types": ["node", "vite/client"]
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  "exclude": []
+}

@@ -1,6 +1,6 @@
 /**
  * Result types shared by the self-tests of the runtimes (src/java, src/spring, src/docker, src/sql).
- * No React and no DOM - the runtimes' tests also run on the command line (scripts/*-test*.ts).
+ * No React and no DOM - the runtimes' tests also run on the command line (Vitest, src/selbsttest/*.content.test.ts).
  */
 
 /** One case of a runtime's own self-test: a program and what the real thing would do. */

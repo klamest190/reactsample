@@ -10,8 +10,9 @@ passt die Struktur unten im selben Commit an. Ebenso neue Konventionen und Stolp
 
 ## Stack und Befehle
 
-React 19, TypeScript 6, Vite 8 (rolldown), Tailwind v4, oxlint. Kein Router-Framework (Hash-Routing
-über `useHashRoute`), keine i18n-Bibliothek, kein Test-Framework - alles Eigenbau im Projekt.
+React 19, TypeScript 6, Vite 8 (rolldown), Tailwind v4, oxlint, Vitest. Kein Router-Framework (Hash-Routing
+über `useHashRoute`), keine i18n-Bibliothek - Eigenbau im Projekt. Die Browser-Tests (`test:inhalte`,
+`test:seiten`) laufen über playwright-core und axe-core.
 
 ```bash
 npm run dev            # Dev-Server (http://localhost:5173)
@@ -24,12 +25,13 @@ npm run test:inhalte -- --build   # dasselbe auf dem Produktions-Build (so läuf
 npm run test:seiten    # jede Seite im Produktions-Build: Seitenfehler, alle Musterlösungen grün,
                        # axe-core (hell + dunkel), Handybreite, App-Funktionen (~4 min, 4 Seiten parallel)
 npm run test:seiten -- js-        # nur Routen mit diesem Anfang (--parallel=N für mehr/weniger gleichzeitig)
-npm run test:java      # Teil 7 in Node (jiti)
-npm run test:backend   # Teil 8: Spring-Laufzeit, Docker-Simulator, Beispiele (Node)
-npm run test:sql       # Teil 9: echtes PostgreSQL (PGlite) in Node
+npm test               # Vitest, drei Projekte (vite.config.ts): unit (Node), dom (jsdom), content
+npm test -- java       # nur Dateien mit "java" im Pfad - z.B. Teil 7 (backend, sql ebenso)
+npm run test:watch     # Vitest im Watch-Modus
+npm run test:coverage  # mit Abdeckungsbericht nach coverage/ (index.html)
 ```
 
-Vor jedem Commit: `npx tsc -b`, `npm run lint`, `npm run build` und die betroffenen `test:*`.
+Vor jedem Commit: `npx tsc -b`, `npm run lint`, `npm run build`, `npm test` und die betroffenen `test:*`.
 Bei Änderungen an Oberfläche, Editoren oder Laufzeiten zusätzlich `test:seiten` (mit Filter reicht oft).
 Die CI (`.github/workflows/ci.yml`) führt bei jedem Push auf `main` alles aus - nach dem Push das
 Ergebnis prüfen. `gh` ist auf diesem Rechner nicht installiert, das Repo ist öffentlich - die API geht ohne Token:
@@ -52,18 +54,16 @@ LICENSE                      MIT
 .editorconfig .nvmrc         Editor-Grundeinstellungen (LF, 2 Leerzeichen) / Node-Version für CI und nvm
 index.html                   App-Einstieg
 selbsttest.html              Einstieg für test:inhalte (src/selbsttest/main.ts)
-vite.config.ts               Tailwind, React, optimizeDeps.exclude für PGlite
-tsconfig.*.json              app (src), node (vite.config), scripts (Test-Skripte - jiti prüft keine Typen, tsc -b schon)
-.github/workflows/ci.yml     CI: Job "code" (lint, build, Node-Tests), Job "browser" (test:inhalte --build, test:seiten)
+vite.config.ts               Tailwind, React, optimizeDeps.exclude für PGlite, Vitest-Projekte und Coverage
+tsconfig.*.json              app (src ohne Tests), node (vite.config), test (src/**/*.test.ts[x] mit Node-Typen)
+.github/workflows/ci.yml     CI: Job "code" (lint, build, Vitest mit Coverage), Job "browser" (test:inhalte --build, test:seiten)
 .github/dependabot.yml       Abhängigkeiten: npm wöchentlich (minor/patch gebündelt), Actions monatlich
 public/favicon.svg           Bildmarke "Lernpfad"
 scripts/
   test-server.mjs            gemeinsam: Dev-Server oder Produktions-Build + Vorschau-Server, Chrome/Edge starten
   inhalte-testen.mjs         test:inhalte - öffnet selbsttest.html, wertet aus (--build: Produktions-Build)
   seiten-testen.mjs          test:seiten - jede Seite im Produktions-Build (siehe oben)
-  java-testen.ts             test:java
-  backend-test.ts            test:backend (Spring + Docker)
-  sql-test.ts                test:sql
+  coverage-summary.mjs       Coverage-Tabelle für die Job-Zusammenfassung der CI
 src/
   main.tsx App.tsx           Einstieg; Layout, Hash-Routing, Seitenwahl, Sprachumschalter.
                              Im ersten Download: Kopfzeile, Seitenleiste, Startseite. KapitelSeite, Glossar,
@@ -126,11 +126,13 @@ src/
   docker/                    Docker-Simulator (build, compose, cli) - kein React
   sql/                       PostgreSQL via PGlite im Worker (engine, client, check, dataset) - kein React
   selbsttest/                main.ts (Seite für test:inhalte), pruefen.ts (Prüfung je Modus),
-                             results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten)
+                             results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten),
+                             tryItUsages.ts (liest <TryIt id modus typen vorschau> aus den Kapitelquellen),
+                             java|backend|sql.content.test.ts (Vitest: Laufzeit-Selbsttests + alle Beispiele in Node)
 ```
 
 Laufzeiten (`java/`, `spring/`, `docker/`, `sql/`) kennen kein React und kein DOM, damit sie auch in
-Node laufen (`test:java`, `test:backend`, `test:sql`). Die Tür nach außen ist jeweils `index.ts` bzw.
+Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.ts` bzw.
 `client.ts`; `inhalte.ts`/`contents.ts`/`check.ts` prüfen die Kapitelbeispiele.
 
 ## Konventionen
@@ -161,6 +163,8 @@ Node laufen (`test:java`, `test:backend`, `test:sql`). Die Tür nach außen ist 
   sie aus, denn Beispielcode darf ein eigenes `<main>` oder `<h1>` haben.
 - **Test-Attribute**: `data-laeuft` am Rahmen eines laufenden Editors, `data-testergebnis="gruen|rot"`
   an Testergebnissen, `data-uebung` an Übungskarten - daran orientiert sich `test:seiten`.
+- **Tests**: Unit-Tests liegen neben dem Code (`name.test.ts`, mit DOM `name.test.tsx`). Inhaltsprüfungen
+  über alle Kapitel heißen `*.content.test.ts`. Neue Logik bekommt einen Test.
 - Git: direkt auf `main` committen und pushen, Branches/PRs nur auf Wunsch.
 
 ## Stolperfallen

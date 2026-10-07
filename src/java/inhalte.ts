@@ -7,7 +7,7 @@
  *                         der Startcode besteht sie NICHT (sonst wäre nichts zu tun)
  *
  * Steht hier statt in src/selbsttest/, weil es weder DOM noch React braucht -
- * so kann es auch die Kommandozeile (scripts/java-testen.ts) benutzen.
+ * so kann es auch die Kommandozeile (src/selbsttest/java.content.test.ts) benutzen.
  */
 
 import { javaAusfuehren } from './index'

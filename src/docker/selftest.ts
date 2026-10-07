@@ -1,7 +1,7 @@
 /**
  * Self-test of the Docker simulator - the cases.
  *
- *   npm run test:backend
+ *   npm test -- backend
  *
  * Each case checks one rule of real Docker: the layer cache, multi-stage builds,
  * `.dockerignore`, user checks, compose start order and the classic mistakes.

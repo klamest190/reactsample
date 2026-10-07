@@ -9,6 +9,7 @@ import { bausteinSchritte } from '../kurs/playground/orte'
 import type { Baustein } from '../kurs/playground/typen'
 import { einfuegungenPlanen } from '../lernen/einfuegen'
 import { ERWARTETE_FEHLER, beispielPruefen, projektRendern, uebungPruefen, type Ergebnis, type Modus } from './pruefen'
+import { tryItUsages } from './tryItUsages'
 
 /**
  * Einstieg der Testseite selbsttest.html (nur im Dev-Server, nicht im Build).
@@ -26,25 +27,8 @@ const kapitelQuellen = import.meta.glob<string>(['../kurs/**/*.tsx', '!../kurs/*
 })
 const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../kurs/uebungen/{js,ts,react,hooks,praxis,java,backend,sql}.ts', { eager: true })
 
-/** Wie ein Beispiel im Kapitel verwendet wird: <TryIt id="…" modus="react" typen /> */
-function modiAusKapiteln() {
-  const modi = new Map<string, Modus>()
-  for (const quelle of Object.values(kapitelQuellen)) {
-    for (const stueck of quelle.split('<TryIt').slice(1)) {
-      const id = stueck.match(/id="([^"]+)"/)?.[1]
-      if (!id) continue
-      // Nur die Props bis zur Aufgabe bzw. zum Tag-Ende betrachten - im Aufgabentext steht Fließtext.
-      const ende = Math.min(...['aufgabe=', '/>'].map((s) => stueck.indexOf(s)).filter((i) => i >= 0))
-      const props = stueck.slice(0, ende)
-      const modus = (props.match(/modus="(\w+)"/)?.[1] ?? 'js') as Modus['modus']
-      modi.set(id, { modus, typen: /\btypen\b/.test(props), vorschau: /\bvorschau\b/.test(props) })
-    }
-  }
-  return modi
-}
-
 function auftraegeSammeln(): Auftrag[] {
-  const modi = modiAusKapiteln()
+  const modi: Map<string, Modus> = tryItUsages(Object.values(kapitelQuellen))
   const auftraege: Auftrag[] = []
 
   // 1. Beispiele und Übungen in den Kapiteln

@@ -1,7 +1,7 @@
 /**
  * Selbsttest der Java-Laufzeit - die Fälle.
  *
- *   npm run test:java
+ *   npm test -- java
  *
  * Jeder Fall ist ein kleines Java-Programm mit der Ausgabe, die echtes Java
  * dafür liefern würde. Wenn hier alles grün ist, verhalten sich die Beispiele
@@ -516,7 +516,7 @@ class Auto implements Fahrzeug {
 
 /**
  * Führt alle Fälle aus. Läuft ohne DOM und ohne React - deshalb sowohl auf der
- * Kommandozeile (scripts/java-testen.ts) als auch in der Selbsttest-Seite.
+ * Kommandozeile (src/selbsttest/java.content.test.ts) als auch in der Selbsttest-Seite.
  */
 export function javaLaufzeitPruefen(): RuntimeResult[] {
   return runCases(faelle, (fall) => {
