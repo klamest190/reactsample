@@ -25,7 +25,7 @@ export default defineConfig({
       },
       {
         extends: true,
-        test: { name: 'dom', environment: 'jsdom', include: ['src/**/*.test.tsx'] },
+        test: { name: 'dom', environment: 'jsdom', include: ['src/**/*.test.tsx'], setupFiles: ['src/test/setup.ts'] },
       },
       {
         extends: true,
@@ -43,8 +43,10 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/kurs/**', 'src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/**/*.worker.ts', 'src/selbsttest/main.ts'],
+      exclude: ['src/kurs/**', 'src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/**/*.worker.ts', 'src/selbsttest/main.ts', 'src/test/**'],
       reporter: ['text-summary', 'html', 'json-summary', 'lcov'],
+      // A few points below the measured values - coverage may only go up.
+      thresholds: { statements: 50, branches: 44, functions: 40, lines: 52 },
     },
   },
 })

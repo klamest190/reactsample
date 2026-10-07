@@ -88,6 +88,7 @@ src/
     teile/                   ein Teil pro Datei: Kapitel (id, titel, lernziele, stichworte, lazy Komponente de/en);
                              typen.ts: Teil, Kapitel, laden()
     glossar.ts               Glossar-Einträge
+    integrity.test.ts        Kurs als Daten prüfen: IDs eindeutig, Verweise gültig, jedes Kapitel DE + EN
     js/ typescript/ react/ hooks/ praxis/ java/ backend/ sql/
       Name.tsx               Kapiteltext DE  ┐ gleiche benannte Export-Komponente
       Name.en.tsx            Kapiteltext EN  ┘
@@ -125,6 +126,7 @@ src/
   spring/                    Spring Boot auf der Java-Laufzeit - kein React
   docker/                    Docker-Simulator (build, compose, cli) - kein React
   sql/                       PostgreSQL via PGlite im Worker (engine, client, check, dataset) - kein React
+  test/                      render.tsx (renderInApp: Komponenten mit Providern, Englisch), setup.ts (jest-dom, Cleanup)
   selbsttest/                main.ts (Seite für test:inhalte), pruefen.ts (Prüfung je Modus),
                              results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten),
                              tryItUsages.ts (liest <TryIt id modus typen vorschau> aus den Kapitelquellen),
@@ -164,7 +166,8 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 - **Test-Attribute**: `data-laeuft` am Rahmen eines laufenden Editors, `data-testergebnis="gruen|rot"`
   an Testergebnissen, `data-uebung` an Übungskarten - daran orientiert sich `test:seiten`.
 - **Tests**: Unit-Tests liegen neben dem Code (`name.test.ts`, mit DOM `name.test.tsx`). Inhaltsprüfungen
-  über alle Kapitel heißen `*.content.test.ts`. Neue Logik bekommt einen Test.
+  über alle Kapitel heißen `*.content.test.ts`. Neue Logik bekommt einen Test. Komponenten mit
+  `renderInApp` aus `src/test/render.tsx` rendern. Die Coverage-Schwellen in `vite.config.ts` nur anheben.
 - Git: direkt auf `main` committen und pushen, Branches/PRs nur auf Wunsch.
 
 ## Stolperfallen
