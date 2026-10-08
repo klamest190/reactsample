@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Tailwind.code'
+import { examples, codeBloecke } from './Tailwind.code'
 import { TailwindDemo } from '../demos/TailwindDemo'
 
 /**
@@ -15,8 +15,8 @@ export function Tailwind() {
         <P>With Tailwind you style directly with classes in <Code>className</Code>.</P>
         <TryIt
           id="praxis-tailwind-einstieg"
-          {...beispiele['praxis-tailwind-einstieg']}
-          modus="react"
+          {...examples['praxis-tailwind-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -49,8 +49,8 @@ export function Tailwind() {
       <Abschnitt titel="Try it">
         <TryIt
           id="praxis-tailwind-karte"
-          {...beispiele['praxis-tailwind-karte']}
-          modus="react"
+          {...examples['praxis-tailwind-karte']}
+          mode="react"
         />
         <Hinweis variante="tipp">
           <strong>Autocompletion like in VS Code:</strong> start typing inside <Code>className="…"</Code>, e.g.{' '}
@@ -85,7 +85,7 @@ export function Tailwind() {
           Since version 4 there is no <Code>tailwind.config.js</Code> anymore. Everything lives in CSS:
         </P>
         <CodeBlock
-          titel="src/index.css"
+          title="src/index.css"
           code={codeBloecke.beispiel3}
         />
         <P>
@@ -96,9 +96,9 @@ export function Tailwind() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-tailwind-uebung"
-          {...beispiele['praxis-tailwind-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-tailwind-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Build a <Code>Badge</Code> component with the prop <Code>status</Code> (
@@ -116,28 +116,28 @@ export function Tailwind() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why doesn’t className={`text-${color}-600`} work reliably?',
-            antworten: [
+            question: 'Why doesn’t className={`text-${color}-600`} work reliably?',
+            answers: [
               'Template literals are forbidden in className',
               'The scanner can’t find the complete class name in the source code',
               'Tailwind doesn’t support colors',
             ],
-            richtig: 1,
-            erklaerung: 'Tailwind reads the code statically. Class names must appear in it in full.',
+            correct: 1,
+            explanation: 'Tailwind reads the code statically. Class names must appear in it in full.',
           },
           {
-            frage: 'What does md:grid-cols-3 mean?',
-            antworten: ['Only on medium screens', 'From 768 px width and up', 'Up to 768 px width'],
-            richtig: 1,
-            erklaerung: 'Tailwind is mobile first: prefixes apply from that width upwards.',
+            question: 'What does md:grid-cols-3 mean?',
+            answers: ['Only on medium screens', 'From 768 px width and up', 'Up to 768 px width'],
+            correct: 1,
+            explanation: 'Tailwind is mobile first: prefixes apply from that width upwards.',
           },
           {
-            frage: 'How do you avoid long, repeated class lists in React?',
-            antworten: ['With @apply in CSS', 'With a dedicated component', 'With inline styles'],
-            richtig: 1,
-            erklaerung: 'In React the component is the natural unit of reuse.',
+            question: 'How do you avoid long, repeated class lists in React?',
+            answers: ['With @apply in CSS', 'With a dedicated component', 'With inline styles'],
+            correct: 1,
+            explanation: 'In React the component is the natural unit of reuse.',
           },
         ]}
       />

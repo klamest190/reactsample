@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.2 - Typen & Variablen. */
 
-export const beispiele = {
+export const examples = {
   'java-variablen-einstieg': {
     code: java`
       public class Main {
@@ -129,7 +129,7 @@ export const beispiele = {
     `,
   },
   'java-variablen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Der Preis hat Nachkommastellen - `double`. Die Stückzahl ist eine ganze Zahl - `int`.',
         '`total` ist `pricePerItem * items`. Weil ein `double` beteiligt ist, wird das Ergebnis automatisch `double`.',
@@ -155,7 +155,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           // Given:
@@ -173,12 +173,12 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: 'total ist 17.5', en: 'total is 17.5' }, ausdruck: 'total', erwartet: 17.5 },
-      { name: { de: 'half ist 3.5 (nicht 3)', en: 'half is 3.5 (not 3)' }, ausdruck: 'half', erwartet: 3.5 },
-      { name: { de: 'rounded ist 18', en: 'rounded is 18' }, ausdruck: 'rounded', erwartet: 18 },
+      { name: { de: 'total ist 17.5', en: 'total is 17.5' }, expression: 'total', expected: 17.5 },
+      { name: { de: 'half ist 3.5 (nicht 3)', en: 'half is 3.5 (not 3)' }, expression: 'half', expected: 3.5 },
+      { name: { de: 'rounded ist 18', en: 'rounded is 18' }, expression: 'rounded', expected: 18 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   deklaration: java`

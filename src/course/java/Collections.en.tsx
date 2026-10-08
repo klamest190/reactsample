@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Collections.code'
+import { examples, codeBloecke } from './Collections.code'
 
 /**
  * CHAPTER 6.8 (English) - Collections & Generics
@@ -16,7 +16,7 @@ export function Collections() {
           An array has a fixed length - for everything else there are the <em>collections</em>. The
           most important one is <Code>ArrayList</Code>: a list that grows with you.
         </P>
-        <TryIt modus="java" id="java-collections-einstieg" {...beispiele['java-collections-einstieg']} />
+        <TryIt mode="java" id="java-collections-einstieg" {...examples['java-collections-einstieg']} />
         <Hinweis variante="info">
           The two <Code>import</Code> lines at the top pull the classes from the package{' '}
           <Code>java.util</Code>. In an IDE a single keystroke inserts them. Here in the course you
@@ -36,7 +36,7 @@ export function Collections() {
       </Abschnitt>
 
       <Abschnitt titel="Working with lists">
-        <TryIt modus="java" id="java-collections-liste" {...beispiele['java-collections-liste']} />
+        <TryIt mode="java" id="java-collections-liste" {...examples['java-collections-liste']} />
         <Hinweis variante="warnung">
           Careful with <Code>remove</Code>: on a <Code>{'List<Integer>'}</Code>,{' '}
           <Code>list.remove(1)</Code> deletes the element at <em>position</em> 1 - not the number 1.
@@ -51,7 +51,7 @@ export function Collections() {
           in here - so only strings come out. Before Java 5 this did not exist; back then you had to
           convert every element back yourself when taking it out.
         </P>
-        <TryIt modus="java" id="java-collections-generics" {...beispiele['java-collections-generics']} />
+        <TryIt mode="java" id="java-collections-generics" {...examples['java-collections-generics']} />
         <Hinweis variante="tipp">
           The diamond <Code>{'<>'}</Code> on the right stays empty - the compiler already knows from
           the left side what is meant. And: a collection only takes objects, hence{' '}
@@ -65,7 +65,7 @@ export function Collections() {
           What is an object or a <Code>Map</Code> in JavaScript is called <Code>HashMap</Code> here.
           The type appears twice inside the angle brackets: <Code>{'Map<key, value>'}</Code>.
         </P>
-        <TryIt modus="java" id="java-collections-map" {...beispiele['java-collections-map']} />
+        <TryIt mode="java" id="java-collections-map" {...examples['java-collections-map']} />
         <Hinweis variante="warnung">
           <Code>get</Code> returns <Code>null</Code> when the key is missing - and <Code>null</Code>{' '}
           is the short path to a <Code>NullPointerException</Code>. Use{' '}
@@ -74,7 +74,7 @@ export function Collections() {
       </Abschnitt>
 
       <Abschnitt titel="HashSet: every value only once">
-        <TryIt modus="java" id="java-collections-set" {...beispiele['java-collections-set']} />
+        <TryIt mode="java" id="java-collections-set" {...examples['java-collections-set']} />
       </Abschnitt>
 
       <Abschnitt titel="Lambdas and streams">
@@ -84,7 +84,7 @@ export function Collections() {
           <em>streams</em>.
         </P>
         <CodeBlock code={codeBloecke.streamVergleich} />
-        <TryIt modus="java" id="java-collections-streams" {...beispiele['java-collections-streams']} />
+        <TryIt mode="java" id="java-collections-streams" {...examples['java-collections-streams']} />
         <P>
           <Code>String::toUpperCase</Code> is a <strong>method reference</strong> - shorthand for{' '}
           <Code>{'name -> name.toUpperCase()'}</Code>.
@@ -97,10 +97,10 @@ export function Collections() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-collections-uebung"
-          {...beispiele['java-collections-uebung']}
-          aufgabe={
+          {...examples['java-collections-uebung']}
+          task={
             <>
               <p>Count how often each word appears in the text:</p>
               <Liste>
@@ -118,29 +118,29 @@ export function Collections() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why List<Integer> and not List<int> ?',
-            antworten: [
+            question: 'Why List<Integer> and not List<int> ?',
+            answers: [
               'It is only a convention.',
               'Collections can only hold objects - Integer is the object form of int.',
               'int would be too slow.',
               'List<int> exists but is deprecated.',
             ],
-            richtig: 1,
-            erklaerung: 'Primitive types are not objects. Autoboxing converts int to Integer automatically - and back.',
+            correct: 1,
+            explanation: 'Primitive types are not objects. Autoboxing converts int to Integer automatically - and back.',
           },
           {
-            frage: 'What does map.get("missing") return on a HashMap without that key?',
-            antworten: ['0', 'an exception', 'null', 'an empty string'],
-            richtig: 2,
-            erklaerung: 'null - which is why getOrDefault(key, fallback) is usually the better choice.',
+            question: 'What does map.get("missing") return on a HashMap without that key?',
+            answers: ['0', 'an exception', 'null', 'an empty string'],
+            correct: 2,
+            explanation: 'null - which is why getOrDefault(key, fallback) is usually the better choice.',
           },
           {
-            frage: 'Which collection do you use when every value may appear only once?',
-            antworten: ['ArrayList', 'HashMap', 'HashSet', 'Array'],
-            richtig: 2,
-            erklaerung: 'A set has no duplicates. add returns false when the value is already there.',
+            question: 'Which collection do you use when every value may appear only once?',
+            answers: ['ArrayList', 'HashMap', 'HashSet', 'Array'],
+            correct: 2,
+            explanation: 'A set has no duplicates. add returns false when the value is already there.',
           },
         ]}
       />

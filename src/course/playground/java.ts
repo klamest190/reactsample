@@ -7,7 +7,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const javaPlayground: PlaygroundDaten = {
   teil: 'java',
-  modus: 'java',
+  mode: 'java',
   hinweis: {
     de: 'Es gibt keine Tastatureingabe (Scanner), keine Threads und keine Dateien - alles andere aus Teil 7 funktioniert.',
     en: 'There is no keyboard input (Scanner), no threads and no files - everything else from part 7 works.',

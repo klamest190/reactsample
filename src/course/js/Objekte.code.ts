@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-objekte-einstieg': {
     code: js`
       const user = { name: 'Ada', city: 'London' }
@@ -107,7 +107,7 @@ export const beispiele = {
     `,
   },
   'js-objekte-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`update`: `{ ...user, ...changes }` - spätere Schlüssel überschreiben frühere.',
         '`displayName` destrukturiert direkt in der Parameterliste: `({ firstName, lastName, title })`.',
@@ -132,7 +132,7 @@ export const beispiele = {
       console.log(update(ada, { firstName: 'Augusta' }))
       console.log(displayName(ada))
     `,
-    loesung: js`
+    solution: js`
       function update(user, changes) {
         return { ...user, ...changes }
       }
@@ -146,11 +146,11 @@ export const beispiele = {
       console.log(displayName(ada))
     `,
     tests: [
-      { name: { de: 'update überschreibt Felder', en: 'update overwrites fields' }, ausdruck: 'update({ a: 1, b: 2 }, { b: 3, c: 4 })', erwartet: { a: 1, b: 3, c: 4 } },
-      { name: { de: 'update verändert das Original nicht', en: 'update does not change the original' }, ausdruck: '(() => { const o = { a: 1 }; update(o, { a: 2 }); return o.a === 1 })()' },
-      { name: { de: 'update gibt ein NEUES Objekt zurück', en: 'update returns a NEW object' }, ausdruck: '(() => { const o = { a: 1 }; return update(o, {}) !== o })()' },
-      { name: { de: 'displayName mit title', en: 'displayName with title' }, ausdruck: 'displayName({ firstName: \'Ada\', lastName: \'Lovelace\', title: \'Dr.\' })', erwartet: 'Dr. Ada Lovelace' },
-      { name: { de: 'displayName ohne title', en: 'displayName without title' }, ausdruck: 'displayName({ firstName: \'Alan\', lastName: \'Turing\' })', erwartet: 'Alan Turing' },
+      { name: { de: 'update überschreibt Felder', en: 'update overwrites fields' }, expression: 'update({ a: 1, b: 2 }, { b: 3, c: 4 })', expected: { a: 1, b: 3, c: 4 } },
+      { name: { de: 'update verändert das Original nicht', en: 'update does not change the original' }, expression: '(() => { const o = { a: 1 }; update(o, { a: 2 }); return o.a === 1 })()' },
+      { name: { de: 'update gibt ein NEUES Objekt zurück', en: 'update returns a NEW object' }, expression: '(() => { const o = { a: 1 }; return update(o, {}) !== o })()' },
+      { name: { de: 'displayName mit title', en: 'displayName with title' }, expression: 'displayName({ firstName: \'Ada\', lastName: \'Lovelace\', title: \'Dr.\' })', expected: 'Dr. Ada Lovelace' },
+      { name: { de: 'displayName ohne title', en: 'displayName without title' }, expression: 'displayName({ firstName: \'Alan\', lastName: \'Turing\' })', expected: 'Alan Turing' },
     ],
   },
   'js-objekte-mapset': {
@@ -184,7 +184,7 @@ export const beispiele = {
       console.log(byId.get('b').price) // 25
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

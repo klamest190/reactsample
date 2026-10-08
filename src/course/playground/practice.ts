@@ -8,7 +8,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const praxisPlayground: PlaygroundDaten = {
   teil: 'praxis',
-  modus: 'react',
+  mode: 'react',
   hinweis: {
     de: 'TypeScript-Syntax funktioniert hier auch ohne Typprüfung - die Typen werden beim Übersetzen einfach entfernt, wie bei Vite.',
     en: 'TypeScript syntax works here too, just without type checking - types are simply removed when compiling, like in Vite.',

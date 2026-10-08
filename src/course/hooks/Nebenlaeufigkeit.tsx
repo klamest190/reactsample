@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Nebenlaeufigkeit.code'
+import { examples, codeBloecke } from './Nebenlaeufigkeit.code'
 import { NebenlaeufigkeitsDemo } from '../demos/NebenlaeufigkeitsDemo'
 
 /**
@@ -16,8 +16,8 @@ export function Nebenlaeufigkeit() {
         <P><Code>useTransition</Code> markiert ein Update als „nicht dringend“ und meldet über <Code>isPending</Code>, dass es noch läuft.</P>
         <TryIt
           id="hooks-nebenlaeufig-einstieg"
-          {...beispiele['hooks-nebenlaeufig-einstieg']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function Nebenlaeufigkeit() {
         </P>
         <TryIt
           id="hooks-nebenlaeufig-problem"
-          {...beispiele['hooks-nebenlaeufig-problem']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-problem']}
+          mode="react"
         />
         <P>
           Seit React 18 kann React Renders <strong>unterbrechen</strong>. Du musst ihm nur sagen,
@@ -67,8 +67,8 @@ export function Nebenlaeufigkeit() {
       <Abschnitt titel="useTransition">
         <TryIt
           id="hooks-nebenlaeufig-transition"
-          {...beispiele['hooks-nebenlaeufig-transition']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-transition']}
+          mode="react"
         />
         <Liste>
           <li>
@@ -94,7 +94,7 @@ export function Nebenlaeufigkeit() {
           zum ersten Mal gerendert wird - der Bundler legt ihren Code dafür in eine eigene Datei. Solange sie lädt,
           zeigt das nächste <Code>{'<Suspense>'}</Code> darüber seinen <Code>fallback</Code>.
         </P>
-        <TryIt id="hooks-nebenlaeufig-lazy" {...beispiele['hooks-nebenlaeufig-lazy']} modus="react" />
+        <TryIt id="hooks-nebenlaeufig-lazy" {...examples['hooks-nebenlaeufig-lazy']} mode="react" />
         <P>
           Gute Kandidaten sind Seiten (je Route eine Datei, <Verweis id="praxis-routing" />), große Diagramme, Editoren
           und selten geöffnete Dialoge. Diese Lern-App lädt so jedes Kapitel erst beim Öffnen. Blende die Statistik aus
@@ -114,9 +114,9 @@ export function Nebenlaeufigkeit() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-nebenlaeufig-uebung"
-          {...beispiele['hooks-nebenlaeufig-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-nebenlaeufig-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Der Farbregler ruckelt, weil jede Bewegung 2.000 langsame Kacheln neu zeichnet. Sorge
@@ -133,28 +133,28 @@ export function Nebenlaeufigkeit() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Ein Eingabefeld setzt State, der eine langsame Liste filtert. Welches Hook passt?',
-            antworten: ['useTransition um setState des Inputs', 'useDeferredValue für den Wert, den die Liste bekommt'],
-            richtig: 1,
-            erklaerung: 'Das Eingabefeld selbst muss sofort aktualisiert werden - nur die Liste darf warten.',
+            question: 'Ein Eingabefeld setzt State, der eine langsame Liste filtert. Welches Hook passt?',
+            answers: ['useTransition um setState des Inputs', 'useDeferredValue für den Wert, den die Liste bekommt'],
+            correct: 1,
+            explanation: 'Das Eingabefeld selbst muss sofort aktualisiert werden - nur die Liste darf warten.',
           },
           {
-            frage: 'Was liefert useTransition zurück?',
-            antworten: ['[isPending, startTransition]', '[value, setValue]', 'Ein Promise'],
-            richtig: 0,
-            erklaerung: 'isPending zeigt an, ob gerade eine Transition gerendert wird.',
+            question: 'Was liefert useTransition zurück?',
+            answers: ['[isPending, startTransition]', '[value, setValue]', 'Ein Promise'],
+            correct: 0,
+            explanation: 'isPending zeigt an, ob gerade eine Transition gerendert wird.',
           },
           {
-            frage: 'Warum braucht useDeferredValue meist memo?',
-            antworten: [
+            question: 'Warum braucht useDeferredValue meist memo?',
+            answers: [
               'Sonst gibt es einen Fehler',
               'Sonst rendert die langsame Komponente beim dringenden Render trotzdem mit',
               'memo macht den Wert verzögert',
             ],
-            richtig: 1,
-            erklaerung: 'Mit memo überspringt React die Liste, solange sie den alten Wert bekommt.',
+            correct: 1,
+            explanation: 'Mit memo überspringt React die Liste, solange sie den alten Wert bekommt.',
           },
         ]}
       />

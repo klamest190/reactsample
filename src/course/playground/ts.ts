@@ -10,7 +10,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const tsPlayground: PlaygroundDaten = {
   teil: 'typescript',
-  modus: 'ts',
+  mode: 'ts',
   hinweis: {
     de: 'Unter dem Editor steht das Ergebnis der Typprüfung. Typfehler halten das Programm nicht auf - genau wie in echt.',
     en: 'The result of the type check is shown below the editor. Type errors do not stop the program - just like for real.',

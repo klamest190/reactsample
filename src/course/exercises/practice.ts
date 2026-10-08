@@ -11,7 +11,7 @@ import type { UebungsSammlung } from './types'
 
 const t = (de: string, en: string) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'praxis-formulare': [
     {
       id: 'praxis-formulare-readonly',
@@ -38,11 +38,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-formulare-checkbox',
       stufe: 'fehler',
       titel: t('Die Checkbox lässt sich nicht abwählen', 'The checkbox cannot be unchecked'),
-      aufgabe: t(
+      task: t(
         '„Send“ soll nur aktiv sein, solange die Checkbox angehakt ist. Nach dem ersten Haken bleibt der Knopf aber für immer aktiv.',
         '“Send” should only be enabled while the checkbox is checked. But after the first check, the button stays enabled forever.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           const [accepted, setAccepted] = useState(false)
@@ -58,7 +58,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [accepted, setAccepted] = useState(false)
 
@@ -73,14 +73,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Gib `e.target.value` einmal mit `console.log` aus.', 'Bei Checkboxen steht der Zustand in `e.target.checked`.'],
         en: ['Log `e.target.value` once with `console.log`.', 'For checkboxes, the state is in `e.target.checked`.'],
       },
       tests: [
         {
           name: t('An, aus, wieder deaktiviert', 'On, off, disabled again'),
-          pruefung: js`
+          script: js`
             await render()
             expect(button('Send')).toBeDisabled()
             await click(field('checkbox'))
@@ -95,11 +95,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-formulare-passwort',
       stufe: 'ergaenzen',
       titel: t('Passwort bestätigen', 'Confirm password'),
-      aufgabe: t(
+      task: t(
         'Ergänze die Validierung als **abgeleitete Werte**: Unter 8 Zeichen erscheint „At least 8 characters“, stimmen die Felder nicht überein „Passwords do not match“ (erst, wenn im zweiten Feld etwas steht). „Create account“ ist nur bei gültigen Eingaben aktiv.',
         'Complete the validation as **derived values**: under 8 characters show “At least 8 characters”, if the fields differ show “Passwords do not match” (only once the second field has content). “Create account” is only enabled for valid input.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           const [password, setPassword] = useState('')
@@ -116,7 +116,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [password, setPassword] = useState('')
           const [confirm, setConfirm] = useState('')
@@ -136,14 +136,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Kein zusätzlicher State nötig - alles lässt sich aus `password` und `confirm` berechnen.', '`const isValid = password.length >= 8 && confirm === password`'],
         en: ['No extra state needed - everything can be computed from `password` and `confirm`.', '`const isValid = password.length >= 8 && confirm === password`'],
       },
       tests: [
         {
           name: t('Zu kurzes Passwort', 'Password too short'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Password'), 'abc')
             expect(text()).toContain('At least 8 characters')
@@ -152,7 +152,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Abweichende Wiederholung', 'Mismatching repeat'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Password'), 'secret123')
             expect(text()).not.toContain('Passwords do not match')
@@ -163,7 +163,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Gültige Eingabe aktiviert den Knopf', 'Valid input enables the button'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Password'), 'secret123')
             await type(field('Repeat password'), 'secret123')
@@ -205,8 +205,8 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-daten-endlos',
       stufe: 'fehler',
       titel: t('Hunderte Anfragen', 'Hundreds of requests'),
-      aufgabe: t('Die Daten erscheinen - aber im Hintergrund wird ununterbrochen neu geladen. Finde den Grund.', 'The data appears - but it keeps reloading in the background. Find the reason.'),
-      modus: 'react',
+      task: t('Die Daten erscheinen - aber im Hintergrund wird ununterbrochen neu geladen. Finde den Grund.', 'The data appears - but it keeps reloading in the background. Find the reason.'),
+      mode: 'react',
       code: js`
         function App() {
           const [quote, setQuote] = useState(null)
@@ -220,7 +220,7 @@ export const uebungen: UebungsSammlung = {
           return <p>{quote ? quote.quote : 'Loading …'}</p>
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [quote, setQuote] = useState(null)
 
@@ -238,14 +238,14 @@ export const uebungen: UebungsSammlung = {
           return <p>{quote ? quote.quote : 'Loading …'}</p>
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ohne Abhängigkeits-Array läuft der Effekt nach **jedem** Render - und `setQuote` löst einen neuen Render aus.', '`[]` als zweites Argument. Gute Praxis zusätzlich: Abbrechen im Cleanup.'],
         en: ['Without a dependency array, the effect runs after **every** render - and `setQuote` triggers a new render.', '`[]` as the second argument. Good practice on top: abort in cleanup.'],
       },
       tests: [
         {
           name: t('Lädt nur einmal', 'Loads only once'),
-          pruefung: js`
+          script: js`
             const api = mockFetch(() => ({ quote: 'Talk is cheap.' }))
             await render()
             await waitFor(() => expect(text()).toContain('Talk is cheap.'))
@@ -261,11 +261,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-daten-usefetch',
       stufe: 'frei',
       titel: t('Ein eigener useFetch-Hook', 'A custom useFetch hook'),
-      aufgabe: t(
+      task: t(
         'Schreibe `useFetch(url)`, der `{ data, loading, error }` liefert. Er bricht Anfragen im Cleanup ab und behandelt HTTP-Fehler. `App` zeigt „Loading …“, „Error: HTTP 404“ oder die Daten.',
         'Write `useFetch(url)` returning `{ data, loading, error }`. It aborts requests in cleanup and handles HTTP errors. `App` shows “Loading …”, “Error: HTTP 404” or the data.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function useFetch(url) {
           return { data: null, loading: true, error: null }
@@ -279,7 +279,7 @@ export const uebungen: UebungsSammlung = {
           return <p>{data.todo}</p>
         }
       `,
-      loesung: js`
+      solution: js`
         function useFetch(url) {
           const [state, setState] = useState({ data: null, loading: true, error: null })
 
@@ -311,14 +311,14 @@ export const uebungen: UebungsSammlung = {
           return <p>{data.todo}</p>
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ein State-Objekt `{ data, loading, error }` und ein Effekt mit `[url]`.', '`fetch` wirft bei 404 nicht - prüfe `response.ok` und wirf selbst `new Error(\'HTTP \' + response.status)`.', '`AbortError` im `catch` ignorieren.'],
         en: ['A state object `{ data, loading, error }` and an effect with `[url]`.', '`fetch` does not throw on 404 - check `response.ok` and throw `new Error(\'HTTP \' + response.status)` yourself.', 'Ignore `AbortError` in the `catch`.'],
       },
       tests: [
         {
           name: t('Laden, dann Daten', 'Loading, then data'),
-          pruefung: js`
+          script: js`
             mockFetch(() => ({ todo: 'Write a custom hook' }))
             await render()
             expect(text()).toContain('Loading')
@@ -327,7 +327,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('HTTP-Fehler wird angezeigt', 'HTTP error is shown'),
-          pruefung: js`
+          script: js`
             mockFetch(() => ({ status: 404, body: { message: 'Not found' } }))
             await render()
             await waitFor(() => expect(text()).toContain('Error: HTTP 404'))
@@ -335,7 +335,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Abbruch beim Entfernen', 'Abort on unmount'),
-          pruefung: js`
+          script: js`
             const api = mockFetch(() => new Promise(() => {}))
             await render()
             await remount()
@@ -380,11 +380,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-komposition-slots',
       stufe: 'ergaenzen',
       titel: t('Karte mit Slots', 'Card with slots'),
-      aufgabe: t(
+      task: t(
         'Ergänze `Card({ title, actions, children })`: Titel als `<h2>`, darunter `children`, und in einem `<footer>` die übergebenen `actions`. Ohne `actions` gibt es keinen Footer.',
         'Complete `Card({ title, actions, children })`: title as `<h2>`, then `children`, and the passed `actions` in a `<footer>`. Without `actions` there is no footer.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function Card({ title, actions, children }) {
           // TODO
@@ -404,7 +404,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function Card({ title, actions, children }) {
           return (
             <section className="card">
@@ -428,14 +428,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['JSX ist ein Wert - `actions` kann man wie `children` einfach rendern.', '`{actions && <footer>{actions}</footer>}`'],
         en: ['JSX is a value - you can render `actions` just like `children`.', '`{actions && <footer>{actions}</footer>}`'],
       },
       tests: [
         {
           name: t('Titel und Inhalt', 'Title and content'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('.card h2')).toHaveLength(2)
             expect(text()).toContain('This cannot be undone.')
@@ -443,7 +443,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Footer nur mit actions', 'Footer only with actions'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('footer')).toHaveLength(1)
             expect(findAll('footer button')).toHaveLength(2)
@@ -476,11 +476,11 @@ export const uebungen: UebungsSammlung = {
       stufe: 'fehler',
       wiederholung: 'js-async',
       titel: t('Hängt bei „Saving …“', 'Stuck at “Saving …”'),
-      aufgabe: t(
+      task: t(
         'Das Speichern schlägt immer fehl (so ist `saveData` gebaut). Die Oberfläche bleibt aber bei „Saving …“ stehen. Zeige stattdessen „Could not save“ an.',
         'Saving always fails (that is how `saveData` is built). But the UI gets stuck at “Saving …”. Show “Could not save” instead.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         async function saveData() {
           await new Promise((resolve) => setTimeout(resolve, 100))
@@ -505,7 +505,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         async function saveData() {
           await new Promise((resolve) => setTimeout(resolve, 100))
           throw new Error('Server unavailable')
@@ -534,14 +534,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Nach dem `throw` wird `setStatus(\'saved\')` nie erreicht.', '`try { … } catch { setStatus(\'error\') }` und einen neuen Status anzeigen.'],
         en: ['After the `throw`, `setStatus(\'saved\')` is never reached.', '`try { … } catch { setStatus(\'error\') }` and display a new status.'],
       },
       tests: [
         {
           name: t('Zeigt „Could not save“', 'Shows “Could not save”'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Save'))
             expect(text()).toContain('Saving')
@@ -555,11 +555,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-fehler-reset',
       stufe: 'ergaenzen',
       titel: t('Error Boundary mit „Try again“', 'Error boundary with “Try again”'),
-      aufgabe: t(
+      task: t(
         'Ergänze `ErrorBoundary`: Bei einem Render-Fehler zeigt sie „Something went wrong“ und einen Knopf „Try again“, der den Fehlerzustand zurücksetzt.',
         'Complete `ErrorBoundary`: on a rendering error it shows “Something went wrong” and a “Try again” button that resets the error state.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         class ErrorBoundary extends React.Component {
           state = { hasError: false }
@@ -589,7 +589,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         class ErrorBoundary extends React.Component {
           state = { hasError: false }
 
@@ -634,14 +634,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`static getDerivedStateFromError() { return { hasError: true } }`', 'Beim Zurücksetzen erst die Ursache beheben (`onReset`), dann `this.setState({ hasError: false })`.'],
         en: ['`static getDerivedStateFromError() { return { hasError: true } }`', 'When resetting, fix the cause first (`onReset`), then `this.setState({ hasError: false })`.'],
       },
       tests: [
         {
           name: t('Fehler wird abgefangen und zurückgesetzt', 'Error is caught and reset'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Break'))
             expect(text()).toContain('Something went wrong')
@@ -676,11 +676,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-tailwind-lookup',
       stufe: 'fehler',
       titel: t('Farben per Lookup-Objekt', 'Colors via a lookup object'),
-      aufgabe: t(
+      task: t(
         'Die Klassen werden zusammengesetzt - in einem echten Projekt fehlen sie dann. Ersetze das durch ein Lookup-Objekt mit **vollständigen** Klassennamen.',
         'The classes are assembled from pieces - in a real project they would then be missing. Replace this with a lookup object containing **complete** class names.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function Status({ tone, children }) {
           return <span className={'rounded px-2 bg-' + tone + '-100 text-' + tone + '-800'}>{children}</span>
@@ -694,7 +694,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const TONES = {
           emerald: 'bg-emerald-100 text-emerald-800',
           amber: 'bg-amber-100 text-amber-800',
@@ -712,14 +712,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`const TONES = { emerald: \'bg-emerald-100 text-emerald-800\', … }`', 'Dann `className={\'rounded px-2 \' + TONES[tone]}`.'],
         en: ['`const TONES = { emerald: \'bg-emerald-100 text-emerald-800\', … }`', 'Then `className={\'rounded px-2 \' + TONES[tone]}`.'],
       },
       tests: [
         {
           name: t('Klassen stimmen', 'Classes are correct'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('span')[0].className).toContain('bg-emerald-100')
             expect(findAll('span')[1].className).toContain('text-amber-800')
@@ -727,7 +727,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Vollständige Klassennamen im Code', 'Complete class names in the code'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/bg-emerald-100 text-emerald-800/)
             expect(code).not.toMatch(/'bg-'\s*\+/)
           `,
@@ -794,11 +794,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-typescript-union',
       stufe: 'fehler',
       titel: t('Action-Union ohne Absicherung', 'Action union without a guard'),
-      aufgabe: t(
+      task: t(
         'Der Reducer kennt zwei Actions, aber `payload` gibt es nur bei einer davon - die Typprüfung meldet das zu Recht. Mach `Action` zu einer **Discriminated Union** und grenze im Reducer über `action.type` ein. Ein unbekannter `type` soll den State unverändert zurückgeben.',
         'The reducer knows two actions, but `payload` exists on only one of them - the type check rightly complains. Turn `Action` into a **discriminated union** and narrow on `action.type` in the reducer. An unknown `type` should return the state unchanged.',
       ),
-      modus: 'ts',
+      mode: 'ts',
       code: js`
         type Action = { type: string; payload?: number }
 
@@ -810,7 +810,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(reducer(1, { type: 'added', payload: 4 }), reducer(9, { type: 'reset' }))
       `,
-      loesung: js`
+      solution: js`
         type Action = { type: 'added'; payload: number } | { type: 'reset' }
 
         function reducer(count: number, action: Action): number {
@@ -826,7 +826,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(reducer(1, { type: 'added', payload: 4 }), reducer(9, { type: 'reset' }))
       `,
-      tipps: {
+      hints: {
         de: [
           'Jede Action bekommt ihren eigenen Typ, verbunden mit `|`. Das gemeinsame Feld `type` unterscheidet sie.',
           'Nach `case \'added\':` weiß TypeScript, dass `payload` existiert - ohne `?`.',
@@ -839,10 +839,10 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: 'added', ausdruck: "reducer(1, { type: 'added', payload: 4 })", erwartet: 5 },
-        { name: 'reset', ausdruck: "reducer(9, { type: 'reset' })", erwartet: 0 },
+        { name: 'added', expression: "reducer(1, { type: 'added', payload: 4 })", expected: 5 },
+        { name: 'reset', expression: "reducer(9, { type: 'reset' })", expected: 0 },
       ],
-      typTests: [
+      typeTests: [
         {
           name: t('payload ist bei added Pflicht', 'payload is required for added'),
           // Prüft von der anderen Seite: OHNE payload MUSS es einen Typfehler geben.
@@ -865,11 +865,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-typescript-useref',
       stufe: 'ergaenzen',
       titel: t('useState und useRef typisieren', 'Typing useState and useRef'),
-      aufgabe: t(
+      task: t(
         'Aus dem Startwert `null` allein kann TypeScript nichts ableiten - `selected` bekommt dadurch den Typ `null` und lässt sich später nicht mehr belegen. Schreib die Typen hin: `selected` ist `User | null`, `current` ist `HTMLInputElement | null`. Genau so machst du es bei `useState<User | null>(null)` und `useRef<HTMLInputElement>(null)`.',
         'From the start value `null` alone TypeScript can infer nothing - `selected` gets the type `null` and cannot be assigned later. Write the types down: `selected` is `User | null`, `current` is `HTMLInputElement | null`. This is exactly what you do with `useState<User | null>(null)` and `useRef<HTMLInputElement>(null)`.',
       ),
-      modus: 'ts',
+      mode: 'ts',
       code: js`
         type User = { id: number; name: string }
 
@@ -887,7 +887,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(select([{ id: 1, name: 'Ada' }], 'Ada'), currentValue())
       `,
-      loesung: js`
+      solution: js`
         type User = { id: number; name: string }
 
         const store: { selected: User | null } = { selected: null }
@@ -904,7 +904,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(select([{ id: 1, name: 'Ada' }], 'Ada'), currentValue())
       `,
-      tipps: {
+      hints: {
         de: [
           '`{ selected: null }` hat den Typ `{ selected: null }` - da passt später kein `User` hinein.',
           'Schreib den Typ an die Variable: `const store: { selected: User | null } = { selected: null }`.',
@@ -917,11 +917,11 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: t('gefunden', 'found'), ausdruck: "select([{ id: 1, name: 'Ada' }], 'Ada')", erwartet: 'Ada' },
-        { name: t('nicht gefunden', 'not found'), ausdruck: "select([], 'Nobody')", erwartet: 'nobody' },
-        { name: t('kein Element gesetzt', 'no element set'), ausdruck: 'currentValue()', erwartet: '' },
+        { name: t('gefunden', 'found'), expression: "select([{ id: 1, name: 'Ada' }], 'Ada')", expected: 'Ada' },
+        { name: t('nicht gefunden', 'not found'), expression: "select([], 'Nobody')", expected: 'nobody' },
+        { name: t('kein Element gesetzt', 'no element set'), expression: 'currentValue()', expected: '' },
       ],
-      typTests: [
+      typeTests: [
         {
           name: t('store nimmt einen User auf', 'store accepts a user'),
           code: js`
@@ -972,11 +972,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-routing-params',
       stufe: 'ergaenzen',
       titel: t('Detailseite mit :id', 'Detail page with :id'),
-      aufgabe: t(
+      task: t(
         'Ergänze die Routen: `/` zeigt die Liste, `/users/:id` die Detailseite des passenden Nutzers, und jede andere Adresse den Text „Not found“. `UserDetail` holt sich die `id` mit `useParams()`.',
         'Add the routes: `/` shows the list, `/users/:id` the detail page of the matching user, and any other address the text “Not found”. `UserDetail` gets the `id` with `useParams()`.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         import { MemoryRouter, Routes, Route, Link, useParams } from 'react-router'
 
@@ -1011,7 +1011,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         import { MemoryRouter, Routes, Route, Link, useParams } from 'react-router'
 
         const USERS = [
@@ -1049,7 +1049,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: [
           '`<Routes>` umschließt alle `<Route path element>` - gerendert wird immer nur die passende.',
           '`useParams()` gibt ein Objekt zurück: `const { id } = useParams()`. Der Name kommt aus `:id`.',
@@ -1064,7 +1064,7 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Startseite zeigt die Liste', 'Start page shows the list'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li')).toHaveLength(2)
             expect(text()).toContain('Ada')
@@ -1072,7 +1072,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Klick öffnet die Detailseite', 'Clicking opens the detail page'),
-          pruefung: js`
+          script: js`
             await render()
             await click(find('a[href="/users/2"]'))
             expect(find('h1').textContent).toBe('Linus')
@@ -1084,11 +1084,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-routing-suchparameter',
       stufe: 'fehler',
       titel: t('Filter im eigenen State statt in der URL', 'Filter in local state instead of the URL'),
-      aufgabe: t(
+      task: t(
         'Der Filter steckt in `useState` - ein Link auf die gefilterte Ansicht lässt sich so nicht teilen. Leg ihn stattdessen mit `useSearchParams()` in die Adresse. Beim Umschalten soll `?status=done` bzw. `?status=open` in der URL stehen; ohne Parameter werden alle Einträge gezeigt.',
         'The filter lives in `useState`, so a link to the filtered view cannot be shared. Put it into the address with `useSearchParams()` instead. Switching should put `?status=done` or `?status=open` into the URL; without a parameter all entries are shown.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         import { MemoryRouter, useSearchParams } from 'react-router'
 
@@ -1124,7 +1124,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         import { MemoryRouter, useSearchParams } from 'react-router'
 
         const TODOS = [
@@ -1160,7 +1160,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: [
           '`useSearchParams()` verhält sich wie `useState`, nur dass der Wert in der Adresse steht.',
           'Lesen: `searchParams.get(\'status\')` - fehlt der Parameter, kommt `null` zurück.',
@@ -1175,7 +1175,7 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Ohne Filter alle Einträge', 'All entries without a filter'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li')).toHaveLength(3)
           `,
@@ -1184,7 +1184,7 @@ export const uebungen: UebungsSammlung = {
           // Der MemoryRouter hält die Adresse im Speicher, nicht in window.location -
           // deshalb wird hier der Quelltext geprüft statt der echten Adresszeile.
           name: t('Der Filter kommt aus der Adresse', 'The filter comes from the address'),
-          pruefung: js`
+          script: js`
             await render()
             expect(code).toMatch(/useSearchParams\(/)
             expect(code).not.toMatch(/useState\(/)
@@ -1192,7 +1192,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Filtern funktioniert weiter', 'Filtering still works'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Done'))
             expect(findAll('li')).toHaveLength(1)
@@ -1201,7 +1201,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('„All“ zeigt wieder alles', '“All” shows everything again'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Done'))
             await click(button('All'))
@@ -1243,11 +1243,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-testen-verhalten',
       stufe: 'frei',
       titel: t('Eine Komponente testbar machen', 'Making a component testable'),
-      aufgabe: t(
+      task: t(
         'Diese Suchleiste soll sich über ihre **Rolle** finden lassen, nicht über CSS-Klassen. Sorg dafür, dass das Eingabefeld ein Label „Search“ hat, der Knopf über seinen Namen „Search“ erreichbar ist, und nach dem Absenden die Trefferzahl als `role="status"` erscheint - also genau das, was ein Test mit `getByRole` und `getByLabelText` ansteuern würde.',
         'This search bar should be findable by its **role**, not by CSS classes. Make sure the input has a label “Search”, the button is reachable by its name “Search”, and after submitting the number of results appears as `role="status"` - exactly what a test with `getByRole` and `getByLabelText` would target.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const ITEMS = ['apple', 'banana', 'avocado']
 
@@ -1270,7 +1270,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const ITEMS = ['apple', 'banana', 'avocado']
 
         function App() {
@@ -1292,7 +1292,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Ein `<div>` mit Text ist kein Label. Nimm `<label htmlFor="…">` und gib dem Feld dieselbe `id`.',
           'Der zugängliche Name eines Knopfes ist sein Textinhalt - ein Emoji allein reicht nicht.',
@@ -1307,7 +1307,7 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Feld hat ein verknüpftes Label', 'Input has a linked label'),
-          pruefung: js`
+          script: js`
             await render()
             const label = find('label')
             const input = find('input')
@@ -1317,14 +1317,14 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Knopf hat einen lesbaren Namen', 'Button has a readable name'),
-          pruefung: js`
+          script: js`
             await render()
             expect(find('button').textContent).toContain('Search')
           `,
         },
         {
           name: t('Trefferzahl als role="status"', 'Result count as role="status"'),
-          pruefung: js`
+          script: js`
             await render()
             await type(find('input'), 'a')
             await submit(find('form'))
@@ -1372,11 +1372,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-barrierefreiheit-elemente',
       stufe: 'fehler',
       titel: t('Klickbare divs ersetzen', 'Replacing clickable divs'),
-      aufgabe: t(
+      task: t(
         'Diese Liste ist mit der Maus bedienbar, mit der Tastatur nicht. Ersetze die `div`s durch die passenden Elemente: Der Umschalter ist ein `button`, der Verweis auf die Detailseite ein `a` mit `href`. Das Symbol-Icon des Löschknopfes braucht außerdem einen `aria-label`.',
         'This list can be operated with a mouse, but not with a keyboard. Replace the `div`s with the right elements: the toggle is a `button`, the link to the detail page an `a` with `href`. The icon-only delete button also needs an `aria-label`.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const TODOS = [{ id: 1, title: 'Write docs', done: false }]
 
@@ -1400,7 +1400,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const TODOS = [{ id: 1, title: 'Write docs', done: false }]
 
         function App() {
@@ -1425,7 +1425,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Etwas, das eine Aktion auslöst, ist ein `button`. Etwas, das woandershin führt, ist ein `a` mit `href`.',
           'Der Löschknopf zeigt nur ein Emoji - sein Name muss per `aria-label` dazu.',
@@ -1440,7 +1440,7 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Keine klickbaren divs mehr', 'No clickable divs left'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li div')).toHaveLength(0)
             expect(findAll('li button')).toHaveLength(2)
@@ -1449,7 +1449,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Umschalter funktioniert weiter', 'Toggle still works'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Open'))
             expect(text()).toContain('Done')
@@ -1457,7 +1457,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Löschknopf hat einen Namen', 'Delete button has a name'),
-          pruefung: js`
+          script: js`
             await render()
             const loeschen = findAll('li button').find((el) => el.textContent.includes('🗑'))
             expect(loeschen.getAttribute('aria-label')).toBeTruthy()
@@ -1469,11 +1469,11 @@ export const uebungen: UebungsSammlung = {
       id: 'praxis-barrierefreiheit-formular',
       stufe: 'ergaenzen',
       titel: t('Fehlermeldung richtig verknüpfen', 'Linking an error message properly'),
-      aufgabe: t(
+      task: t(
         'Das Formular zeigt den Fehler nur optisch an. Verknüpfe ihn richtig: Das Feld bekommt ein Label, im Fehlerfall `aria-invalid="true"` und ein `aria-describedby`, das auf die Meldung zeigt. Die Meldung selbst bekommt `role="alert"`, damit sie angesagt wird.',
         'The form only shows the error visually. Link it properly: the input gets a label, in the error case `aria-invalid="true"` and an `aria-describedby` pointing at the message. The message itself gets `role="alert"` so it is announced.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           const [email, setEmail] = useState('')
@@ -1494,7 +1494,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [email, setEmail] = useState('')
           const [error, setError] = useState('')
@@ -1524,7 +1524,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Aus dem `<span>` wird ein `<label htmlFor="email">`, das Feld bekommt `id="email"`.',
           '`aria-describedby` enthält die `id` der Meldung - also muss die Meldung eine `id` haben.',
@@ -1539,14 +1539,14 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Label ist mit dem Feld verknüpft', 'Label is linked to the input'),
-          pruefung: js`
+          script: js`
             await render()
             expect(find('label').getAttribute('for')).toBe(find('input').getAttribute('id'))
           `,
         },
         {
           name: t('Ohne Fehler keine aria-Attribute', 'No aria attributes without an error'),
-          pruefung: js`
+          script: js`
             await render()
             expect(find('input').getAttribute('aria-invalid')).toBe(null)
             expect(find('input').getAttribute('aria-describedby')).toBe(null)
@@ -1554,7 +1554,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Fehler wird angesagt und verknüpft', 'Error is announced and linked'),
-          pruefung: js`
+          script: js`
             await render()
             await type(find('input'), 'nope')
             await submit(find('form'))

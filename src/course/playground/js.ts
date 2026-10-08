@@ -10,7 +10,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const jsPlayground: PlaygroundDaten = {
   teil: 'javascript',
-  modus: 'js',
+  mode: 'js',
   vorlagen: [
     {
       titel: { de: 'Leeres Blatt', en: 'Blank page' },

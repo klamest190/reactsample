@@ -1,5 +1,5 @@
 import { java, js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für Kapitel 7.10 - Java, JavaScript & React im Vergleich.
@@ -10,7 +10,7 @@ import type { CodeBeispiel } from '../../learning/jsSandbox'
  * im `modus` des jeweiligen <TryIt> in Vergleich.tsx.
  */
 
-export const beispiele = {
+export const examples = {
   // --- dieselbe Aufgabe, zwei Sprachen --------------------------------------
   'java-vergleich-java': {
     code: java`
@@ -143,7 +143,7 @@ export const beispiele = {
   },
 
   'java-vergleich-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Der Rückgabetyp steht vor dem Namen: `static double average(int[] numbers)`.',
         'Für den Durchschnitt musst du eine Seite zu `double` machen: `(double) sum / numbers.length`.',
@@ -181,7 +181,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         static double average(int[] numbers) {
           if (numbers.length == 0) return 0;
@@ -210,32 +210,32 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'average({1, 2, 3, 4}) ist 2.5', en: 'average({1, 2, 3, 4}) is 2.5' },
-        ausdruck: 'average(new int[]{1, 2, 3, 4})',
-        erwartet: 2.5,
+        expression: 'average(new int[]{1, 2, 3, 4})',
+        expected: 2.5,
       },
       {
         name: { de: 'average teilt nicht ganzzahlig', en: 'average does not divide as whole numbers' },
-        ausdruck: 'average(new int[]{1, 2})',
-        erwartet: 1.5,
+        expression: 'average(new int[]{1, 2})',
+        expected: 1.5,
       },
       {
         name: { de: 'average eines leeren Arrays ist 0', en: 'average of an empty array is 0' },
-        ausdruck: 'average(new int[0])',
-        erwartet: 0,
+        expression: 'average(new int[0])',
+        expected: 0,
       },
       {
         name: { de: 'countAbove zählt richtig', en: 'countAbove counts correctly' },
-        ausdruck: 'countAbove(new int[]{4, 8, 15, 16, 23, 42}, 15)',
-        erwartet: 3,
+        expression: 'countAbove(new int[]{4, 8, 15, 16, 23, 42}, 15)',
+        expected: 3,
       },
       {
         name: { de: 'countAbove zählt nicht den Grenzwert selbst', en: 'countAbove does not count the limit itself' },
-        ausdruck: 'countAbove(new int[]{5, 5, 6}, 5)',
-        erwartet: 1,
+        expression: 'countAbove(new int[]{5, 5, 6}, 5)',
+        expected: 1,
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   struktur: js`

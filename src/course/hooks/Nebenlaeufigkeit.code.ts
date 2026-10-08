@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-nebenlaeufig-einstieg': {
     code: js`
       function SlowPage() {
@@ -35,7 +35,7 @@ export const beispiele = {
     `,
   },
   'hooks-nebenlaeufig-problem': {
-    tipps: {
+    hints: {
       de: [
         '`const deferredQuery = useDeferredValue(query)` - das Feld nutzt `query`, die Liste `deferredQuery`.',
         'Ohne `memo` um die Liste bringt es nichts: Sie würde beim dringenden Render trotzdem mitrendern.',
@@ -69,7 +69,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function SlowItem({ text }) {
         const start = performance.now()
         while (performance.now() - start < 1) {}
@@ -101,13 +101,13 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'useDeferredValue wird genutzt', en: 'useDeferredValue is used' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useDeferredValue\(/)
         `,
       },
       {
         name: { de: 'Die Liste zeigt die Ergebnisse zur Eingabe', en: 'The list shows results for the input' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('input'), 'abc')
           await waitFor(() => expect(text()).toContain('abc - result 1'))
@@ -160,7 +160,7 @@ export const beispiele = {
     `,
   },
   'hooks-nebenlaeufig-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Der Regler bleibt beim echten `hue`, die teuren Kacheln bekommen `useDeferredValue(hue)`.',
         '`Tiles` muss mit `memo` umhüllt sein.',
@@ -197,7 +197,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const Tiles = memo(function Tiles({ hue }) {
         const tiles = []
         for (let i = 0; i < 2000; i++) {
@@ -228,7 +228,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Der Regler aktualisiert die Gradzahl', en: 'The slider updates the degree display' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('range'), 90)
           expect(text()).toContain('90°')
@@ -236,7 +236,7 @@ export const beispiele = {
       },
       {
         name: { de: 'useDeferredValue und memo werden genutzt', en: 'useDeferredValue and memo are used' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useDeferredValue\(/)
           expect(code).toMatch(/memo\(/)
         `,
@@ -282,7 +282,7 @@ export const beispiele = {
       }
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

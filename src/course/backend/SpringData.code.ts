@@ -1,5 +1,5 @@
 import { http, java, js, properties } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.5 - Databases with Spring Data JPA. */
 
@@ -35,7 +35,7 @@ const TODO_ENTITY = java`
   }
 `
 
-export const beispiele = {
+export const examples = {
   'spring-daten-einstieg': {
     code: withApp(`${TODO_ENTITY}\n\n` + java`
       // That is all: Spring Data writes the implementation at startup.
@@ -247,7 +247,7 @@ export const beispiele = {
     `,
   },
   'spring-daten-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Abfragen sind Methoden im Repository-Interface - ohne Rumpf: `List<Book> findByReadFalse();`',
         'Groß-/Kleinschreibung ignorieren: `List<Book> findByAuthorIgnoreCase(String author);` Die Namen müssen zu den Feldern der Entity passen.',
@@ -314,7 +314,7 @@ export const beispiele = {
         // TODO: GET /api/books/unread and GET /api/books/by?author=…
       }
     `),
-    loesung: withApp(java`
+    solution: withApp(java`
       @Entity
       class Book {
         @Id @GeneratedValue
@@ -393,7 +393,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   tabelle: js`

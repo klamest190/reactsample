@@ -1,7 +1,7 @@
-/* Layer order. "vorschau" holds the utilities that tailwindMotor.ts builds at runtime for
+/* Layer order. "preview" holds the utilities that tailwindMotor.ts builds at runtime for
    classes in the editors. It sits below "utilities": the page's own classes (and their dark:
    variants) always win - otherwise a preview using bg-white would turn the page light in dark mode. */
-@layer theme, base, components, vorschau, utilities;
+@layer theme, base, components, preview, utilities;
 
 /* Tailwind v4: ein einziger Import zieht Preflight (CSS-Reset) + alle Utilities rein. */
 @import "tailwindcss";
@@ -73,50 +73,50 @@
    <h1> oder <ul> im Editor aus wie normaler Text.
    :where() hat Spezifität 0, deshalb gewinnen Tailwind-Klassen und style={{}}. */
 @layer components {
-  .vorschau {
+  .preview {
     @apply text-sm leading-relaxed;
   }
-  .vorschau :where(h1) {
+  .preview :where(h1) {
     @apply my-2 text-2xl font-bold;
   }
-  .vorschau :where(h2) {
+  .preview :where(h2) {
     @apply my-2 text-xl font-semibold;
   }
-  .vorschau :where(h3) {
+  .preview :where(h3) {
     @apply my-1.5 text-base font-semibold;
   }
-  .vorschau :where(p, ul, ol) {
+  .preview :where(p, ul, ol) {
     @apply my-2;
   }
-  .vorschau :where(ul) {
+  .preview :where(ul) {
     @apply list-disc pl-5;
   }
-  .vorschau :where(ol) {
+  .preview :where(ol) {
     @apply list-decimal pl-5;
   }
-  .vorschau :where(button) {
+  .preview :where(button) {
     @apply m-0.5 cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1 font-medium hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700;
   }
-  .vorschau :where(input:not([type="checkbox"], [type="radio"], [type="range"]), select, textarea) {
+  .preview :where(input:not([type="checkbox"], [type="radio"], [type="range"]), select, textarea) {
     @apply m-0.5 rounded-lg border border-slate-300 bg-white px-2 py-1 dark:border-slate-600 dark:bg-slate-800;
   }
-  .vorschau :where(input[type="checkbox"], input[type="radio"]) {
+  .preview :where(input[type="checkbox"], input[type="radio"]) {
     @apply mr-1 accent-brand-600;
   }
-  .vorschau :where(code) {
+  .preview :where(code) {
     @apply rounded bg-slate-100 px-1 font-mono text-[0.9em] dark:bg-slate-800;
   }
-  .vorschau :where(hr) {
+  .preview :where(hr) {
     @apply my-3 border-slate-200 dark:border-slate-700;
   }
   /* Konvention aus dem ToDo-Projekt: erledigte Einträge durchgestrichen. */
-  .vorschau :where(.done) {
+  .preview :where(.done) {
     @apply text-slate-400 line-through;
   }
-  .vorschau :where([aria-pressed="true"]) {
+  .preview :where([aria-pressed="true"]) {
     @apply border-brand-500 bg-brand-50 dark:bg-brand-950;
   }
-  .vorschau :where([role="alert"]) {
+  .preview :where([role="alert"]) {
     @apply text-rose-600 dark:text-rose-400;
   }
 }

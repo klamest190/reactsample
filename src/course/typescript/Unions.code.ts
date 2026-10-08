@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.4 - Unions & Narrowing. */
 
-export const beispiele = {
+export const examples = {
   'ts-unions-einstieg': {
     code: js`
       type Status = 'loading' | 'success' | 'error'
@@ -190,7 +190,7 @@ export const beispiele = {
     `,
   },
   'ts-unions-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Eine Discriminated Union: drei Objekttypen mit `|` verbunden, jeder mit `type: \'card\'`, `type: \'paypal\'` bzw. `type: \'invoice\'`.',
         'In `describe` hilft `switch (payment.type)` - in jedem `case` kennt TypeScript die Felder der Variante.',
@@ -222,7 +222,7 @@ export const beispiele = {
       console.log(describe({ type: 'paypal', email: 'ada@example.com' }))
       console.log(fee({ type: 'invoice', dueDays: 14 }, 100))
     `,
-    loesung: js`
+    solution: js`
       // 1. The three payment methods as a discriminated union - the common field is "type":
       type Payment =
         | { type: 'card'; number: string; holder: string }
@@ -257,13 +257,13 @@ export const beispiele = {
       console.log(fee({ type: 'invoice', dueDays: 14 }, 100))
     `,
     tests: [
-      { name: 'describe(card)', ausdruck: "describe({ type: 'card', number: '4111111111111234', holder: 'Ada' })", erwartet: 'Card ending in 1234' },
-      { name: 'describe(paypal)', ausdruck: "describe({ type: 'paypal', email: 'ada@example.com' })", erwartet: 'PayPal (ada@example.com)' },
-      { name: 'describe(invoice)', ausdruck: "describe({ type: 'invoice', dueDays: 14 })", erwartet: 'Invoice, due in 14 days' },
-      { name: 'fee(card, 250)', ausdruck: "fee({ type: 'card', number: '1', holder: 'A' }, 250)", erwartet: 5 },
-      { name: 'fee(paypal, 250)', ausdruck: "fee({ type: 'paypal', email: 'a@b.c' }, 250)", erwartet: 7.5 },
+      { name: 'describe(card)', expression: "describe({ type: 'card', number: '4111111111111234', holder: 'Ada' })", expected: 'Card ending in 1234' },
+      { name: 'describe(paypal)', expression: "describe({ type: 'paypal', email: 'ada@example.com' })", expected: 'PayPal (ada@example.com)' },
+      { name: 'describe(invoice)', expression: "describe({ type: 'invoice', dueDays: 14 })", expected: 'Invoice, due in 14 days' },
+      { name: 'fee(card, 250)', expression: "fee({ type: 'card', number: '1', holder: 'A' }, 250)", expected: 5 },
+      { name: 'fee(paypal, 250)', expression: "fee({ type: 'paypal', email: 'a@b.c' }, 250)", expected: 7.5 },
     ],
-    typTests: [
+    typeTests: [
       {
         name: { de: 'Alle drei Varianten sind gültig', en: 'All three variants are valid' },
         code: "const allPayments: Payment[] = [{ type: 'card', number: '4111', holder: 'Ada' }, { type: 'paypal', email: 'a@b.c' }, { type: 'invoice', dueDays: 30 }]",
@@ -273,7 +273,7 @@ export const beispiele = {
       { name: { de: 'Eine Rechnung hat kein email-Feld', en: 'An invoice has no email field' }, code: "// @ts-expect-error\nconst wrongInvoice: Payment = { type: 'invoice', dueDays: 14, email: 'x' }" },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   eingrenzen: js`

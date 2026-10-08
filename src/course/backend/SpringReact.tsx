@@ -5,7 +5,7 @@ import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { CorsPicture } from '../demos/BackendDiagrams'
 import { FullStack } from '../demos/FullStack'
-import { backend, beispiele, codeBloecke, frontend } from './SpringReact.code'
+import { backend, examples, codeBloecke, frontend } from './SpringReact.code'
 
 /**
  * CHAPTER 8.7 - React meets Spring Boot
@@ -36,11 +36,11 @@ export function SpringReact() {
           die API (Port 8080). Sie reden nur über HTTP miteinander - das Frontend weiß nichts von
           Java, das Backend nichts von React.
         </P>
-        <CodeBlock code={codeBloecke.entwicklung} titel="Terminal" sprache="konfig" />
+        <CodeBlock code={codeBloecke.entwicklung} title="Terminal" language="config" />
         <P>
           Im Frontend ist das bekannte Handwerk aus <Verweis nr="5.2" /> gefragt:
         </P>
-        <CodeBlock code={codeBloecke.fetch} titel="api.js" />
+        <CodeBlock code={codeBloecke.fetch} title="api.js" />
         <Hinweis variante="warnung">
           <Code>fetch</Code> wirft bei 400 oder 500 <strong>keinen</strong> Fehler - nur, wenn der
           Server gar nicht erreichbar ist. Den Status musst du selbst mit <Code>response.ok</Code>{' '}
@@ -57,7 +57,7 @@ export function SpringReact() {
           (Protokoll + Host + Port) sprechen, außer der andere Server erlaubt es ausdrücklich.
         </P>
         <CorsPicture />
-        <CodeBlock code={codeBloecke.cors} titel="preflight.http" />
+        <CodeBlock code={codeBloecke.cors} title="preflight.http" />
         <P>Zwei Lösungen - die erste ist beim Entwickeln die bequemste:</P>
         <Liste>
           <li>
@@ -70,8 +70,8 @@ export function SpringReact() {
             einer <Code>WebMvcConfigurer</Code>-Bean.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.proxy} titel="vite.config.ts" />
-        <CodeBlock code={codeBloecke.crossOrigin} titel="TodoController.java / WebConfig.java" />
+        <CodeBlock code={codeBloecke.proxy} title="vite.config.ts" />
+        <CodeBlock code={codeBloecke.crossOrigin} title="TodoController.java / WebConfig.java" />
         <Hinweis variante="info">
           CORS schützt die <em>Nutzer</em>, nicht den Server: Es verhindert, dass eine fremde Webseite
           im Namen des Nutzers deine API aufruft. <Code>curl</Code> oder Postman kümmern sich nicht
@@ -86,7 +86,7 @@ export function SpringReact() {
           Proxys: <Code>/api/</Code> geht ans Backend, alles andere ist die React-App. Wieder ein
           Ursprung, wieder kein CORS.
         </P>
-        <CodeBlock code={codeBloecke.nginx} titel="nginx.conf" sprache="konfig" />
+        <CodeBlock code={codeBloecke.nginx} title="nginx.conf" language="config" />
         <P>
           Wie nginx, Backend und Datenbank zusammen gestartet werden, zeigen die Docker-Kapitel -
           am Ende läuft genau diese App mit einem einzigen Befehl (<Verweis nr="8.10" />).
@@ -95,10 +95,10 @@ export function SpringReact() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-react-uebung"
-          {...beispiele['spring-react-uebung']}
-          aufgabe={
+          {...examples['spring-react-uebung']}
+          task={
             <>
               <p>
                 Die React-App hakt ToDos mit <Code>{'PATCH /api/todos/{id}'}</Code> und dem Body{' '}
@@ -118,29 +118,29 @@ export function SpringReact() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Die App auf localhost:5173 ruft fetch("http://localhost:8080/api/todos"). Was passiert ohne weitere Einstellungen?',
-            antworten: ['Es funktioniert', 'Der Browser blockiert die Antwort (CORS)', 'Spring antwortet mit 404', 'fetch wandelt die URL automatisch um'],
-            richtig: 1,
-            erklaerung: 'Anderer Port = anderer Ursprung. Ohne Access-Control-Allow-Origin gibt der Browser die Antwort nicht heraus.',
+            question: 'Die App auf localhost:5173 ruft fetch("http://localhost:8080/api/todos"). Was passiert ohne weitere Einstellungen?',
+            answers: ['Es funktioniert', 'Der Browser blockiert die Antwort (CORS)', 'Spring antwortet mit 404', 'fetch wandelt die URL automatisch um'],
+            correct: 1,
+            explanation: 'Anderer Port = anderer Ursprung. Ohne Access-Control-Allow-Origin gibt der Browser die Antwort nicht heraus.',
           },
           {
-            frage: 'Der Server antwortet mit 400. Was macht fetch?',
-            antworten: ['Es wirft eine Exception', 'Es liefert eine Response mit ok = false', 'Es versucht es erneut', 'Es liefert undefined'],
-            richtig: 1,
-            erklaerung: 'fetch wirft nur bei Netzwerkfehlern. Den Status prüfst du selbst mit response.ok bzw. response.status.',
+            question: 'Der Server antwortet mit 400. Was macht fetch?',
+            answers: ['Es wirft eine Exception', 'Es liefert eine Response mit ok = false', 'Es versucht es erneut', 'Es liefert undefined'],
+            correct: 1,
+            explanation: 'fetch wirft nur bei Netzwerkfehlern. Den Status prüfst du selbst mit response.ok bzw. response.status.',
           },
           {
-            frage: 'Wofür ist der Vite-Proxy gut?',
-            antworten: [
+            question: 'Wofür ist der Vite-Proxy gut?',
+            answers: [
               'Er macht die App schneller',
               'Er leitet /api an das Backend weiter - für den Browser bleibt es ein Ursprung',
               'Er ersetzt Spring Boot',
               'Er speichert Antworten zwischen',
             ],
-            richtig: 1,
-            erklaerung: 'Der Browser spricht nur mit localhost:5173; Vite reicht /api intern an localhost:8080 weiter.',
+            correct: 1,
+            explanation: 'Der Browser spricht nur mit localhost:5173; Vite reicht /api intern an localhost:8080 weiter.',
           },
         ]}
       />

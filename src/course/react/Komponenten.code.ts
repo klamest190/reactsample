@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'react-komponenten-einstieg': {
     code: js`
       function App() {
@@ -64,7 +64,7 @@ export const beispiele = {
     `,
   },
   'react-komponenten-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Mehrere Elemente brauchen einen Rahmen: `<>…</>`.',
         '`class` heißt in JSX `className`, und leere Tags werden geschlossen: `<br />`.',
@@ -87,7 +87,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function Footer() {
         return <small>Built with React</small>
       }
@@ -108,21 +108,21 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Die Überschrift zeigt den Produktnamen', en: 'The heading shows the product name' },
-        pruefung: js`
+        script: js`
           await render()
           expect(find('h2').textContent).toBe('Coffee mug')
         `,
       },
       {
         name: { de: 'Der Preis wird angezeigt', en: 'The price is displayed' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('Price: 12.5 €')
         `,
       },
       {
         name: { de: 'Eine Komponente Footer zeigt „Built with React“', en: 'A Footer component shows “Built with React”' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/function Footer\s*\(/)
           expect(code).toMatch(/<Footer\s*\/>/)
           await render()
@@ -131,7 +131,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

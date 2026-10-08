@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Kontrollfluss.code'
+import { examples, codeBloecke } from './Kontrollfluss.code'
 
 /**
  * KAPITEL 1.2 (English) - Operators & Conditions
@@ -14,7 +14,7 @@ export function Kontrollfluss() {
         <P>A condition decides which code runs.</P>
         <TryIt
           id="js-kontrollfluss-einstieg"
-          {...beispiele['js-kontrollfluss-einstieg']}
+          {...examples['js-kontrollfluss-einstieg']}
         />
       </Abschnitt>
 
@@ -26,7 +26,7 @@ export function Kontrollfluss() {
         </P>
         <TryIt
           id="js-kontrollfluss-1"
-          {...beispiele['js-kontrollfluss-1']}
+          {...examples['js-kontrollfluss-1']}
         />
       </Abschnitt>
 
@@ -38,7 +38,7 @@ export function Kontrollfluss() {
         </P>
         <TryIt
           id="js-kontrollfluss-2"
-          {...beispiele['js-kontrollfluss-2']}
+          {...examples['js-kontrollfluss-2']}
         />
       </Abschnitt>
 
@@ -69,10 +69,10 @@ export function Kontrollfluss() {
         </Liste>
         <TryIt
           id="js-kontrollfluss-3"
-          {...beispiele['js-kontrollfluss-3']}
+          {...examples['js-kontrollfluss-3']}
         />
         <CodeBlock
-          titel="What this looks like in React later"
+          title="What this looks like in React later"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -85,7 +85,7 @@ export function Kontrollfluss() {
         </P>
         <TryIt
           id="js-kontrollfluss-4"
-          {...beispiele['js-kontrollfluss-4']}
+          {...examples['js-kontrollfluss-4']}
         />
         <Hinweis variante="warnung">
           An infinite loop (e.g. <Code>while (true)</Code> without <Code>break</Code>) freezes the browser
@@ -96,8 +96,8 @@ export function Kontrollfluss() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-kontrollfluss-uebung"
-          {...beispiele['js-kontrollfluss-uebung']}
-          aufgabe={
+          {...examples['js-kontrollfluss-uebung']}
+          task={
             <>
               <p>
                 Complete the function <Code>grade(points)</Code>. It should return:
@@ -118,28 +118,28 @@ export function Kontrollfluss() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: "What is 0 ?? 'empty' ?",
-            antworten: ['0', "'empty'", 'undefined'],
-            richtig: 0,
-            erklaerung: '?? only kicks in for null and undefined. 0 is a valid value and stays.',
+            question: "What is 0 ?? 'empty' ?",
+            answers: ['0', "'empty'", 'undefined'],
+            correct: 0,
+            explanation: '?? only kicks in for null and undefined. 0 is a valid value and stays.',
           },
           {
-            frage: 'Why do you use the ternary operator instead of if/else in JSX?',
-            antworten: [
+            question: 'Why do you use the ternary operator instead of if/else in JSX?',
+            answers: [
               'It is faster.',
               'Only expressions are allowed in JSX, and if is a statement.',
               'if/else does not exist in React.',
             ],
-            richtig: 1,
-            erklaerung: 'An expression produces a value React can render - if/else doesn’t.',
+            correct: 1,
+            explanation: 'An expression produces a value React can render - if/else doesn’t.',
           },
           {
-            frage: 'What happens with user?.address?.city if address is null?',
-            antworten: ['TypeError', 'The result is undefined', "The result is ''"],
-            richtig: 1,
-            erklaerung: 'Optional chaining stops and returns undefined instead of throwing an error.',
+            question: 'What happens with user?.address?.city if address is null?',
+            answers: ['TypeError', 'The result is undefined', "The result is ''"],
+            correct: 1,
+            explanation: 'Optional chaining stops and returns undefined instead of throwing an error.',
           },
         ]}
       />

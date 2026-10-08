@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
+import { examples, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
 
 /**
  * KAPITEL 5.8 - Testen mit Vitest und React Testing Library
@@ -33,7 +33,7 @@ export function Testen() {
           Ein Test rendert eine Komponente, klickt wie ein Mensch und prüft, was danach zu sehen ist. Die Tests
           laufen hier im Editor - ändere <Code>count + 1</Code> in <Code>count + 2</Code> und der Test wird rot.
         </P>
-        <TryIt id="praxis-testen-einstieg" {...beispiele['praxis-testen-einstieg']} modus="test" />
+        <TryIt id="praxis-testen-einstieg" {...examples['praxis-testen-einstieg']} mode="test" />
       </Abschnitt>
 
       <Abschnitt titel="Warum testen?">
@@ -57,7 +57,7 @@ export function Testen() {
           einem <strong>Matcher</strong> wie <Code>toBe</Code>, ob das Ergebnis stimmt. <Code>describe</Code> fasst
           Tests zu einer Gruppe zusammen.
         </P>
-        <TryIt id="praxis-testen-vitest" {...beispiele['praxis-testen-vitest']} modus="test" />
+        <TryIt id="praxis-testen-vitest" {...examples['praxis-testen-vitest']} mode="test" />
         <Liste>
           <li>
             <Code>toBe</Code> vergleicht mit <Code>===</Code>, <Code>toEqual</Code> den Inhalt - für Objekte und
@@ -80,7 +80,7 @@ export function Testen() {
           finden: über ihre <strong>Rolle</strong> und ihren sichtbaren Namen, nicht über CSS-Klassen oder
           Komponenten-Interna. Mit <strong>user-event</strong> tippst und klickst du wie echte Nutzer.
         </P>
-        <TryIt id="praxis-testen-rtl" {...beispiele['praxis-testen-rtl']} modus="test" />
+        <TryIt id="praxis-testen-rtl" {...examples['praxis-testen-rtl']} mode="test" />
         <P>Die Abfragen gibt es in vier Varianten:</P>
         <Tabelle
           dicht
@@ -108,13 +108,13 @@ export function Testen() {
           vorgibst. So prüfst du, <em>ob</em> und <em>womit</em> sie aufgerufen wurde - und kannst auch den
           Fehlerfall durchspielen.
         </P>
-        <TryIt id="praxis-testen-mocks" {...beispiele['praxis-testen-mocks']} modus="test" />
+        <TryIt id="praxis-testen-mocks" {...examples['praxis-testen-mocks']} mode="test" />
         <P>
           Lädt die Komponente selbst Daten (<Verweis id="praxis-daten" />), ersetzt <Code>vi.spyOn()</Code> für die
           Dauer eines Tests das globale <Code>fetch</Code>. <Code>findBy…</Code> wartet, bis die Antwort angezeigt
           wird:
         </P>
-        <TryIt id="praxis-testen-fetch" {...beispiele['praxis-testen-fetch']} modus="test" />
+        <TryIt id="praxis-testen-fetch" {...examples['praxis-testen-fetch']} mode="test" />
         <Hinweis variante="info">
           Größere Projekte fangen Anfragen lieber auf Netzwerkebene ab, mit <strong>MSW</strong> (Mock Service
           Worker). Dann muss der Test nicht wissen, ob die Komponente <Code>fetch</Code>, TanStack Query oder etwas
@@ -143,10 +143,10 @@ export function Testen() {
       </Abschnitt>
 
       <Abschnitt titel="Im eigenen Projekt einrichten">
-        <CodeBlock titel="Terminal" code={codeBloecke.installieren} />
+        <CodeBlock title="Terminal" code={codeBloecke.installieren} />
         <CodeBlock code={codeBloecke.konfiguration} />
         <CodeBlock code={codeBloecke.setup} />
-        <CodeBlock titel="Terminal" code={codeBloecke.ausfuehren} />
+        <CodeBlock title="Terminal" code={codeBloecke.ausfuehren} />
         <P>
           Testdateien liegen neben dem Code und heißen <Code>Name.test.tsx</Code> - Vitest findet sie
           automatisch. <Code>jsdom</Code> stellt in Node ein simuliertes <Code>document</Code> bereit.
@@ -162,11 +162,11 @@ export function Testen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-testen-uebung"
-          {...beispiele['praxis-testen-uebung']}
-          modus="test"
-          dateien={uebungDateien}
-          varianten={uebungVarianten}
-          aufgabe={
+          {...examples['praxis-testen-uebung']}
+          mode="test"
+          files={uebungDateien}
+          variants={uebungVarianten}
+          task={
             <>
               <p>
                 Diesmal schreibst du die Tests. <Code>QuantityPicker</Code> (oben) wählt eine Menge von 1 bis{' '}
@@ -189,38 +189,38 @@ export function Testen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wie prüfst du, dass eine Fehlermeldung NICHT angezeigt wird?',
-            antworten: [
+            question: 'Wie prüfst du, dass eine Fehlermeldung NICHT angezeigt wird?',
+            answers: [
               "expect(screen.getByRole('alert')).not.toBeInTheDocument()",
               "expect(screen.queryByRole('alert')).not.toBeInTheDocument()",
               "expect(screen.findByRole('alert')).toBeNull()",
             ],
-            richtig: 1,
-            erklaerung: 'getBy… wirft schon beim Suchen einen Fehler, wenn nichts da ist. queryBy… liefert null.',
+            correct: 1,
+            explanation: 'getBy… wirft schon beim Suchen einen Fehler, wenn nichts da ist. queryBy… liefert null.',
           },
           {
-            frage: 'Womit wartest du auf ein Element, das erst nach dem Laden erscheint?',
-            antworten: ['getByText', 'await findByText', 'setTimeout im Test'],
-            richtig: 1,
-            erklaerung: 'findBy… versucht es wiederholt, bis das Element da ist oder die Zeit abläuft.',
+            question: 'Womit wartest du auf ein Element, das erst nach dem Laden erscheint?',
+            answers: ['getByText', 'await findByText', 'setTimeout im Test'],
+            correct: 1,
+            explanation: 'findBy… versucht es wiederholt, bis das Element da ist oder die Zeit abläuft.',
           },
           {
-            frage: 'Welche Abfrage bevorzugt Testing Library?',
-            antworten: ['getByTestId', 'container.querySelector(".btn")', 'getByRole'],
-            richtig: 2,
-            erklaerung: 'Rolle und Name sind das, was Menschen und Screenreader wahrnehmen.',
+            question: 'Welche Abfrage bevorzugt Testing Library?',
+            answers: ['getByTestId', 'container.querySelector(".btn")', 'getByRole'],
+            correct: 2,
+            explanation: 'Rolle und Name sind das, was Menschen und Screenreader wahrnehmen.',
           },
           {
-            frage: 'Wofür ist vi.fn()?',
-            antworten: [
+            question: 'Wofür ist vi.fn()?',
+            answers: [
               'Für eine Attrappe, die ihre Aufrufe mitschreibt',
               'Um Tests schneller zu machen',
               'Um eine Komponente zu rendern',
             ],
-            richtig: 0,
-            erklaerung: 'Damit prüfst du z. B. mit toHaveBeenCalledWith, ob ein Callback richtig aufgerufen wurde.',
+            correct: 0,
+            explanation: 'Damit prüfst du z. B. mit toHaveBeenCalledWith, ob ein Callback richtig aufgerufen wurde.',
           },
         ]}
       />

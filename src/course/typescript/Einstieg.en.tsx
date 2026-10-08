@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Einstieg.code'
+import { examples, codeBloecke } from './Einstieg.code'
 
 /**
  * KAPITEL 2.1 (English) - Why TypeScript?
@@ -17,7 +17,7 @@ export function Einstieg() {
           compiler reports mistakes <strong>before</strong> the code runs. Below every editor in this part
           you see the result of the type check.
         </P>
-        <TryIt id="ts-start-einstieg" modus="ts" {...beispiele['ts-start-einstieg']} />
+        <TryIt id="ts-start-einstieg" mode="ts" {...examples['ts-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="What TypeScript is - and what it isn't">
@@ -27,9 +27,9 @@ export function Einstieg() {
           you see them <strong>right away</strong> - typos, forgotten fields, wrong arguments. On top you
           get autocompletion and safe renaming in the IDE.
         </P>
-        <TryIt id="ts-start-tippfehler" modus="ts" {...beispiele['ts-start-tippfehler']} />
+        <TryIt id="ts-start-tippfehler" mode="ts" {...examples['ts-start-tippfehler']} />
         <P>In a real project, two separate things happen:</P>
-        <CodeBlock titel="Checking and translating" code={codeBloecke.ablauf} />
+        <CodeBlock title="Checking and translating" code={codeBloecke.ablauf} />
         <Liste>
           <li>
             The <strong>compiler</strong> (<Code>tsc</Code>, VS Code runs it all the time) checks the types
@@ -47,8 +47,8 @@ export function Einstieg() {
           This has an important consequence: a type error does <strong>not</strong> stop the program. Here
           the type check reports an error - and still the code runs and prints something:
         </P>
-        <TryIt id="ts-start-fehler" modus="ts" {...beispiele['ts-start-fehler']} />
-        <CodeBlock titel="Type erasure: the types are removed" code={codeBloecke.entfernt} />
+        <TryIt id="ts-start-fehler" mode="ts" {...examples['ts-start-fehler']} />
+        <CodeBlock title="Type erasure: the types are removed" code={codeBloecke.entfernt} />
         <Hinweis variante="warnung">
           Since the types are gone at runtime, TypeScript <strong>cannot check anything that only arrives
           at runtime</strong> - user input, <Code>JSON.parse</Code>, server responses. You have to check such
@@ -63,7 +63,7 @@ export function Einstieg() {
           (<strong>inference</strong>). With <Code>const</Code> the type is even more precise: the value
           never changes, so the type is exactly that one value.
         </P>
-        <TryIt id="ts-start-annotation" modus="ts" {...beispiele['ts-start-annotation']} />
+        <TryIt id="ts-start-annotation" mode="ts" {...examples['ts-start-annotation']} />
         <Hinweis variante="tipp">
           Rule of thumb: always annotate function <strong>parameters</strong>, and mostly leave the rest to
           inference. That keeps the code short, and the boundaries (what goes in?) are still clear.
@@ -75,7 +75,7 @@ export function Einstieg() {
           The primitive types are named like their <Code>typeof</Code> results - in lowercase. On top come
           arrays and <strong>tuples</strong>: arrays of fixed length where every position has its own type.
         </P>
-        <TryIt id="ts-start-grundtypen" modus="ts" {...beispiele['ts-start-grundtypen']} />
+        <TryIt id="ts-start-grundtypen" mode="ts" {...examples['ts-start-grundtypen']} />
         <Liste>
           <li>
             <Code>string</Code>, <Code>number</Code>, <Code>boolean</Code>, <Code>null</Code>,{' '}
@@ -101,7 +101,7 @@ export function Einstieg() {
           do <em>nothing</em> with it until you have checked what is inside. That check is called{' '}
           <strong>narrowing</strong> - more in <Verweis nr="2.4" />.
         </P>
-        <TryIt id="ts-start-any-unknown" modus="ts" {...beispiele['ts-start-any-unknown']} />
+        <TryIt id="ts-start-any-unknown" mode="ts" {...examples['ts-start-any-unknown']} />
         <Hinweis variante="warnung">
           <Code>any</Code> is contagious: whatever you read from an <Code>any</Code> is <Code>any</Code>{' '}
           again. A single <Code>any</Code> can switch off the check for a whole area. For "I don't know",{' '}
@@ -116,16 +116,16 @@ export function Einstieg() {
           error (instead of silently becoming <Code>any</Code>), and <Code>null</Code>/<Code>undefined</Code>{' '}
           must be handled explicitly. The editors here run with <Code>strict</Code>.
         </P>
-        <TryIt id="ts-start-strict" modus="ts" {...beispiele['ts-start-strict']} />
+        <TryIt id="ts-start-strict" mode="ts" {...examples['ts-start-strict']} />
         <CodeBlock code={codeBloecke.tsconfig} />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="ts-start-uebung"
-          modus="ts"
-          {...beispiele['ts-start-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-start-uebung']}
+          task={
             <>
               <p>
                 The code works, but the type check reports errors: parameters without a type are not
@@ -152,24 +152,24 @@ export function Einstieg() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'The type check reports an error. What happens when you run the code?',
-            antworten: ['The program does not start at all', 'The code runs anyway - the types are just removed', 'TypeScript fixes the error automatically'],
-            richtig: 1,
-            erklaerung: 'Checking and translating are separate. When translating, the types are simply removed - even broken code runs. In real projects, the build (tsc) usually prevents shipping it.',
+            question: 'The type check reports an error. What happens when you run the code?',
+            answers: ['The program does not start at all', 'The code runs anyway - the types are just removed', 'TypeScript fixes the error automatically'],
+            correct: 1,
+            explanation: 'Checking and translating are separate. When translating, the types are simply removed - even broken code runs. In real projects, the build (tsc) usually prevents shipping it.',
           },
           {
-            frage: 'Which type does TypeScript infer for const status = "open"?',
-            antworten: ['string', 'The literal type "open"', 'any'],
-            richtig: 1,
-            erklaerung: 'A const variable can never change - so its type is exactly that value. With let it would be string.',
+            question: 'Which type does TypeScript infer for const status = "open"?',
+            answers: ['string', 'The literal type "open"', 'any'],
+            correct: 1,
+            explanation: 'A const variable can never change - so its type is exactly that value. With let it would be string.',
           },
           {
-            frage: "You don't know what JSON.parse returns. Which type is the safest?",
-            antworten: ['any', 'unknown', 'object'],
-            richtig: 1,
-            erklaerung: 'unknown forces you to check before using the value. any would let every mistake through.',
+            question: "You don't know what JSON.parse returns. Which type is the safest?",
+            answers: ['any', 'unknown', 'object'],
+            correct: 1,
+            explanation: 'unknown forces you to check before using the value. any would let every mistake through.',
           },
         ]}
       />

@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-variablen-einstieg': {
     code: js`
       const name = 'Ada'
@@ -79,7 +79,7 @@ export const beispiele = {
     `,
   },
   'js-variablen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Werte, die sich nicht ändern, bekommen `const`.',
         'Ein Template-Literal steht in Backticks: `${firstName} is ${age} years old.`',
@@ -95,20 +95,20 @@ export const beispiele = {
       // Your code:
 
     `,
-    loesung: js`
+    solution: js`
       const firstName = 'Ada'
       const age = 36
       const sentence = \`\${firstName} is \${age} years old.\`
       const isAdult = age >= 18
     `,
     tests: [
-      { name: { de: 'firstName ist "Ada"', en: 'firstName is "Ada"' }, ausdruck: 'firstName', erwartet: 'Ada' },
-      { name: { de: 'age ist die Zahl 36 (kein String)', en: 'age is the number 36 (not a string)' }, ausdruck: 'age', erwartet: 36 },
-      { name: { de: 'sentence stimmt', en: 'sentence is correct' }, ausdruck: 'sentence', erwartet: 'Ada is 36 years old.' },
-      { name: { de: 'isAdult ist true', en: 'isAdult is true' }, ausdruck: 'isAdult', erwartet: true },
+      { name: { de: 'firstName ist "Ada"', en: 'firstName is "Ada"' }, expression: 'firstName', expected: 'Ada' },
+      { name: { de: 'age ist die Zahl 36 (kein String)', en: 'age is the number 36 (not a string)' }, expression: 'age', expected: 36 },
+      { name: { de: 'sentence stimmt', en: 'sentence is correct' }, expression: 'sentence', expected: 'Ada is 36 years old.' },
+      { name: { de: 'isAdult ist true', en: 'isAdult is true' }, expression: 'isAdult', expected: true },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

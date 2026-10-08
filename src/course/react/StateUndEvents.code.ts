@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'react-state-einstieg': {
     code: js`
       function App() {
@@ -115,7 +115,7 @@ export const beispiele = {
     `,
   },
   'react-state-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Zwei State-Werte: der Text und die Anzahl gesendeter Nachrichten.',
         '„Zu lang“ und „leer“ sind abgeleitete Werte - einfach beim Rendern berechnen.',
@@ -137,7 +137,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const MAX = 50
 
       function App() {
@@ -168,7 +168,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Anfangs: leer, „0 / 50 characters“, Send deaktiviert', en: 'Initially: empty, “0 / 50 characters”, Send disabled' },
-        pruefung: js`
+        script: js`
           await render()
           expect(field('textarea').value).toBe('')
           expect(text()).toContain('0 / 50 characters')
@@ -177,7 +177,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Tippen aktualisiert den Zähler und aktiviert Send', en: 'Typing updates the counter and enables Send' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('textarea'), 'Hello')
           expect(text()).toContain('5 / 50 characters')
@@ -186,7 +186,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Über 50 Zeichen: Send deaktiviert, Zähler rot', en: 'Over 50 characters: Send disabled, counter red' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('textarea'), 'x'.repeat(51))
           expect(button('Send')).toBeDisabled()
@@ -195,7 +195,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Send leert das Feld und zeigt „Sent: 1“', en: 'Send clears the field and shows “Sent: 1”' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('Sent: 0')
           await type(field('textarea'), 'Hi there')
@@ -206,7 +206,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

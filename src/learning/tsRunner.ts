@@ -1,6 +1,6 @@
 import type { Zweisprachig } from '../i18n/LanguageContext'
-import type { TestErgebnis } from './jsSandbox'
-import { typenPruefen, type Typfehler } from './typeCheck'
+import type { TestResult } from './jsSandbox'
+import { checkTypes, type TypeDiagnostic } from './typeCheck'
 import { localized } from '../i18n/localized'
 
 /**
@@ -17,16 +17,16 @@ import { localized } from '../i18n/localized'
  * mitgeprüft wird. Er kompiliert nur, wenn deren Typen stimmen - z. B. mit
  * `// @ts-expect-error` vor einem Aufruf, der verboten sein soll.
  */
-export type TypTest = { name: string | Zweisprachig; code: string }
+export type TypeTest = { name: string | Zweisprachig; code: string }
 
-export async function tsUebersetzen(quelltext: string): Promise<{ code: string } | { fehler: string }> {
+export async function transpileTs(sourceCode: string): Promise<{ code: string } | { error: string }> {
   const { transform } = await import('sucrase')
   try {
     // Nur die Typen entfernen: Die Zeilen bleiben, wo sie sind - Laufzeitfehler zeigen auf die richtige Zeile.
-    const { code } = transform(quelltext, { transforms: ['typescript'], disableESTransforms: true })
+    const { code } = transform(sourceCode, { transforms: ['typescript'], disableESTransforms: true })
     return { code }
-  } catch (fehler) {
-    return { fehler: fehler instanceof Error ? fehler.message : String(fehler) }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -35,42 +35,42 @@ export async function tsUebersetzen(quelltext: string): Promise<{ code: string }
  * `export {}` am Ende macht die Datei zum Modul: Sonst wären alle Namen global und
  * `const name = …` würde mit `window.name` aus den DOM-Typen kollidieren.
  */
-export async function tsTypenPruefen(code: string, typTests: TypTest[] = []): Promise<{ imCode: Typfehler[]; proTest: Typfehler[][] }> {
-  const codeZeilen = code.split('\n').length
-  const bereiche: { von: number; bis: number }[] = []
-  let gesamt = code
-  let zeile = codeZeilen
-  for (const test of typTests) {
-    const von = zeile + 1
-    zeile += test.code.split('\n').length
-    bereiche.push({ von, bis: zeile })
-    gesamt += '\n' + test.code
+export async function checkTsTypes(code: string, typeTests: TypeTest[] = []): Promise<{ inCode: TypeDiagnostic[]; perTest: TypeDiagnostic[][] }> {
+  const codeLines = code.split('\n').length
+  const scopes: { from: number; to: number }[] = []
+  let total = code
+  let line = codeLines
+  for (const test of typeTests) {
+    const from = line + 1
+    line += test.code.split('\n').length
+    scopes.push({ from, to: line })
+    total += '\n' + test.code
   }
-  const fehler = await typenPruefen(gesamt + '\nexport {}\n', { ts: true })
+  const error = await checkTypes(total + '\nexport {}\n', { ts: true })
   return {
-    imCode: fehler.filter((f) => f.zeile <= codeZeilen),
-    proTest: bereiche.map((b) => fehler.filter((f) => f.zeile >= b.von && f.zeile <= b.bis)),
+    inCode: error.filter((f) => f.line <= codeLines),
+    perTest: scopes.map((b) => error.filter((f) => f.line >= b.from && f.line <= b.to)),
   }
 }
 
 /** Die Typprüfung als Testergebnisse: „keine Typfehler“ plus ein Eintrag pro Typ-Test. */
-export function typErgebnisse(
-  pruefung: { imCode: Typfehler[]; proTest: Typfehler[][] },
-  typTests: TypTest[],
-  sprache: 'de' | 'en',
-  texte: { keineTypfehler: string; typfehlerZeile: (zeile: number) => string },
-): TestErgebnis[] {
-  const erster = pruefung.imCode[0]
+export function typeResults(
+  script: { inCode: TypeDiagnostic[]; perTest: TypeDiagnostic[][] },
+  typeTests: TypeTest[],
+  language: 'de' | 'en',
+  texte: { keineTypfehler: string; typfehlerZeile: (line: number) => string },
+): TestResult[] {
+  const first = script.inCode[0]
   return [
     {
       name: texte.keineTypfehler,
-      ok: !erster,
-      meldung: erster ? `${texte.typfehlerZeile(erster.zeile)}: ${erster.text}` : '',
+      ok: !first,
+      message: first ? `${texte.typfehlerZeile(first.line)}: ${first.text}` : '',
     },
-    ...typTests.map((test, i) => ({
-      name: localized(test.name, sprache),
-      ok: pruefung.proTest[i].length === 0,
-      meldung: pruefung.proTest[i][0]?.text ?? '',
+    ...typeTests.map((test, i) => ({
+      name: localized(test.name, language),
+      ok: script.perTest[i].length === 0,
+      message: script.perTest[i][0]?.text ?? '',
     })),
   ]
 }

@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Variablen.code'
+import { examples, codeBloecke } from './Variablen.code'
 
 /**
  * CHAPTER 6.2 (English) - Types & Variables
@@ -16,7 +16,7 @@ export function Variablen() {
           In Java every name is preceded by its type. That is more typing - and the reason the
           compiler can find so much for you.
         </P>
-        <TryIt modus="java" id="java-variablen-einstieg" {...beispiele['java-variablen-einstieg']} />
+        <TryIt mode="java" id="java-variablen-einstieg" {...examples['java-variablen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="The type belongs to the variable">
@@ -57,7 +57,7 @@ export function Variablen() {
           but a <strong>class</strong> - which is why it is capitalized. More on that in{' '}
           <Verweis nr="7.5" />.
         </P>
-        <TryIt modus="java" id="java-variablen-typen" {...beispiele['java-variablen-typen']} />
+        <TryIt mode="java" id="java-variablen-typen" {...examples['java-variablen-typen']} />
         <Hinweis variante="warnung">
           An <Code>int</Code> has a fixed size. If it grows too large there is no error - it starts
           again at the smallest number (overflow). JavaScript numbers do not have this problem, but
@@ -70,7 +70,7 @@ export function Variablen() {
           If both sides of the <Code>/</Code> are whole numbers, Java divides as whole numbers too -
           the remainder simply disappears. This is the single most common beginner mistake in Java.
         </P>
-        <TryIt modus="java" id="java-variablen-division" {...beispiele['java-variablen-division']} />
+        <TryIt mode="java" id="java-variablen-division" {...examples['java-variablen-division']} />
         <Hinweis variante="tipp">
           Rule of thumb: <strong>one double is enough.</strong> As soon as one of the two values is a
           decimal, Java continues in <Code>double</Code>. That is why <Code>2.0</Code>,{' '}
@@ -90,7 +90,7 @@ export function Variablen() {
             explicitly: <Code>(int) price</Code>. Java then cuts off - it does <em>not</em> round.
           </li>
         </Liste>
-        <TryIt modus="java" id="java-variablen-casting" {...beispiele['java-variablen-casting']} />
+        <TryIt mode="java" id="java-variablen-casting" {...examples['java-variablen-casting']} />
       </Abschnitt>
 
       <Abschnitt titel="final, var - and what compares to const">
@@ -99,7 +99,7 @@ export function Variablen() {
           <Code>var</Code>, on the other hand, only looks like JavaScript - the type is merely
           inferred by the compiler and is just as fixed afterwards.
         </P>
-        <TryIt modus="java" id="java-variablen-final" {...beispiele['java-variablen-final']} />
+        <TryIt mode="java" id="java-variablen-final" {...examples['java-variablen-final']} />
         <Hinweis variante="info">
           By convention Java constants are written <Code>UPPER_WITH_UNDERSCORES</Code>, everything
           else in <Code>lowerCamelCase</Code>, classes in <Code>UpperCamelCase</Code>.
@@ -111,7 +111,7 @@ export function Variablen() {
           And this is what it looks like when you get it wrong. The error does not appear while
           running - but before:
         </P>
-        <TryIt modus="java" id="java-variablen-fehler" {...beispiele['java-variablen-fehler']} />
+        <TryIt mode="java" id="java-variablen-fehler" {...examples['java-variablen-fehler']} />
         <P>
           For comparison: in JavaScript <Code>let count = 'three'</Code> would be perfectly fine, and
           the mistake would surface much later - maybe first for a user.
@@ -134,10 +134,10 @@ export function Variablen() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-variablen-uebung"
-          {...beispiele['java-variablen-uebung']}
-          aufgabe={
+          {...examples['java-variablen-uebung']}
+          task={
             <>
               <p>
                 You are given <Code>items</Code> (7 pieces) and <Code>pricePerItem</Code> (2.50).
@@ -160,29 +160,29 @@ export function Variablen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What does System.out.println(9 / 4) print?',
-            antworten: ['2.25', '2', '2.0', 'an error'],
-            richtig: 1,
-            erklaerung: 'Both values are int, so Java divides as whole numbers: 2 (the remainder is cut off).',
+            question: 'What does System.out.println(9 / 4) print?',
+            answers: ['2.25', '2', '2.0', 'an error'],
+            correct: 1,
+            explanation: 'Both values are int, so Java divides as whole numbers: 2 (the remainder is cut off).',
           },
           {
-            frage: 'Which line is a compile error?',
-            antworten: ['double d = 5;', 'int i = 5.0;', "char c = 'x';", 'long l = 5;'],
-            richtig: 1,
-            erklaerung: 'double → int loses decimals and needs an explicit cast: int i = (int) 5.0;',
+            question: 'Which line is a compile error?',
+            answers: ['double d = 5;', 'int i = 5.0;', "char c = 'x';", 'long l = 5;'],
+            correct: 1,
+            explanation: 'double → int loses decimals and needs an explicit cast: int i = (int) 5.0;',
           },
           {
-            frage: 'What does var mean in Java?',
-            antworten: [
+            question: 'What does var mean in Java?',
+            answers: [
               'The type can change later.',
               'The compiler infers the type from the value - after that it is fixed.',
               'The same as var in JavaScript.',
               'The variable is immutable.',
             ],
-            richtig: 1,
-            erklaerung: 'var only saves typing. Afterwards the type is just as fixed as if written out.',
+            correct: 1,
+            explanation: 'var only saves typing. Afterwards the type is just as fixed as if written out.',
           },
         ]}
       />

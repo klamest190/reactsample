@@ -8,11 +8,11 @@ import { formatSize } from '../docker/images'
 import { PROJECTS } from '../docker/projects'
 import { CodeEditor } from './CodeEditor'
 import { lineMarkers } from './editorChecks'
-import { Rahmen, Testergebnisse } from './EditorFrame'
+import { EditorFrame, TestResults } from './EditorFrame'
 import type { DockerProps } from './TryIt'
 import { useEditor } from './useEditor'
 import { useSavedCode } from './useSavedCode'
-import type { TestErgebnis } from './jsSandbox'
+import type { TestResult } from './jsSandbox'
 import { focusableWhenScrolling } from '../components/scrollFocus'
 
 /**
@@ -88,10 +88,10 @@ const TEXTS = {
 }
 
 export function TryItDocker(props: DockerProps) {
-  return props.modus === 'compose' ? <ComposeEditor {...props} /> : <DockerfileEditor {...props} />
+  return props.mode === 'compose' ? <ComposeEditor {...props} /> : <DockerfileEditor {...props} />
 }
 
-function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: (test: NonNullable<DockerProps['tests']>[number]) => boolean): TestErgebnis[] | null {
+function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: (test: NonNullable<DockerProps['tests']>[number]) => boolean): TestResult[] | null {
   if (!tests?.length) return null
   return tests.map((test) => {
     let ok = false
@@ -100,7 +100,7 @@ function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: 
     } catch {
       ok = false
     }
-    return { name: localized(test.name, language), ok, meldung: '' }
+    return { name: localized(test.name, language), ok, message: '' }
   })
 }
 
@@ -110,18 +110,18 @@ function testResults(tests: DockerProps['tests'], language: 'de' | 'en', check: 
 
 function DockerfileEditor(props: DockerProps) {
   const { id, tests, project = 'spring', ignore: startIgnore } = props
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const { code, rahmen } = useEditor(props)
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const { code, frame } = useEditor(props)
   const [ignore, setIgnore] = useSavedCode(id + ':ignore', startIgnore ?? '')
   const [change, setChange] = useState<Change>('code')
 
   function compute(source: string, withTests: boolean, what: Change) {
     const built = simulateBuild(source, { project, ignore, change: what === 'none' ? undefined : what })
-    return { build: built, results: withTests ? testResults(tests, sprache, (test) => Boolean(test.dockerfile?.(built))) : null }
+    return { build: built, results: withTests ? testResults(tests, language, (test) => Boolean(test.dockerfile?.(built))) : null }
   }
   // Examples are built right away (the simulation is synchronous), exercises on the button.
-  const [result, setResult] = useState<{ build: BuildResult; results: TestErgebnis[] | null } | null>(() => (tests ? null : compute(code, false, 'code')))
+  const [result, setResult] = useState<{ build: BuildResult; results: TestResult[] | null } | null>(() => (tests ? null : compute(code, false, 'code')))
 
   function build(source: string, withTests: boolean, what: Change = change) {
     setResult(compute(source, withTests, what))
@@ -129,10 +129,10 @@ function DockerfileEditor(props: DockerProps) {
 
   const markers = useMemo(() => {
     if (!result) return undefined
-    const marks = result.build.findings.filter((f) => f.severity !== 'info').map((f) => ({ zeile: f.line, text: f[sprache] }))
-    if (result.build.first.error) marks.push({ zeile: result.build.first.error.line, text: result.build.first.error.message })
+    const marks = result.build.findings.filter((f) => f.severity !== 'info').map((f) => ({ line: f.line, text: f[language] }))
+    if (result.build.first.error) marks.push({ line: result.build.first.error.line, text: result.build.first.error.message })
     return lineMarkers(code, marks)
-  }, [result, code, sprache])
+  }, [result, code, language])
 
   const top = (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-slate-200 px-4 py-1.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
@@ -147,22 +147,22 @@ function DockerfileEditor(props: DockerProps) {
           {ignore.trim() ? '' : ' (—)'}
         </summary>
         <div className="mt-1 -mx-4">
-          <CodeEditor wert={ignore} beiAenderung={setIgnore} beiAusfuehren={() => build(code, true)} label={t.ignoreEditor} sprache="properties" maxZeilen={6} />
+          <CodeEditor value={ignore} onChange={setIgnore} onRun={() => build(code, true)} label={t.ignoreEditor} language="properties" maxLines={6} />
         </div>
       </details>
     </div>
   )
 
   return (
-    <Rahmen
-      {...rahmen}
-      art="Docker"
-      markierungen={markers}
-      startText={t.build}
-      oben={top}
-      ausfuehren={(c) => build(c ?? code, true)}
+    <EditorFrame
+      {...frame}
+      kind="Docker"
+      markers={markers}
+      runLabel={t.build}
+      above={top}
+      run={(c) => build(c ?? code, true)}
     >
-      <Testergebnisse id={id} ergebnisse={result?.results ?? null} />
+      <TestResults id={id} results={result?.results ?? null} />
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs dark:border-slate-800">
         <label className="flex items-center gap-2">
           {t.change}
@@ -184,13 +184,13 @@ function DockerfileEditor(props: DockerProps) {
         </label>
       </div>
       {result ? <BuildView result={result.build} change={change} /> : <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.exerciseStart}</p>}
-    </Rahmen>
+    </EditorFrame>
   )
 }
 
 function BuildView({ result, change }: { result: BuildResult; change: Change }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   const image = result.image
   return (
     <div className="space-y-4 px-4 py-3 text-sm">
@@ -248,7 +248,7 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
                     {t.severities[f.severity]} · {t.line(f.line)}
                     {/^DL\d/.test(f.rule) ? ` · ${f.rule}` : ''}:
                   </span>{' '}
-                  <InlineCode text={f[sprache]} />
+                  <InlineCode text={f[language]} />
                 </span>
               </li>
             ))}
@@ -273,8 +273,8 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
 }
 
 function StepList({ title, run, highlight = false }: { title: string; run: BuildRun; highlight?: boolean }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   return (
     <div className="min-w-0">
       <h4 className="mb-1 flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
@@ -365,14 +365,14 @@ function InlineCode({ text }: { text: string }) {
 
 function ComposeEditor(props: DockerProps) {
   const { id, tests } = props
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const { code, rahmen } = useEditor(props)
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const { code, frame } = useEditor(props)
   function compute(source: string, withTests: boolean) {
     const started = composeUp(source)
-    return { up: started, results: withTests ? testResults(tests, sprache, (test) => Boolean(test.compose?.(started))) : null }
+    return { up: started, results: withTests ? testResults(tests, language, (test) => Boolean(test.compose?.(started))) : null }
   }
-  const [result, setResult] = useState<{ up: ComposeResult; results: TestErgebnis[] | null } | null>(() => (tests ? null : compute(code, false)))
+  const [result, setResult] = useState<{ up: ComposeResult; results: TestResult[] | null } | null>(() => (tests ? null : compute(code, false)))
 
   function up(source: string, withTests: boolean) {
     setResult(compute(source, withTests))
@@ -381,20 +381,20 @@ function ComposeEditor(props: DockerProps) {
   const markers = useMemo(() => {
     if (!result) return undefined
     const errors = result.up.findings.filter((f) => f.severity === 'error')
-    return lineMarkers(code, errors.map((f) => ({ zeile: f.line, text: f[sprache] })))
-  }, [result, code, sprache])
+    return lineMarkers(code, errors.map((f) => ({ line: f.line, text: f[language] })))
+  }, [result, code, language])
 
   return (
-    <Rahmen
-      {...rahmen}
-      art="Compose"
-      markierungen={markers}
-      startText={t.up}
-      ausfuehren={(c) => up(c ?? code, true)}
+    <EditorFrame
+      {...frame}
+      kind="Compose"
+      markers={markers}
+      runLabel={t.up}
+      run={(c) => up(c ?? code, true)}
     >
-      <Testergebnisse id={id} ergebnisse={result?.results ?? null} />
+      <TestResults id={id} results={result?.results ?? null} />
       {result ? <ComposeView result={result.up} /> : <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.exerciseStart}</p>}
-    </Rahmen>
+    </EditorFrame>
   )
 }
 
@@ -411,8 +411,8 @@ function ServiceLine({ icon, className, children }: { icon: IconName; className:
 }
 
 function ComposeView({ result }: { result: ComposeResult }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   const colors = ['text-sky-300', 'text-emerald-300', 'text-violet-300', 'text-amber-300', 'text-pink-300']
   const serviceColor = (name: string | null) => {
     const index = result.model?.services.findIndex((s) => s.name === name) ?? -1
@@ -466,7 +466,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
             <li key={i} className="flex gap-2 text-code">
               <SeverityIcon severity={f.severity} />
               <span>
-                <span className="text-xs text-slate-500 dark:text-slate-400">{t.line(f.line)}:</span> <InlineCode text={f[sprache]} />
+                <span className="text-xs text-slate-500 dark:text-slate-400">{t.line(f.line)}:</span> <InlineCode text={f[language]} />
               </span>
             </li>
           ))}

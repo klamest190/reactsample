@@ -1,6 +1,6 @@
 import type { Zweisprachig } from '../../../i18n/LanguageContext'
 import type { ReactTest, Test } from '../../../learning/jsSandbox'
-import type { ProjektDatei } from '../../../learning/reactCompile'
+import type { ProjectFile } from '../../../learning/reactCompile'
 
 /**
  * Inhalte der Projektschritte (Metadaten siehe meta.ts).
@@ -21,19 +21,19 @@ type Basis = {
   anforderungen: Zweisprachig<string[]>
   /** Startcode; fehlt er, startet der Editor mit der Lösung des vorherigen Schritts. */
   start?: string
-  loesung: string
-  tipps: Zweisprachig<string[]>
+  solution: string
+  hints: Zweisprachig<string[]>
 }
 
 export type SchrittInhalt =
-  | (Basis & { modus: 'js'; vorschau?: boolean; tests: Test[] })
+  | (Basis & { mode: 'js'; preview?: boolean; tests: Test[] })
   /** `typen`: zusätzlich echte Typprüfung im Editor (TypeScript-Schritt). */
-  | (Basis & { modus: 'react'; typen?: boolean; tests: ReactTest[] })
+  | (Basis & { mode: 'react'; typed?: boolean; tests: ReactTest[] })
   /** Die Lernenden schreiben die Tests selbst - geprüft per Mutationstest gegen `varianten`. */
   | (Basis & {
-      modus: 'test'
-      dateien: ProjektDatei[]
-      varianten: { name: Zweisprachig; dateien: ProjektDatei[] }[]
+      mode: 'test'
+      files: ProjectFile[]
+      variants: { name: Zweisprachig; files: ProjectFile[] }[]
     })
 
 

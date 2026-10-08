@@ -1,9 +1,9 @@
 /**
- * Selbsttest der Kursinhalte - `npm run e2e:content` (optional: `-- praxis-` für einen Teil).
+ * Self-test of the course contents - `npm run e2e:content` (optional: `-- praxis-` for one part).
  *
- * Startet den Vite-Dev-Server, öffnet selftest.html im installierten Chrome
- * (playwright-core, kein Browser-Download nötig) und wartet, bis alle Beispiele,
- * Übungen und Projektschritte geprüft sind. Beendet sich mit Code 1, wenn etwas fehlschlägt.
+ * Starts the Vite dev server, opens selftest.html in the installed Chrome (playwright-core, no
+ * browser download) and waits until every example, exercise and project step is checked.
+ * Exits with code 1 when something fails.
  *
  * `-- --build`: against a production build instead of the dev server (as in CI) - some bugs
  * exist only there. Both can be combined: `npm run e2e:content -- --build praxis-`.
@@ -11,74 +11,81 @@
 import { createLogger } from 'vite'
 import { launchBrowser, startServer } from './test-server.mjs'
 
-const argumente = process.argv.slice(2)
-const produktion = argumente.includes('--build')
-const nur = argumente.find((a) => !a.startsWith('--')) ?? ''
+const args = process.argv.slice(2)
+const production = args.includes('--build')
+const only = args.find((a) => !a.startsWith('--')) ?? ''
 
-// Viele Beispiele zeigen absichtlich Fehler. Vite reicht sie aus dem Browser durch -
-// hier werden diese Zeilen ausgeblendet, damit nur der Testbericht übrig bleibt.
+// Many examples show errors on purpose. Vite passes them on from the browser - these lines are
+// hidden here so that only the test report remains.
 const logger = createLogger('warn')
-let inBrowserMeldung = false
-const filter = (schreiben) => (text, ...rest) => {
-  const zeile = String(text)
-  if (zeile.includes('[vite]') && zeile.includes('(client)')) {
-    inBrowserMeldung = true
+let inBrowserMessage = false
+const filter = (write) => (text, ...rest) => {
+  const line = String(text)
+  if (line.includes('[vite]') && line.includes('(client)')) {
+    inBrowserMessage = true
     return true
   }
-  if (inBrowserMeldung) {
-    // Folgezeilen einer Browser-Meldung: Stacktrace, Leerzeilen, Hinweise von React.
-    if (/^\s*(at |$)/.test(zeile) || /^(The above error|React will try)/.test(zeile)) return true
-    inBrowserMeldung = false
+  if (inBrowserMessage) {
+    // Lines following a browser message: stack trace, empty lines, notes from React.
+    if (/^\s*(at |$)/.test(line) || /^(The above error|React will try)/.test(line)) return true
+    inBrowserMessage = false
   }
-  return schreiben(zeile, ...rest)
+  return write(line, ...rest)
 }
 process.stdout.write = filter(process.stdout.write.bind(process.stdout))
 process.stderr.write = filter(process.stderr.write.bind(process.stderr))
-if (produktion) console.log('Produktions-Build …')
-const server = await startServer({ production: produktion, pages: ['index.html', 'selftest.html'], logger })
-const adresse = server.url
+if (production) console.log('Production build …')
+const server = await startServer({ production, pages: ['index.html', 'selftest.html'], logger })
 const browser = await launchBrowser()
 
-const seite = await browser.newPage()
-const seitenfehler = []
-seite.on('pageerror', (f) => seitenfehler.push(f.message))
+const page = await browser.newPage()
+const pageErrors = []
+page.on('pageerror', (e) => pageErrors.push(e.message))
 
 const start = Date.now()
-await seite.goto(`${adresse}selftest.html?nur=${encodeURIComponent(nur)}`)
+await page.goto(`${server.url}selftest.html?only=${encodeURIComponent(only)}`)
 
-// Fortschritt ausgeben, bis die Seite fertig meldet.
-let gemeldet = 0
+// Report progress until the page says it is done. A page that never starts (an error while
+// loading the modules) would otherwise keep this loop waiting forever.
+let reported = 0
 for (;;) {
-  const stand = await seite.evaluate(() => window.__selbsttest ?? null)
-  if (stand) {
-    for (const e of stand.ergebnisse.slice(gemeldet)) {
-      if (!e.ok) console.log(`✗ ${e.id}  (${e.ort})\n    → ${e.meldung}`)
-    }
-    if (stand.ergebnisse.length - gemeldet > 0) {
-      process.stdout.write(`  ${stand.ergebnisse.length}/${stand.gesamt} geprüft\r`)
-    }
-    gemeldet = stand.ergebnisse.length
-    if (stand.fertig) break
+  const status = await page.evaluate(() => window.__selftest ?? null)
+  if (!status && Date.now() - start > 60_000) {
+    console.log(`✗ selftest.html did not start within 60 s${pageErrors.length ? ': ' + pageErrors.join(' · ') : ''}`)
+    if (process.env.GITHUB_ACTIONS) console.log(`::error title=Content test::selftest.html did not start: ${pageErrors.join(' · ')}`)
+    await browser.close()
+    await server.close()
+    process.exit(1)
   }
-  await new Promise((r) => setTimeout(r, 500))
+  if (status) {
+    for (const r of status.results.slice(reported)) {
+      if (!r.ok) console.log(`✗ ${r.id}  (${r.location})\n    → ${r.message}`)
+    }
+    if (status.results.length - reported > 0) {
+      process.stdout.write(`  ${status.results.length}/${status.total} checked\r`)
+    }
+    reported = status.results.length
+    if (status.done) break
+  }
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
-const ergebnisse = await seite.evaluate(() => window.__selbsttest.ergebnisse)
-const fehlgeschlagen = ergebnisse.filter((e) => !e.ok)
-const langsamste = [...ergebnisse].sort((a, b) => b.dauer - a.dauer).slice(0, 3)
+const results = await page.evaluate(() => window.__selftest.results)
+const failed = results.filter((r) => !r.ok)
+const slowest = [...results].sort((a, b) => b.duration - a.duration).slice(0, 3)
 
-console.log(`\n${ergebnisse.length - fehlgeschlagen.length} ok, ${fehlgeschlagen.length} fehlgeschlagen - ${Math.round((Date.now() - start) / 1000)} s`)
-console.log('Am langsamsten: ' + langsamste.map((e) => `${e.id} ${e.dauer} ms`).join(', '))
-// Unbehandelte Fehler aus Beispielcode (z. B. ein Startcode ohne passenden case) sind erwartbar - nur zur Info.
-if (seitenfehler.length) {
-  console.log(`Hinweis: ${seitenfehler.length} unbehandelte Fehler aus Beispielcode: ${[...new Set(seitenfehler)].join(' · ')}`)
+console.log(`\n${results.length - failed.length} ok, ${failed.length} failed - ${Math.round((Date.now() - start) / 1000)} s`)
+console.log('Slowest: ' + slowest.map((r) => `${r.id} ${r.duration} ms`).join(', '))
+// Uncaught errors from example code (e.g. starter code without a matching case) are expected - info only.
+if (pageErrors.length) {
+  console.log(`Note: ${pageErrors.length} uncaught errors from example code: ${[...new Set(pageErrors)].join(' · ')}`)
 }
 
 // In GitHub Actions: failures as annotations - visible on the commit without access to the logs.
 if (process.env.GITHUB_ACTIONS) {
-  for (const e of fehlgeschlagen) console.log(`::error title=Inhaltstest ${e.id}::${e.ort}: ${e.meldung.replace(/\n/g, ' ')}`)
+  for (const r of failed) console.log(`::error title=Content test ${r.id}::${r.location}: ${r.message.replace(/\n/g, ' ')}`)
 }
 
 await browser.close()
 await server.close()
-process.exit(fehlgeschlagen.length ? 1 : 0)
+process.exit(failed.length ? 1 : 0)

@@ -2,10 +2,10 @@ import { lazy, Suspense, type ReactNode, type Ref } from 'react'
 import { useTexte, type Zweisprachig } from '../i18n/LanguageContext'
 import type { ProjectId } from '../docker/projects'
 import type { SqlTest } from '../sql/check'
-import type { EditorSteuerung } from './CodeEditor'
+import type { EditorControl } from './CodeEditor'
 import type { DockerTest, ReactTest, SpringTestSpec, Test } from './jsSandbox'
-import type { ProjektDatei } from './reactCompile'
-import type { TypTest } from './tsRunner'
+import type { ProjectFile } from './reactCompile'
+import type { TypeTest } from './tsRunner'
 import { TryItJava } from './TryItJava'
 import { TryItJs } from './TryItJs'
 import { TryItReact } from './TryItReact'
@@ -37,60 +37,60 @@ const TryItSql = lazy(() => import('./TryItSql').then((m) => ({ default: m.TryIt
  * Kapitelwechsel überleben.
  */
 
-export type Gemeinsam = {
+export type CommonProps = {
   /** Eindeutig im ganzen Kurs - Schlüssel für den gespeicherten Code. */
   id: string
-  titel?: string
+  title?: string
   /** Aufgabenstellung über dem Editor. */
-  aufgabe?: ReactNode
+  task?: ReactNode
   code: string
-  loesung?: string
+  solution?: string
   /** Gestufte Tipps, die nacheinander vor der Musterlösung aufgedeckt werden können. */
-  tipps?: { de: string[]; en: string[] }
+  hints?: { de: string[]; en: string[] }
   /** Playground: Zugriff auf den Editor von außen (Bausteine einfügen), eigene Überschrift, größerer Editor. */
-  editorRef?: Ref<EditorSteuerung>
-  kopf?: string
-  maxZeilen?: number
+  editorRef?: Ref<EditorControl>
+  heading?: string
+  maxLines?: number
 }
 
-export type JsProps = Gemeinsam & {
+export type JsProps = CommonProps & {
   /** 'ts': Typen werden vor dem Ausführen entfernt und nebenher geprüft. */
-  modus?: 'js' | 'ts'
+  mode?: 'js' | 'ts'
   tests?: Test[]
   /** Nur bei 'ts': Typ-Tests einer Übung (siehe tsLauf.ts). */
-  typTests?: TypTest[]
+  typeTests?: TypeTest[]
   /** Unsichtbarer Code, der vorher läuft (z. B. Hilfsfunktionen oder Testdaten). */
-  vorbereitung?: string
+  setup?: string
   /** Zeigt das Dokument des iframes an, damit DOM-Code sichtbar wird. */
-  vorschau?: boolean
+  preview?: boolean
 }
 
-export type ReactProps = Gemeinsam & {
-  modus: 'react'
+export type ReactProps = CommonProps & {
+  mode: 'react'
   /** Automatische Prüfung, siehe reactTests.ts */
   tests?: ReactTest[]
   /** TypeScript: zusätzlich echte Typprüfung (siehe typpruefung.ts). Bei Übungen zählt „keine Typfehler“ als Test. */
-  typen?: boolean
+  typed?: boolean
 }
 
-export type TestProps = Gemeinsam & {
-  modus: 'test'
+export type TestProps = CommonProps & {
+  mode: 'test'
   /** Dateien, die der Testcode importieren kann (z. B. die Komponente) - werden nur lesbar angezeigt. */
-  dateien?: ProjektDatei[]
+  files?: ProjectFile[]
   /** Übung: fehlerhafte Fassungen der Dateien. Die Tests der Lernenden müssen jede davon erkennen. */
-  varianten?: { name: Zweisprachig; dateien: ProjektDatei[] }[]
+  variants?: { name: Zweisprachig; files: ProjectFile[] }[]
 }
 
-export type JavaProps = Gemeinsam & {
-  modus: 'java'
+export type JavaProps = CommonProps & {
+  mode: 'java'
   /** Wie bei JS: ein Ausdruck, der nach `main` ausgewertet wird - nur eben in Java. */
   tests?: Test[]
   /** Unsichtbare Hilfsklassen, die hinter den Code gehängt werden (für Tests). */
-  vorbereitung?: string
+  setup?: string
 }
 
-export type SpringProps = Gemeinsam & {
-  modus: 'spring'
+export type SpringProps = CommonProps & {
+  mode: 'spring'
   /** Requests in `.http` notation, optionally with `→ status body` - see src/spring/http.ts. */
   tests?: SpringTestSpec[]
   /** application.properties - shown as a second, editable file. */
@@ -99,7 +99,7 @@ export type SpringProps = Gemeinsam & {
   requests?: string
 }
 
-type DockerBase = Gemeinsam & {
+type DockerBase = CommonProps & {
   tests?: DockerTest[]
   /** Which course project is the build context (Dockerfile only). */
   project?: ProjectId
@@ -107,10 +107,10 @@ type DockerBase = Gemeinsam & {
   ignore?: string
 }
 // Two types instead of `modus: 'dockerfile' | 'compose'` - so TypeScript can tell all modes apart.
-export type DockerProps = (DockerBase & { modus: 'dockerfile' }) | (DockerBase & { modus: 'compose' })
+export type DockerProps = (DockerBase & { mode: 'dockerfile' }) | (DockerBase & { mode: 'compose' })
 
-export type SqlProps = Gemeinsam & {
-  modus: 'sql'
+export type SqlProps = CommonProps & {
+  mode: 'sql'
   /** Compared with the result of the solution - see src/sql/check.ts. */
   tests?: SqlTest[]
 }
@@ -119,17 +119,17 @@ export type SqlProps = Gemeinsam & {
 export type TryItProps = JsProps | ReactProps | TestProps | JavaProps | SpringProps | DockerProps | SqlProps
 
 export function TryIt(props: TryItProps) {
-  if (props.modus === 'react') return <TryItReact {...props} />
-  if (props.modus === 'test') return <TryItTest {...props} />
-  if (props.modus === 'java') return <TryItJava {...props} />
-  if (props.modus === 'spring') return <Suspense fallback={<Laedt />}><TryItSpring {...props} /></Suspense>
-  if (props.modus === 'dockerfile' || props.modus === 'compose') return <Suspense fallback={<Laedt />}><TryItDocker {...props} /></Suspense>
-  if (props.modus === 'sql') return <Suspense fallback={<Laedt />}><TryItSql {...props} /></Suspense>
+  if (props.mode === 'react') return <TryItReact {...props} />
+  if (props.mode === 'test') return <TryItTest {...props} />
+  if (props.mode === 'java') return <TryItJava {...props} />
+  if (props.mode === 'spring') return <Suspense fallback={<Loading />}><TryItSpring {...props} /></Suspense>
+  if (props.mode === 'dockerfile' || props.mode === 'compose') return <Suspense fallback={<Loading />}><TryItDocker {...props} /></Suspense>
+  if (props.mode === 'sql') return <Suspense fallback={<Loading />}><TryItSql {...props} /></Suspense>
   return <TryItJs {...props} />
 }
 
 /** Placeholder while an editor of part 8 or 9 is loading. */
-function Laedt() {
+function Loading() {
   const t = useTexte()
   return <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">{t.laeuft}</div>
 }

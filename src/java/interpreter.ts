@@ -14,40 +14,40 @@
  *   - Methoden werden dynamisch gebunden (Polymorphie)
  */
 
-import type { Anweisung, Ausdruck, FeldDekl, MethodenDekl, Programm, TypRef } from './ast'
-import { parsen } from './parser'
+import type { Statement, Expression, FieldDecl, MethodDecl, Program, TypeRef } from './ast'
+import { parse } from './parser'
 import {
-  alsZahl,
+  toNumber,
   doubleText,
-  identitaet,
-  inhaltGleich,
-  istZahl,
-  komma,
-  neuerString,
+  identity,
+  contentEquals,
+  isNumber,
+  comma,
+  newString,
   NULL,
   poolString,
-  schluesselVon,
-  textVon,
-  typName,
-  wahrheit,
-  zahl,
-  zeichen,
-  type JavaObjekt,
-  type Klasse,
-  type NativWert,
-  type Wert,
+  keyOf,
+  textOf,
+  typeName,
+  bool,
+  number,
+  chars,
+  type JavaObject,
+  type ClassInfo,
+  type NativeValue,
+  type Value,
 } from './values'
 import {
-  EINGEBAUTE_KLASSEN,
-  istAusnahmeKlasse,
-  nativErzeugen,
-  nativMethode,
-  nativesFeld,
-  oberklasseVon,
-  primitivMethode,
-  statischerAufruf,
-  statischesFeld,
-  stringMethode,
+  BUILTIN_CLASSES,
+  isExceptionClass,
+  createNative,
+  nativeMethod,
+  nativeField,
+  superclassOf,
+  primitiveMethod,
+  staticCall,
+  staticField,
+  stringMethod,
 } from './library'
 import type { Extension } from './extension'
 
@@ -56,362 +56,362 @@ import type { Extension } from './extension'
 // ---------------------------------------------------------------------------
 
 /** Eine Java-Exception - fangbar mit try/catch. */
-export class JavaAusnahme extends Error {
-  wert: Wert
-  zeile: number
+export class JavaException extends Error {
+  value: Value
+  line: number
 
-  constructor(wert: Wert, zeile: number) {
+  constructor(value: Value, line: number) {
     super('java exception')
     this.name = 'JavaAusnahme'
-    this.wert = wert
-    this.zeile = zeile
+    this.value = value
+    this.line = line
   }
 }
 
 /** Abbruch von außen: Endlosschleife, zu viel Ausgabe. Nicht fangbar. */
-export class JavaAbbruch extends Error {
-  deutsch: string
-  englisch: string
+export class JavaAbort extends Error {
+  de: string
+  en: string
   /** Zeile, falls der Abbruch zu einer bestimmten Stelle gehört. */
-  zeile?: number
+  line?: number
 
-  constructor(deutsch: string, englisch: string, zeile?: number) {
-    super(deutsch)
+  constructor(de: string, en: string, line?: number) {
+    super(de)
     this.name = 'JavaAbbruch'
-    this.deutsch = deutsch
-    this.englisch = englisch
-    this.zeile = zeile
+    this.de = de
+    this.en = en
+    this.line = line
   }
 }
 
-class Rueckgabe {
-  wert: Wert
-  constructor(wert: Wert) {
-    this.wert = wert
+class Return {
+  value: Value
+  constructor(value: Value) {
+    this.value = value
   }
 }
 const BREAK = Symbol('break')
 const CONTINUE = Symbol('continue')
-type Fluss = void | Rueckgabe | typeof BREAK | typeof CONTINUE
+type Flow = void | Return | typeof BREAK | typeof CONTINUE
 
-const MAX_SCHRITTE = 4_000_000
-const MAX_ZEILEN = 500
+const MAX_STEPS = 4_000_000
+const MAX_LINES = 500
 
 // ---------------------------------------------------------------------------
 // Sichtbarkeitsbereiche
 // ---------------------------------------------------------------------------
 
-type Eintrag = { wert: Wert; typ: TypRef; final: boolean }
+type Entry = { value: Value; type: TypeRef; final: boolean }
 
-export class Umgebung {
-  private variablen = new Map<string, Eintrag>()
-  eltern?: Umgebung
+export class Scope {
+  private variables = new Map<string, Entry>()
+  parent?: Scope
 
-  constructor(eltern?: Umgebung) {
-    this.eltern = eltern
+  constructor(parent?: Scope) {
+    this.parent = parent
   }
 
-  deklarieren(name: string, wert: Wert, typ: TypRef, final = false) {
-    this.variablen.set(name, { wert, typ, final })
+  declare(name: string, value: Value, type: TypeRef, final = false) {
+    this.variables.set(name, { value, type, final })
   }
-  finden(name: string): Eintrag | undefined {
-    return this.variablen.get(name) ?? this.eltern?.finden(name)
+  find(name: string): Entry | undefined {
+    return this.variables.get(name) ?? this.parent?.find(name)
   }
-  setzen(name: string, wert: Wert): boolean {
-    const eintrag = this.variablen.get(name)
-    if (eintrag) {
-      eintrag.wert = wert
+  set(name: string, value: Value): boolean {
+    const entry = this.variables.get(name)
+    if (entry) {
+      entry.value = value
       return true
     }
-    return this.eltern?.setzen(name, wert) ?? false
+    return this.parent?.set(name, value) ?? false
   }
   /** Alle sichtbaren Variablen (für die Testauswertung nach dem Lauf). */
-  alle(): Map<string, Eintrag> {
-    const map = new Map(this.eltern?.alle() ?? [])
-    for (const [k, v] of this.variablen) map.set(k, v)
+  all(): Map<string, Entry> {
+    const map = new Map(this.parent?.all() ?? [])
+    for (const [k, v] of this.variables) map.set(k, v)
     return map
   }
 }
 
-type Kontext = {
-  umgebung: Umgebung
+type Context = {
+  scope: Scope
   /** Das Objekt, auf dem gerade eine Methode läuft (`this`) - null bei static. */
-  selbst: JavaObjekt | null
+  self: JavaObject | null
   /** Die Klasse, in der der laufende Code steht - wichtig für `super`. */
-  klasse: Klasse | null
+  classInfo: ClassInfo | null
 }
 
-export type AusgabeZeile = { strom: 'out' | 'err'; text: string }
+export type OutputLine = { stream: 'out' | 'err'; text: string }
 
 // ---------------------------------------------------------------------------
 // Der Interpreter
 // ---------------------------------------------------------------------------
 
 export class Interpreter {
-  klassen = new Map<string, Klasse>()
-  zeilen: AusgabeZeile[] = []
+  classes = new Map<string, ClassInfo>()
+  lines: OutputLine[] = []
   /** Die Umgebung von `main` nach dem Lauf - darin prüfen die Übungstests. */
-  hauptUmgebung: Umgebung | null = null
-  hauptKlasse: Klasse | null = null
+  globalScope: Scope | null = null
+  mainClass: ClassInfo | null = null
 
   /** Additional library, e.g. Spring - see extension.ts. */
   readonly extension?: Extension
 
-  private schritte = 0
-  private puffer = { out: '', err: '' }
+  private steps = 0
+  private buffer = { out: '', err: '' }
 
-  constructor(programm: Programm, extension?: Extension) {
+  constructor(program: Program, extension?: Extension) {
     this.extension = extension
-    for (const dekl of programm.typen) {
-      if (this.klassen.has(dekl.name)) {
-        throw new JavaAbbruch(
-          `Die Klasse ${dekl.name} ist doppelt deklariert.`,
-          `duplicate class: ${dekl.name}`,
+    for (const decl of program.types) {
+      if (this.classes.has(decl.name)) {
+        throw new JavaAbort(
+          `Die Klasse ${decl.name} ist doppelt deklariert.`,
+          `duplicate class: ${decl.name}`,
         )
       }
-      const klasse: Klasse = {
-        name: dekl.name,
-        dekl,
-        interfaces: new Set(dekl.interfaces),
-        statisch: new Map(),
-        methoden: new Map(),
-        konstruktoren: [],
-        abstrakt: dekl.abstrakt,
-        istInterface: dekl.art === 'interface',
-        istEnum: dekl.art === 'enum',
+      const classInfo: ClassInfo = {
+        name: decl.name,
+        decl,
+        interfaces: new Set(decl.interfaces),
+        isStatic: new Map(),
+        methods: new Map(),
+        constructors: [],
+        isAbstract: decl.isAbstract,
+        isInterface: decl.kind === 'interface',
+        isEnum: decl.kind === 'enum',
       }
-      for (const m of dekl.methoden) {
-        if (m.konstruktor) klasse.konstruktoren.push(m)
+      for (const m of decl.methods) {
+        if (m.isConstructor) classInfo.constructors.push(m)
         else {
-          const liste = klasse.methoden.get(m.name) ?? []
-          liste.push(m)
-          klasse.methoden.set(m.name, liste)
+          const list = classInfo.methods.get(m.name) ?? []
+          list.push(m)
+          classInfo.methods.set(m.name, list)
         }
       }
-      this.klassen.set(dekl.name, klasse)
+      this.classes.set(decl.name, classInfo)
     }
 
     // Verwandtschaft auflösen, dann records/enums vervollständigen.
-    for (const klasse of this.klassen.values()) {
-      if (klasse.dekl.oberklasse) klasse.oberklasse = this.klassen.get(klasse.dekl.oberklasse)
-      if (klasse.dekl.aeussere) klasse.aeussere = this.klassen.get(klasse.dekl.aeussere)
-      for (const name of klasse.dekl.interfaces) {
-        const i = this.klassen.get(name)
-        if (i) for (const geerbt of i.interfaces) klasse.interfaces.add(geerbt)
+    for (const classInfo of this.classes.values()) {
+      if (classInfo.decl.superclass) classInfo.superclass = this.classes.get(classInfo.decl.superclass)
+      if (classInfo.decl.outer) classInfo.outer = this.classes.get(classInfo.decl.outer)
+      for (const name of classInfo.decl.interfaces) {
+        const i = this.classes.get(name)
+        if (i) for (const inherited of i.interfaces) classInfo.interfaces.add(inherited)
       }
-      let oben = klasse.oberklasse
-      while (oben) {
-        for (const i of oben.interfaces) klasse.interfaces.add(i)
-        oben = oben.oberklasse
+      let top = classInfo.superclass
+      while (top) {
+        for (const i of top.interfaces) classInfo.interfaces.add(i)
+        top = top.superclass
       }
-      if (klasse.dekl.komponenten) this.recordVervollstaendigen(klasse)
+      if (classInfo.decl.components) this.completeRecord(classInfo)
     }
-    for (const klasse of this.klassen.values()) this.statischesLaden(klasse)
+    for (const classInfo of this.classes.values()) this.loadStatics(classInfo)
   }
 
   // --- Ausgabe -------------------------------------------------------------
 
-  drucken(text: string, strom: 'out' | 'err' = 'out') {
-    this.puffer[strom] += text
-    let umbruch = this.puffer[strom].indexOf('\n')
-    while (umbruch >= 0) {
-      this.zeileAusgeben(this.puffer[strom].slice(0, umbruch), strom)
-      this.puffer[strom] = this.puffer[strom].slice(umbruch + 1)
-      umbruch = this.puffer[strom].indexOf('\n')
+  print(text: string, stream: 'out' | 'err' = 'out') {
+    this.buffer[stream] += text
+    let newline = this.buffer[stream].indexOf('\n')
+    while (newline >= 0) {
+      this.writeLine(this.buffer[stream].slice(0, newline), stream)
+      this.buffer[stream] = this.buffer[stream].slice(newline + 1)
+      newline = this.buffer[stream].indexOf('\n')
     }
-    if (this.puffer[strom].length > 10_000) {
-      throw new JavaAbbruch('Zu viel Ausgabe in einer Zeile.', 'too much output on one line')
+    if (this.buffer[stream].length > 10_000) {
+      throw new JavaAbort('Zu viel Ausgabe in einer Zeile.', 'too much output on one line')
     }
   }
 
-  private zeileAusgeben(text: string, strom: 'out' | 'err') {
-    if (this.zeilen.length >= MAX_ZEILEN) {
-      throw new JavaAbbruch(
-        `Mehr als ${MAX_ZEILEN} Ausgabezeilen - läuft da eine Endlosschleife?`,
-        `more than ${MAX_ZEILEN} lines of output - is there an endless loop?`,
+  private writeLine(text: string, stream: 'out' | 'err') {
+    if (this.lines.length >= MAX_LINES) {
+      throw new JavaAbort(
+        `Mehr als ${MAX_LINES} Ausgabezeilen - läuft da eine Endlosschleife?`,
+        `more than ${MAX_LINES} lines of output - is there an endless loop?`,
       )
     }
-    this.zeilen.push({ strom, text })
+    this.lines.push({ stream, text })
   }
 
   /** Reste ohne Zeilenumbruch am Ende trotzdem zeigen (print statt println). */
-  abschliessen() {
-    for (const strom of ['out', 'err'] as const) {
-      if (this.puffer[strom]) {
-        this.zeileAusgeben(this.puffer[strom], strom)
-        this.puffer[strom] = ''
+  finish() {
+    for (const stream of ['out', 'err'] as const) {
+      if (this.buffer[stream]) {
+        this.writeLine(this.buffer[stream], stream)
+        this.buffer[stream] = ''
       }
     }
   }
 
   // --- Klassen vorbereiten --------------------------------------------------
 
-  private recordVervollstaendigen(klasse: Klasse) {
-    for (const k of klasse.dekl.komponenten!) {
-      if (!klasse.dekl.felder.some((f) => f.name === k.name)) {
-        klasse.dekl.felder.push({
+  private completeRecord(classInfo: ClassInfo) {
+    for (const k of classInfo.decl.components!) {
+      if (!classInfo.decl.fields.some((f) => f.name === k.name)) {
+        classInfo.decl.fields.push({
           name: k.name,
-          typ: k.typ,
-          statisch: false,
+          type: k.type,
+          isStatic: false,
           final: true,
-          sichtbarkeit: 'private',
-          zeile: klasse.dekl.zeile,
+          visibility: 'private',
+          line: classInfo.decl.line,
         })
       }
     }
   }
 
-  private statischesLaden(klasse: Klasse) {
-    const kontext: Kontext = { umgebung: new Umgebung(), selbst: null, klasse }
-    for (const feld of klasse.dekl.felder) {
-      if (!feld.statisch) continue
-      klasse.statisch.set(feld.name, feld.init ? this.anpassen(this.auswerten(feld.init, kontext), feld.typ) : this.standardWert(feld.typ))
+  private loadStatics(classInfo: ClassInfo) {
+    const kontext: Context = { scope: new Scope(), self: null, classInfo }
+    for (const field of classInfo.decl.fields) {
+      if (!field.isStatic) continue
+      classInfo.isStatic.set(field.name, field.init ? this.adapt(this.evaluate(field.init, kontext), field.type) : this.defaultValue(field.type))
     }
-    if (klasse.istEnum) {
-      const konstanten: Wert[] = []
-      klasse.dekl.konstanten.forEach((konstante, index) => {
-        const argumente = konstante.argumente.map((a) => this.auswerten(a, kontext))
-        const objekt = this.objektErzeugen(klasse, argumente, klasse.dekl.zeile)
-        objekt.felder.set('$name', poolString(konstante.name))
-        objekt.felder.set('$ordinal', zahl(index))
-        klasse.statisch.set(konstante.name, objekt)
-        konstanten.push(objekt)
+    if (classInfo.isEnum) {
+      const constants: Value[] = []
+      classInfo.decl.constants.forEach((constant, index) => {
+        const args = constant.args.map((a) => this.evaluate(a, kontext))
+        const object = this.createObject(classInfo, args, classInfo.decl.line)
+        object.fields.set('$name', poolString(constant.name))
+        object.fields.set('$ordinal', number(index))
+        classInfo.isStatic.set(constant.name, object)
+        constants.push(object)
       })
-      klasse.statisch.set('$werte', { art: 'array', typ: klasse.name, werte: konstanten })
+      classInfo.isStatic.set('$werte', { kind: 'array', type: classInfo.name, values: constants })
     }
   }
 
   // --- Programmstart --------------------------------------------------------
 
   /** Sucht `public static void main(String[] args)` und führt sie aus. */
-  starten() {
-    const mitMain = [...this.klassen.values()].filter((k) => (k.methoden.get('main') ?? []).some((m) => m.statisch))
-    const klasse = mitMain.find((k) => k.name === 'Main') ?? mitMain[0]
-    if (!klasse) {
-      throw new JavaAbbruch(
+  start() {
+    const withMain = [...this.classes.values()].filter((k) => (k.methods.get('main') ?? []).some((m) => m.isStatic))
+    const classInfo = withMain.find((k) => k.name === 'Main') ?? withMain[0]
+    if (!classInfo) {
+      throw new JavaAbort(
         'Keine main-Methode gefunden. Ein Java-Programm startet in `public static void main(String[] args)`.',
         'No main method found. A Java program starts in `public static void main(String[] args)`.',
       )
     }
-    this.hauptKlasse = klasse
-    const methode = (klasse.methoden.get('main') ?? []).find((m) => m.statisch)!
-    const umgebung = new Umgebung()
-    umgebung.deklarieren('args', { art: 'array', typ: 'String', werte: [] }, methode.parameter[0]?.typ ?? { name: 'String', dimensionen: 1, argumente: [] })
-    this.hauptUmgebung = umgebung
-    this.bloeckeAusfuehren(methode.rumpf?.anweisungen ?? [], { umgebung, selbst: null, klasse })
-    this.abschliessen()
+    this.mainClass = classInfo
+    const method = (classInfo.methods.get('main') ?? []).find((m) => m.isStatic)!
+    const scope = new Scope()
+    scope.declare('args', { kind: 'array', type: 'String', values: [] }, method.params[0]?.type ?? { name: 'String', dimensions: 1, args: [] })
+    this.globalScope = scope
+    this.runStatements(method.body?.statements ?? [], { scope, self: null, classInfo })
+    this.finish()
   }
 
   /** Wertet einen einzelnen Ausdruck im Zustand nach `main` aus (für Tests). */
-  ausdruckAuswerten(quelle: string): Wert {
-    const programm = parsen(`class $Test { static Object $wert() { return ${quelle}; } }`)
-    const methode = programm.typen[0].methoden[0]
-    const kontext: Kontext = {
-      umgebung: new Umgebung(this.hauptUmgebung ?? undefined),
-      selbst: null,
-      klasse: this.hauptKlasse,
+  evaluateExpression(source: string): Value {
+    const program = parse(`class $Test { static Object $wert() { return ${source}; } }`)
+    const method = program.types[0].methods[0]
+    const kontext: Context = {
+      scope: new Scope(this.globalScope ?? undefined),
+      self: null,
+      classInfo: this.mainClass,
     }
-    const fluss = this.bloeckeAusfuehren(methode.rumpf!.anweisungen, kontext)
-    return fluss instanceof Rueckgabe ? fluss.wert : NULL
+    const flow = this.runStatements(method.body!.statements, kontext)
+    return flow instanceof Return ? flow.value : NULL
   }
 
   // --- Anweisungen ----------------------------------------------------------
 
-  private takt() {
-    if (++this.schritte > MAX_SCHRITTE) {
-      throw new JavaAbbruch(
+  private tick() {
+    if (++this.steps > MAX_STEPS) {
+      throw new JavaAbort(
         'Das Programm läuft zu lange - vermutlich eine Endlosschleife.',
         'The program runs too long - probably an endless loop.',
       )
     }
   }
 
-  private bloeckeAusfuehren(anweisungen: Anweisung[], kontext: Kontext): Fluss {
-    for (const a of anweisungen) {
-      const fluss = this.ausfuehren(a, kontext)
-      if (fluss) return fluss
+  private runStatements(statements: Statement[], kontext: Context): Flow {
+    for (const a of statements) {
+      const flow = this.execute(a, kontext)
+      if (flow) return flow
     }
   }
 
-  private ausfuehren(anweisung: Anweisung, kontext: Kontext): Fluss {
-    this.takt()
-    switch (anweisung.art) {
-      case 'leer':
+  private execute(statement: Statement, kontext: Context): Flow {
+    this.tick()
+    switch (statement.kind) {
+      case 'empty':
         return
 
       case 'block':
-        return this.bloeckeAusfuehren(anweisung.anweisungen, { ...kontext, umgebung: new Umgebung(kontext.umgebung) })
+        return this.runStatements(statement.statements, { ...kontext, scope: new Scope(kontext.scope) })
 
-      case 'lokal': {
-        for (const v of anweisung.variablen) {
-          const typ: TypRef = { ...anweisung.typ, dimensionen: anweisung.typ.dimensionen + v.dimensionen }
-          let wert = v.init ? this.auswerten(v.init, kontext, typ) : { art: 'null' as const }
-          if (v.init) wert = this.anpassen(wert, typ)
-          kontext.umgebung.deklarieren(v.name, wert, typ, anweisung.final)
+      case 'local': {
+        for (const v of statement.variables) {
+          const type: TypeRef = { ...statement.type, dimensions: statement.type.dimensions + v.dimensions }
+          let value = v.init ? this.evaluate(v.init, kontext, type) : { kind: 'null' as const }
+          if (v.init) value = this.adapt(value, type)
+          kontext.scope.declare(v.name, value, type, statement.final)
         }
         return
       }
 
-      case 'ausdruck':
-        this.auswerten(anweisung.ausdruck, kontext)
+      case 'expression':
+        this.evaluate(statement.expression, kontext)
         return
 
       case 'if':
-        if (this.wahrheitswert(this.auswerten(anweisung.bedingung, kontext), anweisung.zeile)) {
-          return this.ausfuehren(anweisung.dann, kontext)
+        if (this.truthValue(this.evaluate(statement.condition, kontext), statement.line)) {
+          return this.execute(statement.thenBranch, kontext)
         }
-        return anweisung.sonst ? this.ausfuehren(anweisung.sonst, kontext) : undefined
+        return statement.elseBranch ? this.execute(statement.elseBranch, kontext) : undefined
 
       case 'while':
-        while (this.wahrheitswert(this.auswerten(anweisung.bedingung, kontext), anweisung.zeile)) {
-          this.takt()
-          const fluss = this.ausfuehren(anweisung.rumpf, kontext)
-          if (fluss === BREAK) break
-          if (fluss instanceof Rueckgabe) return fluss
+        while (this.truthValue(this.evaluate(statement.condition, kontext), statement.line)) {
+          this.tick()
+          const flow = this.execute(statement.body, kontext)
+          if (flow === BREAK) break
+          if (flow instanceof Return) return flow
         }
         return
 
       case 'doWhile':
         do {
-          this.takt()
-          const fluss = this.ausfuehren(anweisung.rumpf, kontext)
-          if (fluss === BREAK) break
-          if (fluss instanceof Rueckgabe) return fluss
-        } while (this.wahrheitswert(this.auswerten(anweisung.bedingung, kontext), anweisung.zeile))
+          this.tick()
+          const flow = this.execute(statement.body, kontext)
+          if (flow === BREAK) break
+          if (flow instanceof Return) return flow
+        } while (this.truthValue(this.evaluate(statement.condition, kontext), statement.line))
         return
 
       case 'for': {
-        const innen: Kontext = { ...kontext, umgebung: new Umgebung(kontext.umgebung) }
-        for (const i of anweisung.init) this.ausfuehren(i, innen)
-        while (!anweisung.bedingung || this.wahrheitswert(this.auswerten(anweisung.bedingung, innen), anweisung.zeile)) {
-          this.takt()
-          const fluss = this.ausfuehren(anweisung.rumpf, innen)
-          if (fluss === BREAK) break
-          if (fluss instanceof Rueckgabe) return fluss
-          for (const s of anweisung.schritt) this.auswerten(s, innen)
+        const inner: Context = { ...kontext, scope: new Scope(kontext.scope) }
+        for (const i of statement.init) this.execute(i, inner)
+        while (!statement.condition || this.truthValue(this.evaluate(statement.condition, inner), statement.line)) {
+          this.tick()
+          const flow = this.execute(statement.body, inner)
+          if (flow === BREAK) break
+          if (flow instanceof Return) return flow
+          for (const s of statement.update) this.evaluate(s, inner)
         }
         return
       }
 
       case 'forEach': {
-        const quelle = this.auswerten(anweisung.quelle, kontext)
-        const elemente = this.elementeVon(quelle, anweisung.zeile)
-        for (const element of elemente) {
-          this.takt()
-          const innen: Kontext = { ...kontext, umgebung: new Umgebung(kontext.umgebung) }
-          innen.umgebung.deklarieren(anweisung.name, this.anpassen(element, anweisung.typ), anweisung.typ)
-          const fluss = this.ausfuehren(anweisung.rumpf, innen)
-          if (fluss === BREAK) break
-          if (fluss instanceof Rueckgabe) return fluss
+        const source = this.evaluate(statement.source, kontext)
+        const elements = this.elementsOf(source, statement.line)
+        for (const element of elements) {
+          this.tick()
+          const inner: Context = { ...kontext, scope: new Scope(kontext.scope) }
+          inner.scope.declare(statement.name, this.adapt(element, statement.type), statement.type)
+          const flow = this.execute(statement.body, inner)
+          if (flow === BREAK) break
+          if (flow instanceof Return) return flow
         }
         return
       }
 
       case 'switch':
-        return this.switchAusfuehren(anweisung, kontext).fluss
+        return this.runSwitch(statement, kontext).flow
 
       case 'return':
-        return new Rueckgabe(anweisung.wert ? this.auswerten(anweisung.wert, kontext) : NULL)
+        return new Return(statement.value ? this.evaluate(statement.value, kontext) : NULL)
 
       case 'break':
         return BREAK
@@ -420,321 +420,321 @@ export class Interpreter {
         return CONTINUE
 
       case 'throw': {
-        const wert = this.auswerten(anweisung.wert, kontext)
-        if (wert.art === 'null') this.werfen('NullPointerException', null, anweisung.zeile)
-        throw new JavaAusnahme(wert, anweisung.zeile)
+        const value = this.evaluate(statement.value, kontext)
+        if (value.kind === 'null') this.raise('NullPointerException', null, statement.line)
+        throw new JavaException(value, statement.line)
       }
 
       case 'try':
-        return this.tryAusfuehren(anweisung, kontext)
+        return this.runTry(statement, kontext)
     }
   }
 
-  private switchAusfuehren(
-    anweisung: Extract<Anweisung, { art: 'switch' }>,
-    kontext: Kontext,
-  ): { fluss: Fluss; ergebnis?: Wert } {
-    const wert = this.auswerten(anweisung.wert, kontext)
-    const passt = (kandidat: Ausdruck) => {
+  private runSwitch(
+    statement: Extract<Statement, { kind: 'switch' }>,
+    kontext: Context,
+  ): { flow: Flow; result?: Value } {
+    const value = this.evaluate(statement.value, kontext)
+    const matches = (candidate: Expression) => {
       // In `case ROT:` steht der Enum-Name ohne Klasse davor.
-      if (kandidat.art === 'name' && wert.art === 'objekt' && wert.klasse.istEnum) {
-        return wert.klasse.statisch.get(kandidat.name) === wert
+      if (candidate.kind === 'name' && value.kind === 'object' && value.classInfo.isEnum) {
+        return value.classInfo.isStatic.get(candidate.name) === value
       }
-      return inhaltGleich(this.auswerten(kandidat, kontext), wert)
+      return contentEquals(this.evaluate(candidate, kontext), value)
     }
 
-    let start = anweisung.faelle.findIndex((f) => f.werte.length > 0 && f.werte.some(passt))
-    if (start < 0) start = anweisung.faelle.findIndex((f) => f.werte.length === 0)
-    if (start < 0) return { fluss: undefined }
+    let start = statement.cases.findIndex((f) => f.values.length > 0 && f.values.some(matches))
+    if (start < 0) start = statement.cases.findIndex((f) => f.values.length === 0)
+    if (start < 0) return { flow: undefined }
 
-    const innen: Kontext = { ...kontext, umgebung: new Umgebung(kontext.umgebung) }
-    if (anweisung.pfeil) {
-      const fall = anweisung.faelle[start]
-      if (fall.ergebnis) return { fluss: undefined, ergebnis: this.auswerten(fall.ergebnis, innen) }
-      const fluss = this.bloeckeAusfuehren(fall.anweisungen, innen)
-      return { fluss: fluss === BREAK ? undefined : fluss }
+    const inner: Context = { ...kontext, scope: new Scope(kontext.scope) }
+    if (statement.arrow) {
+      const switchCase = statement.cases[start]
+      if (switchCase.result) return { flow: undefined, result: this.evaluate(switchCase.result, inner) }
+      const flow = this.runStatements(switchCase.statements, inner)
+      return { flow: flow === BREAK ? undefined : flow }
     }
     // Klassisches switch: ohne break läuft es in den nächsten Fall weiter.
-    for (let i = start; i < anweisung.faelle.length; i++) {
-      const fluss = this.bloeckeAusfuehren(anweisung.faelle[i].anweisungen, innen)
-      if (fluss === BREAK) return { fluss: undefined }
-      if (fluss) return { fluss }
+    for (let i = start; i < statement.cases.length; i++) {
+      const flow = this.runStatements(statement.cases[i].statements, inner)
+      if (flow === BREAK) return { flow: undefined }
+      if (flow) return { flow }
     }
-    return { fluss: undefined }
+    return { flow: undefined }
   }
 
-  private tryAusfuehren(anweisung: Extract<Anweisung, { art: 'try' }>, kontext: Kontext): Fluss {
-    let fluss: Fluss
+  private runTry(statement: Extract<Statement, { kind: 'try' }>, kontext: Context): Flow {
+    let flow: Flow
     try {
-      fluss = this.ausfuehren(anweisung.rumpf, kontext)
-    } catch (fehler) {
-      if (!(fehler instanceof JavaAusnahme)) throw fehler
-      const faenger = anweisung.faenger.find((f) => f.typen.some((t) => this.istInstanz(fehler.wert, t)))
-      if (!faenger) {
-        if (anweisung.schliesslich) this.ausfuehren(anweisung.schliesslich, kontext)
-        throw fehler
+      flow = this.execute(statement.body, kontext)
+    } catch (error) {
+      if (!(error instanceof JavaException)) throw error
+      const catches = statement.catches.find((f) => f.types.some((t) => this.isInstance(error.value, t)))
+      if (!catches) {
+        if (statement.finallyBlock) this.execute(statement.finallyBlock, kontext)
+        throw error
       }
-      const innen: Kontext = { ...kontext, umgebung: new Umgebung(kontext.umgebung) }
-      innen.umgebung.deklarieren(faenger.name, fehler.wert, { name: faenger.typen[0], dimensionen: 0, argumente: [] })
+      const inner: Context = { ...kontext, scope: new Scope(kontext.scope) }
+      inner.scope.declare(catches.name, error.value, { name: catches.types[0], dimensions: 0, args: [] })
       try {
-        fluss = this.ausfuehren(faenger.rumpf, innen)
+        flow = this.execute(catches.body, inner)
       } finally {
-        if (anweisung.schliesslich) this.ausfuehren(anweisung.schliesslich, kontext)
+        if (statement.finallyBlock) this.execute(statement.finallyBlock, kontext)
       }
-      return fluss
+      return flow
     }
-    if (anweisung.schliesslich) {
-      const flussSchluss = this.ausfuehren(anweisung.schliesslich, kontext)
-      if (flussSchluss) return flussSchluss
+    if (statement.finallyBlock) {
+      const flowEnd = this.execute(statement.finallyBlock, kontext)
+      if (flowEnd) return flowEnd
     }
-    return fluss
+    return flow
   }
 
   // --- Ausdrücke ------------------------------------------------------------
 
-  private auswerten(ausdruck: Ausdruck, kontext: Kontext, erwartet?: TypRef): Wert {
-    this.takt()
-    switch (ausdruck.art) {
+  private evaluate(expression: Expression, kontext: Context, expected?: TypeRef): Value {
+    this.tick()
+    switch (expression.kind) {
       case 'literal': {
-        const l = ausdruck.wert
-        switch (l.typ) {
+        const l = expression.value
+        switch (l.type) {
           case 'int':
-            return { art: 'int', wert: l.wert }
+            return { kind: 'int', value: l.value }
           case 'double':
-            return komma(l.wert)
+            return comma(l.value)
           case 'boolean':
-            return wahrheit(l.wert)
+            return bool(l.value)
           case 'char':
-            return zeichen(l.wert)
+            return chars(l.value)
           case 'String':
-            return poolString(l.wert)
+            return poolString(l.value)
           default:
             return NULL
         }
       }
 
       case 'name':
-        return this.nameLesen(ausdruck.name, kontext, ausdruck.zeile)
+        return this.readName(expression.name, kontext, expression.line)
 
       case 'this':
-        if (!kontext.selbst) this.abbruch('`this` gibt es in einer static-Methode nicht.', 'non-static variable this cannot be referenced from a static context')
-        return kontext.selbst!
+        if (!kontext.self) this.abort('`this` gibt es in einer static-Methode nicht.', 'non-static variable this cannot be referenced from a static context')
+        return kontext.self!
 
       case 'super':
-        return kontext.selbst ?? NULL
+        return kontext.self ?? NULL
 
       case 'classLiteral':
-        return { art: 'nativ', typ: 'Class', daten: { text: ausdruck.className, klasse: this.klassen.get(ausdruck.className) } }
+        return { kind: 'native', type: 'Class', data: { text: expression.className, classInfo: this.classes.get(expression.className) } }
 
-      case 'feld':
-        return this.feldLesen(ausdruck.ziel, ausdruck.name, kontext, ausdruck.zeile)
+      case 'field':
+        return this.readField(expression.target, expression.name, kontext, expression.line)
 
       case 'index': {
-        const ziel = this.auswerten(ausdruck.ziel, kontext)
-        const index = alsZahl(this.auswerten(ausdruck.index, kontext))
-        return this.arrayLesen(ziel, index, ausdruck.zeile)
+        const target = this.evaluate(expression.target, kontext)
+        const index = toNumber(this.evaluate(expression.index, kontext))
+        return this.readArray(target, index, expression.line)
       }
 
-      case 'arrayWerte': {
-        const werte = ausdruck.werte.map((w) => this.auswerten(w, kontext))
-        const typ = erwartet?.name ?? 'Object'
-        return { art: 'array', typ, werte: werte.map((w) => this.anpassen(w, { name: typ, dimensionen: 0, argumente: [] })) }
+      case 'arrayLiteral': {
+        const values = expression.values.map((w) => this.evaluate(w, kontext))
+        const type = expected?.name ?? 'Object'
+        return { kind: 'array', type, values: values.map((w) => this.adapt(w, { name: type, dimensions: 0, args: [] })) }
       }
 
-      case 'neuArray':
-        return this.arrayErzeugen(ausdruck, kontext)
+      case 'newArray':
+        return this.createArray(expression, kontext)
 
-      case 'neu':
-        return this.neuErzeugen(ausdruck.klasse, ausdruck.argumente.map((a) => this.auswerten(a, kontext)), ausdruck.zeile)
+      case 'new':
+        return this.instantiate(expression.classInfo, expression.args.map((a) => this.evaluate(a, kontext)), expression.line)
 
-      case 'aufruf':
-        return this.aufrufAuswerten(ausdruck, kontext)
+      case 'call':
+        return this.evaluateCall(expression, kontext)
 
-      case 'zuweisung':
-        return this.zuweisen(ausdruck, kontext)
+      case 'assign':
+        return this.assign(expression, kontext)
 
-      case 'stufe': {
-        const alt = this.auswerten(ausdruck.ziel, kontext)
-        const eins: Wert = { art: 'int', wert: 1 }
-        const neu = this.rechnen(ausdruck.operator === '++' ? '+' : '-', alt, eins, ausdruck.zeile)
-        const gespeichert = this.schreiben(ausdruck.ziel, neu, kontext, ausdruck.zeile)
-        return ausdruck.vorher ? gespeichert : alt
+      case 'increment': {
+        const previous = this.evaluate(expression.target, kontext)
+        const one: Value = { kind: 'int', value: 1 }
+        const fresh = this.compute(expression.operator === '++' ? '+' : '-', previous, one, expression.line)
+        const stored = this.write(expression.target, fresh, kontext, expression.line)
+        return expression.prefix ? stored : previous
       }
 
-      case 'binaer':
-        return this.binaerAuswerten(ausdruck, kontext)
+      case 'binary':
+        return this.evaluateBinary(expression, kontext)
 
-      case 'unaer': {
-        const wert = this.auswerten(ausdruck.ausdruck, kontext)
-        if (ausdruck.operator === '!') return wahrheit(!this.wahrheitswert(wert, ausdruck.zeile))
-        if (ausdruck.operator === '-') {
-          if (wert.art === 'double') return komma(-wert.wert)
-          return zahl(-alsZahl(wert))
+      case 'unary': {
+        const value = this.evaluate(expression.expression, kontext)
+        if (expression.operator === '!') return bool(!this.truthValue(value, expression.line))
+        if (expression.operator === '-') {
+          if (value.kind === 'double') return comma(-value.value)
+          return number(-toNumber(value))
         }
-        if (ausdruck.operator === '~') return zahl(~alsZahl(wert))
-        return wert.art === 'char' ? zahl(wert.wert) : wert
+        if (expression.operator === '~') return number(~toNumber(value))
+        return value.kind === 'char' ? number(value.value) : value
       }
 
-      case 'ternaer':
-        return this.wahrheitswert(this.auswerten(ausdruck.bedingung, kontext), ausdruck.zeile)
-          ? this.auswerten(ausdruck.dann, kontext, erwartet)
-          : this.auswerten(ausdruck.sonst, kontext, erwartet)
+      case 'ternary':
+        return this.truthValue(this.evaluate(expression.condition, kontext), expression.line)
+          ? this.evaluate(expression.thenBranch, kontext, expected)
+          : this.evaluate(expression.elseBranch, kontext, expected)
 
       case 'instanceof': {
-        const wert = this.auswerten(ausdruck.ausdruck, kontext)
-        const passt = wert.art !== 'null' && this.istInstanz(wert, ausdruck.typ.replace(/\[\]$/, ''))
-        if (passt && ausdruck.bindung) {
-          kontext.umgebung.deklarieren(ausdruck.bindung, wert, { name: ausdruck.typ, dimensionen: 0, argumente: [] })
+        const value = this.evaluate(expression.expression, kontext)
+        const matches = value.kind !== 'null' && this.isInstance(value, expression.type.replace(/\[\]$/, ''))
+        if (matches && expression.binding) {
+          kontext.scope.declare(expression.binding, value, { name: expression.type, dimensions: 0, args: [] })
         }
-        return wahrheit(passt)
+        return bool(matches)
       }
 
       case 'cast':
-        return this.umwandeln(this.auswerten(ausdruck.ausdruck, kontext, ausdruck.typ), ausdruck.typ, ausdruck.zeile)
+        return this.convert(this.evaluate(expression.expression, kontext, expression.type), expression.type, expression.line)
 
       case 'lambda': {
-        const rumpf = ausdruck.rumpf
-        const gefangen = kontext
+        const body = expression.body
+        const caught = kontext
         return {
-          art: 'funktion',
-          aufrufen: (argumente) => {
-            const innen: Kontext = { ...gefangen, umgebung: new Umgebung(gefangen.umgebung) }
-            ausdruck.parameter.forEach((p, i) => {
-              innen.umgebung.deklarieren(p, argumente[i] ?? NULL, { name: 'var', dimensionen: 0, argumente: [] })
+          kind: 'function',
+          call: (args) => {
+            const inner: Context = { ...caught, scope: new Scope(caught.scope) }
+            expression.params.forEach((p, i) => {
+              inner.scope.declare(p, args[i] ?? NULL, { name: 'var', dimensions: 0, args: [] })
             })
-            if ('art' in rumpf && rumpf.art === 'block') {
-              const fluss = this.bloeckeAusfuehren(rumpf.anweisungen, innen)
-              return fluss instanceof Rueckgabe ? fluss.wert : NULL
+            if ('kind' in body && body.kind === 'block') {
+              const flow = this.runStatements(body.statements, inner)
+              return flow instanceof Return ? flow.value : NULL
             }
-            return this.auswerten(rumpf as Ausdruck, innen)
+            return this.evaluate(body as Expression, inner)
           },
         }
       }
 
-      case 'methodenRef': {
-        const ziel = ausdruck.ziel
-        const name = ausdruck.name
+      case 'methodRef': {
+        const target = expression.target
+        const name = expression.name
         return {
-          art: 'funktion',
-          aufrufen: (argumente) => {
-            if (name === '<init>') return this.neuErzeugen(ziel, argumente, ausdruck.zeile)
-            const klasse = this.klassen.get(ziel)
-            if (klasse || this.isBuiltIn(ziel)) {
+          kind: 'function',
+          call: (args) => {
+            if (name === '<init>') return this.instantiate(target, args, expression.line)
+            const classInfo = this.classes.get(target)
+            if (classInfo || this.isBuiltIn(target)) {
               // Statisch (Integer::parseInt) oder auf dem ersten Argument (String::toUpperCase).
               try {
-                return this.statischAufrufen(ziel, name, argumente, ausdruck.zeile)
+                return this.callStatic(target, name, args, expression.line)
               } catch {
-                return this.methodeAufrufen(argumente[0], name, argumente.slice(1), ausdruck.zeile)
+                return this.callMethod(args[0], name, args.slice(1), expression.line)
               }
             }
-            const wert = this.nameLesen(ziel, kontext, ausdruck.zeile)
-            return this.methodeAufrufen(wert, name, argumente, ausdruck.zeile)
+            const value = this.readName(target, kontext, expression.line)
+            return this.callMethod(value, name, args, expression.line)
           },
         }
       }
 
-      case 'switchAusdruck': {
-        const ergebnis = this.switchAusfuehren(ausdruck.anweisung as Extract<Anweisung, { art: 'switch' }>, kontext)
-        if (ergebnis.ergebnis) return ergebnis.ergebnis
-        if (ergebnis.fluss instanceof Rueckgabe) return ergebnis.fluss.wert
+      case 'switchExpression': {
+        const result = this.runSwitch(expression.statement as Extract<Statement, { kind: 'switch' }>, kontext)
+        if (result.result) return result.result
+        if (result.flow instanceof Return) return result.flow.value
         return NULL
       }
     }
   }
 
-  private binaerAuswerten(ausdruck: Extract<Ausdruck, { art: 'binaer' }>, kontext: Kontext): Wert {
-    const { operator, zeile } = ausdruck
+  private evaluateBinary(expression: Extract<Expression, { kind: 'binary' }>, kontext: Context): Value {
+    const { operator, line } = expression
     // && und || werten die rechte Seite nur aus, wenn sie noch gebraucht wird.
     if (operator === '&&' || operator === '||') {
-      const links = this.wahrheitswert(this.auswerten(ausdruck.links, kontext), zeile)
-      if (operator === '&&' && !links) return wahrheit(false)
-      if (operator === '||' && links) return wahrheit(true)
-      return wahrheit(this.wahrheitswert(this.auswerten(ausdruck.rechts, kontext), zeile))
+      const left = this.truthValue(this.evaluate(expression.left, kontext), line)
+      if (operator === '&&' && !left) return bool(false)
+      if (operator === '||' && left) return bool(true)
+      return bool(this.truthValue(this.evaluate(expression.right, kontext), line))
     }
 
-    const links = this.auswerten(ausdruck.links, kontext)
-    const rechts = this.auswerten(ausdruck.rechts, kontext)
+    const left = this.evaluate(expression.left, kontext)
+    const right = this.evaluate(expression.right, kontext)
 
     if (operator === '==' || operator === '!=') {
-      const gleich = this.identisch(links, rechts)
-      return wahrheit(operator === '==' ? gleich : !gleich)
+      const same = this.identical(left, right)
+      return bool(operator === '==' ? same : !same)
     }
 
     // String + irgendwas: Der Sonderfall, den Java als einziges "Operator-Überladen" kennt.
-    if (operator === '+' && (links.art === 'string' || rechts.art === 'string')) {
-      const text = this.alsText(links) + this.alsText(rechts)
+    if (operator === '+' && (left.kind === 'string' || right.kind === 'string')) {
+      const text = this.toText(left) + this.toText(right)
       // Zwei Literale fasst schon der Compiler zusammen - das Ergebnis liegt im Pool.
-      const beideLiteral = ausdruck.links.art === 'literal' && ausdruck.rechts.art === 'literal'
-      return beideLiteral ? poolString(text) : neuerString(text)
+      const bothLiteral = expression.left.kind === 'literal' && expression.right.kind === 'literal'
+      return bothLiteral ? poolString(text) : newString(text)
     }
 
-    return this.rechnen(operator, links, rechts, zeile)
+    return this.compute(operator, left, right, line)
   }
 
-  private rechnen(operator: string, links: Wert, rechts: Wert, zeile: number): Wert {
-    if (operator === '&' && links.art === 'boolean' && rechts.art === 'boolean') return wahrheit(links.wert && rechts.wert)
-    if (operator === '|' && links.art === 'boolean' && rechts.art === 'boolean') return wahrheit(links.wert || rechts.wert)
-    if (operator === '^' && links.art === 'boolean' && rechts.art === 'boolean') return wahrheit(links.wert !== rechts.wert)
+  private compute(operator: string, left: Value, right: Value, line: number): Value {
+    if (operator === '&' && left.kind === 'boolean' && right.kind === 'boolean') return bool(left.value && right.value)
+    if (operator === '|' && left.kind === 'boolean' && right.kind === 'boolean') return bool(left.value || right.value)
+    if (operator === '^' && left.kind === 'boolean' && right.kind === 'boolean') return bool(left.value !== right.value)
 
-    if (!istZahl(links) || !istZahl(rechts)) {
-      this.abbruch(
-        `Der Operator ${operator} passt nicht zu ${typName(links)} und ${typName(rechts)}.`,
-        `bad operand types for operator '${operator}': ${typName(links)}, ${typName(rechts)}`,
+    if (!isNumber(left) || !isNumber(right)) {
+      this.abort(
+        `Der Operator ${operator} passt nicht zu ${typeName(left)} und ${typeName(right)}.`,
+        `bad operand types for operator '${operator}': ${typeName(left)}, ${typeName(right)}`,
       )
     }
-    const a = alsZahl(links)
-    const b = alsZahl(rechts)
+    const a = toNumber(left)
+    const b = toNumber(right)
 
     switch (operator) {
       case '<':
-        return wahrheit(a < b)
+        return bool(a < b)
       case '>':
-        return wahrheit(a > b)
+        return bool(a > b)
       case '<=':
-        return wahrheit(a <= b)
+        return bool(a <= b)
       case '>=':
-        return wahrheit(a >= b)
+        return bool(a >= b)
     }
 
     // Sobald ein double beteiligt ist, rechnet Java in double weiter.
-    const kommazahl = links.art === 'double' || rechts.art === 'double'
+    const isFloat = left.kind === 'double' || right.kind === 'double'
     switch (operator) {
       case '+':
-        return kommazahl ? komma(a + b) : zahl(a + b)
+        return isFloat ? comma(a + b) : number(a + b)
       case '-':
-        return kommazahl ? komma(a - b) : zahl(a - b)
+        return isFloat ? comma(a - b) : number(a - b)
       case '*':
-        return kommazahl ? komma(a * b) : zahl(Math.imul(a | 0, b | 0))
+        return isFloat ? comma(a * b) : number(Math.imul(a | 0, b | 0))
       case '/':
-        if (!kommazahl) {
-          if (b === 0) this.werfen('ArithmeticException', '/ by zero', zeile)
-          return zahl(Math.trunc(a / b))
+        if (!isFloat) {
+          if (b === 0) this.raise('ArithmeticException', '/ by zero', line)
+          return number(Math.trunc(a / b))
         }
-        return komma(a / b)
+        return comma(a / b)
       case '%':
-        if (!kommazahl && b === 0) this.werfen('ArithmeticException', '/ by zero', zeile)
-        return kommazahl ? komma(a % b) : zahl(a % b)
+        if (!isFloat && b === 0) this.raise('ArithmeticException', '/ by zero', line)
+        return isFloat ? comma(a % b) : number(a % b)
       case '&':
-        return zahl(a & b)
+        return number(a & b)
       case '|':
-        return zahl(a | b)
+        return number(a | b)
       case '^':
-        return zahl(a ^ b)
+        return number(a ^ b)
       case '<<':
-        return zahl(a << b)
+        return number(a << b)
       case '>>':
-        return zahl(a >> b)
+        return number(a >> b)
       case '>>>':
-        return zahl(a >>> b)
+        return number(a >>> b)
     }
-    this.abbruch(`Unbekannter Operator ${operator}.`, `unknown operator ${operator}`)
+    this.abort(`Unbekannter Operator ${operator}.`, `unknown operator ${operator}`)
   }
 
   /** `==`: Zahlen nach Wert, alles andere nach Identität - die klassische Java-Falle. */
-  private identisch(a: Wert, b: Wert): boolean {
-    if (a.art === 'null' || b.art === 'null') return a.art === b.art
-    if (istZahl(a) && istZahl(b)) return alsZahl(a) === alsZahl(b)
-    if (a.art === 'boolean' && b.art === 'boolean') return a.wert === b.wert
+  private identical(a: Value, b: Value): boolean {
+    if (a.kind === 'null' || b.kind === 'null') return a.kind === b.kind
+    if (isNumber(a) && isNumber(b)) return toNumber(a) === toNumber(b)
+    if (a.kind === 'boolean' && b.kind === 'boolean') return a.value === b.value
     return a === b
   }
 
@@ -744,108 +744,108 @@ export class Interpreter {
    * Alle Klassen, deren static-Felder und -Methoden von hier aus sichtbar sind:
    * die eigene Klasse samt Oberklassen - und dasselbe für jede umgebende Klasse.
    */
-  private *sichtbareKlassen(start: Klasse | null): Generator<Klasse> {
-    for (let aussen: Klasse | undefined = start ?? undefined; aussen; aussen = aussen.aeussere) {
-      for (let k: Klasse | undefined = aussen; k; k = k.oberklasse) yield k
+  private *visibleClasses(start: ClassInfo | null): Generator<ClassInfo> {
+    for (let outerClass: ClassInfo | undefined = start ?? undefined; outerClass; outerClass = outerClass.outer) {
+      for (let k: ClassInfo | undefined = outerClass; k; k = k.superclass) yield k
     }
   }
 
-  private nameLesen(name: string, kontext: Kontext, zeile: number): Wert {
-    const lokal = kontext.umgebung.finden(name)
-    if (lokal) return lokal.wert
+  private readName(name: string, kontext: Context, line: number): Value {
+    const local = kontext.scope.find(name)
+    if (local) return local.value
 
-    if (kontext.selbst) {
-      const objekt = kontext.selbst
-      if (objekt.felder.has(name)) return objekt.felder.get(name)!
+    if (kontext.self) {
+      const object = kontext.self
+      if (object.fields.has(name)) return object.fields.get(name)!
     }
-    for (const k of this.sichtbareKlassen(kontext.klasse)) {
-      if (k.statisch.has(name)) return k.statisch.get(name)!
+    for (const k of this.visibleClasses(kontext.classInfo)) {
+      if (k.isStatic.has(name)) return k.isStatic.get(name)!
     }
-    this.abbruch(`Die Variable \`${name}\` gibt es hier nicht.`, `cannot find symbol: variable ${name}`, zeile)
+    this.abort(`Die Variable \`${name}\` gibt es hier nicht.`, `cannot find symbol: variable ${name}`, line)
   }
 
-  private feldLesen(zielAusdruck: Ausdruck, name: string, kontext: Kontext, zeile: number): Wert {
+  private readField(targetExpression: Expression, name: string, kontext: Context, line: number): Value {
     // Klassenname davor? Dann ist es ein statisches Feld (Math.PI, Integer.MAX_VALUE).
-    if (zielAusdruck.art === 'name' && !kontext.umgebung.finden(zielAusdruck.name)) {
-      const klassenName = zielAusdruck.name
-      const klasse = this.klassen.get(klassenName)
-      if (klasse) {
-        for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-          if (k.statisch.has(name)) return k.statisch.get(name)!
+    if (targetExpression.kind === 'name' && !kontext.scope.find(targetExpression.name)) {
+      const className = targetExpression.name
+      const classInfo = this.classes.get(className)
+      if (classInfo) {
+        for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+          if (k.isStatic.has(name)) return k.isStatic.get(name)!
         }
-        this.abbruch(`${klassenName} hat kein statisches Feld \`${name}\`.`, `cannot find symbol: variable ${name}`, zeile)
+        this.abort(`${className} hat kein statisches Feld \`${name}\`.`, `cannot find symbol: variable ${name}`, line)
       }
-      const eingebaut = this.extension?.staticField?.(klassenName, name, this) ?? statischesFeld(klassenName, name, this)
-      if (eingebaut) return eingebaut
+      const builtIn = this.extension?.staticField?.(className, name, this) ?? staticField(className, name, this)
+      if (builtIn) return builtIn
     }
 
-    const ziel = this.auswerten(zielAusdruck, kontext)
-    if (ziel.art === 'null') this.werfen('NullPointerException', `Cannot read field "${name}" because the value is null`, zeile)
-    if (ziel.art === 'array' && name === 'length') return zahl(ziel.werte.length)
-    if (ziel.art === 'objekt') {
-      if (ziel.felder.has(name)) return ziel.felder.get(name)!
-      for (let k: Klasse | undefined = ziel.klasse; k; k = k.oberklasse) {
-        if (k.statisch.has(name)) return k.statisch.get(name)!
+    const target = this.evaluate(targetExpression, kontext)
+    if (target.kind === 'null') this.raise('NullPointerException', `Cannot read field "${name}" because the value is null`, line)
+    if (target.kind === 'array' && name === 'length') return number(target.values.length)
+    if (target.kind === 'object') {
+      if (target.fields.has(name)) return target.fields.get(name)!
+      for (let k: ClassInfo | undefined = target.classInfo; k; k = k.superclass) {
+        if (k.isStatic.has(name)) return k.isStatic.get(name)!
       }
     }
-    if (ziel.art === 'nativ') {
-      const wert = nativesFeld(ziel, name, this)
-      if (wert) return wert
+    if (target.kind === 'native') {
+      const value = nativeField(target, name, this)
+      if (value) return value
     }
-    this.abbruch(`\`${name}\` gibt es bei ${typName(ziel)} nicht.`, `cannot find symbol: variable ${name}`, zeile)
+    this.abort(`\`${name}\` gibt es bei ${typeName(target)} nicht.`, `cannot find symbol: variable ${name}`, line)
   }
 
-  private arrayLesen(ziel: Wert, index: number, zeile: number): Wert {
-    if (ziel.art === 'null') this.werfen('NullPointerException', 'Cannot load from null array', zeile)
-    if (ziel.art !== 'array') {
-      this.abbruch(`${typName(ziel)} ist kein Array.`, `array required, but ${typName(ziel)} found`, zeile)
+  private readArray(target: Value, index: number, line: number): Value {
+    if (target.kind === 'null') this.raise('NullPointerException', 'Cannot load from null array', line)
+    if (target.kind !== 'array') {
+      this.abort(`${typeName(target)} ist kein Array.`, `array required, but ${typeName(target)} found`, line)
     }
-    if (index < 0 || index >= ziel.werte.length) {
-      this.werfen('ArrayIndexOutOfBoundsException', `Index ${index} out of bounds for length ${ziel.werte.length}`, zeile)
+    if (index < 0 || index >= target.values.length) {
+      this.raise('ArrayIndexOutOfBoundsException', `Index ${index} out of bounds for length ${target.values.length}`, line)
     }
-    return ziel.werte[index]
+    return target.values[index]
   }
 
-  private zuweisen(ausdruck: Extract<Ausdruck, { art: 'zuweisung' }>, kontext: Kontext): Wert {
-    const zielTyp = this.typVonZiel(ausdruck.ziel, kontext)
-    let wert: Wert
-    if (ausdruck.operator === '=') {
-      wert = this.auswerten(ausdruck.wert, kontext, zielTyp)
+  private assign(expression: Extract<Expression, { kind: 'assign' }>, kontext: Context): Value {
+    const targetType = this.typeOfTarget(expression.target, kontext)
+    let value: Value
+    if (expression.operator === '=') {
+      value = this.evaluate(expression.value, kontext, targetType)
     } else {
-      const alt = this.auswerten(ausdruck.ziel, kontext)
-      const rechts = this.auswerten(ausdruck.wert, kontext)
-      const operator = ausdruck.operator.slice(0, -1)
-      if (operator === '+' && alt.art === 'string') {
-        wert = neuerString(alt.wert + this.alsText(rechts))
+      const previous = this.evaluate(expression.target, kontext)
+      const right = this.evaluate(expression.value, kontext)
+      const operator = expression.operator.slice(0, -1)
+      if (operator === '+' && previous.kind === 'string') {
+        value = newString(previous.value + this.toText(right))
       } else {
-        wert = this.rechnen(operator, alt, rechts, ausdruck.zeile)
+        value = this.compute(operator, previous, right, expression.line)
         // `int x = 5; x += 1.5;` ist in Java erlaubt - es wird still abgeschnitten.
-        if (zielTyp && ['int', 'long', 'short', 'byte', 'char'].includes(zielTyp.name) && zielTyp.dimensionen === 0 && wert.art === 'double') {
-          wert = zielTyp.name === 'char' ? zeichen(Math.trunc(wert.wert)) : zahl(Math.trunc(wert.wert))
+        if (targetType && ['int', 'long', 'short', 'byte', 'char'].includes(targetType.name) && targetType.dimensions === 0 && value.kind === 'double') {
+          value = targetType.name === 'char' ? chars(Math.trunc(value.value)) : number(Math.trunc(value.value))
         }
       }
     }
-    if (zielTyp) wert = this.anpassen(wert, zielTyp)
-    return this.schreiben(ausdruck.ziel, wert, kontext, ausdruck.zeile)
+    if (targetType) value = this.adapt(value, targetType)
+    return this.write(expression.target, value, kontext, expression.line)
   }
 
   /** Der deklarierte Typ des Ziels - nötig für `double d = 5;` und `x += 1.5`. */
-  private typVonZiel(ziel: Ausdruck, kontext: Kontext): TypRef | undefined {
-    if (ziel.art === 'name') {
-      const lokal = kontext.umgebung.finden(ziel.name)
-      if (lokal) return lokal.typ
-      for (let k: Klasse | undefined = kontext.klasse ?? undefined; k; k = k.oberklasse) {
-        const feld = k.dekl.felder.find((f) => f.name === ziel.name)
-        if (feld) return feld.typ
+  private typeOfTarget(target: Expression, kontext: Context): TypeRef | undefined {
+    if (target.kind === 'name') {
+      const local = kontext.scope.find(target.name)
+      if (local) return local.type
+      for (let k: ClassInfo | undefined = kontext.classInfo ?? undefined; k; k = k.superclass) {
+        const field = k.decl.fields.find((f) => f.name === target.name)
+        if (field) return field.type
       }
       return undefined
     }
-    if (ziel.art === 'feld') {
-      const basis = ziel.ziel
-      if (basis.art === 'this' && kontext.klasse) {
-        for (let k: Klasse | undefined = kontext.klasse; k; k = k.oberklasse) {
-          const feld = k.dekl.felder.find((f) => f.name === ziel.name)
-          if (feld) return feld.typ
+    if (target.kind === 'field') {
+      const base = target.target
+      if (base.kind === 'this' && kontext.classInfo) {
+        for (let k: ClassInfo | undefined = kontext.classInfo; k; k = k.superclass) {
+          const field = k.decl.fields.find((f) => f.name === target.name)
+          if (field) return field.type
         }
       }
       return undefined
@@ -853,610 +853,610 @@ export class Interpreter {
     return undefined
   }
 
-  private schreiben(ziel: Ausdruck, wert: Wert, kontext: Kontext, zeile: number): Wert {
-    if (ziel.art === 'name') {
-      const lokal = kontext.umgebung.finden(ziel.name)
-      if (lokal) {
-        if (lokal.final) {
-          this.abbruch(
-            `\`${ziel.name}\` ist final und kann nicht neu zugewiesen werden.`,
-            `cannot assign a value to final variable ${ziel.name}`,
-            zeile,
+  private write(target: Expression, value: Value, kontext: Context, line: number): Value {
+    if (target.kind === 'name') {
+      const local = kontext.scope.find(target.name)
+      if (local) {
+        if (local.final) {
+          this.abort(
+            `\`${target.name}\` ist final und kann nicht neu zugewiesen werden.`,
+            `cannot assign a value to final variable ${target.name}`,
+            line,
           )
         }
-        kontext.umgebung.setzen(ziel.name, wert)
-        return wert
+        kontext.scope.set(target.name, value)
+        return value
       }
-      if (kontext.selbst?.felder.has(ziel.name)) {
-        kontext.selbst.felder.set(ziel.name, wert)
-        return wert
+      if (kontext.self?.fields.has(target.name)) {
+        kontext.self.fields.set(target.name, value)
+        return value
       }
-      for (const k of this.sichtbareKlassen(kontext.klasse)) {
-        if (k.statisch.has(ziel.name)) {
-          k.statisch.set(ziel.name, wert)
-          return wert
+      for (const k of this.visibleClasses(kontext.classInfo)) {
+        if (k.isStatic.has(target.name)) {
+          k.isStatic.set(target.name, value)
+          return value
         }
       }
-      this.abbruch(`Die Variable \`${ziel.name}\` gibt es hier nicht.`, `cannot find symbol: variable ${ziel.name}`, zeile)
+      this.abort(`Die Variable \`${target.name}\` gibt es hier nicht.`, `cannot find symbol: variable ${target.name}`, line)
     }
 
-    if (ziel.art === 'feld') {
-      if (ziel.ziel.art === 'name' && !kontext.umgebung.finden(ziel.ziel.name)) {
-        const klasse = this.klassen.get(ziel.ziel.name)
-        if (klasse) {
-          for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-            if (k.statisch.has(ziel.name)) {
-              k.statisch.set(ziel.name, wert)
-              return wert
+    if (target.kind === 'field') {
+      if (target.target.kind === 'name' && !kontext.scope.find(target.target.name)) {
+        const classInfo = this.classes.get(target.target.name)
+        if (classInfo) {
+          for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+            if (k.isStatic.has(target.name)) {
+              k.isStatic.set(target.name, value)
+              return value
             }
           }
         }
       }
-      const objekt = this.auswerten(ziel.ziel, kontext)
-      if (objekt.art === 'null') this.werfen('NullPointerException', `Cannot assign field "${ziel.name}" because the value is null`, zeile)
-      if (objekt.art !== 'objekt') {
-        this.abbruch(`${typName(objekt)} hat kein Feld \`${ziel.name}\`.`, `cannot find symbol: variable ${ziel.name}`, zeile)
+      const object = this.evaluate(target.target, kontext)
+      if (object.kind === 'null') this.raise('NullPointerException', `Cannot assign field "${target.name}" because the value is null`, line)
+      if (object.kind !== 'object') {
+        this.abort(`${typeName(object)} hat kein Feld \`${target.name}\`.`, `cannot find symbol: variable ${target.name}`, line)
       }
-      objekt.felder.set(ziel.name, wert)
-      return wert
+      object.fields.set(target.name, value)
+      return value
     }
 
-    if (ziel.art === 'index') {
-      const array = this.auswerten(ziel.ziel, kontext)
-      const index = alsZahl(this.auswerten(ziel.index, kontext))
-      if (array.art === 'null') this.werfen('NullPointerException', 'Cannot store to null array', zeile)
-      if (array.art !== 'array') this.abbruch(`${typName(array)} ist kein Array.`, `array required, but ${typName(array)} found`, zeile)
-      if (index < 0 || index >= array.werte.length) {
-        this.werfen('ArrayIndexOutOfBoundsException', `Index ${index} out of bounds for length ${array.werte.length}`, zeile)
+    if (target.kind === 'index') {
+      const array = this.evaluate(target.target, kontext)
+      const index = toNumber(this.evaluate(target.index, kontext))
+      if (array.kind === 'null') this.raise('NullPointerException', 'Cannot store to null array', line)
+      if (array.kind !== 'array') this.abort(`${typeName(array)} ist kein Array.`, `array required, but ${typeName(array)} found`, line)
+      if (index < 0 || index >= array.values.length) {
+        this.raise('ArrayIndexOutOfBoundsException', `Index ${index} out of bounds for length ${array.values.length}`, line)
       }
-      array.werte[index] = this.anpassen(wert, { name: array.typ, dimensionen: 0, argumente: [] })
-      return array.werte[index]
+      array.values[index] = this.adapt(value, { name: array.type, dimensions: 0, args: [] })
+      return array.values[index]
     }
 
-    this.abbruch('Hier kann nichts zugewiesen werden.', 'unexpected type: variable required', zeile)
+    this.abort('Hier kann nichts zugewiesen werden.', 'unexpected type: variable required', line)
   }
 
   // --- Aufrufe --------------------------------------------------------------
 
-  private aufrufAuswerten(ausdruck: Extract<Ausdruck, { art: 'aufruf' }>, kontext: Kontext): Wert {
-    const { name, zeile } = ausdruck
-    const argumente = ausdruck.argumente.map((a) => this.auswerten(a, kontext))
+  private evaluateCall(expression: Extract<Expression, { kind: 'call' }>, kontext: Context): Value {
+    const { name, line } = expression
+    const args = expression.args.map((a) => this.evaluate(a, kontext))
 
     // super(...) und this(...) im Konstruktor
     if (name === '<superinit>' || name === '<init>') {
-      const klasse = name === '<superinit>' ? kontext.klasse?.oberklasse : kontext.klasse
-      if (klasse && kontext.selbst) this.konstruktorLauf(klasse, kontext.selbst, argumente, zeile, name === '<init>')
+      const classInfo = name === '<superinit>' ? kontext.classInfo?.superclass : kontext.classInfo
+      if (classInfo && kontext.self) this.runConstructor(classInfo, kontext.self, args, line, name === '<init>')
       return NULL
     }
 
     // Ohne Ziel: eigene Methode (static oder auf this), sonst eine der umgebenden Klasse
-    if (!ausdruck.ziel) {
-      const klasse = kontext.klasse
-      if (klasse) {
-        const gefunden = this.methodeFinden(kontext.selbst?.klasse ?? klasse, name, argumente)
-        if (gefunden) return this.methodeLaufen(gefunden.klasse, gefunden.methode, kontext.selbst, argumente, zeile)
-        for (let aussen = klasse.aeussere; aussen; aussen = aussen.aeussere) {
-          const dort = this.methodeFinden(aussen, name, argumente)
-          if (dort) return this.methodeLaufen(dort.klasse, dort.methode, null, argumente, zeile)
+    if (!expression.target) {
+      const classInfo = kontext.classInfo
+      if (classInfo) {
+        const found = this.findMethod(kontext.self?.classInfo ?? classInfo, name, args)
+        if (found) return this.runMethod(found.classInfo, found.method, kontext.self, args, line)
+        for (let outerClass = classInfo.outer; outerClass; outerClass = outerClass.outer) {
+          const outerMethod = this.findMethod(outerClass, name, args)
+          if (outerMethod) return this.runMethod(outerMethod.classInfo, outerMethod.method, null, args, line)
         }
         // Von Object geerbt: toString(), getClass(), hashCode() ohne `this.` davor.
-        if (kontext.selbst) {
-          const geerbt = this.objektStandardMethode(kontext.selbst, name, argumente)
-          if (geerbt) return geerbt
+        if (kontext.self) {
+          const inherited = this.objectDefaultMethod(kontext.self, name, args)
+          if (inherited) return inherited
         }
       }
-      this.abbruch(`Die Methode \`${name}\` gibt es hier nicht.`, `cannot find symbol: method ${name}`, zeile)
+      this.abort(`Die Methode \`${name}\` gibt es hier nicht.`, `cannot find symbol: method ${name}`, line)
     }
 
     // super.methode(): bewusst NICHT dynamisch binden
-    if (ausdruck.ueberSuper && kontext.klasse?.oberklasse) {
-      const gefunden = this.methodeFinden(kontext.klasse.oberklasse, name, argumente)
-      if (gefunden) return this.methodeLaufen(gefunden.klasse, gefunden.methode, kontext.selbst, argumente, zeile)
-      this.abbruch(`Die Oberklasse hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, zeile)
+    if (expression.viaSuper && kontext.classInfo?.superclass) {
+      const found = this.findMethod(kontext.classInfo.superclass, name, args)
+      if (found) return this.runMethod(found.classInfo, found.method, kontext.self, args, line)
+      this.abort(`Die Oberklasse hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, line)
     }
 
     // Klassenname davor: statischer Aufruf (Math.max, Integer.parseInt, Helfer.hilf)
-    if (ausdruck.ziel.art === 'name' && !kontext.umgebung.finden(ausdruck.ziel.name)) {
-      const klassenName = ausdruck.ziel.name
-      const klasse = this.klassen.get(klassenName)
-      if (klasse) {
-        if (klasse.istEnum && (name === 'values' || name === 'valueOf')) return this.enumStatisch(klasse, name, argumente, zeile)
-        const gefunden = this.methodeFinden(klasse, name, argumente)
-        if (gefunden) return this.methodeLaufen(gefunden.klasse, gefunden.methode, null, argumente, zeile)
-        this.abbruch(`${klassenName} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, zeile)
+    if (expression.target.kind === 'name' && !kontext.scope.find(expression.target.name)) {
+      const className = expression.target.name
+      const classInfo = this.classes.get(className)
+      if (classInfo) {
+        if (classInfo.isEnum && (name === 'values' || name === 'valueOf')) return this.enumStatic(classInfo, name, args, line)
+        const found = this.findMethod(classInfo, name, args)
+        if (found) return this.runMethod(found.classInfo, found.method, null, args, line)
+        this.abort(`${className} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, line)
       }
-      if (this.isBuiltIn(klassenName)) return this.statischAufrufen(klassenName, name, argumente, zeile)
+      if (this.isBuiltIn(className)) return this.callStatic(className, name, args, line)
     }
 
-    const ziel = this.auswerten(ausdruck.ziel, kontext)
-    return this.methodeAufrufen(ziel, name, argumente, zeile)
+    const target = this.evaluate(expression.target, kontext)
+    return this.callMethod(target, name, args, line)
   }
 
-  statischAufrufen(klasse: string, name: string, argumente: Wert[], zeile: number): Wert {
-    return this.extension?.staticCall?.(klasse, name, argumente, this, zeile) ?? statischerAufruf(klasse, name, argumente, this, zeile)
+  callStatic(classInfo: string, name: string, args: Value[], line: number): Value {
+    return this.extension?.staticCall?.(classInfo, name, args, this, line) ?? staticCall(classInfo, name, args, this, line)
   }
 
   /** A class that can be used without a declaration - from the standard library or an extension. */
   isBuiltIn(className: string): boolean {
-    return EINGEBAUTE_KLASSEN.has(className) || Boolean(this.extension?.classes.has(className))
+    return BUILTIN_CLASSES.has(className) || Boolean(this.extension?.classes.has(className))
   }
 
   /**
    * Runs one specific method on an object - for libraries that find methods by
    * their annotations (this is how Spring calls `@GetMapping` methods).
    */
-  invoke(owner: Klasse, method: MethodenDekl, self: JavaObjekt | null, args: Wert[]): Wert {
-    return this.methodeLaufen(owner, method, self, args, method.zeile)
+  invoke(owner: ClassInfo, method: MethodDecl, self: JavaObject | null, args: Value[]): Value {
+    return this.runMethod(owner, method, self, args, method.line)
   }
 
   /** Starts a fresh step budget - a server handles many requests, and each one gets its own limit. */
   resetStepLimit() {
-    this.schritte = 0
+    this.steps = 0
   }
 
   /** Methodenaufruf auf einem Wert - hier passiert die dynamische Bindung. */
-  methodeAufrufen(ziel: Wert, name: string, argumente: Wert[], zeile: number): Wert {
-    if (ziel.art === 'null') {
-      this.werfen('NullPointerException', `Cannot invoke "${name}()" because the value is null`, zeile)
+  callMethod(target: Value, name: string, args: Value[], line: number): Value {
+    if (target.kind === 'null') {
+      this.raise('NullPointerException', `Cannot invoke "${name}()" because the value is null`, line)
     }
-    if (ziel.art === 'string') return stringMethode(ziel, name, argumente, this, zeile)
-    if (ziel.art === 'nativ') return this.extension?.method?.(ziel, name, argumente, this, zeile) ?? nativMethode(ziel, name, argumente, this, zeile)
-    if (ziel.art === 'funktion') {
+    if (target.kind === 'string') return stringMethod(target, name, args, this, line)
+    if (target.kind === 'native') return this.extension?.method?.(target, name, args, this, line) ?? nativeMethod(target, name, args, this, line)
+    if (target.kind === 'function') {
       // Funktionale Interfaces: egal ob apply, accept, test, get, run oder compare.
-      return ziel.aufrufen(argumente)
+      return target.call(args)
     }
-    if (ziel.art === 'array') {
-      if (name === 'clone') return { art: 'array', typ: ziel.typ, werte: [...ziel.werte] }
-      if (name === 'equals') return wahrheit(ziel === argumente[0])
-      if (name === 'toString') return neuerString(this.alsText(ziel))
+    if (target.kind === 'array') {
+      if (name === 'clone') return { kind: 'array', type: target.type, values: [...target.values] }
+      if (name === 'equals') return bool(target === args[0])
+      if (name === 'toString') return newString(this.toText(target))
     }
-    if (ziel.art === 'objekt') {
-      const gefunden = this.methodeFinden(ziel.klasse, name, argumente)
-      if (gefunden) return this.methodeLaufen(gefunden.klasse, gefunden.methode, ziel, argumente, zeile)
-      const eingebaut = this.objektStandardMethode(ziel, name, argumente)
-      if (eingebaut) return eingebaut
-      this.abbruch(`${ziel.klasse.name} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, zeile)
+    if (target.kind === 'object') {
+      const found = this.findMethod(target.classInfo, name, args)
+      if (found) return this.runMethod(found.classInfo, found.method, target, args, line)
+      const builtIn = this.objectDefaultMethod(target, name, args)
+      if (builtIn) return builtIn
+      this.abort(`${target.classInfo.name} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, line)
     }
-    return primitivMethode(ziel, name, argumente, this, zeile)
+    return primitiveMethod(target, name, args, this, line)
   }
 
   /** toString/equals/hashCode/getClass und die enum-Methoden gibt es immer. */
-  private objektStandardMethode(objekt: JavaObjekt, name: string, argumente: Wert[]): Wert | null {
+  private objectDefaultMethod(object: JavaObject, name: string, args: Value[]): Value | null {
     switch (name) {
       case 'toString':
-        return neuerString(this.alsText(objekt))
+        return newString(this.toText(object))
       case 'equals':
-        return wahrheit(this.recordGleich(objekt, argumente[0]))
+        return bool(this.recordEquals(object, args[0]))
       case 'hashCode':
-        return zahl(parseInt(identitaet(objekt), 16) | 0)
+        return number(parseInt(identity(object), 16) | 0)
       case 'getClass':
-        return { art: 'nativ', typ: 'Class', daten: { text: objekt.klasse.name } }
+        return { kind: 'native', type: 'Class', data: { text: object.classInfo.name } }
       // Eigene Exceptions erben getMessage() von Throwable.
       case 'getMessage':
       case 'getLocalizedMessage':
-        return objekt.felder.get('$meldung') ?? NULL
+        return object.fields.get('$meldung') ?? NULL
       case 'printStackTrace':
-        this.drucken(this.ausnahmeText(objekt) + '\n', 'err')
+        this.print(this.exceptionText(object) + '\n', 'err')
         return NULL
       case 'name':
       case 'toUpperCase':
-        if (objekt.klasse.istEnum && name === 'name') return objekt.felder.get('$name') ?? NULL
+        if (object.classInfo.isEnum && name === 'name') return object.fields.get('$name') ?? NULL
         return null
       case 'ordinal':
-        if (objekt.klasse.istEnum) return objekt.felder.get('$ordinal') ?? zahl(0)
+        if (object.classInfo.isEnum) return object.fields.get('$ordinal') ?? number(0)
         return null
       case 'compareTo':
-        if (objekt.klasse.istEnum && argumente[0]?.art === 'objekt') {
-          return zahl(alsZahl(objekt.felder.get('$ordinal')!) - alsZahl(argumente[0].felder.get('$ordinal')!))
+        if (object.classInfo.isEnum && args[0]?.kind === 'object') {
+          return number(toNumber(object.fields.get('$ordinal')!) - toNumber(args[0].fields.get('$ordinal')!))
         }
         return null
       default:
         // record: die Komponenten sind gleichzeitig Getter.
-        if (objekt.klasse.dekl.komponenten?.some((k) => k.name === name) && !argumente.length) {
-          return objekt.felder.get(name) ?? NULL
+        if (object.classInfo.decl.components?.some((k) => k.name === name) && !args.length) {
+          return object.fields.get(name) ?? NULL
         }
         return null
     }
   }
 
-  private recordGleich(objekt: JavaObjekt, anderer: Wert): boolean {
-    if (anderer?.art !== 'objekt' || anderer.klasse !== objekt.klasse) return false
-    const komponenten = objekt.klasse.dekl.komponenten
-    if (!komponenten) return objekt === anderer
-    return komponenten.every((k) => inhaltGleich(objekt.felder.get(k.name) ?? NULL, anderer.felder.get(k.name) ?? NULL))
+  private recordEquals(object: JavaObject, other: Value): boolean {
+    if (other?.kind !== 'object' || other.classInfo !== object.classInfo) return false
+    const components = object.classInfo.decl.components
+    if (!components) return object === other
+    return components.every((k) => contentEquals(object.fields.get(k.name) ?? NULL, other.fields.get(k.name) ?? NULL))
   }
 
-  private enumStatisch(klasse: Klasse, name: string, argumente: Wert[], zeile: number): Wert {
+  private enumStatic(classInfo: ClassInfo, name: string, args: Value[], line: number): Value {
     if (name === 'values') {
-      const werte = klasse.statisch.get('$werte')
-      return werte?.art === 'array' ? { art: 'array', typ: klasse.name, werte: [...werte.werte] } : NULL
+      const values = classInfo.isStatic.get('$werte')
+      return values?.kind === 'array' ? { kind: 'array', type: classInfo.name, values: [...values.values] } : NULL
     }
-    const gesucht = this.alsText(argumente[0])
-    const treffer = klasse.statisch.get(gesucht)
-    if (!treffer) this.werfen('IllegalArgumentException', `No enum constant ${klasse.name}.${gesucht}`, zeile)
-    return treffer!
+    const wanted = this.toText(args[0])
+    const match = classInfo.isStatic.get(wanted)
+    if (!match) this.raise('IllegalArgumentException', `No enum constant ${classInfo.name}.${wanted}`, line)
+    return match!
   }
 
   /** Sucht die Methode ab `klasse` aufwärts und wählt die passende Überladung. */
-  private methodeFinden(klasse: Klasse, name: string, argumente: Wert[]): { klasse: Klasse; methode: MethodenDekl } | null {
-    for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-      const kandidaten = (k.methoden.get(name) ?? []).filter((m) => m.rumpf)
-      const methode = this.ueberladungWaehlen(kandidaten, argumente)
-      if (methode) return { klasse: k, methode }
+  private findMethod(classInfo: ClassInfo, name: string, args: Value[]): { classInfo: ClassInfo; method: MethodDecl } | null {
+    for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+      const candidates = (k.methods.get(name) ?? []).filter((m) => m.body)
+      const method = this.chooseOverload(candidates, args)
+      if (method) return { classInfo: k, method }
     }
     // default-Methoden aus Interfaces
-    for (const name2 of klasse.interfaces) {
-      const i = this.klassen.get(name2)
-      const methode = i && this.ueberladungWaehlen((i.methoden.get(name) ?? []).filter((m) => m.rumpf), argumente)
-      if (methode) return { klasse: i!, methode }
+    for (const name2 of classInfo.interfaces) {
+      const i = this.classes.get(name2)
+      const method = i && this.chooseOverload((i.methods.get(name) ?? []).filter((m) => m.body), args)
+      if (method) return { classInfo: i!, method }
     }
     return null
   }
 
-  private ueberladungWaehlen(kandidaten: MethodenDekl[], argumente: Wert[]): MethodenDekl | undefined {
-    const passend = kandidaten.filter((m) => m.parameter.length === argumente.length)
-    if (passend.length <= 1) return passend[0] ?? kandidaten.find((m) => m.parameter.at(-1)?.varargs && argumente.length >= m.parameter.length - 1)
+  private chooseOverload(candidates: MethodDecl[], args: Value[]): MethodDecl | undefined {
+    const matching = candidates.filter((m) => m.params.length === args.length)
+    if (matching.length <= 1) return matching[0] ?? candidates.find((m) => m.params.at(-1)?.varargs && args.length >= m.params.length - 1)
     // Mehrere gleich lange: die mit den genauesten Typen gewinnt.
-    let beste = passend[0]
-    let bestePunkte = -1
-    for (const m of passend) {
-      const punkte = m.parameter.reduce((summe, p, i) => summe + this.passung(argumente[i], p.typ), 0)
-      if (punkte > bestePunkte) {
-        bestePunkte = punkte
-        beste = m
+    let best = matching[0]
+    let bestScore = -1
+    for (const m of matching) {
+      const score = m.params.reduce((sum, p, i) => sum + this.match(args[i], p.type), 0)
+      if (score > bestScore) {
+        bestScore = score
+        best = m
       }
     }
-    return beste
+    return best
   }
 
-  private passung(wert: Wert, typ: TypRef): number {
-    if (!wert) return 0
-    const name = typ.name
-    if (typ.dimensionen > 0) return wert.art === 'array' ? 3 : 0
-    if (wert.art === 'string') return name === 'String' ? 3 : name === 'Object' || name === 'CharSequence' ? 1 : 0
-    if (wert.art === 'int' || wert.art === 'long') {
+  private match(value: Value, type: TypeRef): number {
+    if (!value) return 0
+    const name = type.name
+    if (type.dimensions > 0) return value.kind === 'array' ? 3 : 0
+    if (value.kind === 'string') return name === 'String' ? 3 : name === 'Object' || name === 'CharSequence' ? 1 : 0
+    if (value.kind === 'int' || value.kind === 'long') {
       return ['int', 'long', 'short', 'byte'].includes(name) ? 3 : ['double', 'float'].includes(name) ? 2 : name === 'Integer' ? 3 : name === 'Object' ? 1 : 0
     }
-    if (wert.art === 'double') return ['double', 'float'].includes(name) ? 3 : name === 'Double' ? 3 : name === 'Object' ? 1 : 0
-    if (wert.art === 'char') return name === 'char' ? 3 : ['int', 'long', 'double'].includes(name) ? 2 : name === 'Object' ? 1 : 0
-    if (wert.art === 'boolean') return name === 'boolean' || name === 'Boolean' ? 3 : name === 'Object' ? 1 : 0
-    if (wert.art === 'objekt') return this.istInstanz(wert, name) ? 3 : name === 'Object' ? 1 : 0
-    if (wert.art === 'nativ') return wert.typ === name ? 3 : this.istInstanz(wert, name) ? 2 : name === 'Object' ? 1 : 0
-    if (wert.art === 'null') return ['int', 'double', 'boolean', 'char', 'long'].includes(name) ? 0 : 2
+    if (value.kind === 'double') return ['double', 'float'].includes(name) ? 3 : name === 'Double' ? 3 : name === 'Object' ? 1 : 0
+    if (value.kind === 'char') return name === 'char' ? 3 : ['int', 'long', 'double'].includes(name) ? 2 : name === 'Object' ? 1 : 0
+    if (value.kind === 'boolean') return name === 'boolean' || name === 'Boolean' ? 3 : name === 'Object' ? 1 : 0
+    if (value.kind === 'object') return this.isInstance(value, name) ? 3 : name === 'Object' ? 1 : 0
+    if (value.kind === 'native') return value.type === name ? 3 : this.isInstance(value, name) ? 2 : name === 'Object' ? 1 : 0
+    if (value.kind === 'null') return ['int', 'double', 'boolean', 'char', 'long'].includes(name) ? 0 : 2
     return 1
   }
 
-  private methodeLaufen(klasse: Klasse, methode: MethodenDekl, selbst: JavaObjekt | null, argumente: Wert[], zeile: number): Wert {
-    if (!methode.rumpf) {
-      this.abbruch(`\`${methode.name}\` hat keinen Rumpf.`, `abstract method ${methode.name} cannot be called`, zeile)
+  private runMethod(classInfo: ClassInfo, method: MethodDecl, self: JavaObject | null, args: Value[], line: number): Value {
+    if (!method.body) {
+      this.abort(`\`${method.name}\` hat keinen Rumpf.`, `abstract method ${method.name} cannot be called`, line)
     }
-    const umgebung = new Umgebung()
-    methode.parameter.forEach((p, i) => {
+    const scope = new Scope()
+    method.params.forEach((p, i) => {
       if (p.varargs) {
-        const rest = argumente.slice(i)
-        const wert: Wert =
-          rest.length === 1 && rest[0]?.art === 'array' ? rest[0] : { art: 'array', typ: p.typ.name, werte: rest }
-        umgebung.deklarieren(p.name, wert, p.typ)
+        const rest = args.slice(i)
+        const value: Value =
+          rest.length === 1 && rest[0]?.kind === 'array' ? rest[0] : { kind: 'array', type: p.type.name, values: rest }
+        scope.declare(p.name, value, p.type)
       } else {
-        umgebung.deklarieren(p.name, this.anpassen(argumente[i] ?? NULL, p.typ), p.typ)
+        scope.declare(p.name, this.adapt(args[i] ?? NULL, p.type), p.type)
       }
     })
-    const fluss = this.bloeckeAusfuehren(methode.rumpf.anweisungen, {
-      umgebung,
-      selbst: methode.statisch ? null : selbst,
-      klasse,
+    const flow = this.runStatements(method.body.statements, {
+      scope,
+      self: method.isStatic ? null : self,
+      classInfo,
     })
-    const wert = fluss instanceof Rueckgabe ? fluss.wert : NULL
-    return this.anpassen(wert, methode.rueckgabe)
+    const value = flow instanceof Return ? flow.value : NULL
+    return this.adapt(value, method.returnType)
   }
 
   // --- Objekte erzeugen -----------------------------------------------------
 
-  neuErzeugen(klassenName: string, argumente: Wert[], zeile: number): Wert {
-    const klasse = this.klassen.get(klassenName)
-    if (klasse) {
-      if (klasse.abstrakt) {
-        this.abbruch(
-          `${klassenName} ist abstrakt - davon kann es kein Objekt geben.`,
-          `${klassenName} is abstract; cannot be instantiated`,
-          zeile,
+  instantiate(className: string, args: Value[], line: number): Value {
+    const classInfo = this.classes.get(className)
+    if (classInfo) {
+      if (classInfo.isAbstract) {
+        this.abort(
+          `${className} ist abstrakt - davon kann es kein Objekt geben.`,
+          `${className} is abstract; cannot be instantiated`,
+          line,
         )
       }
-      return this.objektErzeugen(klasse, argumente, zeile)
+      return this.createObject(classInfo, args, line)
     }
-    const nativ = this.extension?.create?.(klassenName, argumente, this, zeile) ?? nativErzeugen(klassenName, argumente, this, zeile)
-    if (nativ) return nativ
-    this.abbruch(`Die Klasse \`${klassenName}\` ist unbekannt.`, `cannot find symbol: class ${klassenName}`, zeile)
+    const native = this.extension?.create?.(className, args, this, line) ?? createNative(className, args, this, line)
+    if (native) return native
+    this.abort(`Die Klasse \`${className}\` ist unbekannt.`, `cannot find symbol: class ${className}`, line)
   }
 
-  private objektErzeugen(klasse: Klasse, argumente: Wert[], zeile: number): JavaObjekt {
-    const objekt: JavaObjekt = { art: 'objekt', klasse, felder: new Map() }
+  private createObject(classInfo: ClassInfo, args: Value[], line: number): JavaObject {
+    const object: JavaObject = { kind: 'object', classInfo, fields: new Map() }
     // Felder bekommen IMMER einen Standardwert - anders als lokale Variablen.
-    for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-      for (const feld of k.dekl.felder) {
-        if (!feld.statisch && !objekt.felder.has(feld.name)) objekt.felder.set(feld.name, this.standardWert(feld.typ))
+    for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+      for (const field of k.decl.fields) {
+        if (!field.isStatic && !object.fields.has(field.name)) object.fields.set(field.name, this.defaultValue(field.type))
       }
     }
-    this.konstruktorLauf(klasse, objekt, argumente, zeile, false)
-    return objekt
+    this.runConstructor(classInfo, object, args, line, false)
+    return object
   }
 
-  private konstruktorLauf(klasse: Klasse, objekt: JavaObjekt, argumente: Wert[], zeile: number, ueberThis: boolean) {
-    const konstruktor = this.ueberladungWaehlen(klasse.konstruktoren, argumente)
-    if (!konstruktor && klasse.konstruktoren.length && argumente.length) {
-      this.abbruch(
-        `Kein Konstruktor von ${klasse.name} passt zu ${argumente.length} Argument(en).`,
-        `constructor ${klasse.name} cannot be applied to given types`,
-        zeile,
+  private runConstructor(classInfo: ClassInfo, object: JavaObject, args: Value[], line: number, viaThis: boolean) {
+    const constructor = this.chooseOverload(classInfo.constructors, args)
+    if (!constructor && classInfo.constructors.length && args.length) {
+      this.abort(
+        `Kein Konstruktor von ${classInfo.name} passt zu ${args.length} Argument(en).`,
+        `constructor ${classInfo.name} cannot be applied to given types`,
+        line,
       )
     }
 
-    const umgebung = new Umgebung()
-    konstruktor?.parameter.forEach((p, i) => umgebung.deklarieren(p.name, this.anpassen(argumente[i] ?? NULL, p.typ), p.typ))
-    const kontext: Kontext = { umgebung, selbst: objekt, klasse }
+    const scope = new Scope()
+    constructor?.params.forEach((p, i) => scope.declare(p.name, this.adapt(args[i] ?? NULL, p.type), p.type))
+    const kontext: Context = { scope, self: object, classInfo }
 
-    const anweisungen = konstruktor?.rumpf?.anweisungen ?? []
-    const erste = anweisungen[0]
-    const ersterAufruf =
-      erste?.art === 'ausdruck' && erste.ausdruck.art === 'aufruf' && (erste.ausdruck.name === '<superinit>' || erste.ausdruck.name === '<init>')
-        ? erste.ausdruck
+    const statements = constructor?.body?.statements ?? []
+    const first = statements[0]
+    const firstCall =
+      first?.kind === 'expression' && first.expression.kind === 'call' && (first.expression.name === '<superinit>' || first.expression.name === '<init>')
+        ? first.expression
         : null
 
-    let felderSetzen = !ueberThis
-    if (ersterAufruf?.name === '<superinit>') {
-      const superArgumente = ersterAufruf.argumente.map((a) => this.auswerten(a, kontext))
-      if (klasse.oberklasse) this.konstruktorLauf(klasse.oberklasse, objekt, superArgumente, zeile, false)
+    let setFields = !viaThis
+    if (firstCall?.name === '<superinit>') {
+      const superArgs = firstCall.args.map((a) => this.evaluate(a, kontext))
+      if (classInfo.superclass) this.runConstructor(classInfo.superclass, object, superArgs, line, false)
       // `class MeinFehler extends RuntimeException`: die Oberklasse ist eingebaut,
       // super(meldung) muss die Nachricht trotzdem aufbewahren.
-      else if (superArgumente.length && klasse.dekl.oberklasse) objekt.felder.set('$meldung', superArgumente[0])
-    } else if (ersterAufruf?.name === '<init>') {
-      const eigene = ersterAufruf.argumente.map((a) => this.auswerten(a, kontext))
-      this.konstruktorLauf(klasse, objekt, eigene, zeile, false)
-      felderSetzen = false
-    } else if (klasse.oberklasse) {
-      this.konstruktorLauf(klasse.oberklasse, objekt, [], zeile, false)
+      else if (superArgs.length && classInfo.decl.superclass) object.fields.set('$meldung', superArgs[0])
+    } else if (firstCall?.name === '<init>') {
+      const own = firstCall.args.map((a) => this.evaluate(a, kontext))
+      this.runConstructor(classInfo, object, own, line, false)
+      setFields = false
+    } else if (classInfo.superclass) {
+      this.runConstructor(classInfo.superclass, object, [], line, false)
     }
 
-    if (felderSetzen) {
-      for (const feld of klasse.dekl.felder) {
-        if (!feld.statisch && feld.init) objekt.felder.set(feld.name, this.anpassen(this.auswerten(feld.init, kontext, feld.typ), feld.typ))
+    if (setFields) {
+      for (const field of classInfo.decl.fields) {
+        if (!field.isStatic && field.init) object.fields.set(field.name, this.adapt(this.evaluate(field.init, kontext, field.type), field.type))
       }
       // record: die Komponenten landen automatisch in den Feldern.
-      if (klasse.dekl.komponenten && !konstruktor) {
-        klasse.dekl.komponenten.forEach((k, i) => objekt.felder.set(k.name, this.anpassen(argumente[i] ?? NULL, k.typ)))
+      if (classInfo.decl.components && !constructor) {
+        classInfo.decl.components.forEach((k, i) => object.fields.set(k.name, this.adapt(args[i] ?? NULL, k.type)))
       }
     }
 
-    if (konstruktor?.rumpf) {
-      this.bloeckeAusfuehren(ersterAufruf ? anweisungen.slice(1) : anweisungen, kontext)
+    if (constructor?.body) {
+      this.runStatements(firstCall ? statements.slice(1) : statements, kontext)
     }
   }
 
-  private arrayErzeugen(ausdruck: Extract<Ausdruck, { art: 'neuArray' }>, kontext: Kontext): Wert {
-    if (ausdruck.werte) {
-      const werte = ausdruck.werte.map((w) =>
-        w.art === 'arrayWerte'
-          ? this.auswerten(w, kontext, { ...ausdruck.typ, dimensionen: ausdruck.typ.dimensionen - 1 })
-          : this.anpassen(this.auswerten(w, kontext), { ...ausdruck.typ, dimensionen: 0 }),
+  private createArray(expression: Extract<Expression, { kind: 'newArray' }>, kontext: Context): Value {
+    if (expression.values) {
+      const values = expression.values.map((w) =>
+        w.kind === 'arrayLiteral'
+          ? this.evaluate(w, kontext, { ...expression.type, dimensions: expression.type.dimensions - 1 })
+          : this.adapt(this.evaluate(w, kontext), { ...expression.type, dimensions: 0 }),
       )
-      return { art: 'array', typ: ausdruck.typ.name + '[]'.repeat(ausdruck.typ.dimensionen - 1), werte }
+      return { kind: 'array', type: expression.type.name + '[]'.repeat(expression.type.dimensions - 1), values }
     }
-    const groessen = ausdruck.groessen.map((g) => alsZahl(this.auswerten(g, kontext)))
-    const bauen = (tiefe: number): Wert => {
-      const laenge = groessen[tiefe]
-      if (laenge < 0) this.werfen('NegativeArraySizeException', String(laenge), ausdruck.zeile)
-      if (laenge > 5_000_000) throw new JavaAbbruch('Das Array ist zu groß.', 'array too large')
-      const rest = ausdruck.typ.dimensionen - tiefe - 1
-      const elementTyp = ausdruck.typ.name + '[]'.repeat(rest)
-      const werte: Wert[] = []
-      for (let i = 0; i < laenge; i++) {
-        werte.push(tiefe + 1 < groessen.length ? bauen(tiefe + 1) : this.standardWert({ name: ausdruck.typ.name, dimensionen: rest, argumente: [] }))
+    const sizes = expression.sizes.map((g) => toNumber(this.evaluate(g, kontext)))
+    const build = (depth: number): Value => {
+      const length = sizes[depth]
+      if (length < 0) this.raise('NegativeArraySizeException', String(length), expression.line)
+      if (length > 5_000_000) throw new JavaAbort('Das Array ist zu groß.', 'array too large')
+      const rest = expression.type.dimensions - depth - 1
+      const elementType = expression.type.name + '[]'.repeat(rest)
+      const values: Value[] = []
+      for (let i = 0; i < length; i++) {
+        values.push(depth + 1 < sizes.length ? build(depth + 1) : this.defaultValue({ name: expression.type.name, dimensions: rest, args: [] }))
       }
-      return { art: 'array', typ: elementTyp, werte }
+      return { kind: 'array', type: elementType, values }
     }
-    return bauen(0)
+    return build(0)
   }
 
   // --- Typen ----------------------------------------------------------------
 
-  standardWert(typ: TypRef): Wert {
-    if (typ.dimensionen > 0) return NULL
-    switch (typ.name) {
+  defaultValue(type: TypeRef): Value {
+    if (type.dimensions > 0) return NULL
+    switch (type.name) {
       case 'int':
       case 'short':
       case 'byte':
       case 'long':
-        return zahl(0)
+        return number(0)
       case 'double':
       case 'float':
-        return komma(0)
+        return comma(0)
       case 'boolean':
-        return wahrheit(false)
+        return bool(false)
       case 'char':
-        return zeichen(0)
+        return chars(0)
       default:
         return NULL
     }
   }
 
   /** Erweiternde Umwandlung: `double d = 5;` muss 5.0 ergeben. */
-  anpassen(wert: Wert, typ: TypRef | undefined): Wert {
-    if (!typ || typ.dimensionen > 0) return wert
-    if ((typ.name === 'double' || typ.name === 'float' || typ.name === 'Double') && (wert.art === 'int' || wert.art === 'long' || wert.art === 'char')) {
-      return komma(wert.wert)
+  adapt(value: Value, type: TypeRef | undefined): Value {
+    if (!type || type.dimensions > 0) return value
+    if ((type.name === 'double' || type.name === 'float' || type.name === 'Double') && (value.kind === 'int' || value.kind === 'long' || value.kind === 'char')) {
+      return comma(value.value)
     }
-    if ((typ.name === 'int' || typ.name === 'long' || typ.name === 'Integer' || typ.name === 'short' || typ.name === 'byte') && wert.art === 'char') {
-      return zahl(wert.wert)
+    if ((type.name === 'int' || type.name === 'long' || type.name === 'Integer' || type.name === 'short' || type.name === 'byte') && value.kind === 'char') {
+      return number(value.value)
     }
-    if (typ.name === 'char' && wert.art === 'int') return zeichen(wert.wert)
-    if (typ.name === 'String' && wert.art === 'char') return wert
-    return wert
+    if (type.name === 'char' && value.kind === 'int') return chars(value.value)
+    if (type.name === 'String' && value.kind === 'char') return value
+    return value
   }
 
-  private umwandeln(wert: Wert, typ: TypRef, zeile: number): Wert {
-    if (typ.dimensionen > 0) return wert
-    switch (typ.name) {
+  private convert(value: Value, type: TypeRef, line: number): Value {
+    if (type.dimensions > 0) return value
+    switch (type.name) {
       case 'int':
       case 'short':
       case 'byte':
-        if (!istZahl(wert)) break
-        return zahl(Math.trunc(alsZahl(wert)))
+        if (!isNumber(value)) break
+        return number(Math.trunc(toNumber(value)))
       case 'long':
-        if (!istZahl(wert)) break
-        return { art: 'long', wert: Math.trunc(alsZahl(wert)) }
+        if (!isNumber(value)) break
+        return { kind: 'long', value: Math.trunc(toNumber(value)) }
       case 'double':
       case 'float':
-        if (!istZahl(wert)) break
-        return komma(alsZahl(wert))
+        if (!isNumber(value)) break
+        return comma(toNumber(value))
       case 'char':
-        if (!istZahl(wert)) break
-        return zeichen(Math.trunc(alsZahl(wert)) & 0xffff)
+        if (!isNumber(value)) break
+        return chars(Math.trunc(toNumber(value)) & 0xffff)
       case 'boolean':
-        return wahrheit(this.wahrheitswert(wert, zeile))
+        return bool(this.truthValue(value, line))
       case 'Object':
-        return wert
+        return value
     }
-    if (wert.art !== 'null' && !this.istInstanz(wert, typ.name)) {
-      this.werfen('ClassCastException', `class ${typName(wert)} cannot be cast to class ${typ.name}`, zeile)
+    if (value.kind !== 'null' && !this.isInstance(value, type.name)) {
+      this.raise('ClassCastException', `class ${typeName(value)} cannot be cast to class ${type.name}`, line)
     }
-    return wert
+    return value
   }
 
   /** `instanceof` und `catch`: läuft die Vererbungskette hoch. */
-  istInstanz(wert: Wert, typ: string): boolean {
-    if (typ === 'Object') return wert.art !== 'null'
-    switch (wert.art) {
+  isInstance(value: Value, type: string): boolean {
+    if (type === 'Object') return value.kind !== 'null'
+    switch (value.kind) {
       case 'string':
-        return typ === 'String' || typ === 'CharSequence' || typ === 'Comparable'
+        return type === 'String' || type === 'CharSequence' || type === 'Comparable'
       case 'int':
       case 'long':
-        return typ === 'Integer' || typ === 'Number' || typ === 'Long'
+        return type === 'Integer' || type === 'Number' || type === 'Long'
       case 'double':
-        return typ === 'Double' || typ === 'Number'
+        return type === 'Double' || type === 'Number'
       case 'boolean':
-        return typ === 'Boolean'
+        return type === 'Boolean'
       case 'char':
-        return typ === 'Character'
-      case 'funktion':
+        return type === 'Character'
+      case 'function':
         return true
       case 'array':
-        return typ.endsWith('[]') || typ === 'Object'
-      case 'objekt': {
-        for (let k: Klasse | undefined = wert.klasse; k; k = k.oberklasse) {
-          if (k.name === typ) return true
-          if (k.interfaces.has(typ)) return true
+        return type.endsWith('[]') || type === 'Object'
+      case 'object': {
+        for (let k: ClassInfo | undefined = value.classInfo; k; k = k.superclass) {
+          if (k.name === type) return true
+          if (k.interfaces.has(type)) return true
           // Eigene Exception, die von einer eingebauten erbt
-          if (!k.oberklasse && k.dekl.oberklasse) {
-            for (let e: string | undefined = k.dekl.oberklasse; e; e = oberklasseVon(e) ?? this.extension?.superClasses?.[e]) {
-              if (e === typ) return true
+          if (!k.superclass && k.decl.superclass) {
+            for (let e: string | undefined = k.decl.superclass; e; e = superclassOf(e) ?? this.extension?.superClasses?.[e]) {
+              if (e === type) return true
             }
           }
         }
         return false
       }
-      case 'nativ': {
-        for (let t: string | undefined = wert.typ; t; t = oberklasseVon(t) ?? this.extension?.superClasses?.[t]) {
-          if (t === typ) return true
+      case 'native': {
+        for (let t: string | undefined = value.type; t; t = superclassOf(t) ?? this.extension?.superClasses?.[t]) {
+          if (t === type) return true
         }
-        return ['List', 'Collection', 'Iterable'].includes(typ) && ['ArrayList', 'LinkedList'].includes(wert.typ)
+        return ['List', 'Collection', 'Iterable'].includes(type) && ['ArrayList', 'LinkedList'].includes(value.type)
           ? true
-          : typ === 'Map' && ['HashMap', 'TreeMap', 'LinkedHashMap'].includes(wert.typ)
+          : type === 'Map' && ['HashMap', 'TreeMap', 'LinkedHashMap'].includes(value.type)
             ? true
-            : typ === 'Set' && ['HashSet', 'TreeSet', 'LinkedHashSet'].includes(wert.typ)
+            : type === 'Set' && ['HashSet', 'TreeSet', 'LinkedHashSet'].includes(value.type)
       }
       default:
         return false
     }
   }
 
-  wahrheitswert(wert: Wert, zeile: number): boolean {
-    if (wert.art === 'boolean') return wert.wert
-    if (wert.art === 'null') this.werfen('NullPointerException', 'Cannot unbox null to boolean', zeile)
-    this.abbruch(
-      `Hier wird ein boolean gebraucht, nicht ${typName(wert)}. (In Java gibt es kein "truthy"!)`,
-      `incompatible types: ${typName(wert)} cannot be converted to boolean`,
-      zeile,
+  truthValue(value: Value, line: number): boolean {
+    if (value.kind === 'boolean') return value.value
+    if (value.kind === 'null') this.raise('NullPointerException', 'Cannot unbox null to boolean', line)
+    this.abort(
+      `Hier wird ein boolean gebraucht, nicht ${typeName(value)}. (In Java gibt es kein "truthy"!)`,
+      `incompatible types: ${typeName(value)} cannot be converted to boolean`,
+      line,
     )
   }
 
   /** Alles, was in eine for-each-Schleife darf. */
-  elementeVon(wert: Wert, zeile: number): Wert[] {
-    if (wert.art === 'array') return [...wert.werte]
-    if (wert.art === 'nativ') {
-      if (wert.daten.liste) return [...wert.daten.liste]
-      if (wert.daten.map) return [...wert.daten.map.values()].map((e) => ({ art: 'nativ' as const, typ: 'Entry', daten: { liste: [e.schluessel, e.wert] } }))
+  elementsOf(value: Value, line: number): Value[] {
+    if (value.kind === 'array') return [...value.values]
+    if (value.kind === 'native') {
+      if (value.data.list) return [...value.data.list]
+      if (value.data.map) return [...value.data.map.values()].map((e) => ({ kind: 'native' as const, type: 'Entry', data: { list: [e.key, e.value] } }))
     }
-    if (wert.art === 'null') this.werfen('NullPointerException', 'Cannot iterate over null', zeile)
-    this.abbruch(`Über ${typName(wert)} kann man nicht iterieren.`, `for-each not applicable to expression type ${typName(wert)}`, zeile)
+    if (value.kind === 'null') this.raise('NullPointerException', 'Cannot iterate over null', line)
+    this.abort(`Über ${typeName(value)} kann man nicht iterieren.`, `for-each not applicable to expression type ${typeName(value)}`, line)
   }
 
   // --- String-Darstellung ---------------------------------------------------
 
   /** `String.valueOf(wert)` inklusive eigener toString()-Methoden. */
-  alsText(wert: Wert): string {
-    return textVon(wert, (objekt) => {
-      if (objekt.art === 'objekt') {
-        const eigene = this.methodeFinden(objekt.klasse, 'toString', [])
-        if (eigene) return this.alsText(this.methodeLaufen(eigene.klasse, eigene.methode, objekt, [], 0))
-        if (objekt.klasse.istEnum) return this.alsText(objekt.felder.get('$name') ?? NULL)
-        if (objekt.klasse.dekl.komponenten) {
-          const teile = objekt.klasse.dekl.komponenten.map((k) => `${k.name}=${this.alsText(objekt.felder.get(k.name) ?? NULL)}`)
-          return `${objekt.klasse.name}[${teile.join(', ')}]`
+  toText(value: Value): string {
+    return textOf(value, (object) => {
+      if (object.kind === 'object') {
+        const own = this.findMethod(object.classInfo, 'toString', [])
+        if (own) return this.toText(this.runMethod(own.classInfo, own.method, object, [], 0))
+        if (object.classInfo.isEnum) return this.toText(object.fields.get('$name') ?? NULL)
+        if (object.classInfo.decl.components) {
+          const parts = object.classInfo.decl.components.map((k) => `${k.name}=${this.toText(object.fields.get(k.name) ?? NULL)}`)
+          return `${object.classInfo.name}[${parts.join(', ')}]`
         }
-        return `${objekt.klasse.name}@${identitaet(objekt)}`
+        return `${object.classInfo.name}@${identity(object)}`
       }
-      return this.nativText(objekt)
+      return this.nativeText(object)
     })
   }
 
-  private nativText(wert: NativWert): string {
-    const own = this.extension?.text?.(wert, this)
+  private nativeText(value: NativeValue): string {
+    const own = this.extension?.text?.(value, this)
     if (own !== undefined) return own
-    const { liste, map, text, meldung } = wert.daten
-    if (wert.typ === 'StringBuilder') return text ?? ''
-    if (wert.typ === 'Class') return 'class ' + text
-    if (wert.typ === 'Entry' && liste) return `${this.alsText(liste[0])}=${this.alsText(liste[1])}`
-    if (map) return `{${[...map.values()].map((e) => `${this.alsText(e.schluessel)}=${this.alsText(e.wert)}`).join(', ')}}`
-    if (liste) return `[${liste.map((w) => this.alsText(w)).join(', ')}]`
-    if (istAusnahmeKlasse(wert.typ)) return meldung ? `${wert.typ}: ${meldung}` : wert.typ
-    return `${wert.typ}@${identitaet(wert)}`
+    const { list, map, text, message } = value.data
+    if (value.type === 'StringBuilder') return text ?? ''
+    if (value.type === 'Class') return 'class ' + text
+    if (value.type === 'Entry' && list) return `${this.toText(list[0])}=${this.toText(list[1])}`
+    if (map) return `{${[...map.values()].map((e) => `${this.toText(e.key)}=${this.toText(e.value)}`).join(', ')}}`
+    if (list) return `[${list.map((w) => this.toText(w)).join(', ')}]`
+    if (isExceptionClass(value.type)) return message ? `${value.type}: ${message}` : value.type
+    return `${value.type}@${identity(value)}`
   }
 
   /** Wie Java eine Exception beim Absturz meldet. */
-  ausnahmeText(wert: Wert): string {
-    if (wert.art === 'nativ') {
-      const name = (this.extension?.packageOf?.(wert.typ) ?? 'java.lang') + '.' + wert.typ
-      return wert.daten.meldung ? `${name}: ${wert.daten.meldung}` : name
+  exceptionText(value: Value): string {
+    if (value.kind === 'native') {
+      const name = (this.extension?.packageOf?.(value.type) ?? 'java.lang') + '.' + value.type
+      return value.data.message ? `${name}: ${value.data.message}` : name
     }
-    if (wert.art === 'objekt') {
-      const meldung = this.methodeAufrufen(wert, 'getMessage', [], 0)
-      const text = meldung.art === 'null' ? '' : this.alsText(meldung)
-      return text ? `${wert.klasse.name}: ${text}` : wert.klasse.name
+    if (value.kind === 'object') {
+      const message = this.callMethod(value, 'getMessage', [], 0)
+      const text = message.kind === 'null' ? '' : this.toText(message)
+      return text ? `${value.classInfo.name}: ${text}` : value.classInfo.name
     }
-    return this.alsText(wert)
+    return this.toText(value)
   }
 
   // --- Fehler werfen --------------------------------------------------------
 
   /** Throws any Java value as an exception - e.g. the one an `orElseThrow` supplier created. */
-  throwValue(value: Wert, line: number): never {
-    throw new JavaAusnahme(value, line)
+  throwValue(value: Value, line: number): never {
+    throw new JavaException(value, line)
   }
 
   /** Wirft eine eingebaute Exception (fangbar). */
-  werfen(klasse: string, meldung: string | null, zeile: number): never {
-    throw new JavaAusnahme({ art: 'nativ', typ: klasse, daten: { meldung: meldung ?? undefined } }, zeile)
+  raise(classInfo: string, message: string | null, line: number): never {
+    throw new JavaException({ kind: 'native', type: classInfo, data: { message: message ?? undefined } }, line)
   }
 
   /** Bricht ab: ein Fehler, den echtes Java schon beim Kompilieren finden würde. */
-  abbruch(deutsch: string, englisch: string, zeile?: number): never {
-    throw new JavaAbbruch(deutsch, englisch, zeile)
+  abort(de: string, en: string, line?: number): never {
+    throw new JavaAbort(de, en, line)
   }
 
   // Kleine Helfer, die die Bibliothek braucht ---------------------------------
-  zahlText = (v: number, kommazahl: boolean) => (kommazahl ? doubleText(v) : String(Math.trunc(v)))
-  schluessel = schluesselVon
-  feldDeklarationen(klasse: Klasse): FeldDekl[] {
-    return klasse.dekl.felder
+  numberText = (v: number, isFloat: boolean) => (isFloat ? doubleText(v) : String(Math.trunc(v)))
+  key = keyOf
+  fieldDeclarations(classInfo: ClassInfo): FieldDecl[] {
+    return classInfo.decl.fields
   }
 }

@@ -658,7 +658,7 @@ export function springRuntimeCheck(): RuntimeResult[] {
     const problems: string[] = []
 
     if (c.fails && started.server) problems.push('should not start, but did')
-    if (!c.fails && started.failed) problems.push('did not start: ' + started.lines.filter((l) => l.typ === 'fehler' || l.typ === 'error').map((l) => l.text).join(' | '))
+    if (!c.fails && started.failed) problems.push('did not start: ' + started.lines.filter((l) => l.type === 'exception' || l.type === 'error').map((l) => l.text).join(' | '))
 
     if (started.server) {
       for (const step of parseHttp(c.http ?? '')) {

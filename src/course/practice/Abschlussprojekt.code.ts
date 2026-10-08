@@ -1,14 +1,14 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-projekt': {
-    tipps: {
+    hints: {
       de: [
         'Fang mit dem Reducer an (`added`, `toggled`, `deleted`) und teste ihn mit ein paar `dispatch`-Aufrufen.',
         'Speichern: der Reducer-State wandert per Effekt in den `localStorage` - wie in [[projekt-7-speichern]].',
@@ -62,7 +62,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       // ---- Helper functions -----------------------------------------------
       const pad = (n) => String(n).padStart(2, '0')
       const dayString = (d) => \`\${d.getFullYear()}-\${pad(d.getMonth() + 1)}-\${pad(d.getDate())}\`
@@ -232,14 +232,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Start: „Today: 1 of 1 done“', en: 'Start: “Today: 1 of 1 done”' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('Today: 1 of 1 done')
         `,
       },
       {
         name: { de: 'Eine neue Gewohnheit anlegen', en: 'Create a new habit' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('input'), 'Read 📚')
           await submit(field('input'))
@@ -249,7 +249,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Keine leeren Namen und keine Duplikate', en: 'No empty names and no duplicates' },
-        pruefung: js`
+        script: js`
           await render()
           expect(button('Add')).toBeDisabled()
           await type(field('input'), 'drink water 💧')
@@ -258,7 +258,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Heute abhaken und wieder aus', en: 'Check today and uncheck it again' },
-        pruefung: js`
+        script: js`
           await render()
           const zeile = () => getByText('Drink water 💧').closest('tr, li') ?? getByText('Drink water 💧').parentElement
           await click(within(zeile()).findAll('button')[6])
@@ -269,14 +269,14 @@ export const beispiele = {
       },
       {
         name: { de: 'Die Serie wird angezeigt', en: 'The streak is shown' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('🔥 1')
         `,
       },
       {
         name: { de: 'Daten überleben ein Neuladen', en: 'Data survives a reload' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('input'), 'Read 📚')
           await submit(field('input'))
@@ -286,14 +286,14 @@ export const beispiele = {
       },
       {
         name: { de: 'Der Tab-Titel zeigt den Fortschritt', en: 'The tab title shows the progress' },
-        pruefung: js`
+        script: js`
           await render()
           expect(title()).toContain('Today: 1 of 1 done')
         `,
       },
       {
         name: { de: 'Löschen entfernt die Gewohnheit', en: 'Deleting removes the habit' },
-        pruefung: js`
+        script: js`
           await render()
           const zeile = getByText('Drink water 💧').closest('tr, li') ?? getByText('Drink water 💧').parentElement
           await click(within(zeile).button('🗑'))
@@ -302,4 +302,4 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

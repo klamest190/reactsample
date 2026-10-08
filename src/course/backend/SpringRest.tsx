@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './SpringRest.code'
+import { examples, codeBloecke } from './SpringRest.code'
 
 /**
  * CHAPTER 8.3 - REST APIs with controllers
@@ -18,7 +18,7 @@ export function SpringRest() {
           Start laufen sieben Anfragen durch - jede mit der erwarteten Antwort. Darunter kannst du
           weitermachen: Leg ein drittes ToDo an, lösch das erste, frag nach einem, das es nicht gibt.
         </P>
-        <TryIt modus="spring" id="spring-rest-crud" {...beispiele['spring-rest-crud']} />
+        <TryIt mode="spring" id="spring-rest-crud" {...examples['spring-rest-crud']} />
       </Abschnitt>
 
       <Abschnitt titel="REST: Ressourcen und Verben">
@@ -27,9 +27,9 @@ export function SpringRest() {
           <strong>Der Pfad nennt ein Ding</strong> (eine <em>Ressource</em>, im Plural),{' '}
           <strong>die Methode sagt, was damit passiert.</strong>
         </P>
-        <CodeBlock code={codeBloecke.rest} titel="todos.http" />
+        <CodeBlock code={codeBloecke.rest} title="todos.http" />
         <P>So sieht es aus, wenn man die Idee nicht beachtet:</P>
-        <CodeBlock code={codeBloecke.schlecht} titel="bitte nicht.http" />
+        <CodeBlock code={codeBloecke.schlecht} title="bitte nicht.http" />
         <Hinweis variante="warnung">
           <Code>GET</Code> darf nie etwas verändern. Browser, Proxys und Suchmaschinen rufen
           GET-Links einfach so auf, wiederholen sie oder speichern die Antwort - ein{' '}
@@ -67,7 +67,7 @@ export function SpringRest() {
           Gibt eine Methode einfach ein Objekt zurück, antwortet Spring mit <strong>200</strong>.
           Für alles andere gibt es <Code>ResponseEntity</Code> - Status, Header und Body in einem:
         </P>
-        <CodeBlock code={codeBloecke.responseEntity} titel="ResponseEntity.java" />
+        <CodeBlock code={codeBloecke.responseEntity} title="ResponseEntity.java" />
         <P>
           Steht der Status fest, geht es kürzer mit einer Annotation an der Methode:{' '}
           <Code>@ResponseStatus(HttpStatus.CREATED)</Code>. Die Übung unten nutzt beides.
@@ -83,14 +83,14 @@ export function SpringRest() {
           Die Umwandlung übernimmt die Bibliothek <strong>Jackson</strong>. Sie liest Objekte über
           ihre <strong>Getter</strong>, nicht über die Felder:
         </P>
-        <CodeBlock code={codeBloecke.getter} titel="Getter → JSON" />
+        <CodeBlock code={codeBloecke.getter} title="Getter → JSON" />
         <P>
           Das ist praktisch - ein Passwortfeld ohne Getter bleibt auf dem Server. Aber eine Klasse
           ganz ohne Getter kann Jackson gar nicht schreiben, dann gibt es <strong>500</strong>. Die
           dritte und vierte Anfrage zeigen: Für beliebiges JSON reicht eine <Code>Map</Code>, und
           kaputtes JSON beantwortet Spring mit <strong>400</strong>.
         </P>
-        <TryIt modus="spring" id="spring-rest-json" {...beispiele['spring-rest-json']} />
+        <TryIt mode="spring" id="spring-rest-json" {...examples['spring-rest-json']} />
         <Hinweis variante="info">
           Deshalb sind Records für APIs so beliebt (<Verweis nr="7.7" />): Sie haben automatisch
           „Getter“ für alle Komponenten, sind unveränderlich - und man sieht auf einen Blick, welche
@@ -100,10 +100,10 @@ export function SpringRest() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-rest-uebung"
-          {...beispiele['spring-rest-uebung']}
-          aufgabe={
+          {...examples['spring-rest-uebung']}
+          task={
             <>
               <p>Die Bücher-API kann auflisten und anlegen. Ergänze:</p>
               <Liste>
@@ -122,24 +122,24 @@ export function SpringRest() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welcher Endpunkt folgt den REST-Konventionen, um das ToDo 7 zu löschen?',
-            antworten: ['GET /api/todos/7/delete', 'POST /api/deleteTodo?id=7', 'DELETE /api/todos/7', 'DELETE /api/todo?delete=7'],
-            richtig: 2,
-            erklaerung: 'Der Pfad nennt die Ressource (/api/todos/7), die Methode die Aktion (DELETE).',
+            question: 'Welcher Endpunkt folgt den REST-Konventionen, um das ToDo 7 zu löschen?',
+            answers: ['GET /api/todos/7/delete', 'POST /api/deleteTodo?id=7', 'DELETE /api/todos/7', 'DELETE /api/todo?delete=7'],
+            correct: 2,
+            explanation: 'Der Pfad nennt die Ressource (/api/todos/7), die Methode die Aktion (DELETE).',
           },
           {
-            frage: 'Welcher Status passt nach einem erfolgreichen POST, der etwas angelegt hat?',
-            antworten: ['200 OK', '201 Created', '204 No Content', '302 Found'],
-            richtig: 1,
-            erklaerung: '201 Created - dazu der Location-Header mit der Adresse des neuen Eintrags.',
+            question: 'Welcher Status passt nach einem erfolgreichen POST, der etwas angelegt hat?',
+            answers: ['200 OK', '201 Created', '204 No Content', '302 Found'],
+            correct: 1,
+            explanation: '201 Created - dazu der Location-Header mit der Adresse des neuen Eintrags.',
           },
           {
-            frage: 'Eine Klasse hat ein privates Feld „password“ ohne Getter. Was passiert mit ihm im JSON?',
-            antworten: ['Es erscheint mit seinem Wert', 'Es erscheint als null', 'Es fehlt', 'Spring antwortet mit 500'],
-            richtig: 2,
-            erklaerung: 'Jackson liest über Getter. Ohne Getter bleibt das Feld unsichtbar - solange es andere Getter gibt.',
+            question: 'Eine Klasse hat ein privates Feld „password“ ohne Getter. Was passiert mit ihm im JSON?',
+            answers: ['Es erscheint mit seinem Wert', 'Es erscheint als null', 'Es fehlt', 'Spring antwortet mit 500'],
+            correct: 2,
+            explanation: 'Jackson liest über Getter. Ohne Getter bleibt das Feld unsichtbar - solange es andere Getter gibt.',
           },
         ]}
       />

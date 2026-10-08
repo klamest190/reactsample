@@ -5,7 +5,7 @@ import { t, type SchrittInhalt } from './types'
 /** Step 15: the challenge - the whole app again, without a template. */
 export const schritteChallenge: Record<string, SchrittInhalt> = {
   'projekt-15-challenge': {
-    modus: 'react',
+    mode: 'react',
     einleitung: {
       de: 'Jetzt ohne Vorlage: Baue die ToDo-App **von null** - so, wie du es für richtig hältst. Die Tests prüfen nur, was ein Mensch sieht und tut, nicht wie dein Code aufgebaut ist.\n\nVersuch es zuerst ganz ohne Tipps und ohne in die früheren Schritte zu schauen. Wenn du hängst: Die Tipps verweisen auf die passenden Kapitel. Und wenn alle Tests grün sind, kannst du die App mit [[praxis-lokal]] auf deinen eigenen Rechner holen.',
       en: 'Now without a template: build the todo app **from scratch** - however you think is right. The tests only check what a person sees and does, not how your code is structured.\n\nTry it first without any hints and without looking at the earlier steps. If you get stuck, the hints point to the relevant chapters. And once all tests are green, [[praxis-lokal]] shows you how to move the app to your own computer.',
@@ -29,8 +29,8 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
       ],
     },
     start: P12_START,
-    loesung: P12_LOESUNG,
-    tipps: {
+    solution: P12_LOESUNG,
+    hints: {
       de: [
         'Fang mit den Daten an: Welcher State ist nötig? (Todos, Eingabetext, Filter) - [[react-datenfluss]]',
         'Erst hinzufügen und anzeigen, dann umschalten und löschen, dann Filter - nach jedem Teil ausführen.',
@@ -45,12 +45,12 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
       ],
     },
     tests: [
-      { name: t('Anfangs leer mit „0 open“', 'Empty at first with “0 open”'), pruefung: js`
+      { name: t('Anfangs leer mit „0 open“', 'Empty at first with “0 open”'), script: js`
         await render()
         expect(findAll('li')).toHaveLength(0)
         expect(text()).toContain('0 open')
       ` },
-      { name: t('Hinzufügen: getrimmt, leer ignoriert, Feld geleert', 'Adding: trimmed, empty ignored, input cleared'), pruefung: js`
+      { name: t('Hinzufügen: getrimmt, leer ignoriert, Feld geleert', 'Adding: trimmed, empty ignored, input cleared'), script: js`
         await render()
         await type(field('What needs to be done?'), '  First  ')
         await click(button('Add'))
@@ -63,7 +63,7 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
         expect(field('What needs to be done?').value).toBe('')
         expect(text()).toContain('2 open')
       ` },
-      { name: t('Umschalten und Löschen', 'Toggling and deleting'), pruefung: js`
+      { name: t('Umschalten und Löschen', 'Toggling and deleting'), script: js`
         await render()
         for (const todo of ['A', 'B', 'C']) {
           await type(field('What needs to be done?'), todo)
@@ -75,7 +75,7 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
         await click(within(findAll('li')[2]).button(/✕|delete|remove/i))
         expect(findAll('li')).toHaveLength(2)
       ` },
-      { name: t('Filter mit aria-pressed', 'Filters with aria-pressed'), pruefung: js`
+      { name: t('Filter mit aria-pressed', 'Filters with aria-pressed'), script: js`
         await render()
         for (const todo of ['A', 'B']) {
           await type(field('What needs to be done?'), todo)
@@ -91,7 +91,7 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
         await click(button('All'))
         expect(findAll('li')).toHaveLength(2)
       ` },
-      { name: t('„Clear done“ entfernt erledigte', '“Clear done” removes completed ones'), pruefung: js`
+      { name: t('„Clear done“ entfernt erledigte', '“Clear done” removes completed ones'), script: js`
         await render()
         for (const todo of ['A', 'B']) {
           await type(field('What needs to be done?'), todo)
@@ -104,7 +104,7 @@ export const schritteChallenge: Record<string, SchrittInhalt> = {
       ` },
       {
         name: t('Speichern im localStorage', 'Saving in localStorage'),
-        pruefung: js`
+        script: js`
           await render()
           await type(field('What needs to be done?'), 'Still here')
           await click(button('Add'))

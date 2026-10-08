@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './FehlerUndKlassen.code'
+import { examples } from './FehlerUndKlassen.code'
 
 /**
  * KAPITEL 1.8 - Fehler & Klassen
@@ -16,7 +16,7 @@ export function FehlerUndKlassen() {
         <P>
           <Code>try</Code> probiert etwas, <Code>catch</Code> fängt den Fehler ab - und das Programm läuft weiter.
         </P>
-        <TryIt id="js-fehler-einstieg" {...beispiele['js-fehler-einstieg']} />
+        <TryIt id="js-fehler-einstieg" {...examples['js-fehler-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Fehler werfen und fangen">
@@ -26,7 +26,7 @@ export function FehlerUndKlassen() {
           einen - zum Beispiel, wenn eine Funktion mit ungültigen Werten aufgerufen wird. <Code>finally</Code> läuft
           in jedem Fall, mit oder ohne Fehler.
         </P>
-        <TryIt id="js-fehler-werfen" {...beispiele['js-fehler-werfen']} />
+        <TryIt id="js-fehler-werfen" {...examples['js-fehler-werfen']} />
         <Liste>
           <li>
             Eingebaute Fehlertypen: <Code>TypeError</Code> (falscher Typ, z. B. <Code>undefined.x</Code>),{' '}
@@ -54,7 +54,7 @@ export function FehlerUndKlassen() {
           <Code>new</Code> entsteht ein neues Objekt (eine <strong>Instanz</strong>), der <Code>constructor</Code>{' '}
           richtet es ein. In Methoden zeigt <Code>this</Code> auf die Instanz.
         </P>
-        <TryIt id="js-fehler-klassen" {...beispiele['js-fehler-klassen']} />
+        <TryIt id="js-fehler-klassen" {...examples['js-fehler-klassen']} />
         <Liste>
           <li>
             <Code>#feld</Code> ist privat: Von außen kommt niemand heran, nicht einmal zum Lesen.
@@ -75,7 +75,7 @@ export function FehlerUndKlassen() {
           Methode definiert wurde. Gibst du eine Methode weiter (als Callback, an <Code>setTimeout</Code>, als
           Event-Handler), fehlt dieser Punkt, und <Code>this</Code> ist <Code>undefined</Code>.
         </P>
-        <TryIt id="js-fehler-this" {...beispiele['js-fehler-this']} />
+        <TryIt id="js-fehler-this" {...examples['js-fehler-this']} />
         <P>
           Arrow Functions haben kein eigenes <Code>this</Code>, sie nehmen das von außen (
           <Verweis id="js-funktionen" />). Das ist ein Grund, warum React heute auf Funktionskomponenten setzt: Es gibt
@@ -91,7 +91,7 @@ export function FehlerUndKlassen() {
           <strong>eigene Fehlertypen</strong>: Mit <Code>instanceof</Code> unterscheidest du dann erwartete Fehler
           (falsche Eingabe) von echten Programmfehlern.
         </P>
-        <TryIt id="js-fehler-vererbung" {...beispiele['js-fehler-vererbung']} />
+        <TryIt id="js-fehler-vererbung" {...examples['js-fehler-vererbung']} />
         <P>
           Eine Stelle, an der du in React bis heute eine Klasse schreibst, ist die Error Boundary - sie fängt Fehler
           beim Rendern ab (<Verweis id="praxis-fehler" />).
@@ -101,8 +101,8 @@ export function FehlerUndKlassen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="js-fehler-uebung"
-          {...beispiele['js-fehler-uebung']}
-          aufgabe={
+          {...examples['js-fehler-uebung']}
+          task={
             <>
               <p>Baue ein kleines Bankkonto:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -132,28 +132,28 @@ export function FehlerUndKlassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wann läuft der finally-Block?',
-            antworten: ['Nur ohne Fehler', 'Nur nach einem Fehler', 'Immer - mit und ohne Fehler'],
-            richtig: 2,
-            erklaerung: 'Ideal zum Aufräumen, z. B. um einen Ladezustand zu beenden.',
+            question: 'Wann läuft der finally-Block?',
+            answers: ['Nur ohne Fehler', 'Nur nach einem Fehler', 'Immer - mit und ohne Fehler'],
+            correct: 2,
+            explanation: 'Ideal zum Aufräumen, z. B. um einen Ladezustand zu beenden.',
           },
           {
-            frage: 'Was ist this in obj.methode()?',
-            antworten: ['Die Klasse', 'obj - das Objekt vor dem Punkt', 'Immer window'],
-            richtig: 1,
-            erklaerung: 'Ohne Punkt beim Aufruf (z. B. als Callback) geht this verloren.',
+            question: 'Was ist this in obj.methode()?',
+            answers: ['Die Klasse', 'obj - das Objekt vor dem Punkt', 'Immer window'],
+            correct: 1,
+            explanation: 'Ohne Punkt beim Aufruf (z. B. als Callback) geht this verloren.',
           },
           {
-            frage: 'Wozu eigene Fehlerklassen wie ValidationError?',
-            antworten: [
+            question: 'Wozu eigene Fehlerklassen wie ValidationError?',
+            answers: [
               'Damit man mit instanceof erwartete Fehler von echten Bugs unterscheiden kann',
               'Weil Error nicht geworfen werden darf',
               'Damit der Fehler schneller ist',
             ],
-            richtig: 0,
-            erklaerung: 'Erwartete Fehler behandelst du, unbekannte wirfst du weiter.',
+            correct: 0,
+            explanation: 'Erwartete Fehler behandelst du, unbekannte wirfst du weiter.',
           },
         ]}
       />

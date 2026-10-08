@@ -11,8 +11,8 @@ import { springRuntimeCheck } from '../spring/selftest'
 import { dockerRuntimeCheck } from '../docker/selftest'
 import { springExampleCheck } from '../spring/contents'
 import { dockerExampleCheck } from '../docker/contents'
-import { uebungen } from '../course/exercises/backend'
-import type { CodeBeispiel } from '../learning/jsSandbox'
+import { exercises } from '../course/exercises/backend'
+import type { CodeExample } from '../learning/jsSandbox'
 import { tryItUsages } from './tryItUsages'
 
 const chapterSources = import.meta.glob<string>(['../course/backend/*.tsx', '!../course/backend/*.en.tsx'], {
@@ -20,11 +20,11 @@ const chapterSources = import.meta.glob<string>(['../course/backend/*.tsx', '!..
   import: 'default',
   eager: true,
 })
-const codeModules = import.meta.glob<{ beispiele?: Record<string, CodeBeispiel> }>('../course/backend/*.code.ts', { eager: true })
+const codeModules = import.meta.glob<{ examples?: Record<string, CodeExample> }>('../course/backend/*.code.ts', { eager: true })
 
 const usages = tryItUsages(Object.values(chapterSources))
 
-type Case = { id: string; example: CodeBeispiel; mode: string | undefined; file: string }
+type Case = { id: string; example: CodeExample; mode: string | undefined; file: string }
 
 /** Runs an example on the runtime its editor mode stands for. */
 function check({ id, example, mode }: Case) {
@@ -34,11 +34,11 @@ function check({ id, example, mode }: Case) {
 }
 
 const chapterCases: Case[] = Object.entries(codeModules).flatMap(([path, module]) =>
-  Object.entries(module.beispiele ?? {}).map(([id, example]) => ({ id, example, mode: usages.get(id)?.modus, file: path.split('/').pop()! })),
+  Object.entries(module.examples ?? {}).map(([id, example]) => ({ id, example, mode: usages.get(id)?.mode, file: path.split('/').pop()! })),
 )
 // Predictions are multiple choice - nothing to run.
-const exerciseCases: Case[] = Object.values(uebungen).flatMap((list) =>
-  list.filter((u) => u.stufe !== 'vorhersage').map((u) => ({ id: u.id, example: u, mode: u.modus, file: 'uebungen/backend.ts' })),
+const exerciseCases: Case[] = Object.values(exercises).flatMap((list) =>
+  list.filter((u) => u.stufe !== 'vorhersage').map((u) => ({ id: u.id, example: u, mode: u.mode, file: 'exercises/backend.ts' })),
 )
 
 it('finds the chapters', () => {

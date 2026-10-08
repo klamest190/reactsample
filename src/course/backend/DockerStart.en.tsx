@@ -44,7 +44,7 @@ export function DockerStart() {
           On Windows and macOS, Docker Desktop runs a small Linux VM in the background for this - you
           do not notice it.
         </Hinweis>
-        <CodeBlock code={codeBloecke.installieren} titel="Terminal" />
+        <CodeBlock code={codeBloecke.installieren} title="Terminal" />
       </Abschnitt>
 
       <Abschnitt titel="Image and container">
@@ -64,11 +64,11 @@ export function DockerStart() {
             <Code>latest</Code> - whatever happens to be newest today.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.tags} titel="image names" sprache="konfig" />
+        <CodeBlock code={codeBloecke.tags} title="image names" language="config" />
       </Abschnitt>
 
       <Abschnitt titel="docker run, taken apart">
-        <CodeBlock code={codeBloecke.run} titel="Terminal" />
+        <CodeBlock code={codeBloecke.run} title="Terminal" />
         <P>
           <strong>Ports</strong> are the most common pitfall. A container has its own network: nginx
           listens on port 80 - but inside the container, not on your machine. Only{' '}
@@ -84,7 +84,7 @@ export function DockerStart() {
       </Abschnitt>
 
       <Abschnitt titel="The commands for every day">
-        <CodeBlock code={codeBloecke.befehle} titel="Terminal" />
+        <CodeBlock code={codeBloecke.befehle} title="Terminal" />
         <P>
           If a container dies right after starting, the reason is almost always in{' '}
           <Code>docker logs</Code>. The PostgreSQL task shows the typical example: without{' '}
@@ -98,7 +98,7 @@ export function DockerStart() {
           <strong>volume</strong> is a storage area that Docker manages outside the container and
           mounts into it:
         </P>
-        <CodeBlock code={codeBloecke.volume} titel="Terminal" />
+        <CodeBlock code={codeBloecke.volume} title="Terminal" />
         <P>
           This makes containers <strong>disposable</strong>: you delete them without worry and start
           new ones - the state lives in the volume or the database, never in the container itself.
@@ -114,29 +114,29 @@ export function DockerStart() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is the difference between an image and a container?',
-            antworten: [
+            question: 'What is the difference between an image and a container?',
+            answers: [
               'There is none, they are two names for the same thing',
               'The image is the immutable blueprint, the container a running instance of it',
               'Containers are bigger than images',
               'An image runs, a container is stopped',
             ],
-            richtig: 1,
-            erklaerung: 'Like class and object: any number of containers can be started from one image.',
+            correct: 1,
+            explanation: 'Like class and object: any number of containers can be started from one image.',
           },
           {
-            frage: 'docker run -p 3000:80 nginx - at which address do you reach nginx in the browser?',
-            antworten: ['http://localhost:80', 'http://localhost:3000', 'http://nginx:80', 'not at all'],
-            richtig: 1,
-            erklaerung: 'The port of your machine (3000) is on the left, the one in the container (80) on the right.',
+            question: 'docker run -p 3000:80 nginx - at which address do you reach nginx in the browser?',
+            answers: ['http://localhost:80', 'http://localhost:3000', 'http://nginx:80', 'not at all'],
+            correct: 1,
+            explanation: 'The port of your machine (3000) is on the left, the one in the container (80) on the right.',
           },
           {
-            frage: 'A container stops right after starting. Where do you look first?',
-            antworten: ['docker images', 'docker logs NAME', 'docker pull', 'In the Docker Desktop settings'],
-            richtig: 1,
-            erklaerung: 'docker logs shows what the container printed - the reason is usually there.',
+            question: 'A container stops right after starting. Where do you look first?',
+            answers: ['docker images', 'docker logs NAME', 'docker pull', 'In the Docker Desktop settings'],
+            correct: 1,
+            explanation: 'docker logs shows what the container printed - the reason is usually there.',
           },
         ]}
       />

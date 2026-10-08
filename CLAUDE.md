@@ -129,7 +129,7 @@ src/
   test/                      render.tsx (renderInApp: Komponenten mit Providern, Englisch), setup.ts (jest-dom, Cleanup)
   selftest/                  main.ts (Seite für e2e:content), checks.ts (Prüfung je Modus),
                              results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten),
-                             tryItUsages.ts (liest <TryIt id modus typen vorschau> aus den Kapitelquellen),
+                             tryItUsages.ts (liest <TryIt id mode typed preview> aus den Kapitelquellen),
                              java|backend|sql.content.test.ts (Vitest: Laufzeit-Selbsttests + alle Beispiele in Node)
 ```
 
@@ -139,8 +139,9 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 
 ## Konventionen
 
-- **Neuer Code auf Englisch** (Bezeichner und Kommentare). Älterer Code ist deutsch benannt
-  (`Rahmen`, `ausfuehren`, `laeuft`) - beim Verschieben nicht umbenennen, nur Neues englisch schreiben.
+- **Code auf Englisch** (Bezeichner und Kommentare). Laufzeiten (`java/`, `spring/`, `docker/`, `sql/`),
+  Editoren (`learning/`) und Selbsttest sind umgestellt; App-Oberfläche (components, context, hooks,
+  i18n, pages) und Kursstruktur folgen. Neues immer englisch schreiben.
   Texte für Lernende immer zweisprachig (`{ de, en }` bzw. `i18n/messages.ts`).
 - **Kapitel = drei Dateien**: `.tsx` (DE), `.en.tsx` (EN), `.code.ts` (Code einmal, Englisch).
   Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `course/parts/<teil>.ts`,
@@ -148,7 +149,7 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
   Ablauf: README → "Ein Kapitel hinzufügen".
 - **`TryIt`-IDs** sind kursweit eindeutig (Schlüssel für gespeicherten Code und Fortschritt).
 - **Neuer Editor-Modus**: in `learning/modes.ts` eintragen, Props in `TryIt.tsx`, Editor als
-  `TryIt<Name>.tsx` - `const { code, rahmen } = useEditor(props)`, dann `<Rahmen {...rahmen} art=… ausfuehren=…>`;
+  `TryIt<Name>.tsx` - `const { code, frame } = useEditor(props)`, dann `<EditorFrame {...frame} kind=… run=…>`;
   Prüfung in `selftest/checks.ts`. Eine neue Laufzeit liefert `RuntimeResult`/`ContentResult` aus `selftest/results.ts`.
 - **Keine Emoji in der Oberfläche** - Icons aus `components/Icon.tsx` (fehlende dort ergänzen).
   Kursinhalte (Kapiteltexte, Beispielcode, simulierte Terminalausgaben) dürfen Emoji haben.
@@ -161,10 +162,10 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 - **Barrierefreiheit**: Eingabefelder brauchen ein Label (`<label>` oder `aria-label`), scrollbare
   Bereiche `ref={focusableWhenScrolling}`, Links im Fließtext eine Unterstreichung, Statuspunkte
   `role="img"` + `aria-label`. Nur ein `<main>` (App.tsx) und keine übersprungenen Überschriften.
-- **Vorschau-Container** (gerenderter Code der Lernenden) tragen `data-vorschau` - die Prüfungen lassen
+- **Vorschau-Container** (gerenderter Code der Lernenden) tragen `data-preview` - die Prüfungen lassen
   sie aus, denn Beispielcode darf ein eigenes `<main>` oder `<h1>` haben.
-- **Test-Attribute**: `data-laeuft` am Rahmen eines laufenden Editors, `data-testergebnis="gruen|rot"`
-  an Testergebnissen, `data-uebung` an Übungskarten - daran orientiert sich `e2e:pages`.
+- **Test-Attribute**: `data-running` am Rahmen eines laufenden Editors, `data-test-result="pass|fail"`
+  an Testergebnissen, `data-exercise` an Übungskarten - daran orientiert sich `e2e:pages`.
 - **Tests**: Unit-Tests liegen neben dem Code (`name.test.ts`, mit DOM `name.test.tsx`). Inhaltsprüfungen
   über alle Kapitel heißen `*.content.test.ts`. Neue Logik bekommt einen Test. Komponenten mit
   `renderInApp` aus `src/test/render.tsx` rendern. Die Coverage-Schwellen in `vite.config.ts` nur anheben.
@@ -173,16 +174,16 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 ## Stolperfallen
 
 - **Dev- und Produktions-Build verhalten sich verschieden.** Beispiel: React 19 hat `act` nur im
-  Dev-Build - deshalb installiert `testLauf.ts` einen Ersatz, bevor die Testing Library lädt.
+  Dev-Build - deshalb installiert `testRunner.ts` einen Ersatz, bevor die Testing Library lädt.
   `e2e:content` ohne `--build` sieht solche Fehler nicht; `e2e:pages` und die CI laufen auf dem
   Produktions-Build.
-- **Tailwind zur Laufzeit** (`tailwindMotor.ts`) erzeugt CSS für Klassen im Editor-Code. Es liegt in der
-  Ebene `vorschau` unter `utilities` (`@layer`-Reihenfolge in `index.css`). Ohne das hat eine Vorschau
+- **Tailwind zur Laufzeit** (`tailwindEngine.ts`) erzeugt CSS für Klassen im Editor-Code. Es liegt in der
+  Ebene `preview` unter `utilities` (`@layer`-Reihenfolge in `index.css`). Ohne das hat eine Vorschau
   mit `bg-white` die `dark:`-Klassen der Seite überschrieben - die Seitenleiste wurde im Dunkeln hell.
 - **Alle Editoren einer Seite teilen sich `window`.** Tests dürfen keine Globalen ersetzen, die
   Vorschauen und andere Beispiele mitbenutzen: `mockFetch` tauscht deshalb nur das `fetch`, das
-  `kompilieren` dem getesteten Code als Globale gibt. React-Übungen starten ihre Tests erst,
-  wenn die neue Vorschau steht (`TryItReact.ausfuehren`).
+  `compile` dem getesteten Code als Globale gibt. React-Übungen starten ihre Tests erst,
+  wenn die neue Vorschau steht (`run` in `TryItReact.tsx`).
 - `e2e:content` prüft ohne Vorschau - Wechselwirkungen zwischen Vorschau und Test fallen nur im
   echten Editor auf.
 - Eine Demo kann das Farbschema umschalten: Prüfskripte laden jede Seite frisch (`goto` + `reload`),
@@ -194,5 +195,12 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 - PGlite ist in `optimizeDeps.exclude` - nicht entfernen, sonst lädt die WASM-Datei nicht.
 - Git Bash wandelt Argumente wie `/sql-start` in Windows-Pfade um - Routen ohne führenden `/` übergeben.
 - Shell-Heredocs verschlucken Backslashes - Dateien mit `\` über Editor-Tools oder Node-Skripte schreiben.
+- **Namen, die der Compiler nicht sieht.** Das iframe-Protokoll (`BRIDGE`/`TEST_RUNNER` in `jsSandbox.ts`,
+  Typ `SandboxMessage`), `'kind' in x`-Prüfungen, `data-*`-Attribute, die CSS-Ebene `preview` und
+  `window.__selftest` hängen an Strings. Beim Umbenennen dort von Hand nachziehen; die Content-Tests
+  und `e2e:*` fangen Fehler, `tsc` nicht.
+- **Optionale Props verschwinden beim Spread still.** Ein Objekt mit falschem Schlüssel, das per
+  `{...props}` in eine Komponente geht, meldet `tsc` nicht - solche Objekte mit
+  `satisfies Partial<ComponentProps<typeof X>>` absichern (siehe `useEditor.ts`).
 - **Erster Download klein halten:** Was `App.tsx` fest importiert, lädt jede Seite beim Start. Neue
   Seiten und alles mit Editoren oder großen Daten per `lazy()` einbinden (Stand: ~110 kB JS gzip).

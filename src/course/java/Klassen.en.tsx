@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Klassen.code'
+import { examples, codeBloecke } from './Klassen.code'
 
 /**
  * CHAPTER 6.6 (English) - Classes & Objects
@@ -16,7 +16,7 @@ export function Klassen() {
           So far the class was only a frame around <Code>main</Code>. Now it becomes what it is meant
           to be: a <strong>blueprint</strong> for objects that keep data and behaviour together.
         </P>
-        <TryIt modus="java" id="java-klassen-einstieg" {...beispiele['java-klassen-einstieg']} />
+        <TryIt mode="java" id="java-klassen-einstieg" {...examples['java-klassen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Blueprint and object">
@@ -34,7 +34,7 @@ export function Klassen() {
           Fields are variables that belong to the object. Unlike local variables they automatically
           get a default value - <Code>0</Code>, <Code>false</Code> or <Code>null</Code>.
         </P>
-        <TryIt modus="java" id="java-klassen-felder" {...beispiele['java-klassen-felder']} />
+        <TryIt mode="java" id="java-klassen-felder" {...examples['java-klassen-felder']} />
         <P>
           A <Code>static</Code> field, in contrast, belongs to the class and exists exactly once - no
           matter how many objects there are. Handy for counters and constants.
@@ -46,7 +46,7 @@ export function Klassen() {
           The constructor is named like the class, has <strong>no</strong> return type and runs
           exactly once: on <Code>new</Code>. Its job is to bring the object into a valid state.
         </P>
-        <TryIt modus="java" id="java-klassen-konstruktor" {...beispiele['java-klassen-konstruktor']} />
+        <TryIt mode="java" id="java-klassen-konstruktor" {...examples['java-klassen-konstruktor']} />
         <Hinweis variante="info">
           <Code>this.title = title;</Code> is not decoration: on the left is the field, on the right
           the parameter. Without <Code>this</Code> the parameter would be assigned to itself - a bug
@@ -73,7 +73,7 @@ export function Klassen() {
           </li>
           <li>nothing written - visible within the same package. Fine while learning.</li>
         </Liste>
-        <TryIt modus="java" id="java-klassen-kapselung" {...beispiele['java-klassen-kapselung']} />
+        <TryIt mode="java" id="java-klassen-kapselung" {...examples['java-klassen-kapselung']} />
         <Hinweis variante="tipp">
           A setter is not an end in itself. Often a method with a meaningful name is better:{' '}
           <Code>deposit(100)</Code> says more than <Code>setBalance(getBalance() + 100)</Code> - and
@@ -87,7 +87,7 @@ export function Klassen() {
           <Code>toString()</Code> and <Code>equals()</Code>. The default versions are not very
           helpful (<Code>Point@1b6d2f1d</Code> and “is it the same object?”), so you override them.
         </P>
-        <TryIt modus="java" id="java-klassen-tostring" {...beispiele['java-klassen-tostring']} />
+        <TryIt mode="java" id="java-klassen-tostring" {...examples['java-klassen-tostring']} />
         <Hinweis variante="info">
           <Code>@Override</Code> is an annotation. It changes nothing about the program but lets the
           compiler verify that you really are overriding an inherited method - a typo in the name
@@ -100,15 +100,15 @@ export function Klassen() {
           A variable of a class type never contains the object itself, only a reference to it. So two
           variables can point at the same object - or at none at all.
         </P>
-        <TryIt modus="java" id="java-klassen-referenzen" {...beispiele['java-klassen-referenzen']} />
+        <TryIt mode="java" id="java-klassen-referenzen" {...examples['java-klassen-referenzen']} />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-klassen-uebung"
-          {...beispiele['java-klassen-uebung']}
-          aufgabe={
+          {...examples['java-klassen-uebung']}
+          task={
             <>
               <p>
                 Write the class <Code>Task</Code> for a todo item:
@@ -138,39 +138,39 @@ export function Klassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is special about the constructor?',
-            antworten: [
+            question: 'What is special about the constructor?',
+            answers: [
               'It always returns the object.',
               'It is named like the class and has no return type.',
               'It is always static.',
               'There may only be one per class.',
             ],
-            richtig: 1,
-            erklaerung: 'No return type, not even void. And there may be any number, as long as the parameters differ.',
+            correct: 1,
+            explanation: 'No return type, not even void. And there may be any number, as long as the parameters differ.',
           },
           {
-            frage: 'What is private good for on a field?',
-            antworten: [
+            question: 'What is private good for on a field?',
+            answers: [
               'It makes the field immutable.',
               'Only the class itself can reach it - changes go through methods that can check.',
               'It saves memory.',
               'The field exists only once.',
             ],
-            richtig: 1,
-            erklaerung: 'Immutable is what final does. private controls visibility - that is encapsulation.',
+            correct: 1,
+            explanation: 'Immutable is what final does. private controls visibility - that is encapsulation.',
           },
           {
-            frage: 'What does this.name = name do in a constructor?',
-            antworten: [
+            question: 'What does this.name = name do in a constructor?',
+            answers: [
               'It copies the object.',
               'It assigns the value of the same-named parameter to the field.',
               'It creates a new field.',
               'It is only style, you can leave it out.',
             ],
-            richtig: 1,
-            erklaerung: 'Without this, name would be the parameter - on both sides. The field would stay empty.',
+            correct: 1,
+            explanation: 'Without this, name would be the parameter - on both sides. The field would stay empty.',
           },
         ]}
       />

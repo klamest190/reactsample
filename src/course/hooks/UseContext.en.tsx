@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseContext.code'
+import { examples, codeBloecke } from './UseContext.code'
 import { ContextDemo } from '../demos/ContextDemo'
 
 /**
@@ -15,8 +15,8 @@ export function UseContext() {
         <P><Code>useContext</Code> reads a value provided further up the tree - without any props.</P>
         <TryIt
           id="hooks-usecontext-einstieg"
-          {...beispiele['hooks-usecontext-einstieg']}
-          modus="react"
+          {...examples['hooks-usecontext-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -28,8 +28,8 @@ export function UseContext() {
         </P>
         <TryIt
           id="hooks-usecontext-drilling"
-          {...beispiele['hooks-usecontext-drilling']}
-          modus="react"
+          {...examples['hooks-usecontext-drilling']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -63,8 +63,8 @@ export function UseContext() {
         </P>
         <TryIt
           id="hooks-usecontext-muster"
-          {...beispiele['hooks-usecontext-muster']}
-          modus="react"
+          {...examples['hooks-usecontext-muster']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           Every change to the context value re-renders <em>all</em> consumers. Keep the value stable with{' '}
@@ -77,9 +77,9 @@ export function UseContext() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-usecontext-uebung"
-          {...beispiele['hooks-usecontext-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usecontext-uebung']}
+          mode="react"
+          task={
             <>
               <p>Make the app multilingual:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -101,32 +101,32 @@ export function UseContext() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What does useContext return if there is no provider above?',
-            antworten: ['undefined', 'The default value from createContext', 'An error'],
-            richtig: 1,
-            erklaerung: 'That’s why you often use null as the default and check for it in your own hook.',
+            question: 'What does useContext return if there is no provider above?',
+            answers: ['undefined', 'The default value from createContext', 'An error'],
+            correct: 1,
+            explanation: 'That’s why you often use null as the default and check for it in your own hook.',
           },
           {
-            frage: 'What happens when a provider’s value changes?',
-            antworten: [
+            question: 'What happens when a provider’s value changes?',
+            answers: [
               'Nothing until the page reloads',
               'All components that read the context re-render',
               'Only direct children re-render',
             ],
-            richtig: 1,
-            erklaerung: 'Even memo components re-render when they read the changed context.',
+            correct: 1,
+            explanation: 'Even memo components re-render when they read the changed context.',
           },
           {
-            frage: 'What is context NOT meant for?',
-            antworten: [
+            question: 'What is context NOT meant for?',
+            answers: [
               'Making values available deep in the tree',
               'Replacing every piece of state, even if only one child needs it',
               'Providing the theme or logged-in user',
             ],
-            richtig: 1,
-            erklaerung: 'For nearby components, props are simpler and more explicit.',
+            correct: 1,
+            explanation: 'For nearby components, props are simpler and more explicit.',
           },
         ]}
       />

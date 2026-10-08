@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Objekte.code'
+import { examples, codeBloecke } from './Objekte.code'
 
 /**
  * KAPITEL 2.2 - Objekttypen & Interfaces
@@ -17,7 +17,7 @@ export function Objekte() {
           Ein Objekttyp listet auf, welche Felder ein Objekt hat und welchen Typ jedes Feld hat. Mit{' '}
           <Code>?</Code> wird ein Feld optional, mit <Code>readonly</Code> unveränderlich.
         </P>
-        <TryIt id="ts-objekte-einstieg" modus="ts" {...beispiele['ts-objekte-einstieg']} />
+        <TryIt id="ts-objekte-einstieg" mode="ts" {...examples['ts-objekte-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="type oder interface?">
@@ -26,8 +26,8 @@ export function Objekte() {
           <Code>interface</Code> wird mit <Code>extends</Code> erweitert, Typen kombinierst du mit{' '}
           <Code>&</Code> (Intersection: „beides zugleich“).
         </P>
-        <TryIt id="ts-objekte-type-interface" modus="ts" {...beispiele['ts-objekte-type-interface']} />
-        <CodeBlock titel="Die Unterschiede" code={codeBloecke.vergleich} />
+        <TryIt id="ts-objekte-type-interface" mode="ts" {...examples['ts-objekte-type-interface']} />
+        <CodeBlock title="Die Unterschiede" code={codeBloecke.vergleich} />
         <Hinweis variante="tipp">
           Such dir eine Schreibweise aus und bleib dabei. Viele React-Projekte nehmen <Code>type</Code>,
           weil es auch für Unions und Funktionen funktioniert. <Code>interface</Code> braucht man, wenn
@@ -42,7 +42,7 @@ export function Objekte() {
           Fall <Code>undefined</Code> behandelt hast. Die Operatoren <Code>??</Code> und <Code>?.</Code>{' '}
           aus <Verweis nr="1.2" /> sind dafür wie gemacht.
         </P>
-        <TryIt id="ts-objekte-optional" modus="ts" {...beispiele['ts-objekte-optional']} />
+        <TryIt id="ts-objekte-optional" mode="ts" {...examples['ts-objekte-optional']} />
       </Abschnitt>
 
       <Abschnitt titel="readonly">
@@ -52,7 +52,7 @@ export function Objekte() {
           Array verändern, sind dann gar nicht vorhanden. Genau das Verhalten, das React bei State
           erwartet (<Verweis nr="1.6" />).
         </P>
-        <TryIt id="ts-objekte-readonly" modus="ts" {...beispiele['ts-objekte-readonly']} />
+        <TryIt id="ts-objekte-readonly" mode="ts" {...examples['ts-objekte-readonly']} />
         <Hinweis variante="info">
           Auch <Code>readonly</Code> gibt es nur beim Prüfen. Zur Laufzeit ließe sich das Objekt
           weiterhin ändern - wer das wirklich verhindern will, nimmt zusätzlich{' '}
@@ -67,7 +67,7 @@ export function Objekte() {
           quakt wie eine Ente … Eine Ausnahme: Schreibst du ein Objekt-Literal direkt hin, meldet TypeScript
           überzählige Felder, weil das fast immer ein Tippfehler ist.
         </P>
-        <TryIt id="ts-objekte-strukturell" modus="ts" {...beispiele['ts-objekte-strukturell']} />
+        <TryIt id="ts-objekte-strukturell" mode="ts" {...examples['ts-objekte-strukturell']} />
       </Abschnitt>
 
       <Abschnitt titel="Beliebige Schlüssel: Index-Signaturen und Record">
@@ -76,7 +76,7 @@ export function Objekte() {
           beschreibst du nur, welchen Typ Schlüssel und Werte haben. <Code>{'Record<K, V>'}</Code> ist die
           kürzere Schreibweise dafür.
         </P>
-        <TryIt id="ts-objekte-index" modus="ts" {...beispiele['ts-objekte-index']} />
+        <TryIt id="ts-objekte-index" mode="ts" {...examples['ts-objekte-index']} />
       </Abschnitt>
 
       <Abschnitt titel="Verschachtelte Typen">
@@ -84,7 +84,7 @@ export function Objekte() {
           Typen lassen sich beliebig ineinander setzen. Lieber mehrere kleine, benannte Typen als ein großer
           verschachtelter: Sie sind lesbarer, und du kannst sie einzeln wiederverwenden.
         </P>
-        <TryIt id="ts-objekte-verschachtelt" modus="ts" {...beispiele['ts-objekte-verschachtelt']} />
+        <TryIt id="ts-objekte-verschachtelt" mode="ts" {...examples['ts-objekte-verschachtelt']} />
         <Liste>
           <li>
             Arrays von Objekten: <Code>Order[]</Code> - ein Array, in dem jedes Element ein{' '}
@@ -97,9 +97,9 @@ export function Objekte() {
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-objekte-uebung"
-          modus="ts"
-          {...beispiele['ts-objekte-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-objekte-uebung']}
+          task={
             <>
               <p>Beschreibe die Daten einer Bibliothek, sodass die Typprüfung keine Fehler mehr meldet:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -118,24 +118,24 @@ export function Objekte() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'type Point = { x: number; y: number }. Passt { x: 1, y: 2, z: 3 } aus einer Variablen?',
-            antworten: ['Ja - es hat mindestens x und y', 'Nein - z ist zu viel', 'Nur mit interface'],
-            richtig: 0,
-            erklaerung: 'Strukturelle Typisierung: Es zählt, dass die geforderten Felder da sind. Nur bei direkt hingeschriebenen Objekt-Literalen meldet TypeScript überzählige Felder.',
+            question: 'type Point = { x: number; y: number }. Passt { x: 1, y: 2, z: 3 } aus einer Variablen?',
+            answers: ['Ja - es hat mindestens x und y', 'Nein - z ist zu viel', 'Nur mit interface'],
+            correct: 0,
+            explanation: 'Strukturelle Typisierung: Es zählt, dass die geforderten Felder da sind. Nur bei direkt hingeschriebenen Objekt-Literalen meldet TypeScript überzählige Felder.',
           },
           {
-            frage: 'Welchen Typ hat settings.fontSize bei fontSize?: number?',
-            antworten: ['number', 'number | undefined', 'number | null'],
-            richtig: 1,
-            erklaerung: 'Ein optionales Feld kann fehlen - dann liest man undefined. Deshalb gehört undefined zum Typ.',
+            question: 'Welchen Typ hat settings.fontSize bei fontSize?: number?',
+            answers: ['number', 'number | undefined', 'number | null'],
+            correct: 1,
+            explanation: 'Ein optionales Feld kann fehlen - dann liest man undefined. Deshalb gehört undefined zum Typ.',
           },
           {
-            frage: 'Womit kombinierst du zwei Objekttypen A und B zu einem Typ mit allen Feldern?',
-            antworten: ['A | B', 'A & B', 'A + B'],
-            richtig: 1,
-            erklaerung: 'Die Intersection A & B hat alle Felder von A und von B. A | B wäre „A oder B“ - dazu mehr in Kapitel 2.4.',
+            question: 'Womit kombinierst du zwei Objekttypen A und B zu einem Typ mit allen Feldern?',
+            answers: ['A | B', 'A & B', 'A + B'],
+            correct: 1,
+            explanation: 'Die Intersection A & B hat alle Felder von A und von B. A | B wäre „A oder B“ - dazu mehr in Kapitel 2.4.',
           },
         ]}
       />

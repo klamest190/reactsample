@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Fehler.code'
+import { examples, codeBloecke } from './Fehler.code'
 
 /**
  * KAPITEL 7.9 - Exceptions
@@ -17,7 +17,7 @@ export function Fehler() {
           Wenn etwas schiefgeht, wirft Java eine <strong>Exception</strong>. Fängt sie niemand,
           stürzt das Programm ab - mit <Code>try/catch</Code> übernimmst du das Steuer.
         </P>
-        <TryIt modus="java" id="java-fehler-einstieg" {...beispiele['java-fehler-einstieg']} />
+        <TryIt mode="java" id="java-fehler-einstieg" {...examples['java-fehler-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Der Aufbau">
@@ -31,7 +31,7 @@ export function Fehler() {
       </Abschnitt>
 
       <Abschnitt titel="Die drei, die du am häufigsten siehst">
-        <TryIt modus="java" id="java-fehler-typen" {...beispiele['java-fehler-typen']} />
+        <TryIt mode="java" id="java-fehler-typen" {...examples['java-fehler-typen']} />
         <Tabelle
           breit
           kopf={['Exception', 'Passiert, wenn …']}
@@ -53,7 +53,7 @@ export function Fehler() {
           ein <Code>return</Code> stand. Klassisch nutzt man ihn zum Aufräumen: Datei schließen,
           Verbindung trennen.
         </P>
-        <TryIt modus="java" id="java-fehler-finally" {...beispiele['java-fehler-finally']} />
+        <TryIt mode="java" id="java-fehler-finally" {...examples['java-fehler-finally']} />
       </Abschnitt>
 
       <Abschnitt titel="Selbst werfen">
@@ -62,7 +62,7 @@ export function Fehler() {
           oft besser, als einen falschen Wert zurückzugeben - der Aufrufer <em>muss</em> sich dann
           kümmern.
         </P>
-        <TryIt modus="java" id="java-fehler-werfen" {...beispiele['java-fehler-werfen']} />
+        <TryIt mode="java" id="java-fehler-werfen" {...examples['java-fehler-werfen']} />
       </Abschnitt>
 
       <Abschnitt titel="Eigene Exceptions">
@@ -71,7 +71,7 @@ export function Fehler() {
           (<Verweis nr="7.7" />). Der Vorteil: Sie kann zusätzliche Daten mitbringen - und der
           Aufrufer kann gezielt <em>diesen</em> Fall fangen.
         </P>
-        <TryIt modus="java" id="java-fehler-eigene" {...beispiele['java-fehler-eigene']} />
+        <TryIt mode="java" id="java-fehler-eigene" {...examples['java-fehler-eigene']} />
       </Abschnitt>
 
       <Abschnitt titel="Checked und unchecked">
@@ -103,7 +103,7 @@ export function Fehler() {
           Dann wandert die Exception die Aufrufkette hoch, bis sie oben herausfällt. Das Programm
           endet - und gibt vorher aus, was passiert ist und wo.
         </P>
-        <TryIt modus="java" id="java-fehler-ungefangen" {...beispiele['java-fehler-ungefangen']} />
+        <TryIt mode="java" id="java-fehler-ungefangen" {...examples['java-fehler-ungefangen']} />
         <Hinweis variante="info">
           Eine echte JVM listet hier die ganze Aufrufkette (<em>Stacktrace</em>):{' '}
           <Code>level2 → level1 → main</Code>. Diese Laufzeit nennt die Zeile, in der es passiert ist
@@ -118,10 +118,10 @@ export function Fehler() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-fehler-uebung"
-          {...beispiele['java-fehler-uebung']}
-          aufgabe={
+          {...examples['java-fehler-uebung']}
+          task={
             <>
               <p>Zwei Methoden, zwei Seiten derselben Medaille:</p>
               <Liste>
@@ -141,39 +141,39 @@ export function Fehler() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wann läuft der finally-Block?',
-            antworten: [
+            question: 'Wann läuft der finally-Block?',
+            answers: [
               'nur wenn kein Fehler auftrat',
               'nur wenn ein Fehler auftrat',
               'immer - auch nach einem return im try',
               'nur wenn es kein catch gibt',
             ],
-            richtig: 2,
-            erklaerung: 'finally ist der Aufräumblock und läuft in jedem Fall.',
+            correct: 2,
+            explanation: 'finally ist der Aufräumblock und läuft in jedem Fall.',
           },
           {
-            frage: 'Was unterscheidet checked von unchecked Exceptions?',
-            antworten: [
+            question: 'Was unterscheidet checked von unchecked Exceptions?',
+            answers: [
               'Checked sind schwerwiegender.',
               'Bei checked verlangt der Compiler catch oder throws.',
               'Unchecked kann man nicht fangen.',
               'Checked gibt es nur in eigenen Klassen.',
             ],
-            richtig: 1,
-            erklaerung: 'Alles unterhalb von RuntimeException ist unchecked - der Rest muss behandelt oder weitergereicht werden.',
+            correct: 1,
+            explanation: 'Alles unterhalb von RuntimeException ist unchecked - der Rest muss behandelt oder weitergereicht werden.',
           },
           {
-            frage: 'In welcher Reihenfolge stehen mehrere catch-Blöcke?',
-            antworten: [
+            question: 'In welcher Reihenfolge stehen mehrere catch-Blöcke?',
+            answers: [
               'egal',
               'vom allgemeinsten zum speziellsten',
               'vom speziellsten zum allgemeinsten',
               'alphabetisch',
             ],
-            richtig: 2,
-            erklaerung: 'Java nimmt den ersten passenden. Stünde catch (Exception e) oben, käme nie ein anderer dran - das ist sogar ein Kompilierfehler.',
+            correct: 2,
+            explanation: 'Java nimmt den ersten passenden. Stünde catch (Exception e) oben, käme nie ein anderer dran - das ist sogar ein Kompilierfehler.',
           },
         ]}
       />

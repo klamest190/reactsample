@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Start.code'
+import { examples, codeBloecke } from './Start.code'
 
 /**
  * KAPITEL 7.1 - Hallo Java
@@ -17,7 +17,7 @@ export function Start() {
           Das kürzeste vollständige Java-Programm. Drück auf ▶ Ausführen - es läuft hier im Browser,
           genau wie die JavaScript-Beispiele, nur über einen anderen Weg.
         </P>
-        <TryIt modus="java" id="java-start-einstieg" {...beispiele['java-start-einstieg']} />
+        <TryIt mode="java" id="java-start-einstieg" {...examples['java-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Warum ein Java-Teil in einem React-Kurs?">
@@ -49,7 +49,7 @@ export function Start() {
       </Abschnitt>
 
       <Abschnitt titel="Das Gerüst Wort für Wort">
-        <CodeBlock code={codeBloecke.geruest} titel="Main.java" />
+        <CodeBlock code={codeBloecke.geruest} title="Main.java" />
         <P>Jedes Wort in der zweiten Zeile hat eine Aufgabe:</P>
         <Tabelle
           kopf={['Wort', 'Bedeutung']}
@@ -66,7 +66,7 @@ export function Start() {
           Zum Vergleich - dasselbe Programm in JavaScript braucht genau eine Zeile und keinerlei
           Rahmen:
         </P>
-        <CodeBlock code={codeBloecke.jsVergleich} titel="hallo.js" />
+        <CodeBlock code={codeBloecke.jsVergleich} title="hallo.js" />
         <Hinweis variante="tipp">
           Die Klasse heißt hier <Code>Main</Code>, weil unsere Laufzeit dort zuerst nach{' '}
           <Code>main</Code> sucht. In einem echten Projekt muss der Dateiname zum Namen der
@@ -80,7 +80,7 @@ export function Start() {
           kein Zufall: <Code>System</Code> ist eine Klasse, <Code>out</Code> ein Feld darin (der
           Ausgabestrom) und <Code>println</Code> eine Methode auf diesem Strom.
         </P>
-        <TryIt modus="java" id="java-start-ausgabe" {...beispiele['java-start-ausgabe']} />
+        <TryIt mode="java" id="java-start-ausgabe" {...examples['java-start-ausgabe']} />
         <Hinweis variante="tipp">
           Tipp für den Editor: Tippe <Code>sout</Code> und drück Enter - das ist dieselbe Abkürzung
           wie in IntelliJ IDEA.
@@ -107,12 +107,12 @@ export function Start() {
             anywhere“.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.werkzeuge} titel="Auf der Kommandozeile" />
+        <CodeBlock code={codeBloecke.werkzeuge} title="Auf der Kommandozeile" />
         <P>
           Der wichtige Effekt: Ein Tippfehler wird zum <strong>Kompilierfehler</strong>, und das
           Programm startet gar nicht. Probier es aus - das Semikolon in Zeile 3 fehlt:
         </P>
-        <TryIt modus="java" id="java-start-fehler" {...beispiele['java-start-fehler']} />
+        <TryIt mode="java" id="java-start-fehler" {...examples['java-start-fehler']} />
         <Hinweis variante="warnung">
           Genau deshalb siehst du im Editor rote Schlangenlinien, sobald du kurz nicht tippst:
           Unsere Laufzeit prüft den Code im Hintergrund - so wie eine Java-IDE es auch tut.
@@ -124,7 +124,7 @@ export function Start() {
           Ein Java-Programm besteht fast immer aus mehreren Klassen. Fürs Lernen dürfen sie in
           derselben Datei stehen - nur eine davon darf <Code>public</Code> sein.
         </P>
-        <TryIt modus="java" id="java-start-mehrere" {...beispiele['java-start-mehrere']} />
+        <TryIt mode="java" id="java-start-mehrere" {...examples['java-start-mehrere']} />
       </Abschnitt>
 
       <Abschnitt titel="Die ersten Unterschiede zu JavaScript">
@@ -149,10 +149,10 @@ export function Start() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-start-uebung"
-          {...beispiele['java-start-uebung']}
-          aufgabe={
+          {...examples['java-start-uebung']}
+          task={
             <>
               <p>
                 Lege in <Code>main</Code> zwei Variablen an: <Code>name</Code> mit dem Text{' '}
@@ -167,39 +167,39 @@ export function Start() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wo startet ein Java-Programm?',
-            antworten: [
+            question: 'Wo startet ein Java-Programm?',
+            answers: [
               'in der ersten Zeile der Datei',
               'in der Methode main',
               'in der Klasse mit dem kürzesten Namen',
               'im Konstruktor',
             ],
-            richtig: 1,
-            erklaerung: 'Die JVM sucht nach public static void main(String[] args) und startet dort.',
+            correct: 1,
+            explanation: 'Die JVM sucht nach public static void main(String[] args) und startet dort.',
           },
           {
-            frage: 'Was macht javac?',
-            antworten: [
+            question: 'Was macht javac?',
+            answers: [
               'Es führt das Programm aus.',
               'Es prüft den Quelltext und erzeugt Bytecode.',
               'Es lädt Bibliotheken aus dem Internet.',
               'Es formatiert den Code.',
             ],
-            richtig: 1,
-            erklaerung: 'javac ist der Compiler: prüfen, dann .class-Dateien mit Bytecode erzeugen. Ausgeführt wird der von der JVM.',
+            correct: 1,
+            explanation: 'javac ist der Compiler: prüfen, dann .class-Dateien mit Bytecode erzeugen. Ausgeführt wird der von der JVM.',
           },
           {
-            frage: 'Was passiert bei einem fehlenden Semikolon?',
-            antworten: [
+            question: 'Was passiert bei einem fehlenden Semikolon?',
+            answers: [
               'Java ergänzt es automatisch.',
               'Nur die betroffene Zeile wird übersprungen.',
               'Das Programm startet gar nicht.',
               'Es gibt eine Warnung zur Laufzeit.',
             ],
-            richtig: 2,
-            erklaerung: 'Ein Syntaxfehler verhindert das Kompilieren - und ohne .class-Datei gibt es nichts auszuführen.',
+            correct: 2,
+            explanation: 'Ein Syntaxfehler verhindert das Kompilieren - und ohne .class-Datei gibt es nichts auszuführen.',
           },
         ]}
       />

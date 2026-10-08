@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.5 - Arrays & Strings. */
 
-export const beispiele = {
+export const examples = {
   'java-arrays-einstieg': {
     code: java`
       public class Main {
@@ -166,7 +166,7 @@ export const beispiele = {
     `,
   },
   'java-arrays-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`text.split(" ")` liefert ein `String[]` mit allen Wörtern.',
         'Die Länge eines Arrays ist `array.length` (ohne Klammern), die eines Strings `s.length()` (mit).',
@@ -190,7 +190,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           String text = "Java is a compiled and typed language";
@@ -210,13 +210,13 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: 'words hat 7 Einträge', en: 'words has 7 entries' }, ausdruck: 'words.length', erwartet: 7 },
-      { name: { de: 'wordCount ist 7', en: 'wordCount is 7' }, ausdruck: 'wordCount', erwartet: 7 },
-      { name: { de: 'longest ist "compiled"', en: 'longest is "compiled"' }, ausdruck: 'longest', erwartet: 'compiled' },
-      { name: { de: 'mentionsJava ist true', en: 'mentionsJava is true' }, ausdruck: 'mentionsJava', erwartet: true },
+      { name: { de: 'words hat 7 Einträge', en: 'words has 7 entries' }, expression: 'words.length', expected: 7 },
+      { name: { de: 'wordCount ist 7', en: 'wordCount is 7' }, expression: 'wordCount', expected: 7 },
+      { name: { de: 'longest ist "compiled"', en: 'longest is "compiled"' }, expression: 'longest', expected: 'compiled' },
+      { name: { de: 'mentionsJava ist true', en: 'mentionsJava is true' }, expression: 'mentionsJava', expected: true },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   anlegen: java`

@@ -9,13 +9,13 @@ import { PGlite } from '@electric-sql/pglite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { sqlExampleCheck, type SqlRunner } from '../sql/check'
-import { SHOP_TABELLEN } from '../sql/dataset'
+import { SHOP_TABLES } from '../sql/dataset'
 import { runScript } from '../sql/engine'
-import { uebungen } from '../course/exercises/sql'
+import { exercises } from '../course/exercises/sql'
 import { sqlPlayground } from '../course/playground/sql'
-import type { CodeBeispiel } from '../learning/jsSandbox'
+import type { CodeExample } from '../learning/jsSandbox'
 
-const codeModules = import.meta.glob<{ beispiele?: Record<string, CodeBeispiel> }>('../course/sql/*.code.ts', { eager: true })
+const codeModules = import.meta.glob<{ examples?: Record<string, CodeExample> }>('../course/sql/*.code.ts', { eager: true })
 
 let db: PGlite
 const run: SqlRunner = (script, options) => runScript(db, script, options)
@@ -57,20 +57,20 @@ describe('runtime', () => {
 })
 
 describe('example database', () => {
-  it.each(SHOP_TABELLEN)('$name has the documented columns and rows', async (table) => {
+  it.each(SHOP_TABLES)('$name has the documented columns and rows', async (table) => {
     const r = await run(`
       SELECT column_name, CASE WHEN data_type = 'numeric' THEN 'numeric(' || numeric_precision || ',' || numeric_scale || ')' ELSE data_type END
       FROM information_schema.columns WHERE table_name = '${table.name}' ORDER BY ordinal_position;
       SELECT count(*) FROM ${table.name};`)
     const columns = r.results[0]?.rows.map((row) => `${row[0]} ${row[1]}`)
-    expect(columns).toEqual(table.spalten.map((c) => `${c.name} ${c.typ}`))
-    expect(Number(r.results[1]?.rows[0]?.[0])).toBe(table.zeilen)
+    expect(columns).toEqual(table.columns.map((c) => `${c.name} ${c.type}`))
+    expect(Number(r.results[1]?.rows[0]?.[0])).toBe(table.lines)
   })
 })
 
 describe('chapter contents', () => {
   const examples = Object.entries(codeModules).flatMap(([path, module]) =>
-    Object.entries(module.beispiele ?? {}).map(([id, example]) => ({ id, example, file: path.split('/').pop()! })),
+    Object.entries(module.examples ?? {}).map(([id, example]) => ({ id, example, file: path.split('/').pop()! })),
   )
   it('finds the chapters', () => expect(examples.length).toBeGreaterThan(0))
   it.each(examples)('$id ($file)', async ({ id, example }) => {
@@ -80,7 +80,7 @@ describe('chapter contents', () => {
 })
 
 describe('extra exercises', () => {
-  const all = Object.values(uebungen).flat()
+  const all = Object.values(exercises).flat()
   it.each(all)('$id', async (u) => {
     if (u.stufe === 'vorhersage') {
       // The code of a prediction must run - the answer is about its result.

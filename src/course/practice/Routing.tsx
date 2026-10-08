@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Routing.code'
+import { examples, codeBloecke } from './Routing.code'
 
 /**
  * KAPITEL 5.7 - Routing mit React Router
@@ -19,7 +19,7 @@ export function Routing() {
           Zwei Seiten, zwei Links: <Code>{'<Routes>'}</Code> zeigt die <Code>{'<Route>'}</Code>, deren{' '}
           <Code>path</Code> zur aktuellen Adresse passt.
         </P>
-        <TryIt id="praxis-routing-einstieg" {...beispiele['praxis-routing-einstieg']} modus="react" />
+        <TryIt id="praxis-routing-einstieg" {...examples['praxis-routing-einstieg']} mode="react" />
       </Abschnitt>
 
       <Abschnitt titel="Was ist Routing?">
@@ -33,7 +33,7 @@ export function Routing() {
           Im Kern ist das nichts Neues: Der aktuelle Pfad ist State, und daraus wird die Seite ausgewählt. So sieht
           das ohne Bibliothek aus:
         </P>
-        <TryIt id="praxis-routing-idee" {...beispiele['praxis-routing-idee']} modus="react" />
+        <TryIt id="praxis-routing-idee" {...examples['praxis-routing-idee']} mode="react" />
         <P>
           Ein echter Router macht zusätzlich zwei Dinge: Er schreibt den Pfad mit{' '}
           <Code>history.pushState()</Code> in die Adresszeile, und er hört auf das Ereignis <Code>popstate</Code>,
@@ -47,7 +47,7 @@ export function Routing() {
           Die verbreitetste Bibliothek dafür ist <strong>React Router</strong>. Im eigenen Projekt installierst du sie
           und legst einen <Code>BrowserRouter</Code> um die ganze App:
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.installieren} />
+        <CodeBlock title="Terminal" code={codeBloecke.installieren} />
         <CodeBlock code={codeBloecke.einrichten} />
         <Hinweis variante="info">
           In den Editoren hier steht stattdessen <Code>MemoryRouter</Code>. Er merkt sich die Adresse nur im
@@ -72,7 +72,7 @@ export function Routing() {
           <Code>/products/:id</Code>. Die Komponente liest den Wert mit <Code>useParams()</Code>. Die Route{' '}
           <Code>path="*"</Code> fängt alles auf, was sonst nicht passt.
         </P>
-        <TryIt id="praxis-routing-params" {...beispiele['praxis-routing-params']} modus="react" />
+        <TryIt id="praxis-routing-params" {...examples['praxis-routing-params']} mode="react" />
         <Liste>
           <li>
             <Code>NavLink</Code> ist ein <Code>Link</Code>, der weiß, ob er aktiv ist - ideal für Menüs. „Products“
@@ -93,7 +93,7 @@ export function Routing() {
           <Code>{'<Outlet />'}</Code> erscheint die passende innere Route. Eine <Code>index</Code>-Route ist die
           Standardseite eines Bereichs.
         </P>
-        <TryIt id="praxis-routing-layout" {...beispiele['praxis-routing-layout']} modus="react" />
+        <TryIt id="praxis-routing-layout" {...examples['praxis-routing-layout']} mode="react" />
         <P>
           Das ist dasselbe Prinzip wie <Code>children</Code> aus <Verweis id="praxis-komposition" /> - nur entscheidet
           hier die Adresse, was eingesetzt wird. Beim Wechsel zwischen „Profile“ und „Security“ bleibt das Layout
@@ -107,7 +107,7 @@ export function Routing() {
           <Code>useNavigate()</Code> weiter. Soll eine Seite gar nicht erst angezeigt werden, gibst du{' '}
           <Code>{'<Navigate to="…" />'}</Code> zurück - eine Weiterleitung beim Rendern.
         </P>
-        <TryIt id="praxis-routing-navigieren" {...beispiele['praxis-routing-navigieren']} modus="react" />
+        <TryIt id="praxis-routing-navigieren" {...examples['praxis-routing-navigieren']} mode="react" />
         <Liste>
           <li>
             <Code>replace</Code> ersetzt den aktuellen Eintrag im Verlauf, statt einen neuen anzulegen. Nach dem
@@ -130,7 +130,7 @@ export function Routing() {
           übersteht ein Neuladen. <Code>useSearchParams()</Code> funktioniert fast wie <Code>useState</Code>, nur
           liegt der Wert in der URL - eine Quelle der Wahrheit (<Verweis id="react-datenfluss" />).
         </P>
-        <TryIt id="praxis-routing-suche" {...beispiele['praxis-routing-suche']} modus="react" />
+        <TryIt id="praxis-routing-suche" {...examples['praxis-routing-suche']} mode="react" />
         <P>
           Suchparameter sind immer Strings. Fehlt einer, liefert <Code>get()</Code> <Code>null</Code> - deshalb die
           Standardwerte mit <Code>??</Code>.
@@ -145,7 +145,7 @@ export function Routing() {
           Die Komponente holt sich das Ergebnis mit <Code>useLoaderData()</Code> und muss sich um Laden und Fehler
           nicht mehr kümmern.
         </P>
-        <TryIt id="praxis-routing-loader" {...beispiele['praxis-routing-loader']} modus="react" />
+        <TryIt id="praxis-routing-loader" {...examples['praxis-routing-loader']} mode="react" />
         <Liste>
           <li>
             Die Routen sind hier Objekte statt JSX und werden mit <Code>createMemoryRouter</Code> (im Projekt:{' '}
@@ -160,7 +160,7 @@ export function Routing() {
             Error Boundary (<Verweis id="praxis-fehler" />).
           </li>
         </Liste>
-        <CodeBlock titel="Im eigenen Projekt" code={codeBloecke.datenRouter} />
+        <CodeBlock title="Im eigenen Projekt" code={codeBloecke.datenRouter} />
         <Hinweis variante="tipp">
           React Router hat drei Stufen: <strong>Declarative</strong> (<Code>{'<Routes>'}</Code>, wie oben),{' '}
           <strong>Data</strong> (Loader, Actions) und <strong>Framework</strong> (mit Vite-Plugin, Server-Rendering und
@@ -172,9 +172,9 @@ export function Routing() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-routing-uebung"
-          {...beispiele['praxis-routing-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-routing-uebung']}
+          mode="react"
+          task={
             <>
               <p>Mach aus dem Blog eine App mit Detailseiten:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -195,42 +195,42 @@ export function Routing() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum <Link> statt <a href> für Seiten innerhalb der App?',
-            antworten: [
+            question: 'Warum <Link> statt <a href> für Seiten innerhalb der App?',
+            answers: [
               'Link ist schneller gestylt',
               'Ein <a> lädt die ganze Seite neu - aller State geht verloren',
               'Mit <a> funktioniert der Zurück-Knopf nicht',
             ],
-            richtig: 1,
-            erklaerung: 'Link ändert nur die Adresse und lässt React die passende Route rendern.',
+            correct: 1,
+            explanation: 'Link ändert nur die Adresse und lässt React die passende Route rendern.',
           },
           {
-            frage: 'Wie liest eine Komponente das :id aus /products/:id?',
-            antworten: ['props.id', 'useParams()', 'useLocation().id'],
-            richtig: 1,
-            erklaerung: 'useParams() liefert ein Objekt mit allen Platzhaltern der passenden Route.',
+            question: 'Wie liest eine Komponente das :id aus /products/:id?',
+            answers: ['props.id', 'useParams()', 'useLocation().id'],
+            correct: 1,
+            explanation: 'useParams() liefert ein Objekt mit allen Platzhaltern der passenden Route.',
           },
           {
-            frage: 'Wofür steht <Outlet /> in einer Layout-Route?',
-            antworten: [
+            question: 'Wofür steht <Outlet /> in einer Layout-Route?',
+            answers: [
               'Für einen Link nach draußen',
               'Für die Stelle, an der die passende Unter-Route erscheint',
               'Für die 404-Seite',
             ],
-            richtig: 1,
-            erklaerung: 'Das Layout bleibt stehen, nur der Inhalt am Outlet wechselt mit der Adresse.',
+            correct: 1,
+            explanation: 'Das Layout bleibt stehen, nur der Inhalt am Outlet wechselt mit der Adresse.',
           },
           {
-            frage: 'Welcher State gehört typischerweise in die URL?',
-            antworten: [
+            question: 'Welcher State gehört typischerweise in die URL?',
+            answers: [
               'Der Text, den jemand gerade in ein Formular tippt',
               'Filter, Suche und Sortierung einer Liste',
               'Ob ein Tooltip offen ist',
             ],
-            richtig: 1,
-            erklaerung: 'Alles, was man teilen oder als Lesezeichen speichern möchte.',
+            correct: 1,
+            explanation: 'Alles, was man teilen oder als Lesezeichen speichern möchte.',
           },
         ]}
       />

@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './UseState.code'
+import { examples } from './UseState.code'
 import { ZaehlerDemo } from '../demos/ZaehlerDemo'
 
 const hookOverview: [string, string, string][] = [
@@ -28,8 +28,8 @@ export function UseState() {
         <P><Code>useState</Code> returns the current value and a function to change it.</P>
         <TryIt
           id="hooks-usestate-einstieg"
-          {...beispiele['hooks-usestate-einstieg']}
-          modus="react"
+          {...examples['hooks-usestate-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -67,7 +67,7 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-regeln"
-          {...beispiele['hooks-usestate-regeln']}
+          {...examples['hooks-usestate-regeln']}
         />
       </Abschnitt>
 
@@ -80,8 +80,8 @@ export function UseState() {
         <ZaehlerDemo />
         <TryIt
           id="hooks-usestate-funktional"
-          {...beispiele['hooks-usestate-funktional']}
-          modus="react"
+          {...examples['hooks-usestate-funktional']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           The interval above is never stopped. You will learn how to clean up timers properly with{' '}
@@ -97,8 +97,8 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-objekte"
-          {...beispiele['hooks-usestate-objekte']}
-          modus="react"
+          {...examples['hooks-usestate-objekte']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -110,8 +110,8 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-lazy"
-          {...beispiele['hooks-usestate-lazy']}
-          modus="react"
+          {...examples['hooks-usestate-lazy']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -123,17 +123,17 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-key"
-          {...beispiele['hooks-usestate-key']}
-          modus="react"
+          {...examples['hooks-usestate-key']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-usestate-uebung"
-          {...beispiele['hooks-usestate-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usestate-uebung']}
+          mode="react"
+          task={
             <>
               <p>Build a shopping list. All updates as updater functions and without mutation:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -150,34 +150,34 @@ export function UseState() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why can’t hooks be inside an if?',
-            antworten: [
+            question: 'Why can’t hooks be inside an if?',
+            answers: [
               'For performance reasons',
               'React matches hooks by their call order',
               'Because if is forbidden in components',
             ],
-            richtig: 1,
-            erklaerung: 'If one call is skipped, the mapping of all following hooks shifts.',
+            correct: 1,
+            explanation: 'If one call is skipped, the mapping of all following hooks shifts.',
           },
           {
-            frage: 'count is 0. What is it on the next render after calling setCount(c => c + 1) twice?',
-            antworten: ['1', '2', '0'],
-            richtig: 1,
-            erklaerung: 'Updater functions are applied one after another to the latest value.',
+            question: 'count is 0. What is it on the next render after calling setCount(c => c + 1) twice?',
+            answers: ['1', '2', '0'],
+            correct: 1,
+            explanation: 'Updater functions are applied one after another to the latest value.',
           },
           {
-            frage: 'What does setProfile({ name: "Grace" }) do to the other fields of profile?',
-            antworten: ['Keeps them', 'Removes them - the state is replaced entirely'],
-            richtig: 1,
-            erklaerung: 'useState replaces the value. That’s why you write { ...prev, name: "Grace" }.',
+            question: 'What does setProfile({ name: "Grace" }) do to the other fields of profile?',
+            answers: ['Keeps them', 'Removes them - the state is replaced entirely'],
+            correct: 1,
+            explanation: 'useState replaces the value. That’s why you write { ...prev, name: "Grace" }.',
           },
           {
-            frage: 'How do you completely reset the state of a child component?',
-            antworten: ['With a new key', 'With useState(null)', 'Not at all'],
-            richtig: 0,
-            erklaerung: 'A different key makes React create the component anew - with fresh state.',
+            question: 'How do you completely reset the state of a child component?',
+            answers: ['With a new key', 'With useState(null)', 'Not at all'],
+            correct: 0,
+            explanation: 'A different key makes React create the component anew - with fresh state.',
           },
         ]}
       />

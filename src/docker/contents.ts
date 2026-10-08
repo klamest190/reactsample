@@ -7,7 +7,7 @@
  * No DOM, no React - used by the browser self-test and by `npm test -- backend`.
  */
 
-import type { CodeBeispiel, DockerTest } from '../learning/jsSandbox'
+import type { CodeExample, DockerTest } from '../learning/jsSandbox'
 import { simulateBuild } from './build'
 import { composeUp } from './compose'
 import { localized } from '../i18n/localized'
@@ -19,7 +19,7 @@ export const DOCKER_EXPECTED_FAILURES: Record<string, string> = {
 }
 
 
-export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'dockerfile' | 'compose'): ContentResult {
+export function dockerExampleCheck(id: string, example: CodeExample, mode: 'dockerfile' | 'compose'): ContentResult {
   const result = contentResult(id)
   const tests = example.tests as DockerTest[] | undefined
   const name = (t: DockerTest) => localized(t.name, 'de')
@@ -41,7 +41,7 @@ export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'doc
   }
 
   if (tests?.length) {
-    const solution = evaluate(example.loesung ?? example.code)
+    const solution = evaluate(example.solution ?? example.code)
     if (solution.failed.length) return result(`solution fails: ${solution.failed.join(' · ')}${solution.error ? ` (${solution.error})` : ''}`)
     const start = evaluate(example.code)
     if (!start.failed.length) return result('the start code already passes all tests - nothing to practise')
@@ -52,8 +52,8 @@ export function dockerExampleCheck(id: string, example: CodeBeispiel, mode: 'doc
   const run = evaluate(example.code)
   if (run.error && !expected) return result(run.error)
   if (!run.error && expected) return result(`should fail (${expected}), but works`)
-  if (example.loesung) {
-    const solution = evaluate(example.loesung)
+  if (example.solution) {
+    const solution = evaluate(example.solution)
     if (solution.error) return result('solution: ' + solution.error)
   }
   return result()

@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { RequestFlow } from '../demos/BackendDiagrams'
-import { beispiele, codeBloecke } from './SpringStart.code'
+import { examples, codeBloecke } from './SpringStart.code'
 
 /**
  * CHAPTER 8.1 - Hello Spring Boot
@@ -20,7 +20,7 @@ export function SpringStart() {
           Spring-Boot-Backend. Nach dem Start schickt der Editor automatisch eine Anfrage an{' '}
           <Code>/hello</Code>; unten siehst du die Antwort.
         </P>
-        <TryIt modus="spring" id="spring-start-einstieg" {...beispiele['spring-start-einstieg']} />
+        <TryIt mode="spring" id="spring-start-einstieg" {...examples['spring-start-einstieg']} />
         <Hinweis variante="info">
           Im Formular unter der Antwort kannst du selbst Anfragen schicken - probier{' '}
           <Code>/hallo</Code> (Tippfehler) oder die Methode <Code>POST</Code> und sieh dir an, was
@@ -57,10 +57,10 @@ export function SpringStart() {
           hat einen <strong>Status-Code</strong>, Header und einen Body - bei uns fast immer JSON.
         </P>
         <div className="grid gap-3 lg:grid-cols-2">
-          <CodeBlock code={codeBloecke.anfrage} titel="Anfrage · request.http" />
-          <CodeBlock code={codeBloecke.antwort} titel="Antwort" sprache="konfig" />
-          <CodeBlock code={codeBloecke.anlegen} titel="Anlegen · request.http" />
-          <CodeBlock code={codeBloecke.angelegt} titel="Antwort" sprache="konfig" />
+          <CodeBlock code={codeBloecke.anfrage} title="Anfrage · request.http" />
+          <CodeBlock code={codeBloecke.antwort} title="Antwort" language="config" />
+          <CodeBlock code={codeBloecke.anlegen} title="Anlegen · request.http" />
+          <CodeBlock code={codeBloecke.angelegt} title="Antwort" language="config" />
         </div>
         <Tabelle
           kopf={['Methode', 'Bedeutung']}
@@ -103,15 +103,15 @@ export function SpringStart() {
           IntelliJ): Projekt <em>Maven</em>, Sprache <em>Java</em>, Java-Version 21, als Abhängigkeit{' '}
           <em>Spring Web</em>. Heraus kommt ein Ordner mit dieser Struktur:
         </P>
-        <CodeBlock code={codeBloecke.struktur} titel="todo-api/" sprache="konfig" />
+        <CodeBlock code={codeBloecke.struktur} title="todo-api/" language="config" />
         <P>
           Die <Code>pom.xml</Code> ist für Maven, was die <Code>package.json</Code> für npm ist: Sie
           nennt die Abhängigkeiten. Ein „Starter“ bündelt dabei alles, was zusammengehört -{' '}
           <Code>spring-boot-starter-web</Code> bringt Tomcat, Spring MVC und die JSON-Bibliothek
           Jackson mit.
         </P>
-        <CodeBlock code={codeBloecke.pom} titel="pom.xml (Ausschnitt)" />
-        <CodeBlock code={codeBloecke.starten} titel="Terminal" />
+        <CodeBlock code={codeBloecke.pom} title="pom.xml (Ausschnitt)" />
+        <CodeBlock code={codeBloecke.starten} title="Terminal" />
       </Abschnitt>
 
       <Abschnitt titel="Das erste Programm Stück für Stück">
@@ -140,7 +140,7 @@ export function SpringStart() {
           auf.</strong> Ab jetzt lassen wir die <Code>import</Code>-Zeilen weg; im echten Projekt
           ergänzt sie die IDE.
         </P>
-        <CodeBlock code={codeBloecke.reactVergleich} titel="Vergleich mit React Router" />
+        <CodeBlock code={codeBloecke.reactVergleich} title="Vergleich mit React Router" />
       </Abschnitt>
 
       <Abschnitt titel="Parameter: aus dem Pfad und aus der Query">
@@ -151,7 +151,7 @@ export function SpringStart() {
           Parameters um - und antwortet mit <strong>400 Bad Request</strong>, wenn das nicht geht.
           Die vierte Anfrage zeigt es.
         </P>
-        <TryIt modus="spring" id="spring-start-parameter" {...beispiele['spring-start-parameter']} />
+        <TryIt mode="spring" id="spring-start-parameter" {...examples['spring-start-parameter']} />
       </Abschnitt>
 
       <Abschnitt titel="Java-Objekte werden JSON">
@@ -160,7 +160,7 @@ export function SpringStart() {
           um. Records (<Verweis nr="7.7" />) eignen sich dafür perfekt: Ihre Komponenten werden zu
           den Feldern im JSON.
         </P>
-        <TryIt modus="spring" id="spring-start-json" {...beispiele['spring-start-json']} />
+        <TryIt mode="spring" id="spring-start-json" {...examples['spring-start-json']} />
         <Hinweis variante="info">
           <strong>Wie läuft das hier im Browser?</strong> Die Java-Laufzeit aus Teil 7 führt deinen
           Code aus, eine kleine Nachbildung von Spring (<Code>src/spring/</Code>) liest die
@@ -172,10 +172,10 @@ export function SpringStart() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-start-uebung"
-          {...beispiele['spring-start-uebung']}
-          aufgabe={
+          {...examples['spring-start-uebung']}
+          task={
             <>
               <p>Schreibe einen Controller mit zwei Endpunkten:</p>
               <Liste>
@@ -194,24 +194,24 @@ export function SpringStart() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welche HTTP-Methode passt zu „einen neuen Eintrag anlegen“?',
-            antworten: ['GET', 'POST', 'DELETE', 'HEAD'],
-            richtig: 1,
-            erklaerung: 'POST legt etwas Neues an. GET liest nur, PUT/PATCH ändern, DELETE löscht.',
+            question: 'Welche HTTP-Methode passt zu „einen neuen Eintrag anlegen“?',
+            answers: ['GET', 'POST', 'DELETE', 'HEAD'],
+            correct: 1,
+            explanation: 'POST legt etwas Neues an. GET liest nur, PUT/PATCH ändern, DELETE löscht.',
           },
           {
-            frage: 'Wer ruft eine Methode mit @GetMapping("/hello") auf?',
-            antworten: ['Die main-Methode', 'Spring, bei jeder Anfrage an GET /hello', 'Der Browser direkt', 'Niemand - sie ist nur Dokumentation'],
-            richtig: 1,
-            erklaerung: 'Spring findet die Methode beim Start über die Annotation und ruft sie für jede passende Anfrage auf.',
+            question: 'Wer ruft eine Methode mit @GetMapping("/hello") auf?',
+            answers: ['Die main-Methode', 'Spring, bei jeder Anfrage an GET /hello', 'Der Browser direkt', 'Niemand - sie ist nur Dokumentation'],
+            correct: 1,
+            explanation: 'Spring findet die Methode beim Start über die Annotation und ruft sie für jede passende Anfrage auf.',
           },
           {
-            frage: 'GET /square/seven, die Methode erwartet @PathVariable int n. Was antwortet Spring?',
-            antworten: ['200 mit 0', '404 Not Found', '400 Bad Request', '500 Internal Server Error'],
-            richtig: 2,
-            erklaerung: '„seven“ lässt sich nicht in int umwandeln - das ist ein Fehler der Anfrage, also 400.',
+            question: 'GET /square/seven, die Methode erwartet @PathVariable int n. Was antwortet Spring?',
+            answers: ['200 mit 0', '404 Not Found', '400 Bad Request', '500 Internal Server Error'],
+            correct: 2,
+            explanation: '„seven“ lässt sich nicht in int umwandeln - das ist ein Fehler der Anfrage, also 400.',
           },
         ]}
       />

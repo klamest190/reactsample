@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Tailwind.code'
+import { examples, codeBloecke } from './Tailwind.code'
 import { TailwindDemo } from '../demos/TailwindDemo'
 
 /**
@@ -15,8 +15,8 @@ export function Tailwind() {
         <P>Mit Tailwind stylst du direkt über Klassen in <Code>className</Code>.</P>
         <TryIt
           id="praxis-tailwind-einstieg"
-          {...beispiele['praxis-tailwind-einstieg']}
-          modus="react"
+          {...examples['praxis-tailwind-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -50,8 +50,8 @@ export function Tailwind() {
       <Abschnitt titel="Ausprobieren">
         <TryIt
           id="praxis-tailwind-karte"
-          {...beispiele['praxis-tailwind-karte']}
-          modus="react"
+          {...examples['praxis-tailwind-karte']}
+          mode="react"
         />
         <Hinweis variante="tipp">
           <strong>Autovervollständigung wie in VS Code:</strong> Tippe in <Code>className="…"</Code> los,
@@ -86,7 +86,7 @@ export function Tailwind() {
           Seit Version 4 gibt es keine <Code>tailwind.config.js</Code> mehr. Alles steht in CSS:
         </P>
         <CodeBlock
-          titel="src/index.css"
+          title="src/index.css"
           code={codeBloecke.beispiel3}
         />
         <P>
@@ -97,9 +97,9 @@ export function Tailwind() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-tailwind-uebung"
-          {...beispiele['praxis-tailwind-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-tailwind-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Baue eine <Code>Badge</Code>-Komponente mit der Prop <Code>status</Code> (
@@ -116,28 +116,28 @@ export function Tailwind() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum funktioniert className={`text-${color}-600`} nicht zuverlässig?',
-            antworten: [
+            question: 'Warum funktioniert className={`text-${color}-600`} nicht zuverlässig?',
+            answers: [
               'Template-Literale sind in className verboten',
               'Der Scanner findet den vollständigen Klassennamen nicht im Quelltext',
               'Tailwind unterstützt keine Farben',
             ],
-            richtig: 1,
-            erklaerung: 'Tailwind liest den Code statisch. Klassennamen müssen vollständig darin stehen.',
+            correct: 1,
+            explanation: 'Tailwind liest den Code statisch. Klassennamen müssen vollständig darin stehen.',
           },
           {
-            frage: 'Was bedeutet md:grid-cols-3?',
-            antworten: ['Nur auf mittleren Bildschirmen', 'Ab 768 px Breite und größer', 'Bis 768 px Breite'],
-            richtig: 1,
-            erklaerung: 'Tailwind ist mobile first: Präfixe gelten ab der Breite aufwärts.',
+            question: 'Was bedeutet md:grid-cols-3?',
+            answers: ['Nur auf mittleren Bildschirmen', 'Ab 768 px Breite und größer', 'Bis 768 px Breite'],
+            correct: 1,
+            explanation: 'Tailwind ist mobile first: Präfixe gelten ab der Breite aufwärts.',
           },
           {
-            frage: 'Wie verhindert man lange, wiederholte Klassenlisten in React?',
-            antworten: ['Mit @apply in CSS', 'Mit einer eigenen Komponente', 'Mit inline style'],
-            richtig: 1,
-            erklaerung: 'Die Komponente ist in React die natürliche Einheit für Wiederverwendung.',
+            question: 'Wie verhindert man lange, wiederholte Klassenlisten in React?',
+            answers: ['Mit @apply in CSS', 'Mit einer eigenen Komponente', 'Mit inline style'],
+            correct: 1,
+            explanation: 'Die Komponente ist in React die natürliche Einheit für Wiederverwendung.',
           },
         ]}
       />

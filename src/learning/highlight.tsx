@@ -17,21 +17,21 @@
  * "quoted names" and psql meta commands like `\dt`.
  */
 
-type TokenTyp =
-  | 'kommentar'
+type TokenType =
+  | 'comment'
   | 'string'
   | 'keyword'
   | 'literal'
-  | 'zahl'
+  | 'number'
   | 'tag'
-  | 'funktion'
-  | 'komponente'
+  | 'function'
+  | 'component'
   | 'annotation'
   | 'text'
 
-type Token = { typ: TokenTyp; text: string }
+type Token = { type: TokenType; text: string }
 
-export type HighlightMode = 'code' | 'konfig' | 'sql'
+export type HighlightMode = 'code' | 'config' | 'sql'
 
 const KEYWORDS = new Set(
   (
@@ -54,41 +54,41 @@ function tokenisieren(code: string): Token[] {
   const tokens: Token[] = []
   let position = 0
 
-  for (const treffer of code.matchAll(MUSTER)) {
-    const start = treffer.index
-    if (start > position) tokens.push({ typ: 'text', text: code.slice(position, start) })
-    const [text, kommentar, string, tag, zahl, annotation, wort] = treffer
+  for (const hits of code.matchAll(MUSTER)) {
+    const start = hits.index
+    if (start > position) tokens.push({ type: 'text', text: code.slice(position, start) })
+    const [text, comment, string, tag, number, annotation, word] = hits
     position = start + text.length
 
-    if (kommentar) tokens.push({ typ: 'kommentar', text })
-    else if (string) tokens.push({ typ: 'string', text })
+    if (comment) tokens.push({ type: 'comment', text })
+    else if (string) tokens.push({ type: 'string', text })
     else if (tag) {
       // `a<b` ist ein Vergleich, kein Tag: direkt davor steht ein Bezeichner.
-      const davor = code[start - 1] ?? ''
-      if (/[\w$)\]]/.test(davor)) {
-        tokens.push({ typ: 'text', text: '<' })
+      const before = code[start - 1] ?? ''
+      if (/[\w$)\]]/.test(before)) {
+        tokens.push({ type: 'text', text: '<' })
         position = start + 1
       } else {
-        tokens.push({ typ: 'tag', text })
+        tokens.push({ type: 'tag', text })
       }
-    } else if (zahl) tokens.push({ typ: 'zahl', text })
-    else if (annotation) tokens.push({ typ: 'annotation', text })
-    else if (wort) {
-      const danach = code.slice(position).match(/^\s*(.)/)?.[1]
-      const typ: TokenTyp = KEYWORDS.has(wort)
+    } else if (number) tokens.push({ type: 'number', text })
+    else if (annotation) tokens.push({ type: 'annotation', text })
+    else if (word) {
+      const after = code.slice(position).match(/^\s*(.)/)?.[1]
+      const type: TokenType = KEYWORDS.has(word)
         ? 'keyword'
-        : LITERALE.has(wort)
+        : LITERALE.has(word)
           ? 'literal'
-          : danach === '('
-            ? 'funktion'
-            : /^[A-Z]/.test(wort)
-              ? 'komponente'
+          : after === '('
+            ? 'function'
+            : /^[A-Z]/.test(word)
+              ? 'component'
               : 'text'
-      tokens.push({ typ, text: wort })
+      tokens.push({ type, text: word })
     }
   }
 
-  if (position < code.length) tokens.push({ typ: 'text', text: code.slice(position) })
+  if (position < code.length) tokens.push({ type: 'text', text: code.slice(position) })
   return tokens
 }
 
@@ -101,21 +101,21 @@ const VALUE = /("(?:\\.|[^"\\\n])*"?|'[^'\n]*'?)|(\$\{[^}\n]*\}|--?[\w-]+=?|→|
 function tokenizeConfig(code: string): Token[] {
   const tokens: Token[] = []
   code.split('\n').forEach((line, index) => {
-    if (index > 0) tokens.push({ typ: 'text', text: '\n' })
+    if (index > 0) tokens.push({ type: 'text', text: '\n' })
     const comment = line.match(/^(\s*)(#.*)$/)
     if (comment) {
-      tokens.push({ typ: 'text', text: comment[1] }, { typ: 'kommentar', text: comment[2] })
+      tokens.push({ type: 'text', text: comment[1] }, { type: 'comment', text: comment[2] })
       return
     }
     let rest = line
     const instruction = rest.match(INSTRUCTION)
     if (instruction) {
-      tokens.push({ typ: 'text', text: instruction[1] }, { typ: 'keyword', text: instruction[2] })
+      tokens.push({ type: 'text', text: instruction[1] }, { type: 'keyword', text: instruction[2] })
       rest = rest.slice(instruction[0].length)
     } else {
       const key = rest.match(KEY)
       if (key) {
-        tokens.push({ typ: 'text', text: key[1] }, { typ: 'funktion', text: key[2] }, { typ: 'text', text: key[3] })
+        tokens.push({ type: 'text', text: key[1] }, { type: 'function', text: key[2] }, { type: 'text', text: key[3] })
         rest = rest.slice(key[0].length)
       }
     }
@@ -124,13 +124,13 @@ function tokenizeConfig(code: string): Token[] {
     const body = trailing ? rest.slice(0, trailing.index) : rest
     let position = 0
     for (const match of body.matchAll(VALUE)) {
-      if (match.index > position) tokens.push({ typ: 'text', text: body.slice(position, match.index) })
+      if (match.index > position) tokens.push({ type: 'text', text: body.slice(position, match.index) })
       const [text, string, special, number, literal] = match
-      tokens.push({ typ: string ? 'string' : special ? 'literal' : number ? 'zahl' : literal ? 'keyword' : 'text', text })
+      tokens.push({ type: string ? 'string' : special ? 'literal' : number ? 'number' : literal ? 'keyword' : 'text', text })
       position = match.index + text.length
     }
-    if (position < body.length) tokens.push({ typ: 'text', text: body.slice(position) })
-    if (trailing) tokens.push({ typ: 'kommentar', text: trailing[0] })
+    if (position < body.length) tokens.push({ type: 'text', text: body.slice(position) })
+    if (trailing) tokens.push({ type: 'comment', text: trailing[0] })
   })
   return tokens
 }
@@ -155,45 +155,45 @@ function tokenizeSql(code: string): Token[] {
   const tokens: Token[] = []
   let position = 0
   for (const match of code.matchAll(SQL_PATTERN)) {
-    if (match.index > position) tokens.push({ typ: 'text', text: code.slice(position, match.index) })
+    if (match.index > position) tokens.push({ type: 'text', text: code.slice(position, match.index) })
     const [text, comment, string, quoted, meta, number, word] = match
     position = match.index + text.length
-    if (comment) tokens.push({ typ: 'kommentar', text })
-    else if (string) tokens.push({ typ: 'string', text })
-    else if (quoted) tokens.push({ typ: 'komponente', text })
-    else if (meta) tokens.push({ typ: 'annotation', text })
-    else if (number) tokens.push({ typ: 'zahl', text })
+    if (comment) tokens.push({ type: 'comment', text })
+    else if (string) tokens.push({ type: 'string', text })
+    else if (quoted) tokens.push({ type: 'component', text })
+    else if (meta) tokens.push({ type: 'annotation', text })
+    else if (number) tokens.push({ type: 'number', text })
     else if (word) {
       const lower = word.toLowerCase()
       const next = code.slice(position).match(/^\s*(.)/)?.[1]
-      tokens.push({ typ: SQL_LITERALS.has(lower) ? 'literal' : SQL_KEYWORDS.has(lower) ? 'keyword' : next === '(' ? 'funktion' : 'text', text: word })
+      tokens.push({ type: SQL_LITERALS.has(lower) ? 'literal' : SQL_KEYWORDS.has(lower) ? 'keyword' : next === '(' ? 'function' : 'text', text: word })
     }
   }
-  if (position < code.length) tokens.push({ typ: 'text', text: code.slice(position) })
+  if (position < code.length) tokens.push({ type: 'text', text: code.slice(position) })
   return tokens
 }
 
 // Vollständige Klassennamen, damit der Tailwind-Scanner sie findet.
-const FARBEN: Record<TokenTyp, string> = {
-  kommentar: 'text-slate-500 italic dark:text-slate-400',
+const COLORS: Record<TokenType, string> = {
+  comment: 'text-slate-500 italic dark:text-slate-400',
   string: 'text-emerald-700 dark:text-emerald-400',
   keyword: 'text-violet-700 dark:text-violet-400',
   literal: 'text-amber-700 dark:text-amber-400',
-  zahl: 'text-amber-700 dark:text-amber-400',
+  number: 'text-amber-700 dark:text-amber-400',
   tag: 'text-rose-700 dark:text-rose-400',
-  funktion: 'text-sky-700 dark:text-sky-400',
-  komponente: 'text-teal-700 dark:text-teal-300',
+  function: 'text-sky-700 dark:text-sky-400',
+  component: 'text-teal-700 dark:text-teal-300',
   annotation: 'text-amber-700 dark:text-amber-300',
   text: '',
 }
 
 /** Rendert Code als eingefärbte <span>s - für CodeBlock und CodeEditor. */
-export function HervorgehobenerCode({ code, sprache = 'code' }: { code: string; sprache?: HighlightMode }) {
-  return (sprache === 'konfig' ? tokenizeConfig(code) : sprache === 'sql' ? tokenizeSql(code) : tokenisieren(code)).map((t, i) =>
-    t.typ === 'text' ? (
+export function HighlightedCode({ code, language = 'code' }: { code: string; language?: HighlightMode }) {
+  return (language === 'config' ? tokenizeConfig(code) : language === 'sql' ? tokenizeSql(code) : tokenisieren(code)).map((t, i) =>
+    t.type === 'text' ? (
       t.text
     ) : (
-      <span key={i} className={FARBEN[t.typ]}>
+      <span key={i} className={COLORS[t.type]}>
         {t.text}
       </span>
     ),

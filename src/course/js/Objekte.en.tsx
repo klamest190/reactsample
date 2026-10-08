@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Objekte.code'
+import { examples, codeBloecke } from './Objekte.code'
 
 /**
  * KAPITEL 1.5 (English) - Objects, Destructuring & Spread
@@ -15,7 +15,7 @@ export function Objekte() {
         <P>An object groups related values under names.</P>
         <TryIt
           id="js-objekte-einstieg"
-          {...beispiele['js-objekte-einstieg']}
+          {...examples['js-objekte-einstieg']}
         />
       </Abschnitt>
 
@@ -26,7 +26,7 @@ export function Objekte() {
         </P>
         <TryIt
           id="js-objekte-1"
-          {...beispiele['js-objekte-1']}
+          {...examples['js-objekte-1']}
         />
       </Abschnitt>
 
@@ -36,12 +36,12 @@ export function Objekte() {
           every single React component:
         </P>
         <CodeBlock
-          titel="Destructuring in React"
+          title="Destructuring in React"
           code={codeBloecke.beispiel1}
         />
         <TryIt
           id="js-objekte-2"
-          {...beispiele['js-objekte-2']}
+          {...examples['js-objekte-2']}
         />
       </Abschnitt>
 
@@ -52,7 +52,7 @@ export function Objekte() {
         </P>
         <TryIt
           id="js-objekte-3"
-          {...beispiele['js-objekte-3']}
+          {...examples['js-objekte-3']}
         />
         <Hinweis variante="tipp">
           <Code>{'{ ...prev, field: next }'}</Code> is <strong>the</strong> pattern for updating state
@@ -67,7 +67,7 @@ export function Objekte() {
           anything (numbers or even objects), the order is kept and <Code>size</Code> tells you how many entries there
           are.
         </P>
-        <TryIt id="js-objekte-mapset" {...beispiele['js-objekte-mapset']} />
+        <TryIt id="js-objekte-mapset" {...examples['js-objekte-mapset']} />
         <Hinweis variante="warnung">
           In React state the rule still applies: copy, don’t change (<Verweis id="js-referenzen" />).{' '}
           <Code>selected.add(id)</Code> changes the existing set and React sees no change. Correct is{' '}
@@ -82,15 +82,15 @@ export function Objekte() {
         </P>
         <TryIt
           id="js-objekte-4"
-          {...beispiele['js-objekte-4']}
+          {...examples['js-objekte-4']}
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-objekte-uebung"
-          {...beispiele['js-objekte-uebung']}
-          aufgabe={
+          {...examples['js-objekte-uebung']}
+          task={
             <>
               <p>
                 <strong>1.</strong> Write <Code>update(user, changes)</Code>: it returns a <em>new</em>{' '}
@@ -109,24 +109,24 @@ export function Objekte() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is the result of { ...{ a: 1, b: 2 }, b: 5 } ?',
-            antworten: ['{ a: 1, b: 2 }', '{ a: 1, b: 5 }', '{ b: 5 }'],
-            richtig: 1,
-            erklaerung: 'Later properties overwrite earlier ones with the same name.',
+            question: 'What is the result of { ...{ a: 1, b: 2 }, b: 5 } ?',
+            answers: ['{ a: 1, b: 2 }', '{ a: 1, b: 5 }', '{ b: 5 }'],
+            correct: 1,
+            explanation: 'Later properties overwrite earlier ones with the same name.',
           },
           {
-            frage: 'What is in y after const [x, y] = useState(0) ?',
-            antworten: ['0', 'The setter function', 'undefined'],
-            richtig: 1,
-            erklaerung: 'useState returns an array [value, setter] - destructured by position.',
+            question: 'What is in y after const [x, y] = useState(0) ?',
+            answers: ['0', 'The setter function', 'undefined'],
+            correct: 1,
+            explanation: 'useState returns an array [value, setter] - destructured by position.',
           },
           {
-            frage: 'How do you read a property whose name is stored in the variable field?',
-            antworten: ['obj.field', 'obj[field]', "obj['field']"],
-            richtig: 1,
-            erklaerung: "obj.field and obj['field'] both read the property literally named “field”.",
+            question: 'How do you read a property whose name is stored in the variable field?',
+            answers: ['obj.field', 'obj[field]', "obj['field']"],
+            correct: 1,
+            explanation: "obj.field and obj['field'] both read the property literally named “field”.",
           },
         ]}
       />

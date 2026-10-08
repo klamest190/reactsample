@@ -130,65 +130,65 @@ export const SHOP_SQL = sql`
 
 export type Spalte = {
   name: string
-  typ: string
+  type: string
   /** Key or note, e.g. "PK" or "→ customers.id". */
-  schluessel?: string
+  key?: string
   info?: Zweisprachig
 }
 
-export type Tabelle = { name: string; zeilen: number; info: Zweisprachig; spalten: Spalte[] }
+export type Tabelle = { name: string; lines: number; info: Zweisprachig; columns: Spalte[] }
 
 /**
  * The tables for the table browser above every SQL editor and for the schema diagram.
  * `npm test -- sql` checks that this list matches what PostgreSQL reports.
  */
-export const SHOP_TABELLEN: Tabelle[] = [
+export const SHOP_TABLES: Tabelle[] = [
   {
     name: 'customers',
-    zeilen: 12,
+    lines: 12,
     info: { de: 'Kunden des Shops', en: 'The shop’s customers' },
-    spalten: [
-      { name: 'id', typ: 'integer', schluessel: 'PK' },
-      { name: 'name', typ: 'text' },
-      { name: 'company', typ: 'text' },
-      { name: 'email', typ: 'text', info: { de: 'eindeutig, einmal NULL', en: 'unique, NULL once' } },
-      { name: 'city', typ: 'text', info: { de: 'einmal NULL', en: 'NULL once' } },
-      { name: 'country', typ: 'text' },
-      { name: 'joined', typ: 'date', info: { de: 'Kunde seit', en: 'customer since' } },
+    columns: [
+      { name: 'id', type: 'integer', key: 'PK' },
+      { name: 'name', type: 'text' },
+      { name: 'company', type: 'text' },
+      { name: 'email', type: 'text', info: { de: 'eindeutig, einmal NULL', en: 'unique, NULL once' } },
+      { name: 'city', type: 'text', info: { de: 'einmal NULL', en: 'NULL once' } },
+      { name: 'country', type: 'text' },
+      { name: 'joined', type: 'date', info: { de: 'Kunde seit', en: 'customer since' } },
     ],
   },
   {
     name: 'products',
-    zeilen: 16,
+    lines: 16,
     info: { de: 'Das Sortiment', en: 'The product range' },
-    spalten: [
-      { name: 'id', typ: 'integer', schluessel: 'PK' },
-      { name: 'name', typ: 'text' },
-      { name: 'category', typ: 'text', info: { de: 'hardware, software, service, books, accessories', en: 'hardware, software, service, books, accessories' } },
-      { name: 'price', typ: 'numeric(8,2)' },
-      { name: 'stock', typ: 'integer', info: { de: 'Lagerbestand, NULL bei Software und Services', en: 'in stock, NULL for software and services' } },
+    columns: [
+      { name: 'id', type: 'integer', key: 'PK' },
+      { name: 'name', type: 'text' },
+      { name: 'category', type: 'text', info: { de: 'hardware, software, service, books, accessories', en: 'hardware, software, service, books, accessories' } },
+      { name: 'price', type: 'numeric(8,2)' },
+      { name: 'stock', type: 'integer', info: { de: 'Lagerbestand, NULL bei Software und Services', en: 'in stock, NULL for software and services' } },
     ],
   },
   {
     name: 'orders',
-    zeilen: 20,
+    lines: 20,
     info: { de: 'Bestellungen (ab id 101)', en: 'Orders (from id 101)' },
-    spalten: [
-      { name: 'id', typ: 'integer', schluessel: 'PK' },
-      { name: 'customer_id', typ: 'integer', schluessel: '→ customers.id' },
-      { name: 'ordered_at', typ: 'date' },
-      { name: 'status', typ: 'text', info: { de: 'open, paid, shipped, cancelled', en: 'open, paid, shipped, cancelled' } },
+    columns: [
+      { name: 'id', type: 'integer', key: 'PK' },
+      { name: 'customer_id', type: 'integer', key: '→ customers.id' },
+      { name: 'ordered_at', type: 'date' },
+      { name: 'status', type: 'text', info: { de: 'open, paid, shipped, cancelled', en: 'open, paid, shipped, cancelled' } },
     ],
   },
   {
     name: 'order_items',
-    zeilen: 37,
+    lines: 37,
     info: { de: 'Positionen: welches Produkt, wie oft, zu welchem Preis', en: 'Line items: which product, how many, at which price' },
-    spalten: [
-      { name: 'order_id', typ: 'integer', schluessel: 'PK · → orders.id' },
-      { name: 'product_id', typ: 'integer', schluessel: 'PK · → products.id' },
-      { name: 'quantity', typ: 'integer' },
-      { name: 'unit_price', typ: 'numeric(8,2)', info: { de: 'Preis zum Zeitpunkt der Bestellung', en: 'price at the time of the order' } },
+    columns: [
+      { name: 'order_id', type: 'integer', key: 'PK · → orders.id' },
+      { name: 'product_id', type: 'integer', key: 'PK · → products.id' },
+      { name: 'quantity', type: 'integer' },
+      { name: 'unit_price', type: 'numeric(8,2)', info: { de: 'Preis zum Zeitpunkt der Bestellung', en: 'price at the time of the order' } },
     ],
   },
 ]

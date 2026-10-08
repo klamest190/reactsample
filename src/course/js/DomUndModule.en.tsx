@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './DomUndModule.code'
+import { examples, codeBloecke } from './DomUndModule.code'
 
 /**
  * KAPITEL 1.9 (English) - DOM, Events & Modules
@@ -14,8 +14,8 @@ export function DomUndModule() {
         <P>Create an element, react to a click, add it to the document.</P>
         <TryIt
           id="js-dom-einstieg"
-          {...beispiele['js-dom-einstieg']}
-          vorschau
+          {...examples['js-dom-einstieg']}
+          preview
         />
       </Abschnitt>
 
@@ -27,8 +27,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-1"
-          {...beispiele['js-dom-1']}
-          vorschau
+          {...examples['js-dom-1']}
+          preview
         />
       </Abschnitt>
 
@@ -40,8 +40,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-2"
-          {...beispiele['js-dom-2']}
-          vorschau
+          {...examples['js-dom-2']}
+          preview
         />
       </Abschnitt>
 
@@ -54,8 +54,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-3"
-          {...beispiele['js-dom-3']}
-          vorschau
+          {...examples['js-dom-3']}
+          preview
         />
         <P>
           React solves exactly this problem with a different approach - <strong>declarative</strong>:
@@ -71,7 +71,7 @@ export function DomUndModule() {
           </li>
         </Liste>
         <CodeBlock
-          titel="The same list in React (a taste of part 3)"
+          title="The same list in React (a taste of part 3)"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -83,11 +83,11 @@ export function DomUndModule() {
           <Code>src/</Code> in this project.
         </P>
         <CodeBlock
-          titel="math.js"
+          title="math.js"
           code={codeBloecke.beispiel2}
         />
         <CodeBlock
-          titel="app.js"
+          title="app.js"
           code={codeBloecke.beispiel3}
         />
         <Hinweis variante="tipp">
@@ -99,9 +99,9 @@ export function DomUndModule() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-dom-uebung"
-          {...beispiele['js-dom-uebung']}
-          vorschau
-          aufgabe={
+          {...examples['js-dom-uebung']}
+          preview
+          task={
             <>
               <p>
                 Build a counter with DOM methods: a <Code>{'<span>'}</Code> shows the number, a{' '}
@@ -118,28 +118,28 @@ export function DomUndModule() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What does “declarative” mean in the context of React?',
-            antworten: [
+            question: 'What does “declarative” mean in the context of React?',
+            answers: [
               'You describe step by step how the DOM is changed.',
               'You describe what the UI looks like for certain data.',
               'You declare all variables with const.',
             ],
-            richtig: 1,
-            erklaerung: 'React derives the necessary DOM changes from your description by itself.',
+            correct: 1,
+            explanation: 'React derives the necessary DOM changes from your description by itself.',
           },
           {
-            frage: 'How many default exports can a file have?',
-            antworten: ['None', 'At most one', 'Any number'],
-            richtig: 1,
-            erklaerung: 'One default export per module, any number of named exports.',
+            question: 'How many default exports can a file have?',
+            answers: ['None', 'At most one', 'Any number'],
+            correct: 1,
+            explanation: 'One default export per module, any number of named exports.',
           },
           {
-            frage: 'How do you import the named export area?',
-            antworten: ["import area from './math.js'", "import { area } from './math.js'"],
-            richtig: 1,
-            erklaerung: 'Named exports go in curly braces, the default export without.',
+            question: 'How do you import the named export area?',
+            answers: ["import area from './math.js'", "import { area } from './math.js'"],
+            correct: 1,
+            explanation: 'Named exports go in curly braces, the default export without.',
           },
         ]}
       />

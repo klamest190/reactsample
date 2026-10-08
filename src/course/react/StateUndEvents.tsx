@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './StateUndEvents.code'
+import { examples, codeBloecke } from './StateUndEvents.code'
 
 /**
  * KAPITEL 3.3 - Events & State
@@ -15,8 +15,8 @@ export function StateUndEvents() {
         <P>Ein Klick ändert den State - und React zeichnet die Komponente neu.</P>
         <TryIt
           id="react-state-einstieg"
-          {...beispiele['react-state-einstieg']}
-          modus="react"
+          {...examples['react-state-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function StateUndEvents() {
         </P>
         <TryIt
           id="react-state-1"
-          {...beispiele['react-state-1']}
-          modus="react"
+          {...examples['react-state-1']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -38,8 +38,8 @@ export function StateUndEvents() {
         <P>Probier aus, was hier passiert, wenn du auf den Knopf klickst:</P>
         <TryIt
           id="react-state-2"
-          {...beispiele['react-state-2']}
-          modus="react"
+          {...examples['react-state-2']}
+          mode="react"
         />
         <P>Die Konsole zählt hoch, die Anzeige bleibt bei 0. Zwei Gründe:</P>
         <Liste>
@@ -64,8 +64,8 @@ export function StateUndEvents() {
         />
         <TryIt
           id="react-state-3"
-          {...beispiele['react-state-3']}
-          modus="react"
+          {...examples['react-state-3']}
+          mode="react"
         />
         <Hinweis variante="info">
           Hooks erkennst du am <Code>use</Code> am Anfang. Sie dürfen nur{' '}
@@ -97,17 +97,17 @@ export function StateUndEvents() {
         </P>
         <TryIt
           id="react-state-4"
-          {...beispiele['react-state-4']}
-          modus="react"
+          {...examples['react-state-4']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="react-state-uebung"
-          {...beispiele['react-state-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-state-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue eine Tweet-Box:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -131,28 +131,28 @@ export function StateUndEvents() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was löst ein neues Rendern der Komponente aus?',
-            antworten: [
+            question: 'Was löst ein neues Rendern der Komponente aus?',
+            answers: [
               'Eine lokale Variable ändern',
               'Den Setter von useState mit einem neuen Wert aufrufen',
               'console.log aufrufen',
             ],
-            richtig: 1,
-            erklaerung: 'Nur State-Änderungen (und neue Props von oben) lösen einen Render aus.',
+            correct: 1,
+            explanation: 'Nur State-Änderungen (und neue Props von oben) lösen einen Render aus.',
           },
           {
-            frage: 'number ist 0. Was loggt: setNumber(number + 1); console.log(number) ?',
-            antworten: ['0', '1', 'undefined'],
-            richtig: 0,
-            erklaerung: 'State ist innerhalb eines Renders ein Snapshot. Der neue Wert gilt erst im nächsten Render.',
+            question: 'number ist 0. Was loggt: setNumber(number + 1); console.log(number) ?',
+            answers: ['0', '1', 'undefined'],
+            correct: 0,
+            explanation: 'State ist innerhalb eines Renders ein Snapshot. Der neue Wert gilt erst im nächsten Render.',
           },
           {
-            frage: 'Wann wird der Startwert von useState(0) verwendet?',
-            antworten: ['Bei jedem Render', 'Nur beim allerersten Render', 'Bei jedem Klick'],
-            richtig: 1,
-            erklaerung: 'Danach merkt sich React den aktuellen Wert und ignoriert das Argument.',
+            question: 'Wann wird der Startwert von useState(0) verwendet?',
+            answers: ['Bei jedem Render', 'Nur beim allerersten Render', 'Bei jedem Klick'],
+            correct: 1,
+            explanation: 'Danach merkt sich React den aktuellen Wert und ignoriert das Argument.',
           },
         ]}
       />

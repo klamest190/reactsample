@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Arrays.code'
+import { examples, codeBloecke } from './Arrays.code'
 
 /**
  * KAPITEL 1.4 (English) - Arrays & Their Methods
@@ -15,7 +15,7 @@ export function Arrays() {
         <P>A list of values - and with <Code>map</Code> a new list made from it.</P>
         <TryIt
           id="js-arrays-einstieg"
-          {...beispiele['js-arrays-einstieg']}
+          {...examples['js-arrays-einstieg']}
         />
       </Abschnitt>
 
@@ -25,7 +25,7 @@ export function Arrays() {
         </P>
         <TryIt
           id="js-arrays-1"
-          {...beispiele['js-arrays-1']}
+          {...examples['js-arrays-1']}
         />
       </Abschnitt>
 
@@ -39,7 +39,7 @@ export function Arrays() {
         />
         <TryIt
           id="js-arrays-2"
-          {...beispiele['js-arrays-2']}
+          {...examples['js-arrays-2']}
         />
         <Hinweis variante="info">
           In React, <Code>.map()</Code> is <strong>the</strong> way to display lists:{' '}
@@ -51,7 +51,7 @@ export function Arrays() {
       <Abschnitt titel="Searching and checking">
         <TryIt
           id="js-arrays-3"
-          {...beispiele['js-arrays-3']}
+          {...examples['js-arrays-3']}
         />
       </Abschnitt>
 
@@ -76,15 +76,15 @@ export function Arrays() {
         />
         <TryIt
           id="js-arrays-4"
-          {...beispiele['js-arrays-4']}
+          {...examples['js-arrays-4']}
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-arrays-uebung"
-          {...beispiele['js-arrays-uebung']}
-          aufgabe={
+          {...examples['js-arrays-uebung']}
+          task={
             <>
               <p>
                 The array <Code>products</Code> (as above) already exists. Write these functions -{' '}
@@ -108,24 +108,24 @@ export function Arrays() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What does [1, 2, 3].map(x => x > 1) return?',
-            antworten: ['[2, 3]', '[false, true, true]', 'true'],
-            richtig: 1,
-            erklaerung: 'map transforms every element - here into the result of the comparison. To remove elements, use filter.',
+            question: 'What does [1, 2, 3].map(x => x > 1) return?',
+            answers: ['[2, 3]', '[false, true, true]', 'true'],
+            correct: 1,
+            explanation: 'map transforms every element - here into the result of the comparison. To remove elements, use filter.',
           },
           {
-            frage: 'What does find return when nothing matches?',
-            antworten: ['-1', 'null', 'undefined', '[]'],
-            richtig: 2,
-            erklaerung: 'find returns undefined; findIndex returns -1.',
+            question: 'What does find return when nothing matches?',
+            answers: ['-1', 'null', 'undefined', '[]'],
+            correct: 2,
+            explanation: 'find returns undefined; findIndex returns -1.',
           },
           {
-            frage: 'Which method changes the original array?',
-            antworten: ['filter', 'toSorted', 'sort', 'map'],
-            richtig: 2,
-            erklaerung: 'sort sorts “in place”. toSorted returns a sorted copy.',
+            question: 'Which method changes the original array?',
+            answers: ['filter', 'toSorted', 'sort', 'map'],
+            correct: 2,
+            explanation: 'sort sorts “in place”. toSorted returns a sorted copy.',
           },
         ]}
       />

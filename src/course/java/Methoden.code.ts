@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.4 - Methoden. */
 
-export const beispiele = {
+export const examples = {
   'java-methoden-einstieg': {
     code: java`
       public class Main {
@@ -141,7 +141,7 @@ export const beispiele = {
     `,
   },
   'java-methoden-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Die Signatur steht schon da: `static boolean isPrime(int number)` - du füllst nur den Rumpf.',
         'Zahlen kleiner als 2 sind keine Primzahlen: `if (number < 2) return false;`',
@@ -173,7 +173,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         static boolean isPrime(int number) {
           if (number < 2) return false;
@@ -198,14 +198,14 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: 'isPrime(7) ist true', en: 'isPrime(7) is true' }, ausdruck: 'isPrime(7)', erwartet: true },
-      { name: { de: 'isPrime(9) ist false', en: 'isPrime(9) is false' }, ausdruck: 'isPrime(9)', erwartet: false },
-      { name: { de: 'isPrime(2) ist true', en: 'isPrime(2) is true' }, ausdruck: 'isPrime(2)', erwartet: true },
-      { name: { de: 'isPrime(1) ist false', en: 'isPrime(1) is false' }, ausdruck: 'isPrime(1)', erwartet: false },
-      { name: { de: 'countPrimes(20) ist 8', en: 'countPrimes(20) is 8' }, ausdruck: 'countPrimes(20)', erwartet: 8 },
+      { name: { de: 'isPrime(7) ist true', en: 'isPrime(7) is true' }, expression: 'isPrime(7)', expected: true },
+      { name: { de: 'isPrime(9) ist false', en: 'isPrime(9) is false' }, expression: 'isPrime(9)', expected: false },
+      { name: { de: 'isPrime(2) ist true', en: 'isPrime(2) is true' }, expression: 'isPrime(2)', expected: true },
+      { name: { de: 'isPrime(1) ist false', en: 'isPrime(1) is false' }, expression: 'isPrime(1)', expected: false },
+      { name: { de: 'countPrimes(20) ist 8', en: 'countPrimes(20) is 8' }, expression: 'countPrimes(20)', expected: 8 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   signatur: java`

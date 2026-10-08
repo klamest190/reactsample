@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './UseState.code'
+import { examples } from './UseState.code'
 import { ZaehlerDemo } from '../demos/ZaehlerDemo'
 
 const hookUebersicht: [string, string, string][] = [
@@ -28,8 +28,8 @@ export function UseState() {
         <P><Code>useState</Code> liefert den aktuellen Wert und eine Funktion, um ihn zu ändern.</P>
         <TryIt
           id="hooks-usestate-einstieg"
-          {...beispiele['hooks-usestate-einstieg']}
-          modus="react"
+          {...examples['hooks-usestate-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -68,7 +68,7 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-regeln"
-          {...beispiele['hooks-usestate-regeln']}
+          {...examples['hooks-usestate-regeln']}
         />
       </Abschnitt>
 
@@ -81,8 +81,8 @@ export function UseState() {
         <ZaehlerDemo />
         <TryIt
           id="hooks-usestate-funktional"
-          {...beispiele['hooks-usestate-funktional']}
-          modus="react"
+          {...examples['hooks-usestate-funktional']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           Das Intervall oben wird nie gestoppt. Wie man Timer sauber aufräumt, lernst du im nächsten
@@ -98,8 +98,8 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-objekte"
-          {...beispiele['hooks-usestate-objekte']}
-          modus="react"
+          {...examples['hooks-usestate-objekte']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -111,8 +111,8 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-lazy"
-          {...beispiele['hooks-usestate-lazy']}
-          modus="react"
+          {...examples['hooks-usestate-lazy']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -124,17 +124,17 @@ export function UseState() {
         </P>
         <TryIt
           id="hooks-usestate-key"
-          {...beispiele['hooks-usestate-key']}
-          modus="react"
+          {...examples['hooks-usestate-key']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-usestate-uebung"
-          {...beispiele['hooks-usestate-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usestate-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue eine Einkaufsliste. Alle Updates als funktionale Updates und ohne Mutation:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -151,34 +151,34 @@ export function UseState() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum dürfen Hooks nicht in einem if stehen?',
-            antworten: [
+            question: 'Warum dürfen Hooks nicht in einem if stehen?',
+            answers: [
               'Aus Performance-Gründen',
               'React ordnet Hooks über ihre Aufruf-Reihenfolge zu',
               'Weil if in Komponenten verboten ist',
             ],
-            richtig: 1,
-            erklaerung: 'Fällt ein Aufruf weg, verrutscht die Zuordnung aller folgenden Hooks.',
+            correct: 1,
+            explanation: 'Fällt ein Aufruf weg, verrutscht die Zuordnung aller folgenden Hooks.',
           },
           {
-            frage: 'count ist 0. Was steht nach zweimal setCount(c => c + 1) im nächsten Render?',
-            antworten: ['1', '2', '0'],
-            richtig: 1,
-            erklaerung: 'Funktionale Updates werden nacheinander auf den jeweils neuesten Wert angewendet.',
+            question: 'count ist 0. Was steht nach zweimal setCount(c => c + 1) im nächsten Render?',
+            answers: ['1', '2', '0'],
+            correct: 1,
+            explanation: 'Funktionale Updates werden nacheinander auf den jeweils neuesten Wert angewendet.',
           },
           {
-            frage: 'Was macht setProfile({ name: "Grace" }) mit den anderen Feldern von profile?',
-            antworten: ['Behält sie', 'Entfernt sie - der State wird komplett ersetzt'],
-            richtig: 1,
-            erklaerung: 'useState ersetzt den Wert. Deshalb { ...prev, name: "Grace" }.',
+            question: 'Was macht setProfile({ name: "Grace" }) mit den anderen Feldern von profile?',
+            answers: ['Behält sie', 'Entfernt sie - der State wird komplett ersetzt'],
+            correct: 1,
+            explanation: 'useState ersetzt den Wert. Deshalb { ...prev, name: "Grace" }.',
           },
           {
-            frage: 'Wie setzt du den State einer Kind-Komponente komplett zurück?',
-            antworten: ['Mit einem neuen key', 'Mit useState(null)', 'Gar nicht'],
-            richtig: 0,
-            erklaerung: 'Ein anderer key lässt React die Komponente neu erzeugen - mit frischem State.',
+            question: 'Wie setzt du den State einer Kind-Komponente komplett zurück?',
+            answers: ['Mit einem neuen key', 'Mit useState(null)', 'Gar nicht'],
+            correct: 0,
+            explanation: 'Ein anderer key lässt React die Komponente neu erzeugen - mit frischem State.',
           },
         ]}
       />

@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-usereducer-einstieg': {
     code: js`
       function reducer(state, action) {
@@ -104,7 +104,7 @@ export const beispiele = {
     `,
   },
   'hooks-usereducer-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Für `added`: Gibt es das Produkt schon (`some`)? Dann Menge per `map` erhöhen, sonst mit `quantity: 1` anhängen.',
         '`quantityChanged`: erst `map`, dann `filter((item) => item.quantity > 0)`.',
@@ -133,7 +133,7 @@ export const beispiele = {
       let cart = cartReducer([], { type: 'added', product: coffee })
       console.log(cart)
     `,
-    loesung: js`
+    solution: js`
       function cartReducer(state, action) {
         switch (action.type) {
           case 'added': {
@@ -164,22 +164,22 @@ export const beispiele = {
       let cart = cartReducer([], { type: 'added', product: coffee })
       console.log(cart)
     `,
-    vorbereitung: js`
+    setup: js`
       const __tea = { id: 2, name: 'Tea', price: 3 }
       const __cake = { id: 3, name: 'Cake', price: 5 }
       const __cart = () => [{ ...__tea, quantity: 2 }]
     `,
     tests: [
-      { name: { de: 'added: neues Produkt mit quantity 1', en: 'added: new product with quantity 1' }, ausdruck: 'cartReducer([], { type: \'added\', product: __cake })', erwartet: [{ id: 3, name: 'Cake', price: 5, quantity: 1 }] },
-      { name: { de: 'added: vorhandenes Produkt erhöht die Menge', en: 'added: existing product increases the quantity' }, ausdruck: 'cartReducer(__cart(), { type: \'added\', product: __tea })[0].quantity', erwartet: 3 },
-      { name: { de: 'quantityChanged setzt die Menge', en: 'quantityChanged sets the quantity' }, ausdruck: 'cartReducer(__cart(), { type: \'quantityChanged\', id: 2, quantity: 7 })[0].quantity', erwartet: 7 },
-      { name: { de: 'quantityChanged mit 0 entfernt den Artikel', en: 'quantityChanged with 0 removes the item' }, ausdruck: 'cartReducer(__cart(), { type: \'quantityChanged\', id: 2, quantity: 0 })', erwartet: [] },
-      { name: { de: 'removed und cleared funktionieren', en: 'removed and cleared work' }, ausdruck: 'cartReducer(__cart(), { type: \'removed\', id: 2 }).length === 0 && cartReducer(__cart(), { type: \'cleared\' }).length === 0' },
-      { name: { de: 'Der alte State wird nicht verändert', en: 'The old state is not changed' }, ausdruck: '(() => { const s = __cart(); cartReducer(s, { type: \'added\', product: __tea }); cartReducer(s, { type: \'quantityChanged\', id: 2, quantity: 9 }); return s[0].quantity === 2 && s.length === 1 })()' },
-      { name: { de: 'total berechnet den Gesamtpreis', en: 'total calculates the total price' }, ausdruck: 'total([{ ...__tea, quantity: 2 }, { ...__cake, quantity: 3 }])', erwartet: 21 },
+      { name: { de: 'added: neues Produkt mit quantity 1', en: 'added: new product with quantity 1' }, expression: 'cartReducer([], { type: \'added\', product: __cake })', expected: [{ id: 3, name: 'Cake', price: 5, quantity: 1 }] },
+      { name: { de: 'added: vorhandenes Produkt erhöht die Menge', en: 'added: existing product increases the quantity' }, expression: 'cartReducer(__cart(), { type: \'added\', product: __tea })[0].quantity', expected: 3 },
+      { name: { de: 'quantityChanged setzt die Menge', en: 'quantityChanged sets the quantity' }, expression: 'cartReducer(__cart(), { type: \'quantityChanged\', id: 2, quantity: 7 })[0].quantity', expected: 7 },
+      { name: { de: 'quantityChanged mit 0 entfernt den Artikel', en: 'quantityChanged with 0 removes the item' }, expression: 'cartReducer(__cart(), { type: \'quantityChanged\', id: 2, quantity: 0 })', expected: [] },
+      { name: { de: 'removed und cleared funktionieren', en: 'removed and cleared work' }, expression: 'cartReducer(__cart(), { type: \'removed\', id: 2 }).length === 0 && cartReducer(__cart(), { type: \'cleared\' }).length === 0' },
+      { name: { de: 'Der alte State wird nicht verändert', en: 'The old state is not changed' }, expression: '(() => { const s = __cart(); cartReducer(s, { type: \'added\', product: __tea }); cartReducer(s, { type: \'quantityChanged\', id: 2, quantity: 9 }); return s[0].quantity === 2 && s.length === 1 })()' },
+      { name: { de: 'total berechnet den Gesamtpreis', en: 'total calculates the total price' }, expression: 'total([{ ...__tea, quantity: 2 }, { ...__cake, quantity: 3 }])', expected: 21 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

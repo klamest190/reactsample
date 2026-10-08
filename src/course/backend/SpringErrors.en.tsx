@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './SpringErrors.code'
+import { examples, codeBloecke } from './SpringErrors.code'
 
 /**
  * CHAPTER 8.4 - Validation & error handling (English version)
@@ -17,7 +17,7 @@ export function SpringErrors() {
           data before your method even runs. The second request gets <strong>400</strong>; the method
           is not called at all. What exactly was wrong is in the log.
         </P>
-        <TryIt modus="spring" id="spring-fehler-valid" {...beispiele['spring-fehler-valid']} />
+        <TryIt mode="spring" id="spring-fehler-valid" {...examples['spring-fehler-valid']} />
       </Abschnitt>
 
       <Abschnitt titel="Never trust the client">
@@ -31,7 +31,7 @@ export function SpringErrors() {
           That is what <strong>Bean Validation</strong> is for: rules as annotations directly on the
           fields. In a real project it needs this starter:
         </P>
-        <CodeBlock code={codeBloecke.abhaengigkeit} titel="pom.xml" />
+        <CodeBlock code={codeBloecke.abhaengigkeit} title="pom.xml" />
         <Tabelle
           kopf={['Annotation', 'checks']}
           spalten={['font-mono text-xs']}
@@ -55,7 +55,7 @@ export function SpringErrors() {
           By the way, Spring Boot’s default answer does not reveal <em>what</em> was wrong - only
           that something was:
         </P>
-        <CodeBlock code={codeBloecke.standard} titel="400 Bad Request" sprache="konfig" />
+        <CodeBlock code={codeBloecke.standard} title="400 Bad Request" language="config" />
         <P>How to change that comes in a moment.</P>
       </Abschnitt>
 
@@ -79,7 +79,7 @@ export function SpringErrors() {
           trace in the log. The message only shows up in the response because the properties say{' '}
           <Code>server.error.include-message=always</Code>:
         </P>
-        <TryIt modus="spring" id="spring-fehler-status" {...beispiele['spring-fehler-status']} />
+        <TryIt mode="spring" id="spring-fehler-status" {...examples['spring-fehler-status']} />
         <Hinweis variante="info">
           That Spring Boot hides error messages by default is intentional: a message like
           “Connection to db-prod-3 refused” tells attackers more than they should know.
@@ -97,22 +97,22 @@ export function SpringErrors() {
           For the content there is a standard, <strong>Problem Details</strong> (RFC 9457), which
           Spring supports directly with <Code>ProblemDetail</Code>:
         </P>
-        <CodeBlock code={codeBloecke.problem} titel="404 · application/problem+json" sprache="konfig" />
+        <CodeBlock code={codeBloecke.problem} title="404 · application/problem+json" language="config" />
         <P>
           Validation errors are exceptions too (<Code>MethodArgumentNotValidException</Code>) - a
           handler can turn them into a list “field → message” that a form in the frontend can use:
         </P>
-        <TryIt modus="spring" id="spring-fehler-advice" {...beispiele['spring-fehler-advice']} />
+        <TryIt mode="spring" id="spring-fehler-advice" {...examples['spring-fehler-advice']} />
         <P>Who gets an exception is decided by Spring in this order:</P>
-        <CodeBlock code={codeBloecke.reihenfolge} titel="Order" sprache="konfig" />
+        <CodeBlock code={codeBloecke.reihenfolge} title="Order" language="config" />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-fehler-uebung"
-          {...beispiele['spring-fehler-uebung']}
-          aufgabe={
+          {...examples['spring-fehler-uebung']}
+          task={
             <>
               <p>Make the book API robust:</p>
               <Liste>
@@ -131,24 +131,24 @@ export function SpringErrors() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'A record has @NotBlank on the title, the controller parameter only @RequestBody. What happens with an empty title?',
-            antworten: ['400 Bad Request', 'Nothing - the empty title is accepted', '500 Internal Server Error', 'The application does not start'],
-            richtig: 1,
-            erklaerung: 'Without @Valid nothing is checked. The annotations alone do nothing.',
+            question: 'A record has @NotBlank on the title, the controller parameter only @RequestBody. What happens with an empty title?',
+            answers: ['400 Bad Request', 'Nothing - the empty title is accepted', '500 Internal Server Error', 'The application does not start'],
+            correct: 1,
+            explanation: 'Without @Valid nothing is checked. The annotations alone do nothing.',
           },
           {
-            frage: 'A method throws a NullPointerException that nobody catches. Which status comes out?',
-            antworten: ['400', '404', '500', '200 with an empty body'],
-            richtig: 2,
-            erklaerung: 'An unexpected exception is a server error: 500 Internal Server Error.',
+            question: 'A method throws a NullPointerException that nobody catches. Which status comes out?',
+            answers: ['400', '404', '500', '200 with an empty body'],
+            correct: 2,
+            explanation: 'An unexpected exception is a server error: 500 Internal Server Error.',
           },
           {
-            frage: 'What is @RestControllerAdvice good for?',
-            antworten: ['It makes controllers faster', 'It collects @ExceptionHandler methods that apply to all controllers', 'It validates input', 'It replaces @RestController'],
-            richtig: 1,
-            erklaerung: 'One central place where exceptions from all controllers are turned into consistent answers.',
+            question: 'What is @RestControllerAdvice good for?',
+            answers: ['It makes controllers faster', 'It collects @ExceptionHandler methods that apply to all controllers', 'It validates input', 'It replaces @RestController'],
+            correct: 1,
+            explanation: 'One central place where exceptions from all controllers are turned into consistent answers.',
           },
         ]}
       />

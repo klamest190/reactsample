@@ -18,11 +18,11 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 /** Stand eines Kapitel-Quiz. `gesamt` dient als Gültigkeitsprüfung. */
 export type QuizStand = {
   /** Anzahl Fragen zum Zeitpunkt des Speicherns. */
-  gesamt: number
+  total: number
   /** Anzahl richtiger Antworten - abgeleitet, aber auch ohne die Fragen lesbar. */
-  richtig: number
+  correct: number
   /** Gewählter Antwortindex je Frage, null = noch offen. */
-  antworten: (number | null)[]
+  answers: (number | null)[]
 }
 
 type FortschrittWert = {
@@ -92,5 +92,5 @@ export function useFortschritt() {
  * Ändert sich die Fragenzahl eines Kapitels, ist der alte Stand wertlos.
  */
 export function gueltigerQuizStand(stand: QuizStand | undefined, fragen: number) {
-  return stand && stand.gesamt === fragen ? stand : undefined
+  return stand && stand.total === fragen ? stand : undefined
 }

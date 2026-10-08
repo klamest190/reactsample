@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für Kapitel 2.1 - Warum TypeScript?
  * Alle laufen mit <TryIt modus="ts">: Typen werden entfernt, das JavaScript läuft, nebenher prüft der Compiler.
  */
 
-export const beispiele = {
+export const examples = {
   'ts-start-einstieg': {
     code: js`
       function greet(name: string, times: number) {
@@ -133,7 +133,7 @@ export const beispiele = {
     `,
   },
   'ts-start-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Jeder Parameter braucht einen Typ: `amount: number`, `currency: string`, `prices: number[]`.',
         'Ohne Angabe macht TypeScript aus `[a, b]` ein `number[]`. Für ein Tupel schreibst du den Rückgabetyp hin: `function minMax(values: number[]): [number, number]`.',
@@ -160,7 +160,7 @@ export const beispiele = {
       console.log(formatPrice(total(cart), 'EUR'))
       console.log(minMax(cart))
     `,
-    loesung: js`
+    solution: js`
       function formatPrice(amount: number, currency: string): string {
         return amount.toFixed(2) + ' ' + currency
       }
@@ -178,17 +178,17 @@ export const beispiele = {
       console.log(minMax(cart))
     `,
     tests: [
-      { name: "formatPrice(24.49, 'EUR')", ausdruck: "formatPrice(24.49, 'EUR')", erwartet: '24.49 EUR' },
-      { name: 'total([1, 2, 3])', ausdruck: 'total([1, 2, 3])', erwartet: 6 },
-      { name: 'minMax([3, 1, 2])', ausdruck: 'minMax([3, 1, 2])', erwartet: [1, 3] },
+      { name: "formatPrice(24.49, 'EUR')", expression: "formatPrice(24.49, 'EUR')", expected: '24.49 EUR' },
+      { name: 'total([1, 2, 3])', expression: 'total([1, 2, 3])', expected: 6 },
+      { name: 'minMax([3, 1, 2])', expression: 'minMax([3, 1, 2])', expected: [1, 3] },
     ],
-    typTests: [
+    typeTests: [
       { name: { de: 'formatPrice lehnt einen Text als Betrag ab', en: 'formatPrice rejects a string as amount' }, code: "// @ts-expect-error\nformatPrice('10', 'EUR')" },
       { name: { de: 'total nimmt nur Zahlen-Arrays', en: 'total only takes number arrays' }, code: "// @ts-expect-error\ntotal(['1', '2'])" },
       { name: { de: 'minMax liefert ein Tupel [number, number]', en: 'minMax returns a tuple [number, number]' }, code: 'const minMaxResult: [number, number] = minMax([3, 1, 2])' },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

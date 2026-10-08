@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Klassen.code'
+import { examples, codeBloecke } from './Klassen.code'
 
 /**
  * KAPITEL 7.6 - Klassen & Objekte
@@ -18,7 +18,7 @@ export function Klassen() {
           gedacht ist: ein <strong>Bauplan</strong> für Objekte, die Daten und Verhalten zusammen
           halten.
         </P>
-        <TryIt modus="java" id="java-klassen-einstieg" {...beispiele['java-klassen-einstieg']} />
+        <TryIt mode="java" id="java-klassen-einstieg" {...examples['java-klassen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Bauplan und Objekt">
@@ -37,7 +37,7 @@ export function Klassen() {
           automatisch einen Standardwert - <Code>0</Code>, <Code>false</Code> oder{' '}
           <Code>null</Code>.
         </P>
-        <TryIt modus="java" id="java-klassen-felder" {...beispiele['java-klassen-felder']} />
+        <TryIt mode="java" id="java-klassen-felder" {...examples['java-klassen-felder']} />
         <P>
           Ein <Code>static</Code>-Feld gehört dagegen der Klasse und existiert genau einmal - egal,
           wie viele Objekte es gibt. Praktisch für Zähler und Konstanten.
@@ -50,7 +50,7 @@ export function Klassen() {
           genau einmal: beim <Code>new</Code>. Seine Aufgabe ist, das Objekt in einen gültigen
           Zustand zu bringen.
         </P>
-        <TryIt modus="java" id="java-klassen-konstruktor" {...beispiele['java-klassen-konstruktor']} />
+        <TryIt mode="java" id="java-klassen-konstruktor" {...examples['java-klassen-konstruktor']} />
         <Hinweis variante="info">
           <Code>this.title = title;</Code> ist kein Zierrat: Links steht das Feld, rechts der
           Parameter. Ohne <Code>this</Code> würde der Parameter sich selbst zugewiesen - ein Fehler,
@@ -78,7 +78,7 @@ export function Klassen() {
           </li>
           <li>ohne Angabe - sichtbar im selben Paket. Fürs Lernen völlig in Ordnung.</li>
         </Liste>
-        <TryIt modus="java" id="java-klassen-kapselung" {...beispiele['java-klassen-kapselung']} />
+        <TryIt mode="java" id="java-klassen-kapselung" {...examples['java-klassen-kapselung']} />
         <Hinweis variante="tipp">
           Ein Setter ist kein Selbstzweck. Oft ist eine Methode mit einem sprechenden Namen besser:{' '}
           <Code>deposit(100)</Code> sagt mehr als <Code>setBalance(getBalance() + 100)</Code> - und
@@ -93,7 +93,7 @@ export function Klassen() {
           hilfreich (<Code>Point@1b6d2f1d</Code> bzw. „ist es dasselbe Objekt?“), deshalb
           überschreibt man sie.
         </P>
-        <TryIt modus="java" id="java-klassen-tostring" {...beispiele['java-klassen-tostring']} />
+        <TryIt mode="java" id="java-klassen-tostring" {...examples['java-klassen-tostring']} />
         <Hinweis variante="info">
           <Code>@Override</Code> ist eine Annotation. Sie ändert nichts am Programm, lässt den
           Compiler aber prüfen, dass du wirklich eine geerbte Methode überschreibst - ein Tippfehler
@@ -106,15 +106,15 @@ export function Klassen() {
           Eine Variable vom Typ einer Klasse enthält nie das Objekt selbst, sondern einen Verweis
           darauf. Zwei Variablen können also auf dasselbe Objekt zeigen - oder auf gar keins.
         </P>
-        <TryIt modus="java" id="java-klassen-referenzen" {...beispiele['java-klassen-referenzen']} />
+        <TryIt mode="java" id="java-klassen-referenzen" {...examples['java-klassen-referenzen']} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-klassen-uebung"
-          {...beispiele['java-klassen-uebung']}
-          aufgabe={
+          {...examples['java-klassen-uebung']}
+          task={
             <>
               <p>
                 Schreibe die Klasse <Code>Task</Code> für eine ToDo-Aufgabe:
@@ -144,39 +144,39 @@ export function Klassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was ist am Konstruktor besonders?',
-            antworten: [
+            question: 'Was ist am Konstruktor besonders?',
+            answers: [
               'Er gibt immer das Objekt zurück.',
               'Er heißt wie die Klasse und hat keinen Rückgabetyp.',
               'Er ist immer static.',
               'Es darf nur einen pro Klasse geben.',
             ],
-            richtig: 1,
-            erklaerung: 'Kein Rückgabetyp, auch kein void. Und es darf beliebig viele geben, solange sich die Parameter unterscheiden.',
+            correct: 1,
+            explanation: 'Kein Rückgabetyp, auch kein void. Und es darf beliebig viele geben, solange sich die Parameter unterscheiden.',
           },
           {
-            frage: 'Wozu dient private bei einem Feld?',
-            antworten: [
+            question: 'Wozu dient private bei einem Feld?',
+            answers: [
               'Es macht das Feld unveränderlich.',
               'Nur die eigene Klasse kommt heran - Änderungen laufen über Methoden, die prüfen können.',
               'Es spart Speicher.',
               'Das Feld existiert nur einmal.',
             ],
-            richtig: 1,
-            erklaerung: 'Unveränderlich macht final. private steuert die Sichtbarkeit - das ist Kapselung.',
+            correct: 1,
+            explanation: 'Unveränderlich macht final. private steuert die Sichtbarkeit - das ist Kapselung.',
           },
           {
-            frage: 'Was macht this.name = name im Konstruktor?',
-            antworten: [
+            question: 'Was macht this.name = name im Konstruktor?',
+            answers: [
               'Es kopiert das Objekt.',
               'Es weist dem Feld den Wert des gleichnamigen Parameters zu.',
               'Es legt ein neues Feld an.',
               'Es ist nur Stil, man kann es weglassen.',
             ],
-            richtig: 1,
-            erklaerung: 'Ohne this wäre name der Parameter - auf beiden Seiten. Das Feld bliebe leer.',
+            correct: 1,
+            explanation: 'Ohne this wäre name der Parameter - auf beiden Seiten. Das Feld bliebe leer.',
           },
         ]}
       />

@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Barrierefreiheit.code'
+import { examples } from './Barrierefreiheit.code'
 
 /**
  * KAPITEL 5.9 - Barrierefreiheit (Accessibility, kurz a11y)
@@ -26,7 +26,7 @@ export function Barrierefreiheit() {
           Zwei Knöpfe, die gleich aussehen könnten. Klicke in die Vorschau und versuche es nur mit der Tastatur: Den{' '}
           <Code>{'<div>'}</Code> erreichst du mit Tab gar nicht.
         </P>
-        <TryIt id="praxis-a11y-einstieg" {...beispiele['praxis-a11y-einstieg']} modus="react" />
+        <TryIt id="praxis-a11y-einstieg" {...examples['praxis-a11y-einstieg']} mode="react" />
       </Abschnitt>
 
       <Abschnitt titel="Für wen?">
@@ -64,7 +64,7 @@ export function Barrierefreiheit() {
           spalten={['align-top', 'align-top']}
           zeilen={elemente.map(([el, rolle, text]) => [<Code key={el}>{el}</Code>, rolle, text])}
         />
-        <TryIt id="praxis-a11y-semantik" {...beispiele['praxis-a11y-semantik']} modus="react" />
+        <TryIt id="praxis-a11y-semantik" {...examples['praxis-a11y-semantik']} mode="react" />
         <Liste>
           <li>
             <Code>alt</Code> beschreibt, was das Bild zeigt. Ist es reine Dekoration, schreibst du{' '}
@@ -90,7 +90,7 @@ export function Barrierefreiheit() {
           <strong>Label</strong> pro Feld, <strong>Fehler</strong>, die mit dem Feld verknüpft sind, und Fehler, die{' '}
           <strong>angesagt</strong> werden, sobald sie erscheinen. Grundlagen dazu in <Verweis id="praxis-formulare" />.
         </P>
-        <TryIt id="praxis-a11y-formular" {...beispiele['praxis-a11y-formular']} modus="react" />
+        <TryIt id="praxis-a11y-formular" {...examples['praxis-a11y-formular']} mode="react" />
         <Liste>
           <li>
             Ein Platzhalter (<Code>placeholder</Code>) ist kein Label: Er verschwindet beim Tippen und wird nicht
@@ -113,7 +113,7 @@ export function Barrierefreiheit() {
           Leertaste zum Auslösen, Escape zum Schließen. Und man muss immer <strong>sehen</strong>, wo der Fokus
           gerade ist.
         </P>
-        <TryIt id="praxis-a11y-fokus" {...beispiele['praxis-a11y-fokus']} modus="react" />
+        <TryIt id="praxis-a11y-fokus" {...examples['praxis-a11y-fokus']} mode="react" />
         <Liste>
           <li>
             Dialoge sind am schwierigsten: Der Fokus muss hinein, darf nicht dahinter verschwinden und muss danach
@@ -140,7 +140,7 @@ export function Barrierefreiheit() {
           ist. Für Meldungen wie „3 Treffer“ oder „Gespeichert“ gibt es <strong>Live-Regionen</strong>: Ändert sich
           ihr Inhalt, wird er vorgelesen.
         </P>
-        <TryIt id="praxis-a11y-live" {...beispiele['praxis-a11y-live']} modus="react" />
+        <TryIt id="praxis-a11y-live" {...examples['praxis-a11y-live']} mode="react" />
         <P>
           <Code>aria-live="polite"</Code> und <Code>role="status"</Code> warten, bis der Screenreader fertig ist.{' '}
           <Code>role="alert"</Code> unterbricht sofort - nur für Fehler. Wichtig: Die Region muss schon im DOM sein,
@@ -154,7 +154,7 @@ export function Barrierefreiheit() {
           <strong>Accessibility-Baum</strong> steht - das, was auch ein Screenreader sieht. Tausche im Beispiel{' '}
           <Code>GoodToolbar</Code> gegen <Code>BadToolbar</Code>:
         </P>
-        <TryIt id="praxis-a11y-pruefen" {...beispiele['praxis-a11y-pruefen']} modus="test" />
+        <TryIt id="praxis-a11y-pruefen" {...examples['praxis-a11y-pruefen']} mode="test" />
         <Liste>
           <li>
             <strong>Tastatur-Test:</strong> Maus weglegen und einmal alles durchklicken. Findet in fünf Minuten die
@@ -179,9 +179,9 @@ export function Barrierefreiheit() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-a11y-uebung"
-          {...beispiele['praxis-a11y-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-a11y-uebung']}
+          mode="react"
+          task={
             <>
               <p>Die Newsletter-Box sieht gut aus, ist aber ohne Maus und Bildschirm kaum zu benutzen. Repariere sie:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -203,38 +203,38 @@ export function Barrierefreiheit() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum ist <div onClick> als Knopf ein Problem?',
-            antworten: [
+            question: 'Warum ist <div onClick> als Knopf ein Problem?',
+            answers: [
               'Er sieht anders aus',
               'Er ist nicht per Tab erreichbar, reagiert nicht auf Enter und hat keine Rolle',
               'onClick funktioniert auf div nicht',
             ],
-            richtig: 1,
-            erklaerung: '<button> bringt Fokus, Tastatur und die Rolle „button“ gratis mit.',
+            correct: 1,
+            explanation: '<button> bringt Fokus, Tastatur und die Rolle „button“ gratis mit.',
           },
           {
-            frage: 'Welchen alt-Text bekommt ein rein dekoratives Bild?',
-            antworten: ['Gar keinen alt', 'alt=""', 'alt="Bild"'],
-            richtig: 1,
-            erklaerung: 'Ein leeres alt heißt „überspringen“. Ohne alt wird oft der Dateiname vorgelesen.',
+            question: 'Welchen alt-Text bekommt ein rein dekoratives Bild?',
+            answers: ['Gar keinen alt', 'alt=""', 'alt="Bild"'],
+            correct: 1,
+            explanation: 'Ein leeres alt heißt „überspringen“. Ohne alt wird oft der Dateiname vorgelesen.',
           },
           {
-            frage: 'Wie erfährt ein Screenreader von „Gespeichert“, das neben dem Knopf erscheint?',
-            antworten: ['Gar nicht', 'Über eine Live-Region wie role="status"', 'Über einen title-Tooltip'],
-            richtig: 1,
-            erklaerung: 'Live-Regionen lesen Änderungen vor, auch wenn der Fokus woanders ist.',
+            question: 'Wie erfährt ein Screenreader von „Gespeichert“, das neben dem Knopf erscheint?',
+            answers: ['Gar nicht', 'Über eine Live-Region wie role="status"', 'Über einen title-Tooltip'],
+            correct: 1,
+            explanation: 'Live-Regionen lesen Änderungen vor, auch wenn der Fokus woanders ist.',
           },
           {
-            frage: 'Was ist die erste Regel von ARIA?',
-            antworten: [
+            question: 'Was ist die erste Regel von ARIA?',
+            answers: [
               'Jedes Element braucht eine role',
               'Kein ARIA, wenn es ein passendes HTML-Element gibt',
               'aria-label immer zusätzlich zum Text',
             ],
-            richtig: 1,
-            erklaerung: 'Natives HTML bringt Verhalten mit - ARIA ändert nur, was angesagt wird.',
+            correct: 1,
+            explanation: 'Natives HTML bringt Verhalten mit - ARIA ändert nur, was angesagt wird.',
           },
         ]}
       />

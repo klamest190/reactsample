@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Methoden.code'
+import { examples, codeBloecke } from './Methoden.code'
 
 /**
  * KAPITEL 7.4 - Methoden
@@ -17,7 +17,7 @@ export function Methoden() {
           Was in JavaScript eine Funktion ist, heißt in Java <strong>Methode</strong> - einfach
           deshalb, weil sie immer zu einer Klasse gehört. Freistehende Funktionen gibt es nicht.
         </P>
-        <TryIt modus="java" id="java-methoden-einstieg" {...beispiele['java-methoden-einstieg']} />
+        <TryIt mode="java" id="java-methoden-einstieg" {...examples['java-methoden-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Die Signatur">
@@ -41,7 +41,7 @@ export function Methoden() {
           denselben Namen tragen, solange sich ihre <strong>Parameter</strong> unterscheiden. Der
           Compiler sucht die passende heraus.
         </P>
-        <TryIt modus="java" id="java-methoden-ueberladung" {...beispiele['java-methoden-ueberladung']} />
+        <TryIt mode="java" id="java-methoden-ueberladung" {...examples['java-methoden-ueberladung']} />
         <P>
           Genau deshalb kann <Code>System.out.println(…)</Code> mit Text, Zahl, Wahrheitswert und
           Objekt umgehen: Es gibt die Methode gut ein Dutzend Mal, einmal pro Typ.
@@ -59,7 +59,7 @@ export function Methoden() {
           <em>Referenz</em> kopiert: Beide zeigen danach auf dasselbe Objekt, und wer es verändert,
           verändert es für alle.
         </P>
-        <TryIt modus="java" id="java-methoden-parameter" {...beispiele['java-methoden-parameter']} />
+        <TryIt mode="java" id="java-methoden-parameter" {...examples['java-methoden-parameter']} />
         <P>
           Das ist dieselbe Unterscheidung wie zwischen Wert und Referenz in JavaScript (
           <Verweis nr="1.6" />) - nur dass Java sie durch die Typen sichtbar macht.
@@ -80,7 +80,7 @@ export function Methoden() {
             <Verweis nr="7.6" />).
           </li>
         </Liste>
-        <TryIt modus="java" id="java-methoden-static" {...beispiele['java-methoden-static']} />
+        <TryIt mode="java" id="java-methoden-static" {...examples['java-methoden-static']} />
         <Hinweis variante="tipp">
           Deshalb ist <Code>main</Code> static: Beim Start gibt es noch kein einziges Objekt, das die
           JVM benutzen könnte.
@@ -92,15 +92,15 @@ export function Methoden() {
           Eine Methode darf sich selbst aufrufen. Wichtig ist nur der Ausstieg - ohne ihn läuft der
           Aufrufstapel voll und Java wirft einen <Code>StackOverflowError</Code>.
         </P>
-        <TryIt modus="java" id="java-methoden-rekursion" {...beispiele['java-methoden-rekursion']} />
+        <TryIt mode="java" id="java-methoden-rekursion" {...examples['java-methoden-rekursion']} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-methoden-uebung"
-          {...beispiele['java-methoden-uebung']}
-          aufgabe={
+          {...examples['java-methoden-uebung']}
+          task={
             <>
               <p>Schreibe zwei Methoden:</p>
               <Liste>
@@ -119,39 +119,39 @@ export function Methoden() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wodurch dürfen sich zwei überladene Methoden unterscheiden?',
-            antworten: [
+            question: 'Wodurch dürfen sich zwei überladene Methoden unterscheiden?',
+            answers: [
               'nur durch den Rückgabetyp',
               'durch Anzahl oder Typ der Parameter',
               'durch die Reihenfolge im Quelltext',
               'durch den Namen der Parameter',
             ],
-            richtig: 1,
-            erklaerung: 'Die Parameterliste macht die Methode eindeutig. Der Rückgabetyp allein reicht nicht.',
+            correct: 1,
+            explanation: 'Die Parameterliste macht die Methode eindeutig. Der Rückgabetyp allein reicht nicht.',
           },
           {
-            frage: 'Was passiert bei change(int zahl) { zahl = 99; } mit der Variablen des Aufrufers?',
-            antworten: [
+            question: 'Was passiert bei change(int zahl) { zahl = 99; } mit der Variablen des Aufrufers?',
+            answers: [
               'Sie wird auch 99.',
               'Sie bleibt unverändert - die Methode hat eine Kopie bekommen.',
               'Es gibt einen Kompilierfehler.',
               'Das hängt vom Typ ab.',
             ],
-            richtig: 1,
-            erklaerung: 'Java übergibt immer eine Kopie. Bei Objekten wird die Referenz kopiert - deshalb wirken Änderungen AM Objekt sehr wohl nach außen.',
+            correct: 1,
+            explanation: 'Java übergibt immer eine Kopie. Bei Objekten wird die Referenz kopiert - deshalb wirken Änderungen AM Objekt sehr wohl nach außen.',
           },
           {
-            frage: 'Warum ist main static?',
-            antworten: [
+            question: 'Warum ist main static?',
+            answers: [
               'Damit sie schneller läuft.',
               'Weil beim Start noch kein Objekt existiert, auf dem sie laufen könnte.',
               'Damit sie nur einmal aufgerufen wird.',
               'Das ist reine Konvention.',
             ],
-            richtig: 1,
-            erklaerung: 'static-Methoden gehören der Klasse - die JVM kann main also aufrufen, ohne vorher etwas zu erzeugen.',
+            correct: 1,
+            explanation: 'static-Methoden gehören der Klasse - die JVM kann main also aufrufen, ohne vorher etwas zu erzeugen.',
           },
         ]}
       />

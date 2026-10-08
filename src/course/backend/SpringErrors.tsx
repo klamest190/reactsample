@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './SpringErrors.code'
+import { examples, codeBloecke } from './SpringErrors.code'
 
 /**
  * CHAPTER 8.4 - Validation & error handling
@@ -19,7 +19,7 @@ export function SpringErrors() {
           <strong>400</strong>, die Methode wird gar nicht aufgerufen. Was genau falsch war, steht im
           Log.
         </P>
-        <TryIt modus="spring" id="spring-fehler-valid" {...beispiele['spring-fehler-valid']} />
+        <TryIt mode="spring" id="spring-fehler-valid" {...examples['spring-fehler-valid']} />
       </Abschnitt>
 
       <Abschnitt titel="Traue nie dem Client">
@@ -33,7 +33,7 @@ export function SpringErrors() {
           Dafür gibt es <strong>Bean Validation</strong>: Regeln als Annotationen direkt an den
           Feldern. Im echten Projekt braucht es dazu diesen Starter:
         </P>
-        <CodeBlock code={codeBloecke.abhaengigkeit} titel="pom.xml" />
+        <CodeBlock code={codeBloecke.abhaengigkeit} title="pom.xml" />
         <Tabelle
           kopf={['Annotation', 'prüft']}
           spalten={['font-mono text-xs']}
@@ -57,7 +57,7 @@ export function SpringErrors() {
           Die Standard-Antwort von Spring Boot verrät übrigens nicht, <em>was</em> falsch war - nur
           dass es falsch war:
         </P>
-        <CodeBlock code={codeBloecke.standard} titel="400 Bad Request" sprache="konfig" />
+        <CodeBlock code={codeBloecke.standard} title="400 Bad Request" language="config" />
         <P>Wie man das ändert, kommt gleich.</P>
       </Abschnitt>
 
@@ -81,7 +81,7 @@ export function SpringErrors() {
           Stacktrace im Log. Die Meldung erscheint in der Antwort nur, weil in den Properties{' '}
           <Code>server.error.include-message=always</Code> steht:
         </P>
-        <TryIt modus="spring" id="spring-fehler-status" {...beispiele['spring-fehler-status']} />
+        <TryIt mode="spring" id="spring-fehler-status" {...examples['spring-fehler-status']} />
         <Hinweis variante="info">
           Dass Spring Boot Fehlermeldungen standardmäßig verschweigt, ist Absicht: Eine Meldung wie
           „Connection to db-prod-3 refused“ verrät Angreifern mehr, als sie wissen sollten.
@@ -99,23 +99,23 @@ export function SpringErrors() {
           Für den Inhalt gibt es einen Standard, <strong>Problem Details</strong> (RFC 9457), den
           Spring mit <Code>ProblemDetail</Code> direkt unterstützt:
         </P>
-        <CodeBlock code={codeBloecke.problem} titel="404 · application/problem+json" sprache="konfig" />
+        <CodeBlock code={codeBloecke.problem} title="404 · application/problem+json" language="config" />
         <P>
           Auch Validierungsfehler sind Exceptions (<Code>MethodArgumentNotValidException</Code>) - ein
           Handler kann daraus eine Liste „Feld → Meldung“ machen, mit der ein Formular im Frontend
           etwas anfangen kann:
         </P>
-        <TryIt modus="spring" id="spring-fehler-advice" {...beispiele['spring-fehler-advice']} />
+        <TryIt mode="spring" id="spring-fehler-advice" {...examples['spring-fehler-advice']} />
         <P>Wer eine Exception bekommt, entscheidet Spring in dieser Reihenfolge:</P>
-        <CodeBlock code={codeBloecke.reihenfolge} titel="Reihenfolge" sprache="konfig" />
+        <CodeBlock code={codeBloecke.reihenfolge} title="Reihenfolge" language="config" />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-fehler-uebung"
-          {...beispiele['spring-fehler-uebung']}
-          aufgabe={
+          {...examples['spring-fehler-uebung']}
+          task={
             <>
               <p>Mach die Bücher-API robust:</p>
               <Liste>
@@ -135,29 +135,29 @@ export function SpringErrors() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Ein Record hat @NotBlank am Titel, der Controller-Parameter nur @RequestBody. Was passiert bei leerem Titel?',
-            antworten: ['400 Bad Request', 'Nichts - der leere Titel wird angenommen', '500 Internal Server Error', 'Die Anwendung startet nicht'],
-            richtig: 1,
-            erklaerung: 'Ohne @Valid wird nicht geprüft. Die Annotationen allein bewirken nichts.',
+            question: 'Ein Record hat @NotBlank am Titel, der Controller-Parameter nur @RequestBody. Was passiert bei leerem Titel?',
+            answers: ['400 Bad Request', 'Nichts - der leere Titel wird angenommen', '500 Internal Server Error', 'Die Anwendung startet nicht'],
+            correct: 1,
+            explanation: 'Ohne @Valid wird nicht geprüft. Die Annotationen allein bewirken nichts.',
           },
           {
-            frage: 'Eine Methode wirft eine NullPointerException, niemand fängt sie. Welcher Status kommt heraus?',
-            antworten: ['400', '404', '500', '200 mit leerem Body'],
-            richtig: 2,
-            erklaerung: 'Eine unerwartete Exception ist ein Fehler des Servers: 500 Internal Server Error.',
+            question: 'Eine Methode wirft eine NullPointerException, niemand fängt sie. Welcher Status kommt heraus?',
+            answers: ['400', '404', '500', '200 mit leerem Body'],
+            correct: 2,
+            explanation: 'Eine unerwartete Exception ist ein Fehler des Servers: 500 Internal Server Error.',
           },
           {
-            frage: 'Wofür ist @RestControllerAdvice gut?',
-            antworten: [
+            question: 'Wofür ist @RestControllerAdvice gut?',
+            answers: [
               'Es macht Controller schneller',
               'Es sammelt @ExceptionHandler-Methoden, die für alle Controller gelten',
               'Es prüft Eingaben',
               'Es ersetzt @RestController',
             ],
-            richtig: 1,
-            erklaerung: 'Eine zentrale Stelle, an der Exceptions aus allen Controllern in einheitliche Antworten übersetzt werden.',
+            correct: 1,
+            explanation: 'Eine zentrale Stelle, an der Exceptions aus allen Controllern in einheitliche Antworten übersetzt werden.',
           },
         ]}
       />

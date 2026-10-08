@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-eigene-einstieg': {
     code: js`
       function useToggle(initial = false) {
@@ -23,7 +23,7 @@ export const beispiele = {
     `,
   },
   'hooks-eigene-extrahieren': {
-    tipps: {
+    hints: {
       de: [
         'Verschiebe `useState` und `useEffect` für den Online-Status unverändert in `function useOnlineStatus()`.',
         'Der Hook gibt nur `online` zurück - beide Komponenten rufen ihn einzeln auf.',
@@ -77,7 +77,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function useOnlineStatus() {
         const [online, setOnline] = useState(navigator.onLine)
         useEffect(() => {
@@ -116,7 +116,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'useOnlineStatus enthält die Logik genau einmal', en: 'useOnlineStatus contains the logic exactly once' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/function useOnlineStatus\s*\(/)
           expect((code.match(/addEventListener\(\s*'online'/g) ?? []).length).toBe(1)
           expect((code.match(/useOnlineStatus\(\)/g) ?? []).length).toBeGreaterThan(2)
@@ -124,7 +124,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Beide Komponenten zeigen den Status', en: 'Both components show the status' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toMatch(/Online|Offline/)
           expect(button(/Save|Waiting/)).toBeTruthy()
@@ -166,7 +166,7 @@ export const beispiele = {
     `,
   },
   'hooks-eigene-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Der Hook bekommt Startwert und ein Optionsobjekt mit Standardwerten: `{ min = -Infinity, max = Infinity } = {}`.',
         'Eine Hilfsfunktion `clamp` hält den Wert in den Grenzen.',
@@ -216,7 +216,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function useCounter(initial, { min = -Infinity, max = Infinity } = {}) {
         const [value, setValue] = useState(initial)
 
@@ -267,7 +267,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startwerte werden angezeigt', en: 'Initial values are shown' },
-        pruefung: js`
+        script: js`
           await render()
           expect(getByText('Guests').textContent).toMatch(/Guests:\D*2/)
           expect(getByText('Nights').textContent).toMatch(/Nights:\D*1/)
@@ -275,7 +275,7 @@ export const beispiele = {
       },
       {
         name: { de: 'increment und decrement zählen', en: 'increment and decrement count' },
-        pruefung: js`
+        script: js`
           await render()
           await click(within(getByText('Guests')).button('+'))
           expect(getByText('Guests').textContent).toMatch(/Guests:\D*3/)
@@ -285,7 +285,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Der Wert bleibt unter max, atMax deaktiviert +', en: 'The value stays below max, atMax disables +' },
-        pruefung: js`
+        script: js`
           await render()
           for (let i = 0; i < 4; i++) await click(within(getByText('Guests')).button('+'))
           expect(getByText('Guests').textContent).toMatch(/Guests:\D*6/)
@@ -294,14 +294,14 @@ export const beispiele = {
       },
       {
         name: { de: 'atMin deaktiviert −', en: 'atMin disables −' },
-        pruefung: js`
+        script: js`
           await render()
           expect(within(getByText('Nights')).button('−')).toBeDisabled()
         `,
       },
       {
         name: { de: 'Zähler sind unabhängig, reset funktioniert', en: 'Counters are independent, reset works' },
-        pruefung: js`
+        script: js`
           await render()
           await click(within(getByText('Nights')).button('+'))
           await click(within(getByText('Nights')).button('+'))
@@ -313,7 +313,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

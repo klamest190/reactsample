@@ -16,22 +16,22 @@
  * Kommentare überspringen, sonst das längste passende Token einsammeln.
  */
 
-export type TokenArt = 'name' | 'schluessel' | 'zahl' | 'text' | 'zeichen' | 'symbol' | 'ende'
+export type TokenKind = 'name' | 'keyword' | 'number' | 'text' | 'char' | 'symbol' | 'end'
 
 export type Token = {
-  art: TokenArt
+  kind: TokenKind
   /** Der Quelltext des Tokens - bei Strings ohne Anführungszeichen. */
   text: string
   /** Bei Zahlen der Wert, bei `char` der Code-Punkt. */
-  wert?: number
+  value?: number
   /** true, wenn die Zahl double/float ist (3.14, 2e3, 1.0f). */
-  kommazahl?: boolean
-  zeile: number
-  spalte: number
+  isFloat?: boolean
+  line: number
+  column: number
 }
 
 /** Alle Schlüsselwörter, die diese Laufzeit kennt (echtes Java hat ein paar mehr). */
-export const SCHLUESSELWOERTER = new Set([
+export const KEYWORDS = new Set([
   'abstract', 'assert', 'boolean', 'break', 'byte', 'case', 'catch', 'char', 'class', 'const',
   'continue', 'default', 'do', 'double', 'else', 'enum', 'extends', 'final', 'finally', 'float',
   'for', 'goto', 'if', 'implements', 'import', 'instanceof', 'int', 'interface', 'long', 'native',
@@ -41,10 +41,10 @@ export const SCHLUESSELWOERTER = new Set([
 ])
 
 /** Literale sind in Java keine Schlüsselwörter, verhalten sich hier aber so. */
-export const LITERALE = new Set(['true', 'false', 'null'])
+export const LITERALS = new Set(['true', 'false', 'null'])
 
 /** Mehrzeichen-Operatoren, längste zuerst - so greift immer der längste Treffer. */
-const SYMBOLE = [
+const SYMBOLS = [
   '>>>=', '<<=', '>>=', '>>>', '...', '->', '::',
   '++', '--', '&&', '||', '==', '!=', '<=', '>=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<',
   '{', '}', '(', ')', '[', ']', ';', ',', '.', '=', '>', '<', '!', '~', '?', ':', '+', '-', '*', '/',
@@ -52,15 +52,15 @@ const SYMBOLE = [
 ]
 
 /** Fehler, den Lexer, Parser und Prüfer werfen: eine Meldung mit Zeilennummer. */
-export class JavaSyntaxFehler extends Error {
-  meldung: string
-  zeile: number
+export class JavaSyntaxError extends Error {
+  message: string
+  line: number
 
-  constructor(meldung: string, zeile: number) {
-    super(meldung)
+  constructor(message: string, line: number) {
+    super(message)
     this.name = 'JavaSyntaxFehler'
-    this.meldung = meldung
-    this.zeile = zeile
+    this.message = message
+    this.line = line
   }
 }
 
@@ -68,25 +68,25 @@ const ESCAPES: Record<string, string> = {
   n: '\n', t: '\t', r: '\r', b: '\b', f: '\f', s: ' ', '0': '\0', "'": "'", '"': '"', '\\': '\\',
 }
 
-export function tokenisieren(quelle: string): Token[] {
+export function tokenize(source: string): Token[] {
   const tokens: Token[] = []
   let i = 0
-  let zeile = 1
-  let zeilenAnfang = 0
+  let line = 1
+  let lineStart = 0
 
-  const spalte = () => i - zeilenAnfang + 1
-  const fehler = (meldung: string): never => {
-    throw new JavaSyntaxFehler(meldung, zeile)
+  const column = () => i - lineStart + 1
+  const error = (message: string): never => {
+    throw new JavaSyntaxError(message, line)
   }
 
-  while (i < quelle.length) {
-    const c = quelle[i]
+  while (i < source.length) {
+    const c = source[i]
 
     // --- Leerraum -----------------------------------------------------------
     if (c === '\n') {
-      zeile++
+      line++
       i++
-      zeilenAnfang = i
+      lineStart = i
       continue
     }
     if (c === ' ' || c === '\t' || c === '\r') {
@@ -95,96 +95,96 @@ export function tokenisieren(quelle: string): Token[] {
     }
 
     // --- Kommentare ---------------------------------------------------------
-    if (c === '/' && quelle[i + 1] === '/') {
-      while (i < quelle.length && quelle[i] !== '\n') i++
+    if (c === '/' && source[i + 1] === '/') {
+      while (i < source.length && source[i] !== '\n') i++
       continue
     }
-    if (c === '/' && quelle[i + 1] === '*') {
-      const start = zeile
+    if (c === '/' && source[i + 1] === '*') {
+      const start = line
       i += 2
-      while (i < quelle.length && !(quelle[i] === '*' && quelle[i + 1] === '/')) {
-        if (quelle[i] === '\n') {
-          zeile++
-          zeilenAnfang = i + 1
+      while (i < source.length && !(source[i] === '*' && source[i + 1] === '/')) {
+        if (source[i] === '\n') {
+          line++
+          lineStart = i + 1
         }
         i++
       }
-      if (i >= quelle.length) throw new JavaSyntaxFehler('unclosed comment', start)
+      if (i >= source.length) throw new JavaSyntaxError('unclosed comment', start)
       i += 2
       continue
     }
 
-    const beginn = { zeile, spalte: spalte() }
+    const begin = { line, column: column() }
 
     // --- Namen & Schlüsselwörter -------------------------------------------
     if (/[A-Za-z_$]/.test(c)) {
       let j = i
-      while (j < quelle.length && /[A-Za-z0-9_$]/.test(quelle[j])) j++
-      const text = quelle.slice(i, j)
+      while (j < source.length && /[A-Za-z0-9_$]/.test(source[j])) j++
+      const text = source.slice(i, j)
       i = j
-      tokens.push({ art: SCHLUESSELWOERTER.has(text) ? 'schluessel' : 'name', text, ...beginn })
+      tokens.push({ kind: KEYWORDS.has(text) ? 'keyword' : 'name', text, ...begin })
       continue
     }
 
     // --- Zahlen -------------------------------------------------------------
-    if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(quelle[i + 1] ?? ''))) {
+    if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(source[i + 1] ?? ''))) {
       let j = i
-      let kommazahl = false
-      if (c === '0' && /[xXbB]/.test(quelle[i + 1] ?? '')) {
+      let isFloat = false
+      if (c === '0' && /[xXbB]/.test(source[i + 1] ?? '')) {
         j = i + 2
-        while (j < quelle.length && /[0-9a-fA-F_]/.test(quelle[j])) j++
+        while (j < source.length && /[0-9a-fA-F_]/.test(source[j])) j++
       } else {
-        while (j < quelle.length && /[0-9_]/.test(quelle[j])) j++
-        if (quelle[j] === '.' && /[0-9]/.test(quelle[j + 1] ?? '')) {
-          kommazahl = true
+        while (j < source.length && /[0-9_]/.test(source[j])) j++
+        if (source[j] === '.' && /[0-9]/.test(source[j + 1] ?? '')) {
+          isFloat = true
           j++
-          while (j < quelle.length && /[0-9_]/.test(quelle[j])) j++
+          while (j < source.length && /[0-9_]/.test(source[j])) j++
         }
-        if (/[eE]/.test(quelle[j] ?? '') && /[0-9+-]/.test(quelle[j + 1] ?? '')) {
-          kommazahl = true
+        if (/[eE]/.test(source[j] ?? '') && /[0-9+-]/.test(source[j + 1] ?? '')) {
+          isFloat = true
           j += 2
-          while (j < quelle.length && /[0-9]/.test(quelle[j])) j++
+          while (j < source.length && /[0-9]/.test(source[j])) j++
         }
       }
-      const text = quelle.slice(i, j)
-      const suffix = quelle[j] ?? ''
+      const text = source.slice(i, j)
+      const suffix = source[j] ?? ''
       if (/[lLdDfF]/.test(suffix)) {
-        if (/[dDfF]/.test(suffix)) kommazahl = true
+        if (/[dDfF]/.test(suffix)) isFloat = true
         j++
       }
       i = j
-      const wert = Number(text.replace(/_/g, ''))
-      if (Number.isNaN(wert)) fehler(`malformed numeric literal: ${text}`)
-      tokens.push({ art: 'zahl', text, wert, kommazahl, ...beginn })
+      const value = Number(text.replace(/_/g, ''))
+      if (Number.isNaN(value)) error(`malformed numeric literal: ${text}`)
+      tokens.push({ kind: 'number', text, value, isFloat, ...begin })
       continue
     }
 
     // --- Strings ------------------------------------------------------------
     if (c === '"') {
       // Textblock """…""" (Java 15+)
-      if (quelle.startsWith('"""', i)) {
-        const ende = quelle.indexOf('"""', i + 3)
-        if (ende < 0) fehler('unclosed text block')
-        const roh = quelle.slice(i + 3, ende).replace(/^[ \t]*\n/, '')
-        for (const z of quelle.slice(i, ende + 3)) if (z === '\n') zeile++
-        i = ende + 3
-        const zeilen = roh.split('\n')
-        const einzug = Math.min(
-          ...zeilen.filter((z) => z.trim()).map((z) => z.match(/^[ \t]*/)![0].length),
+      if (source.startsWith('"""', i)) {
+        const end = source.indexOf('"""', i + 3)
+        if (end < 0) error('unclosed text block')
+        const raw = source.slice(i + 3, end).replace(/^[ \t]*\n/, '')
+        for (const z of source.slice(i, end + 3)) if (z === '\n') line++
+        i = end + 3
+        const lines = raw.split('\n')
+        const indent = Math.min(
+          ...lines.filter((z) => z.trim()).map((z) => z.match(/^[ \t]*/)![0].length),
           Number.MAX_SAFE_INTEGER,
         )
-        const inhalt = zeilen.map((z) => z.slice(einzug)).join('\n').replace(/\n$/, '')
-        tokens.push({ art: 'text', text: inhalt, ...beginn })
+        const content = lines.map((z) => z.slice(indent)).join('\n').replace(/\n$/, '')
+        tokens.push({ kind: 'text', text: content, ...begin })
         continue
       }
       let j = i + 1
       let text = ''
-      while (j < quelle.length && quelle[j] !== '"') {
-        if (quelle[j] === '\n') fehler('unclosed string literal')
-        if (quelle[j] === '\\') {
-          const e = quelle[j + 1]
+      while (j < source.length && source[j] !== '"') {
+        if (source[j] === '\n') error('unclosed string literal')
+        if (source[j] === '\\') {
+          const e = source[j + 1]
           if (e === 'u') {
-            text += String.fromCharCode(parseInt(quelle.slice(j + 2, j + 6), 16))
+            text += String.fromCharCode(parseInt(source.slice(j + 2, j + 6), 16))
             j += 6
             continue
           }
@@ -192,49 +192,49 @@ export function tokenisieren(quelle: string): Token[] {
           j += 2
           continue
         }
-        text += quelle[j]
+        text += source[j]
         j++
       }
-      if (j >= quelle.length) fehler('unclosed string literal')
+      if (j >= source.length) error('unclosed string literal')
       i = j + 1
-      tokens.push({ art: 'text', text, ...beginn })
+      tokens.push({ kind: 'text', text, ...begin })
       continue
     }
 
     // --- char ---------------------------------------------------------------
     if (c === "'") {
       let j = i + 1
-      let zeichen: string
-      if (quelle[j] === '\\') {
-        const e = quelle[j + 1]
+      let chars: string
+      if (source[j] === '\\') {
+        const e = source[j + 1]
         if (e === 'u') {
-          zeichen = String.fromCharCode(parseInt(quelle.slice(j + 2, j + 6), 16))
+          chars = String.fromCharCode(parseInt(source.slice(j + 2, j + 6), 16))
           j += 6
         } else {
-          zeichen = ESCAPES[e] ?? e
+          chars = ESCAPES[e] ?? e
           j += 2
         }
       } else {
-        zeichen = quelle[j]
+        chars = source[j]
         j++
       }
-      if (quelle[j] !== "'") fehler('unclosed character literal')
+      if (source[j] !== "'") error('unclosed character literal')
       i = j + 1
-      tokens.push({ art: 'zeichen', text: zeichen, wert: zeichen.charCodeAt(0), ...beginn })
+      tokens.push({ kind: 'char', text: chars, value: chars.charCodeAt(0), ...begin })
       continue
     }
 
     // --- Operatoren & Satzzeichen ------------------------------------------
-    const symbol = SYMBOLE.find((s) => quelle.startsWith(s, i))
+    const symbol = SYMBOLS.find((s) => source.startsWith(s, i))
     if (symbol) {
       i += symbol.length
-      tokens.push({ art: 'symbol', text: symbol, ...beginn })
+      tokens.push({ kind: 'symbol', text: symbol, ...begin })
       continue
     }
 
-    fehler(`illegal character: '${c}'`)
+    error(`illegal character: '${c}'`)
   }
 
-  tokens.push({ art: 'ende', text: '<ende>', zeile, spalte: spalte() })
+  tokens.push({ kind: 'end', text: '<ende>', line, column: column() })
   return tokens
 }

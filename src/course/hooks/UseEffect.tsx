@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseEffect.code'
+import { examples, codeBloecke } from './UseEffect.code'
 import { TitelUndFenster } from '../demos/TitelUndFenster'
 
 /**
@@ -15,8 +15,8 @@ export function UseEffect() {
         <P><Code>useEffect</Code> läuft nach dem Rendern - hier jedes Mal, wenn sich <Code>count</Code> ändert.</P>
         <TryIt
           id="hooks-useeffect-einstieg"
-          {...beispiele['hooks-useeffect-einstieg']}
-          modus="react"
+          {...examples['hooks-useeffect-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -51,8 +51,8 @@ export function UseEffect() {
         />
         <TryIt
           id="hooks-useeffect-deps"
-          {...beispiele['hooks-useeffect-deps']}
-          modus="react"
+          {...examples['hooks-useeffect-deps']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -64,8 +64,8 @@ export function UseEffect() {
         </P>
         <TryIt
           id="hooks-useeffect-cleanup"
-          {...beispiele['hooks-useeffect-cleanup']}
-          modus="react"
+          {...examples['hooks-useeffect-cleanup']}
+          mode="react"
         />
         <TitelUndFenster />
         <Hinweis variante="info">
@@ -85,8 +85,8 @@ export function UseEffect() {
         </P>
         <TryIt
           id="hooks-useeffect-stale"
-          {...beispiele['hooks-useeffect-stale']}
-          modus="react"
+          {...examples['hooks-useeffect-stale']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -119,9 +119,9 @@ export function UseEffect() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-useeffect-uebung"
-          {...beispiele['hooks-useeffect-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-useeffect-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue einen Pomodoro-Countdown:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -141,42 +141,42 @@ export function UseEffect() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wann läuft ein Effekt mit leerem Dependency-Array []?',
-            antworten: ['Vor dem ersten Render', 'Nach dem ersten Render', 'Nach jedem Render'],
-            richtig: 1,
-            erklaerung: 'Effekte laufen immer nach dem Rendern. Mit [] nur nach dem ersten.',
+            question: 'Wann läuft ein Effekt mit leerem Dependency-Array []?',
+            answers: ['Vor dem ersten Render', 'Nach dem ersten Render', 'Nach jedem Render'],
+            correct: 1,
+            explanation: 'Effekte laufen immer nach dem Rendern. Mit [] nur nach dem ersten.',
           },
           {
-            frage: 'Wann ruft React die Cleanup-Funktion auf?',
-            antworten: [
+            question: 'Wann ruft React die Cleanup-Funktion auf?',
+            answers: [
               'Nur beim Entfernen der Komponente',
               'Vor jedem erneuten Effekt-Lauf und beim Entfernen',
               'Nach jedem Render',
             ],
-            richtig: 1,
-            erklaerung: 'So wird der alte Effekt immer abgeräumt, bevor der neue startet.',
+            correct: 1,
+            explanation: 'So wird der alte Effekt immer abgeräumt, bevor der neue startet.',
           },
           {
-            frage: 'Du willst filteredList aus list und search erzeugen. Was ist richtig?',
-            antworten: [
+            question: 'Du willst filteredList aus list und search erzeugen. Was ist richtig?',
+            answers: [
               'useEffect + setFilteredList',
               'Beim Rendern berechnen (ggf. useMemo)',
               'useRef',
             ],
-            richtig: 1,
-            erklaerung: 'Abgeleitete Werte brauchen weder Effekt noch State.',
+            correct: 1,
+            explanation: 'Abgeleitete Werte brauchen weder Effekt noch State.',
           },
           {
-            frage: 'Warum läuft ein Effekt in der Entwicklung zweimal?',
-            antworten: [
+            question: 'Warum läuft ein Effekt in der Entwicklung zweimal?',
+            answers: [
               'Ein Bug in React',
               'StrictMode prüft absichtlich, ob der Cleanup korrekt ist',
               'Weil die Dependencies fehlen',
             ],
-            richtig: 1,
-            erklaerung: 'Nur in der Entwicklung und nur im StrictMode.',
+            correct: 1,
+            explanation: 'Nur in der Entwicklung und nur im StrictMode.',
           },
         ]}
       />

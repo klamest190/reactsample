@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Routing.code'
+import { examples, codeBloecke } from './Routing.code'
 
 /**
  * KAPITEL 5.7 (English) - Routing with React Router
@@ -16,7 +16,7 @@ export function Routing() {
           Two pages, two links: <Code>{'<Routes>'}</Code> shows the <Code>{'<Route>'}</Code> whose{' '}
           <Code>path</Code> matches the current address.
         </P>
-        <TryIt id="praxis-routing-einstieg" {...beispiele['praxis-routing-einstieg']} modus="react" />
+        <TryIt id="praxis-routing-einstieg" {...examples['praxis-routing-einstieg']} mode="react" />
       </Abschnitt>
 
       <Abschnitt titel="What is routing?">
@@ -30,7 +30,7 @@ export function Routing() {
           At its core, that is nothing new: the current path is state, and the page is chosen from it. Without a
           library it looks like this:
         </P>
-        <TryIt id="praxis-routing-idee" {...beispiele['praxis-routing-idee']} modus="react" />
+        <TryIt id="praxis-routing-idee" {...examples['praxis-routing-idee']} mode="react" />
         <P>
           A real router does two more things: it writes the path into the address bar with{' '}
           <Code>history.pushState()</Code>, and it listens to the <Code>popstate</Code> event so the back button
@@ -44,7 +44,7 @@ export function Routing() {
           The most widely used library for this is <strong>React Router</strong>. In your own project you install it
           and wrap the whole app in a <Code>BrowserRouter</Code>:
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.installieren} />
+        <CodeBlock title="Terminal" code={codeBloecke.installieren} />
         <CodeBlock code={codeBloecke.einrichten} />
         <Hinweis variante="info">
           The editors here use <Code>MemoryRouter</Code> instead. It keeps the address in memory rather than in the
@@ -68,7 +68,7 @@ export function Routing() {
           <Code>/products/:id</Code>. The component reads the value with <Code>useParams()</Code>. The route{' '}
           <Code>path="*"</Code> catches everything that matches nothing else.
         </P>
-        <TryIt id="praxis-routing-params" {...beispiele['praxis-routing-params']} modus="react" />
+        <TryIt id="praxis-routing-params" {...examples['praxis-routing-params']} mode="react" />
         <Liste>
           <li>
             <Code>NavLink</Code> is a <Code>Link</Code> that knows whether it is active - ideal for menus. “Products”
@@ -88,7 +88,7 @@ export function Routing() {
           route renders the <strong>layout</strong>, and the matching inner route appears where{' '}
           <Code>{'<Outlet />'}</Code> is. An <Code>index</Code> route is the default page of a section.
         </P>
-        <TryIt id="praxis-routing-layout" {...beispiele['praxis-routing-layout']} modus="react" />
+        <TryIt id="praxis-routing-layout" {...examples['praxis-routing-layout']} mode="react" />
         <P>
           It is the same principle as <Code>children</Code> from <Verweis id="praxis-komposition" /> - only here the
           address decides what goes in. Switching between “Profile” and “Security” keeps the layout, only the inner
@@ -102,7 +102,7 @@ export function Routing() {
           <Code>useNavigate()</Code>. If a page should not be shown at all, return <Code>{'<Navigate to="…" />'}</Code>{' '}
           - a redirect while rendering.
         </P>
-        <TryIt id="praxis-routing-navigieren" {...beispiele['praxis-routing-navigieren']} modus="react" />
+        <TryIt id="praxis-routing-navigieren" {...examples['praxis-routing-navigieren']} mode="react" />
         <Liste>
           <li>
             <Code>replace</Code> replaces the current history entry instead of adding a new one. After logging in,
@@ -125,7 +125,7 @@ export function Routing() {
           <Code>useSearchParams()</Code> works almost like <Code>useState</Code>, except the value lives in the URL -
           a single source of truth (<Verweis id="react-datenfluss" />).
         </P>
-        <TryIt id="praxis-routing-suche" {...beispiele['praxis-routing-suche']} modus="react" />
+        <TryIt id="praxis-routing-suche" {...examples['praxis-routing-suche']} mode="react" />
         <P>
           Search params are always strings. If one is missing, <Code>get()</Code> returns <Code>null</Code> - hence
           the defaults with <Code>??</Code>.
@@ -139,7 +139,7 @@ export function Routing() {
           route gets a <Code>loader</Code> that runs <em>before</em> rendering. The component gets the result with{' '}
           <Code>useLoaderData()</Code> and no longer has to deal with loading and errors.
         </P>
-        <TryIt id="praxis-routing-loader" {...beispiele['praxis-routing-loader']} modus="react" />
+        <TryIt id="praxis-routing-loader" {...examples['praxis-routing-loader']} mode="react" />
         <Liste>
           <li>
             Here the routes are objects instead of JSX and are created once, outside the components, with{' '}
@@ -154,7 +154,7 @@ export function Routing() {
             (<Verweis id="praxis-fehler" />).
           </li>
         </Liste>
-        <CodeBlock titel="In your own project" code={codeBloecke.datenRouter} />
+        <CodeBlock title="In your own project" code={codeBloecke.datenRouter} />
         <Hinweis variante="tipp">
           React Router has three levels: <strong>declarative</strong> (<Code>{'<Routes>'}</Code>, as above),{' '}
           <strong>data</strong> (loaders, actions) and <strong>framework</strong> (with a Vite plugin, server rendering
@@ -166,9 +166,9 @@ export function Routing() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-routing-uebung"
-          {...beispiele['praxis-routing-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-routing-uebung']}
+          mode="react"
+          task={
             <>
               <p>Turn the blog into an app with detail pages:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -187,38 +187,38 @@ export function Routing() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why <Link> instead of <a href> for pages inside the app?',
-            antworten: [
+            question: 'Why <Link> instead of <a href> for pages inside the app?',
+            answers: [
               'Link is easier to style',
               'An <a> reloads the whole page - all state is lost',
               'The back button does not work with <a>',
             ],
-            richtig: 1,
-            erklaerung: 'Link only changes the address and lets React render the matching route.',
+            correct: 1,
+            explanation: 'Link only changes the address and lets React render the matching route.',
           },
           {
-            frage: 'How does a component read the :id from /products/:id?',
-            antworten: ['props.id', 'useParams()', 'useLocation().id'],
-            richtig: 1,
-            erklaerung: 'useParams() returns an object with all placeholders of the matching route.',
+            question: 'How does a component read the :id from /products/:id?',
+            answers: ['props.id', 'useParams()', 'useLocation().id'],
+            correct: 1,
+            explanation: 'useParams() returns an object with all placeholders of the matching route.',
           },
           {
-            frage: 'What does <Outlet /> stand for in a layout route?',
-            antworten: ['A link to the outside', 'The place where the matching child route appears', 'The 404 page'],
-            richtig: 1,
-            erklaerung: 'The layout stays, only the content at the outlet changes with the address.',
+            question: 'What does <Outlet /> stand for in a layout route?',
+            answers: ['A link to the outside', 'The place where the matching child route appears', 'The 404 page'],
+            correct: 1,
+            explanation: 'The layout stays, only the content at the outlet changes with the address.',
           },
           {
-            frage: 'Which state typically belongs in the URL?',
-            antworten: [
+            question: 'Which state typically belongs in the URL?',
+            answers: [
               'The text someone is currently typing into a form',
               'Filters, search and sort order of a list',
               'Whether a tooltip is open',
             ],
-            richtig: 1,
-            erklaerung: 'Anything people want to share or bookmark.',
+            correct: 1,
+            explanation: 'Anything people want to share or bookmark.',
           },
         ]}
       />

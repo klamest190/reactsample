@@ -17,16 +17,16 @@
  * gets the same object.
  */
 
-import type { Annotation, MethodenDekl, Programm, TypRef } from '../java/ast'
-import { Interpreter, JavaAbbruch, JavaAusnahme } from '../java/interpreter'
-import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
+import type { Annotation, MethodDecl, Program, TypeRef } from '../java/ast'
+import { Interpreter, JavaAbort, JavaException } from '../java/interpreter'
+import { NULL, newString, type JavaObject, type ClassInfo, type NativeValue, type Value } from '../java/values'
 import { STEREOTYPES, beanNameOf, find, has, text } from './annotations'
 import { Config, PlaceholderError, kebab } from './config'
 import { REPOSITORY_TYPES, Repository, RepositoryError, repositoryEntity } from './data'
 import { springLibrary, type LibraryHost } from './library'
 
 export type Language = 'de' | 'en'
-export type OutputLine = { typ: 'log' | 'info' | 'warn' | 'error' | 'fehler'; text: string }
+export type OutputLine = { type: 'log' | 'info' | 'warn' | 'error' | 'exception'; text: string }
 
 export type BeanKind = 'controller' | 'service' | 'repository' | 'component' | 'configuration' | 'bean' | 'advice'
 export type BeanInfo = { name: string; type: string; kind: BeanKind; dependencies: string[]; line: number }
@@ -36,15 +36,15 @@ type Definition = {
   /** Declared type: the class, the repository interface or the return type of a @Bean method. */
   type: string
   kind: BeanKind
-  klasse?: Klasse
-  factory?: { owner: Definition; method: MethodenDekl }
+  classInfo?: ClassInfo
+  factory?: { owner: Definition; method: MethodDecl }
   repository?: { entity: string }
   primary: boolean
   order: number
   annotations: Annotation[]
   line: number
   dependencies: string[]
-  instance?: Wert
+  instance?: Value
 }
 
 /** "APPLICATION FAILED TO START" - with Spring's description and action, plus a hint for learners. */
@@ -72,20 +72,20 @@ export class SpringApp implements LibraryHost {
   readonly config: Config
   readonly lines: OutputLine[] = []
   readonly definitions: Definition[] = []
-  readonly repositories = new WeakMap<NativWert, Repository>()
+  readonly repositories = new WeakMap<NativeValue, Repository>()
   started = false
   /** The class whose main method started the application. */
   mainClass: string | undefined
   readonly library: ReturnType<typeof springLibrary>
-  readonly contextValue: NativWert = { art: 'nativ', typ: 'ApplicationContext', daten: {} }
+  readonly contextValue: NativeValue = { kind: 'native', type: 'ApplicationContext', data: {} }
   /** Filled by web.ts after the beans exist. */
   onStarted: ((app: SpringApp) => void) | null = null
-  private readonly tables = new Map<string, { rows: JavaObjekt[]; nextId: number }>()
+  private readonly tables = new Map<string, { rows: JavaObject[]; nextId: number }>()
 
-  readonly program: Programm
+  readonly program: Program
   readonly language: Language
 
-  constructor(program: Programm, properties: string, language: Language) {
+  constructor(program: Program, properties: string, language: Language) {
     this.program = program
     this.language = language
     this.config = new Config(properties)
@@ -105,41 +105,41 @@ export class SpringApp implements LibraryHost {
 
   /** Moves finished System.out lines over first - so logs and prints keep their order. */
   flushOutput() {
-    for (const line of this.interpreter.zeilen) this.lines.push({ typ: line.strom === 'err' ? 'error' : 'log', text: line.text })
-    this.interpreter.zeilen.length = 0
+    for (const line of this.interpreter.lines) this.lines.push({ type: line.stream === 'err' ? 'error' : 'log', text: line.text })
+    this.interpreter.lines.length = 0
   }
 
   log(level: 'INFO' | 'WARN' | 'ERROR', logger: string, message: string) {
     this.flushOutput()
-    const typ = level === 'INFO' ? 'info' : level === 'WARN' ? 'warn' : 'error'
-    this.lines.push({ typ, text: `${level.padEnd(5)} ${logger} : ${message}` })
+    const type = level === 'INFO' ? 'info' : level === 'WARN' ? 'warn' : 'error'
+    this.lines.push({ type, text: `${level.padEnd(5)} ${logger} : ${message}` })
   }
 
-  print(text: string, typ: OutputLine['typ'] = 'log') {
+  print(text: string, type: OutputLine['type'] = 'log') {
     this.flushOutput()
-    this.lines.push({ typ, text })
+    this.lines.push({ type, text })
   }
 
   // --- LibraryHost -------------------------------------------------------------
 
-  run(mainClass: string | undefined, line: number): Wert {
+  run(mainClass: string | undefined, line: number): Value {
     if (!this.started) this.start(mainClass ?? this.mainClass, line)
     return this.contextValue
   }
 
-  getBean(query: Wert, line: number): Wert {
+  getBean(query: Value, line: number): Value {
     const i = this.interpreter
-    if (query.art === 'string') {
-      const definition = this.definitions.find((d) => d.name === query.wert)
-      if (!definition) i.werfen('NoSuchBeanDefinitionException', `No bean named '${query.wert}' available`, line)
+    if (query.kind === 'string') {
+      const definition = this.definitions.find((d) => d.name === query.value)
+      if (!definition) i.raise('NoSuchBeanDefinitionException', `No bean named '${query.value}' available`, line)
       return this.instantiate(definition!, [])
     }
-    const type = query.art === 'nativ' ? (query.daten.text ?? '') : i.alsText(query)
+    const type = query.kind === 'native' ? (query.data.text ?? '') : i.toText(query)
     const candidates = this.definitions.filter((d) => this.assignable(d, type))
-    if (candidates.length === 0) i.werfen('NoSuchBeanDefinitionException', `No qualifying bean of type '${type}' available`, line)
+    if (candidates.length === 0) i.raise('NoSuchBeanDefinitionException', `No qualifying bean of type '${type}' available`, line)
     const primary = candidates.filter((d) => d.primary)
     if (candidates.length > 1 && primary.length !== 1) {
-      i.werfen(
+      i.raise(
         'NoUniqueBeanDefinitionException',
         `No qualifying bean of type '${type}' available: expected single matching bean but found ${candidates.length}: ${candidates.map((d) => d.name).join(',')}`,
         line,
@@ -160,7 +160,7 @@ export class SpringApp implements LibraryHost {
     return this.config.activeProfiles
   }
 
-  repositoryCall(target: NativWert, name: string, args: Wert[], line: number): Wert | undefined {
+  repositoryCall(target: NativeValue, name: string, args: Value[], line: number): Value | undefined {
     return this.repositories.get(target)?.call(name, args, line)
   }
 
@@ -208,7 +208,7 @@ export class SpringApp implements LibraryHost {
       const instance = this.instantiate(runner, [])
       try {
         this.interpreter.resetStepLimit()
-        this.interpreter.methodeAufrufen(instance, 'run', [{ art: 'array', typ: 'String', werte: [] }], runner.line)
+        this.interpreter.callMethod(instance, 'run', [{ kind: 'array', type: 'String', values: [] }], runner.line)
       } catch (error) {
         throw this.asFailure(error, runner.line, runner.name)
       }
@@ -217,16 +217,16 @@ export class SpringApp implements LibraryHost {
 
   private asFailure(error: unknown, line: number, bean?: string): unknown {
     if (error instanceof StartupFailure) return error
-    if (error instanceof JavaAusnahme) {
-      const text = this.interpreter.ausnahmeText(error.wert)
+    if (error instanceof JavaException) {
+      const text = this.interpreter.exceptionText(error.value)
       return new StartupFailure(
         bean ? `Failed to execute CommandLineRunner '${bean}': ${text}` : `Error creating bean: ${text}`,
         null,
         {
-          de: `Beim Start ist eine Exception geflogen (Zeile ${error.zeile}). Solange ein Konstruktor, eine @Bean-Methode oder ein CommandLineRunner scheitert, startet die ganze Anwendung nicht.`,
-          en: `An exception was thrown during startup (line ${error.zeile}). If a constructor, a @Bean method or a CommandLineRunner fails, the whole application does not start.`,
+          de: `Beim Start ist eine Exception geflogen (Zeile ${error.line}). Solange ein Konstruktor, eine @Bean-Methode oder ein CommandLineRunner scheitert, startet die ganze Anwendung nicht.`,
+          en: `An exception was thrown during startup (line ${error.line}). If a constructor, a @Bean method or a CommandLineRunner fails, the whole application does not start.`,
         },
-        error.zeile,
+        error.line,
       )
     }
     if (error instanceof PlaceholderError) {
@@ -252,27 +252,27 @@ export class SpringApp implements LibraryHost {
   // --- 1. Component scan ------------------------------------------------------
 
   private collect() {
-    const classes = [...this.interpreter.klassen.values()]
+    const classes = [...this.interpreter.classes.values()]
     let order = 0
 
-    for (const klasse of classes) {
-      const annotations = klasse.dekl.annotations ?? []
+    for (const classInfo of classes) {
+      const annotations = classInfo.decl.annotations ?? []
       const profile = find(annotations, 'Profile')
       if (profile && !(text(profile) ?? '').split(',').some((p) => this.config.isProfileActive(p))) continue
 
-      const entity = repositoryEntity(klasse.dekl)
+      const entity = repositoryEntity(classInfo.decl)
       if (entity) {
-        for (const base of klasse.dekl.superTypes ?? []) if (REPOSITORY_TYPES.includes(base.name)) this.library.superClasses[klasse.name] = base.name
+        for (const base of classInfo.decl.superTypes ?? []) if (REPOSITORY_TYPES.includes(base.name)) this.library.superClasses[classInfo.name] = base.name
         this.definitions.push({
-          name: beanNameOf(klasse.name),
-          type: klasse.name,
+          name: beanNameOf(classInfo.name),
+          type: classInfo.name,
           kind: 'repository',
-          klasse,
+          classInfo,
           repository: { entity },
           primary: false,
           order: order++,
           annotations,
-          line: klasse.dekl.zeile,
+          line: classInfo.decl.line,
           dependencies: [],
         })
         continue
@@ -280,24 +280,24 @@ export class SpringApp implements LibraryHost {
 
       const stereotype = find(annotations, ...STEREOTYPES)
       const propertiesClass = has(annotations, 'ConfigurationProperties')
-      if ((!stereotype && !propertiesClass) || klasse.istInterface || klasse.abstrakt) continue
+      if ((!stereotype && !propertiesClass) || classInfo.isInterface || classInfo.isAbstract) continue
 
       const definition: Definition = {
-        name: text(stereotype, 'value') ?? beanNameOf(klasse.name),
-        type: klasse.name,
+        name: text(stereotype, 'value') ?? beanNameOf(classInfo.name),
+        type: classInfo.name,
         kind: kindOf(stereotype?.name ?? 'Component'),
-        klasse,
+        classInfo,
         primary: has(annotations, 'Primary'),
         order: orderOf(annotations) ?? order,
         annotations,
-        line: klasse.dekl.zeile,
+        line: classInfo.decl.line,
         dependencies: [],
       }
       order++
       this.definitions.push(definition)
 
       // @Bean methods of @Configuration classes (and of the @SpringBootApplication class)
-      for (const overloads of klasse.methoden.values()) {
+      for (const overloads of classInfo.methods.values()) {
         for (const method of overloads) {
           const bean = find(method.annotations, 'Bean')
           if (!bean) continue
@@ -305,13 +305,13 @@ export class SpringApp implements LibraryHost {
           if (methodProfile && !(text(methodProfile) ?? '').split(',').some((p) => this.config.isProfileActive(p))) continue
           this.definitions.push({
             name: text(bean, 'value', 'name') ?? method.name,
-            type: method.rueckgabe.name,
+            type: method.returnType.name,
             kind: 'bean',
             factory: { owner: definition, method },
             primary: has(method.annotations, 'Primary'),
             order: orderOf(method.annotations) ?? order++,
             annotations: method.annotations ?? [],
-            line: method.zeile,
+            line: method.line,
             dependencies: [],
           })
         }
@@ -339,32 +339,32 @@ export class SpringApp implements LibraryHost {
 
   // --- 2. Creating beans ------------------------------------------------------
 
-  instantiate(definition: Definition, chain: Definition[]): Wert {
+  instantiate(definition: Definition, chain: Definition[]): Value {
     if (definition.instance) return definition.instance
     if (chain.includes(definition)) throw cycleFailure([...chain.slice(chain.indexOf(definition)), definition])
     const path = [...chain, definition]
     const i = this.interpreter
     i.resetStepLimit()
 
-    let instance: Wert
+    let instance: Value
     if (definition.repository) {
-      const entity = i.klassen.get(definition.repository.entity)
+      const entity = i.classes.get(definition.repository.entity)
       if (!entity) throw new RepositoryError(`Not a managed type: class ${definition.repository.entity}`)
       let table = this.tables.get(entity.name)
       if (!table) this.tables.set(entity.name, (table = { rows: [], nextId: 1 }))
-      const repository = new Repository(definition.name, definition.klasse!.dekl, entity, table, i, (sql) => {
+      const repository = new Repository(definition.name, definition.classInfo!.decl, entity, table, i, (sql) => {
         if (this.config.get('spring.jpa.show-sql') === 'true') this.print('Hibernate: ' + sql)
       })
-      const value: NativWert = { art: 'nativ', typ: definition.type, daten: { text: '$repository' } }
+      const value: NativeValue = { kind: 'native', type: definition.type, data: { text: '$repository' } }
       this.repositories.set(value, repository)
       instance = value
     } else if (definition.factory) {
       const { owner, method } = definition.factory
-      const ownerInstance = this.instantiate(owner, path) as JavaObjekt
-      const args = method.parameter.map((p, index) =>
-        this.resolve(p.typ, p.name, p.annotations, { text: `Parameter ${index} of method ${method.name} in ${owner.type}`, line: method.zeile }, definition, path),
+      const ownerInstance = this.instantiate(owner, path) as JavaObject
+      const args = method.params.map((p, index) =>
+        this.resolve(p.type, p.name, p.annotations, { text: `Parameter ${index} of method ${method.name} in ${owner.type}`, line: method.line }, definition, path),
       )
-      instance = i.invoke(owner.klasse!, method, method.statisch ? null : ownerInstance, args)
+      instance = i.invoke(owner.classInfo!, method, method.isStatic ? null : ownerInstance, args)
     } else {
       instance = this.construct(definition, path)
     }
@@ -373,88 +373,88 @@ export class SpringApp implements LibraryHost {
     return instance
   }
 
-  private construct(definition: Definition, path: Definition[]): Wert {
+  private construct(definition: Definition, path: Definition[]): Value {
     const i = this.interpreter
-    const klasse = definition.klasse!
-    const properties = find(klasse.dekl.annotations, 'ConfigurationProperties')
-    if (properties) return this.bindProperties(klasse, text(properties, 'value', 'prefix') ?? '')
+    const classInfo = definition.classInfo!
+    const properties = find(classInfo.decl.annotations, 'ConfigurationProperties')
+    if (properties) return this.bindProperties(classInfo, text(properties, 'value', 'prefix') ?? '')
 
-    const constructor = chooseConstructor(klasse)
-    const args = (constructor?.parameter ?? []).map((p, index) =>
-      this.resolve(p.typ, p.name, p.annotations, { text: `Parameter ${index} of constructor in ${klasse.name}`, line: constructor!.zeile }, definition, path),
+    const constructor = chooseConstructor(classInfo)
+    const args = (constructor?.params ?? []).map((p, index) =>
+      this.resolve(p.type, p.name, p.annotations, { text: `Parameter ${index} of constructor in ${classInfo.name}`, line: constructor!.line }, definition, path),
     )
-    const object = i.neuErzeugen(klasse.name, args, definition.line) as JavaObjekt
+    const object = i.instantiate(classInfo.name, args, definition.line) as JavaObject
 
     // Field injection (@Autowired on a field) - works, but constructors are the recommended way.
-    for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-      for (const field of k.dekl.felder) {
-        if (field.statisch) continue
+    for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+      for (const field of k.decl.fields) {
+        if (field.isStatic) continue
         if (has(field.annotations, 'Autowired', 'Inject', 'Value')) {
-          object.felder.set(
+          object.fields.set(
             field.name,
-            i.anpassen(this.resolve(field.typ, field.name, field.annotations, { text: `Field ${field.name} in ${klasse.name}`, line: field.zeile }, definition, path), field.typ),
+            i.adapt(this.resolve(field.type, field.name, field.annotations, { text: `Field ${field.name} in ${classInfo.name}`, line: field.line }, definition, path), field.type),
           )
         }
       }
     }
 
-    for (const overloads of klasse.methoden.values()) {
+    for (const overloads of classInfo.methods.values()) {
       for (const method of overloads) {
-        if (has(method.annotations, 'PostConstruct') && method.rumpf) i.invoke(klasse, method, object, [])
+        if (has(method.annotations, 'PostConstruct') && method.body) i.invoke(classInfo, method, object, [])
       }
     }
     return object
   }
 
   /** @ConfigurationProperties(prefix = "app"): fields / record components from `app.*`. */
-  private bindProperties(klasse: Klasse, prefix: string): Wert {
+  private bindProperties(classInfo: ClassInfo, prefix: string): Value {
     const i = this.interpreter
-    const read = (name: string, type: TypRef): Wert | undefined => {
+    const read = (name: string, type: TypeRef): Value | undefined => {
       const raw = this.config.get(`${prefix}.${kebab(name)}`) ?? this.config.get(`${prefix}.${name}`)
       return raw === undefined ? undefined : convertProperty(raw, type, i)
     }
-    if (klasse.dekl.komponenten) {
-      return i.neuErzeugen(klasse.name, klasse.dekl.komponenten.map((c) => read(c.name, c.typ) ?? i.standardWert(c.typ)), klasse.dekl.zeile)
+    if (classInfo.decl.components) {
+      return i.instantiate(classInfo.name, classInfo.decl.components.map((c) => read(c.name, c.type) ?? i.defaultValue(c.type)), classInfo.decl.line)
     }
-    const object = i.neuErzeugen(klasse.name, [], klasse.dekl.zeile) as JavaObjekt
-    for (const field of klasse.dekl.felder) {
-      if (field.statisch) continue
-      const value = read(field.name, field.typ)
+    const object = i.instantiate(classInfo.name, [], classInfo.decl.line) as JavaObject
+    for (const field of classInfo.decl.fields) {
+      if (field.isStatic) continue
+      const value = read(field.name, field.type)
       if (value === undefined) continue
       const setter = 'set' + field.name.charAt(0).toUpperCase() + field.name.slice(1)
-      if (klasse.methoden.has(setter)) i.methodeAufrufen(object, setter, [value], field.zeile)
-      else object.felder.set(field.name, value)
+      if (classInfo.methods.has(setter)) i.callMethod(object, setter, [value], field.line)
+      else object.fields.set(field.name, value)
     }
     return object
   }
 
   /** Finds exactly one matching bean for a constructor parameter, a field or a @Bean parameter. */
   private resolve(
-    type: TypRef,
+    type: TypeRef,
     name: string,
     annotations: Annotation[] | undefined,
     point: InjectionPoint,
     target: Definition,
     path: Definition[],
-  ): Wert {
+  ): Value {
     const i = this.interpreter
     const value = find(annotations, 'Value')
     if (value) return convertProperty(this.config.resolve(text(value) ?? ''), type, i)
 
     if (type.name === 'ApplicationContext' || type.name === 'ConfigurableApplicationContext') return this.contextValue
-    if (type.name === 'Environment') return { art: 'nativ', typ: 'Environment', daten: {} }
+    if (type.name === 'Environment') return { kind: 'native', type: 'Environment', data: {} }
 
-    const elementType = type.argumente[0]?.name
+    const elementType = type.args[0]?.name
     if (['List', 'Collection', 'Set'].includes(type.name) && elementType) {
       const all = this.candidates(elementType).sort((a, b) => a.order - b.order)
       if (!all.length) throw missingFailure(point, `${type.name}<${elementType}>`)
       for (const d of all) target.dependencies.push(d.name)
-      return { art: 'nativ', typ: 'ArrayList', daten: { liste: all.map((d) => this.instantiate(d, path)) } }
+      return { kind: 'native', type: 'ArrayList', data: { list: all.map((d) => this.instantiate(d, path)) } }
     }
     if (type.name === 'Optional' && elementType) {
       const all = this.candidates(elementType)
       if (all.length === 1) target.dependencies.push(all[0].name)
-      return { art: 'nativ', typ: 'Optional', daten: { liste: all.length === 1 ? [this.instantiate(all[0], path)] : [] } }
+      return { kind: 'native', type: 'Optional', data: { list: all.length === 1 ? [this.instantiate(all[0], path)] : [] } }
     }
 
     let candidates = this.candidates(type.name)
@@ -485,12 +485,12 @@ export class SpringApp implements LibraryHost {
   assignable(definition: Definition, type: string): boolean {
     if (type === 'Object') return false
     if (definition.type === type) return true
-    const start = definition.klasse ?? this.interpreter.klassen.get(definition.type)
-    for (let k: Klasse | undefined = start; k; k = k.oberklasse) {
-      if (k.name === type || k.interfaces.has(type) || k.dekl.oberklasse === type) return true
+    const start = definition.classInfo ?? this.interpreter.classes.get(definition.type)
+    for (let k: ClassInfo | undefined = start; k; k = k.superclass) {
+      if (k.name === type || k.interfaces.has(type) || k.decl.superclass === type) return true
     }
     for (let t: string | undefined = definition.type; t; t = this.library.superClasses[t]) if (t === type) return true
-    if (definition.instance?.art === 'funktion') return false
+    if (definition.instance?.kind === 'function') return false
     return false
   }
 
@@ -542,10 +542,10 @@ function orderOf(annotations: Annotation[] | undefined): number | undefined {
 }
 
 /** One constructor → that one. Several → the one with @Autowired, else the one without parameters. */
-function chooseConstructor(klasse: Klasse): MethodenDekl | undefined {
-  const constructors = klasse.konstruktoren
+function chooseConstructor(classInfo: ClassInfo): MethodDecl | undefined {
+  const constructors = classInfo.constructors
   if (constructors.length <= 1) return constructors[0]
-  return constructors.find((c) => has(c.annotations, 'Autowired')) ?? constructors.find((c) => c.parameter.length === 0)
+  return constructors.find((c) => has(c.annotations, 'Autowired')) ?? constructors.find((c) => c.params.length === 0)
 }
 
 function where(definition: Definition) {
@@ -553,26 +553,26 @@ function where(definition: Definition) {
 }
 
 /** Text from properties/@Value into the parameter's type: "5" → int 5, "a,b" → List. */
-export function convertProperty(raw: string, type: TypRef, interpreter: Interpreter): Wert {
+export function convertProperty(raw: string, type: TypeRef, interpreter: Interpreter): Value {
   const name = type.name
   const fail = (): never =>
-    interpreter.werfen('IllegalArgumentException', `Failed to convert value of type 'java.lang.String' to required type '${name}'; For input string: "${raw}"`, 0)
+    interpreter.raise('IllegalArgumentException', `Failed to convert value of type 'java.lang.String' to required type '${name}'; For input string: "${raw}"`, 0)
   if (['int', 'Integer', 'long', 'Long', 'short', 'byte'].includes(name)) {
     if (!/^\s*-?\d+\s*$/.test(raw)) fail()
-    return name === 'long' || name === 'Long' ? { art: 'long', wert: Number(raw) } : { art: 'int', wert: Number(raw) | 0 }
+    return name === 'long' || name === 'Long' ? { kind: 'long', value: Number(raw) } : { kind: 'int', value: Number(raw) | 0 }
   }
   if (['double', 'Double', 'float', 'Float'].includes(name)) {
     if (Number.isNaN(Number(raw)) || raw.trim() === '') fail()
-    return { art: 'double', wert: Number(raw) }
+    return { kind: 'double', value: Number(raw) }
   }
-  if (name === 'boolean' || name === 'Boolean') return { art: 'boolean', wert: raw.trim().toLowerCase() === 'true' }
-  if (['List', 'Set', 'Collection'].includes(name) || type.dimensionen > 0) {
+  if (name === 'boolean' || name === 'Boolean') return { kind: 'boolean', value: raw.trim().toLowerCase() === 'true' }
+  if (['List', 'Set', 'Collection'].includes(name) || type.dimensions > 0) {
     const parts = raw.split(',').map((p) => p.trim()).filter(Boolean)
-    const element: TypRef = type.dimensionen > 0 ? { ...type, dimensionen: 0 } : (type.argumente[0] ?? { name: 'String', dimensionen: 0, argumente: [] })
+    const element: TypeRef = type.dimensions > 0 ? { ...type, dimensions: 0 } : (type.args[0] ?? { name: 'String', dimensions: 0, args: [] })
     const values = parts.map((p) => convertProperty(p, element, interpreter))
-    return type.dimensionen > 0 ? { art: 'array', typ: element.name, werte: values } : { art: 'nativ', typ: 'ArrayList', daten: { liste: values } }
+    return type.dimensions > 0 ? { kind: 'array', type: element.name, values } : { kind: 'native', type: 'ArrayList', data: { list: values } }
   }
-  return neuerString(raw)
+  return newString(raw)
 }
 
 function missingFailure(point: InjectionPoint, type: string, qualifier?: string) {
@@ -619,4 +619,4 @@ function cycleFailure(cycle: Definition[]) {
   )
 }
 
-export { JavaAbbruch, JavaAusnahme, NULL }
+export { JavaAbort as JavaAbbruch, JavaException as JavaAusnahme, NULL }

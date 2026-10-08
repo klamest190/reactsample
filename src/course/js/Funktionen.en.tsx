@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Funktionen.code'
+import { examples, codeBloecke } from './Funktionen.code'
 
 /**
  * KAPITEL 1.3 (English) - Functions & Closures
@@ -14,7 +14,7 @@ export function Funktionen() {
         <P>A function takes values in and returns a result.</P>
         <TryIt
           id="js-funktionen-einstieg"
-          {...beispiele['js-funktionen-einstieg']}
+          {...examples['js-funktionen-einstieg']}
         />
       </Abschnitt>
 
@@ -26,7 +26,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-1"
-          {...beispiele['js-funktionen-1']}
+          {...examples['js-funktionen-1']}
         />
       </Abschnitt>
 
@@ -41,7 +41,7 @@ export function Funktionen() {
         />
         <TryIt
           id="js-funktionen-2"
-          {...beispiele['js-funktionen-2']}
+          {...examples['js-funktionen-2']}
         />
       </Abschnitt>
 
@@ -54,7 +54,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-3"
-          {...beispiele['js-funktionen-3']}
+          {...examples['js-funktionen-3']}
         />
         <Hinweis variante="warnung">
           Common React mistake: <Code>{'onClick={remove()}'}</Code> calls the function{' '}
@@ -72,7 +72,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-4"
-          {...beispiele['js-funktionen-4']}
+          {...examples['js-funktionen-4']}
         />
         <P>Why does this matter so much for React?</P>
         <Liste>
@@ -91,8 +91,8 @@ export function Funktionen() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-funktionen-uebung"
-          {...beispiele['js-funktionen-uebung']}
-          aufgabe={
+          {...examples['js-funktionen-uebung']}
+          task={
             <>
               <p>
                 Write a function <Code>createCart()</Code> that returns an object with three functions:
@@ -117,28 +117,28 @@ export function Funktionen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What does (x) => { x * 2 } return?',
-            antworten: ['x * 2', 'undefined', 'An error'],
-            richtig: 1,
-            erklaerung: 'With curly braces you need an explicit return - otherwise undefined.',
+            question: 'What does (x) => { x * 2 } return?',
+            answers: ['x * 2', 'undefined', 'An error'],
+            correct: 1,
+            explanation: 'With curly braces you need an explicit return - otherwise undefined.',
           },
           {
-            frage: 'Which syntax calls remove only when clicked?',
-            antworten: ['onClick={remove()}', 'onClick={() => remove()}', 'onClick="remove()"'],
-            richtig: 1,
-            erklaerung: 'The arrow function is passed and only executed on click.',
+            question: 'Which syntax calls remove only when clicked?',
+            answers: ['onClick={remove()}', 'onClick={() => remove()}', 'onClick="remove()"'],
+            correct: 1,
+            explanation: 'The arrow function is passed and only executed on click.',
           },
           {
-            frage: 'What is a closure?',
-            antworten: [
+            question: 'What is a closure?',
+            answers: [
               'A function that calls itself',
               'A function that remembers access to the variables of the scope it was created in',
               'Closing a code block with }',
             ],
-            richtig: 1,
-            erklaerung: 'The inner function “closes over” the outer variables and keeps them.',
+            correct: 1,
+            explanation: 'The inner function “closes over” the outer variables and keeps them.',
           },
         ]}
       />

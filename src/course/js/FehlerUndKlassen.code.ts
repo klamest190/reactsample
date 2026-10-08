@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen und Tipps gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-fehler-einstieg': {
     code: js`
       try {
@@ -154,7 +154,7 @@ export const beispiele = {
     `,
   },
   'js-fehler-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Beginne mit `class InsufficientFundsError extends Error` - im Konstruktor `super(…)` aufrufen und `this.name` setzen.',
         'Der Kontostand gehört in ein privates Feld `#balance`, nach außen gibt ihn ein Getter `get balance()` heraus.',
@@ -179,7 +179,7 @@ export const beispiele = {
       //    returns true on success, false for InsufficientFundsError,
       //    and throws every other error on
     `,
-    loesung: js`
+    solution: js`
       class InsufficientFundsError extends Error {
         constructor(balance, amount) {
           super('Cannot withdraw ' + amount + ', only ' + balance + ' available')
@@ -231,47 +231,47 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startguthaben und Einzahlung', en: 'Starting balance and deposit' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 100); a.deposit(50); return a.balance })()',
-        erwartet: 150,
+        expression: '(() => { const a = new BankAccount("Ada", 100); a.deposit(50); return a.balance })()',
+        expected: 150,
       },
       {
         name: { de: 'Startguthaben ist ohne Angabe 0', en: 'Starting balance defaults to 0' },
-        ausdruck: 'new BankAccount("Ada").balance',
-        erwartet: 0,
+        expression: 'new BankAccount("Ada").balance',
+        expected: 0,
       },
       {
         name: { de: 'balance lässt sich nicht von außen setzen', en: 'balance cannot be set from outside' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 100); try { a.balance = 1e6 } catch {} return a.balance })()',
-        erwartet: 100,
+        expression: '(() => { const a = new BankAccount("Ada", 100); try { a.balance = 1e6 } catch {} return a.balance })()',
+        expected: 100,
       },
       {
         name: { de: 'Zu viel abheben wirft InsufficientFundsError', en: 'Withdrawing too much throws InsufficientFundsError' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 10); try { a.withdraw(50) } catch (e) { return e instanceof InsufficientFundsError && e instanceof Error && e.name } return "no error" })()',
-        erwartet: 'InsufficientFundsError',
+        expression: '(() => { const a = new BankAccount("Ada", 10); try { a.withdraw(50) } catch (e) { return e instanceof InsufficientFundsError && e instanceof Error && e.name } return "no error" })()',
+        expected: 'InsufficientFundsError',
       },
       {
         name: { de: 'Nach dem Fehler ist das Guthaben unverändert', en: 'The balance is unchanged after the error' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 10); try { a.withdraw(50) } catch {} return a.balance })()',
-        erwartet: 10,
+        expression: '(() => { const a = new BankAccount("Ada", 10); try { a.withdraw(50) } catch {} return a.balance })()',
+        expected: 10,
       },
       {
         name: { de: 'history protokolliert beide Buchungen', en: 'history records both transactions' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 100); a.deposit(20); a.withdraw(30); return a.history })()',
-        erwartet: [
+        expression: '(() => { const a = new BankAccount("Ada", 100); a.deposit(20); a.withdraw(30); return a.history })()',
+        expected: [
           { type: 'deposit', amount: 20 },
           { type: 'withdraw', amount: 30 },
         ],
       },
       {
         name: { de: 'safeWithdraw liefert true bzw. false', en: 'safeWithdraw returns true or false' },
-        ausdruck: '(() => { const a = new BankAccount("Ada", 100); return [safeWithdraw(a, 40), safeWithdraw(a, 400), a.balance] })()',
-        erwartet: [true, false, 60],
+        expression: '(() => { const a = new BankAccount("Ada", 100); return [safeWithdraw(a, 40), safeWithdraw(a, 400), a.balance] })()',
+        expected: [true, false, 60],
       },
       {
         name: { de: 'safeWithdraw reicht andere Fehler weiter', en: 'safeWithdraw passes other errors on' },
-        ausdruck: '(() => { try { safeWithdraw({ withdraw() { throw new TypeError("boom") } }, 1); return "swallowed" } catch (e) { return e.message } })()',
-        erwartet: 'boom',
+        expression: '(() => { try { safeWithdraw({ withdraw() { throw new TypeError("boom") } }, 1); return "swallowed" } catch (e) { return e.message } })()',
+        expected: 'boom',
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

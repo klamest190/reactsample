@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Fehler.code'
+import { examples, codeBloecke } from './Fehler.code'
 
 /**
  * CHAPTER 6.9 (English) - Exceptions
@@ -16,7 +16,7 @@ export function Fehler() {
           When something goes wrong, Java throws an <strong>exception</strong>. If nobody catches it
           the program crashes - with <Code>try/catch</Code> you take the wheel.
         </P>
-        <TryIt modus="java" id="java-fehler-einstieg" {...beispiele['java-fehler-einstieg']} />
+        <TryIt mode="java" id="java-fehler-einstieg" {...examples['java-fehler-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="The structure">
@@ -30,7 +30,7 @@ export function Fehler() {
       </Abschnitt>
 
       <Abschnitt titel="The three you will see most often">
-        <TryIt modus="java" id="java-fehler-typen" {...beispiele['java-fehler-typen']} />
+        <TryIt mode="java" id="java-fehler-typen" {...examples['java-fehler-typen']} />
         <Tabelle
           breit
           kopf={['Exception', 'Happens when …']}
@@ -51,7 +51,7 @@ export function Fehler() {
           The <Code>finally</Code> block runs in any case - even if the <Code>try</Code> already had
           a <Code>return</Code>. Classically it is used for cleanup: close a file, drop a connection.
         </P>
-        <TryIt modus="java" id="java-fehler-finally" {...beispiele['java-fehler-finally']} />
+        <TryIt mode="java" id="java-fehler-finally" {...examples['java-fehler-finally']} />
       </Abschnitt>
 
       <Abschnitt titel="Throwing yourself">
@@ -59,7 +59,7 @@ export function Fehler() {
           <Code>throw</Code> ends the method immediately and passes the error upwards. That is often
           better than returning a wrong value - the caller then <em>has</em> to deal with it.
         </P>
-        <TryIt modus="java" id="java-fehler-werfen" {...beispiele['java-fehler-werfen']} />
+        <TryIt mode="java" id="java-fehler-werfen" {...examples['java-fehler-werfen']} />
       </Abschnitt>
 
       <Abschnitt titel="Your own exceptions">
@@ -68,7 +68,7 @@ export function Fehler() {
           <Verweis nr="7.7" />). The benefit: it can carry extra data - and callers can catch exactly{' '}
           <em>this</em> case.
         </P>
-        <TryIt modus="java" id="java-fehler-eigene" {...beispiele['java-fehler-eigene']} />
+        <TryIt mode="java" id="java-fehler-eigene" {...examples['java-fehler-eigene']} />
       </Abschnitt>
 
       <Abschnitt titel="Checked and unchecked">
@@ -99,7 +99,7 @@ export function Fehler() {
           Then the exception travels up the call chain until it falls out at the top. The program
           ends - and first prints what happened and where.
         </P>
-        <TryIt modus="java" id="java-fehler-ungefangen" {...beispiele['java-fehler-ungefangen']} />
+        <TryIt mode="java" id="java-fehler-ungefangen" {...examples['java-fehler-ungefangen']} />
         <Hinweis variante="info">
           A real JVM lists the whole call chain here (the <em>stack trace</em>):{' '}
           <Code>level2 → level1 → main</Code>. This runtime names the line where it happened - the
@@ -114,10 +114,10 @@ export function Fehler() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-fehler-uebung"
-          {...beispiele['java-fehler-uebung']}
-          aufgabe={
+          {...examples['java-fehler-uebung']}
+          task={
             <>
               <p>Two methods, two sides of the same coin:</p>
               <Liste>
@@ -136,39 +136,39 @@ export function Fehler() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'When does the finally block run?',
-            antworten: [
+            question: 'When does the finally block run?',
+            answers: [
               'only when no error occurred',
               'only when an error occurred',
               'always - even after a return inside try',
               'only when there is no catch',
             ],
-            richtig: 2,
-            erklaerung: 'finally is the cleanup block and runs in any case.',
+            correct: 2,
+            explanation: 'finally is the cleanup block and runs in any case.',
           },
           {
-            frage: 'What is the difference between checked and unchecked exceptions?',
-            antworten: [
+            question: 'What is the difference between checked and unchecked exceptions?',
+            answers: [
               'Checked ones are more severe.',
               'For checked ones the compiler demands catch or throws.',
               'Unchecked ones cannot be caught.',
               'Checked ones only exist in your own classes.',
             ],
-            richtig: 1,
-            erklaerung: 'Everything below RuntimeException is unchecked - the rest must be handled or passed on.',
+            correct: 1,
+            explanation: 'Everything below RuntimeException is unchecked - the rest must be handled or passed on.',
           },
           {
-            frage: 'In what order do several catch blocks go?',
-            antworten: [
+            question: 'In what order do several catch blocks go?',
+            answers: [
               'any order',
               'most general to most specific',
               'most specific to most general',
               'alphabetically',
             ],
-            richtig: 2,
-            erklaerung: 'Java takes the first match. With catch (Exception e) on top nothing else would ever run - that is even a compile error.',
+            correct: 2,
+            explanation: 'Java takes the first match. With catch (Exception e) on top nothing else would ever run - that is even a compile error.',
           },
         ]}
       />

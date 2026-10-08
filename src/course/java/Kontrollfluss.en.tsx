@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Kontrollfluss.code'
+import { examples, codeBloecke } from './Kontrollfluss.code'
 
 /**
  * CHAPTER 6.3 (English) - Conditions & Loops
@@ -16,7 +16,7 @@ export function Kontrollfluss() {
           <Code>if</Code>, <Code>else if</Code>, <Code>else</Code> look just like JavaScript. Change
           the temperature and see which branch runs.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-einstieg" {...beispiele['java-kontrollfluss-einstieg']} />
+        <TryIt mode="java" id="java-kontrollfluss-einstieg" {...examples['java-kontrollfluss-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="A condition is a boolean - nothing else">
@@ -26,7 +26,7 @@ export function Kontrollfluss() {
           <Code>boolean</Code> - otherwise it does not compile.
         </P>
         <CodeBlock code={codeBloecke.keinTruthy} />
-        <TryIt modus="java" id="java-kontrollfluss-boolean" {...beispiele['java-kontrollfluss-boolean']} />
+        <TryIt mode="java" id="java-kontrollfluss-boolean" {...examples['java-kontrollfluss-boolean']} />
         <Hinweis variante="tipp">
           It is annoying at first and saves you later: <Code>if (name)</Code> is a common source of
           bugs in JavaScript (is <Code>0</Code> empty or not?). In Java you have to decide - and the
@@ -47,7 +47,7 @@ export function Kontrollfluss() {
           same trap as in JavaScript). The new one with <Code>-&gt;</Code> does not, and it can even
           produce a value.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-switch" {...beispiele['java-kontrollfluss-switch']} />
+        <TryIt mode="java" id="java-kontrollfluss-switch" {...examples['java-kontrollfluss-switch']} />
         <Hinweis variante="info">
           When in doubt use the arrow form. It is shorter, cannot forget anything and turns the{' '}
           <Code>switch</Code> into an expression - much like <Code>useReducer</Code> in React turns
@@ -57,7 +57,7 @@ export function Kontrollfluss() {
 
       <Abschnitt titel="Four loops for four situations">
         <CodeBlock code={codeBloecke.schleifenWahl} />
-        <TryIt modus="java" id="java-kontrollfluss-schleifen" {...beispiele['java-kontrollfluss-schleifen']} />
+        <TryIt mode="java" id="java-kontrollfluss-schleifen" {...examples['java-kontrollfluss-schleifen']} />
         <P>
           The second form (<Code>for (int score : scores)</Code>) is called the <em>enhanced for</em>{' '}
           or for-each loop. It is Java’s counterpart to <Code>for…of</Code> and works over arrays,
@@ -74,15 +74,15 @@ export function Kontrollfluss() {
           <Code>continue</Code> skips the rest of the current round, <Code>break</Code> leaves the
           loop entirely. With nested loops both only affect the <strong>innermost</strong> loop.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-break" {...beispiele['java-kontrollfluss-break']} />
+        <TryIt mode="java" id="java-kontrollfluss-break" {...examples['java-kontrollfluss-break']} />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-kontrollfluss-uebung"
-          {...beispiele['java-kontrollfluss-uebung']}
-          aufgabe={
+          {...examples['java-kontrollfluss-uebung']}
+          task={
             <>
               <p>FizzBuzz - the classic. Print the numbers from 1 to 20, but:</p>
               <Liste>
@@ -106,34 +106,34 @@ export function Kontrollfluss() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Which condition compiles in Java?',
-            antworten: ['if (list.size())', 'if (name)', 'if (count > 0)', 'if (1)'],
-            richtig: 2,
-            erklaerung: 'Only an expression of type boolean is allowed. Numbers and objects are not conditions.',
+            question: 'Which condition compiles in Java?',
+            answers: ['if (list.size())', 'if (name)', 'if (count > 0)', 'if (1)'],
+            correct: 2,
+            explanation: 'Only an expression of type boolean is allowed. Numbers and objects are not conditions.',
           },
           {
-            frage: 'What happens in a classic switch without break?',
-            antworten: [
+            question: 'What happens in a classic switch without break?',
+            answers: [
               'Nothing, break is optional.',
               'Execution continues into the next case.',
               'It is a compile error.',
               'The default branch is skipped.',
             ],
-            richtig: 1,
-            erklaerung: 'That is the infamous fall-through. The arrow form switch (…) { case x -> … } does not have it.',
+            correct: 1,
+            explanation: 'That is the infamous fall-through. The arrow form switch (…) { case x -> … } does not have it.',
           },
           {
-            frage: 'When do you use do-while instead of while?',
-            antworten: [
+            question: 'When do you use do-while instead of while?',
+            answers: [
               'When the loop should run at least once.',
               'When you need a counter.',
               'When looping over an array.',
               'When the condition is complicated.',
             ],
-            richtig: 0,
-            erklaerung: 'In do-while the check is at the end - so the body runs at least once, guaranteed.',
+            correct: 0,
+            explanation: 'In do-while the check is at the end - so the body runs at least once, guaranteed.',
           },
         ]}
       />

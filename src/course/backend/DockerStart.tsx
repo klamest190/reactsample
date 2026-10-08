@@ -45,7 +45,7 @@ export function DockerStart() {
           Auf Windows und macOS läuft Docker Desktop dafür im Hintergrund eine kleine Linux-VM - du
           merkst davon nichts.
         </Hinweis>
-        <CodeBlock code={codeBloecke.installieren} titel="Terminal" />
+        <CodeBlock code={codeBloecke.installieren} title="Terminal" />
       </Abschnitt>
 
       <Abschnitt titel="Image und Container">
@@ -65,11 +65,11 @@ export function DockerStart() {
             <Code>latest</Code> - also das, was heute zufällig das Neueste ist.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.tags} titel="Image-Namen" sprache="konfig" />
+        <CodeBlock code={codeBloecke.tags} title="Image-Namen" language="config" />
       </Abschnitt>
 
       <Abschnitt titel="docker run, auseinandergenommen">
-        <CodeBlock code={codeBloecke.run} titel="Terminal" />
+        <CodeBlock code={codeBloecke.run} title="Terminal" />
         <P>
           <strong>Ports</strong> sind die häufigste Stolperfalle. Ein Container hat sein eigenes
           Netzwerk: nginx lauscht auf Port 80 - aber im Container, nicht auf deinem Rechner. Erst{' '}
@@ -85,7 +85,7 @@ export function DockerStart() {
       </Abschnitt>
 
       <Abschnitt titel="Die Befehle für jeden Tag">
-        <CodeBlock code={codeBloecke.befehle} titel="Terminal" />
+        <CodeBlock code={codeBloecke.befehle} title="Terminal" />
         <P>
           Stirbt ein Container gleich nach dem Start, steht der Grund fast immer in{' '}
           <Code>docker logs</Code>. Die Aufgabe mit PostgreSQL zeigt das typische Beispiel: Ohne{' '}
@@ -99,7 +99,7 @@ export function DockerStart() {
           Ein <strong>Volume</strong> ist ein Speicherbereich, den Docker außerhalb des Containers
           verwaltet und in ihn einhängt:
         </P>
-        <CodeBlock code={codeBloecke.volume} titel="Terminal" />
+        <CodeBlock code={codeBloecke.volume} title="Terminal" />
         <P>
           Container sind damit <strong>wegwerfbar</strong>: Man löscht sie ohne Bedenken und startet
           neue - der Zustand liegt im Volume oder in der Datenbank, nie im Container selbst.
@@ -115,29 +115,29 @@ export function DockerStart() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was ist der Unterschied zwischen Image und Container?',
-            antworten: [
+            question: 'Was ist der Unterschied zwischen Image und Container?',
+            answers: [
               'Es gibt keinen, das sind zwei Namen für dasselbe',
               'Das Image ist der unveränderliche Bauplan, der Container eine laufende Instanz davon',
               'Container sind größer als Images',
               'Ein Image läuft, ein Container ist gestoppt',
             ],
-            richtig: 1,
-            erklaerung: 'Wie Klasse und Objekt: aus einem Image lassen sich beliebig viele Container starten.',
+            correct: 1,
+            explanation: 'Wie Klasse und Objekt: aus einem Image lassen sich beliebig viele Container starten.',
           },
           {
-            frage: 'docker run -p 3000:80 nginx - unter welcher Adresse erreichst du nginx im Browser?',
-            antworten: ['http://localhost:80', 'http://localhost:3000', 'http://nginx:80', 'gar nicht'],
-            richtig: 1,
-            erklaerung: 'Links steht der Port deines Rechners (3000), rechts der im Container (80).',
+            question: 'docker run -p 3000:80 nginx - unter welcher Adresse erreichst du nginx im Browser?',
+            answers: ['http://localhost:80', 'http://localhost:3000', 'http://nginx:80', 'gar nicht'],
+            correct: 1,
+            explanation: 'Links steht der Port deines Rechners (3000), rechts der im Container (80).',
           },
           {
-            frage: 'Ein Container ist direkt nach dem Start beendet. Wo schaust du zuerst?',
-            antworten: ['docker images', 'docker logs NAME', 'docker pull', 'In den Einstellungen von Docker Desktop'],
-            richtig: 1,
-            erklaerung: 'docker logs zeigt, was der Container ausgegeben hat - meist steht der Grund dort.',
+            question: 'Ein Container ist direkt nach dem Start beendet. Wo schaust du zuerst?',
+            answers: ['docker images', 'docker logs NAME', 'docker pull', 'In den Einstellungen von Docker Desktop'],
+            correct: 1,
+            explanation: 'docker logs zeigt, was der Container ausgegeben hat - meist steht der Grund dort.',
           },
         ]}
       />

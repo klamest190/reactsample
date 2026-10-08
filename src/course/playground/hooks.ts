@@ -5,7 +5,7 @@ import type { PlaygroundDaten } from './types'
 /** Playground für Teil 4 (Hooks): pro Hook eine kleine, fertige Komponente plus Gerüste für App. */
 export const hooksPlayground: PlaygroundDaten = {
   teil: 'hooks',
-  modus: 'react',
+  mode: 'react',
   vorlagen: [
     reactLeer,
     {

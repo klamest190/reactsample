@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Funktionen.code'
+import { examples, codeBloecke } from './Funktionen.code'
 
 /**
  * KAPITEL 1.3 - Funktionen & Closures
@@ -15,7 +15,7 @@ export function Funktionen() {
         <P>Eine Funktion bekommt Werte hinein und gibt ein Ergebnis zurück.</P>
         <TryIt
           id="js-funktionen-einstieg"
-          {...beispiele['js-funktionen-einstieg']}
+          {...examples['js-funktionen-einstieg']}
         />
       </Abschnitt>
 
@@ -27,7 +27,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-1"
-          {...beispiele['js-funktionen-1']}
+          {...examples['js-funktionen-1']}
         />
       </Abschnitt>
 
@@ -42,7 +42,7 @@ export function Funktionen() {
         />
         <TryIt
           id="js-funktionen-2"
-          {...beispiele['js-funktionen-2']}
+          {...examples['js-funktionen-2']}
         />
       </Abschnitt>
 
@@ -55,7 +55,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-3"
-          {...beispiele['js-funktionen-3']}
+          {...examples['js-funktionen-3']}
         />
         <Hinweis variante="warnung">
           Häufiger React-Fehler: <Code>{'onClick={remove()}'}</Code> ruft die Funktion{' '}
@@ -73,7 +73,7 @@ export function Funktionen() {
         </P>
         <TryIt
           id="js-funktionen-4"
-          {...beispiele['js-funktionen-4']}
+          {...examples['js-funktionen-4']}
         />
         <P>Warum ist das für React so wichtig?</P>
         <Liste>
@@ -92,8 +92,8 @@ export function Funktionen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="js-funktionen-uebung"
-          {...beispiele['js-funktionen-uebung']}
-          aufgabe={
+          {...examples['js-funktionen-uebung']}
+          task={
             <>
               <p>
                 Schreibe eine Funktion <Code>createCart()</Code>, die ein Objekt mit drei
@@ -120,28 +120,28 @@ export function Funktionen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was gibt (x) => { x * 2 } zurück?',
-            antworten: ['x * 2', 'undefined', 'Einen Fehler'],
-            richtig: 1,
-            erklaerung: 'Mit geschweiften Klammern braucht es ein explizites return - sonst undefined.',
+            question: 'Was gibt (x) => { x * 2 } zurück?',
+            answers: ['x * 2', 'undefined', 'Einen Fehler'],
+            correct: 1,
+            explanation: 'Mit geschweiften Klammern braucht es ein explizites return - sonst undefined.',
           },
           {
-            frage: 'Welche Schreibweise ruft remove erst beim Klick auf?',
-            antworten: ['onClick={remove()}', 'onClick={() => remove()}', 'onClick="remove()"'],
-            richtig: 1,
-            erklaerung: 'Die Arrow Function wird übergeben und erst beim Klick ausgeführt.',
+            question: 'Welche Schreibweise ruft remove erst beim Klick auf?',
+            answers: ['onClick={remove()}', 'onClick={() => remove()}', 'onClick="remove()"'],
+            correct: 1,
+            explanation: 'Die Arrow Function wird übergeben und erst beim Klick ausgeführt.',
           },
           {
-            frage: 'Was ist eine Closure?',
-            antworten: [
+            question: 'Was ist eine Closure?',
+            answers: [
               'Eine Funktion, die sich selbst aufruft',
               'Eine Funktion, die sich den Zugriff auf Variablen ihres Entstehungs-Scopes merkt',
               'Das Schließen eines Code-Blocks mit }',
             ],
-            richtig: 1,
-            erklaerung: 'Die innere Funktion „schließt“ die äußeren Variablen ein und behält sie.',
+            correct: 1,
+            explanation: 'Die innere Funktion „schließt“ die äußeren Variablen ein und behält sie.',
           },
         ]}
       />

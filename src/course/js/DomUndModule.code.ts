@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-dom-einstieg': {
     code: js`
       const button = document.createElement('button')
@@ -101,7 +101,7 @@ export const beispiele = {
     `,
   },
   'js-dom-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Elemente einmal erzeugen und mit `app.append(…)` einhängen.',
         'Eine Funktion `render()` setzt Text und Farbe aus `count` - rufe sie nach jeder Änderung auf.',
@@ -119,7 +119,7 @@ export const beispiele = {
 
       // Your code
     `,
-    loesung: js`
+    solution: js`
       const app = document.querySelector('#app')
       let count = 0
 
@@ -148,7 +148,7 @@ export const beispiele = {
       render()
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

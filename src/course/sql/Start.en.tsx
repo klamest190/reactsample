@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { SchemaDiagram } from '../demos/SqlDiagrams'
-import { beispiele, codeBloecke } from './Start.code'
+import { examples, codeBloecke } from './Start.code'
 
 /**
  * CHAPTER 9.1 - Tables & SELECT (English version)
@@ -19,7 +19,7 @@ export function Start() {
           orders. Change the query and press <Code>Ctrl+Enter</Code>: every run starts with fresh
           tables, so you cannot break anything.
         </P>
-        <TryIt modus="sql" id="sql-start-einstieg" {...beispiele['sql-start-einstieg']} />
+        <TryIt mode="sql" id="sql-start-einstieg" {...examples['sql-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Why a database?">
@@ -70,7 +70,7 @@ export function Start() {
           <strong>meta commands</strong> of <Code>psql</Code>, PostgreSQL’s command-line tool. They
           start with a backslash:
         </P>
-        <TryIt modus="sql" id="sql-start-erkunden" {...beispiele['sql-start-erkunden']} />
+        <TryIt mode="sql" id="sql-start-erkunden" {...examples['sql-start-erkunden']} />
         <P>
           <Code>\d products</Code> shows the columns with their type, whether they are required (
           <Code>not null</Code>) and below that the table’s rules: primary key, checks (
@@ -81,20 +81,20 @@ export function Start() {
 
       <Abschnitt titel="SELECT: choosing columns">
         <P>Every query has the same basic shape - the parts always come in this order:</P>
-        <CodeBlock code={codeBloecke.syntax} titel="SQL" />
+        <CodeBlock code={codeBloecke.syntax} title="SQL" />
         <P>
           After <Code>SELECT</Code> there can be not only columns but any <strong>expressions</strong>:
           calculations, texts, functions. <Code>AS</Code> gives a result column a name.{' '}
           <Code>||</Code> joins texts.
         </P>
-        <TryIt modus="sql" id="sql-start-select" {...beispiele['sql-start-select']} />
+        <TryIt mode="sql" id="sql-start-select" {...examples['sql-start-select']} />
         <Hinweis variante="warnung">
           <Code>SELECT *</Code> is handy for exploring. In an application you name the columns: if a
           column is added later, the result would otherwise change silently - and more data is sent
           than needed.
         </Hinweis>
         <P>A few rules almost everyone stumbles over at first:</P>
-        <CodeBlock code={codeBloecke.regeln} titel="SQL" />
+        <CodeBlock code={codeBloecke.regeln} title="SQL" />
         <Liste>
           <li>
             <strong>Single</strong> quotes for text: <Code>'UK'</Code>. Double quotes are for names of
@@ -113,7 +113,7 @@ export function Start() {
           rows come in insertion order - until the table grows or something changes. If you need an
           order, write it down.
         </P>
-        <TryIt modus="sql" id="sql-start-sortieren" {...beispiele['sql-start-sortieren']} />
+        <TryIt mode="sql" id="sql-start-sortieren" {...examples['sql-start-sortieren']} />
         <Liste>
           <li>
             <Code>ORDER BY price DESC, name</Code>: first by price descending, with the same price by
@@ -134,8 +134,8 @@ export function Start() {
           Here PostgreSQL runs in the browser. On your machine the easiest way is Docker (
           <Verweis id="docker-start" />), then open <Code>psql</Code> inside it:
         </P>
-        <CodeBlock code={codeBloecke.docker} titel="Terminal" />
-        <CodeBlock code={codeBloecke.psql} titel="psql" />
+        <CodeBlock code={codeBloecke.docker} title="Terminal" />
+        <CodeBlock code={codeBloecke.psql} title="psql" />
         <P>
           If you prefer clicking: <strong>pgAdmin</strong>, <strong>DBeaver</strong> or the PostgreSQL
           extension for VS Code show tables and results graphically. The queries are the same. Spring
@@ -146,10 +146,10 @@ export function Start() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-start-uebung"
-          {...beispiele['sql-start-uebung']}
-          aufgabe={
+          {...examples['sql-start-uebung']}
+          task={
             <p>
               For the shop’s home page: show the <strong>five most expensive products</strong> - only{' '}
               <Code>name</Code> and <Code>price</Code>, the most expensive first.
@@ -159,29 +159,29 @@ export function Start() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What makes a row in a table unique?',
-            antworten: ['Its position in the table', 'The primary key', 'The first text column', 'The order of insertion'],
-            richtig: 1,
-            erklaerung: 'The primary key (usually id) is different in every row - that is how you recognise it, and what foreign keys point to.',
+            question: 'What makes a row in a table unique?',
+            answers: ['Its position in the table', 'The primary key', 'The first text column', 'The order of insertion'],
+            correct: 1,
+            explanation: 'The primary key (usually id) is different in every row - that is how you recognise it, and what foreign keys point to.',
           },
           {
-            frage: 'SELECT name FROM customers - in which order do the rows come?',
-            antworten: ['By id', 'Alphabetically', 'In no guaranteed order', 'In the order of the last ORDER BY'],
-            richtig: 2,
-            erklaerung: 'Without ORDER BY the order is not defined. It can change as soon as the table changes.',
+            question: 'SELECT name FROM customers - in which order do the rows come?',
+            answers: ['By id', 'Alphabetically', 'In no guaranteed order', 'In the order of the last ORDER BY'],
+            correct: 2,
+            explanation: 'Without ORDER BY the order is not defined. It can change as soon as the table changes.',
           },
           {
-            frage: "What does SELECT \"country\" FROM customers return compared to SELECT 'country' FROM customers?",
-            antworten: [
+            question: "What does SELECT \"country\" FROM customers return compared to SELECT 'country' FROM customers?",
+            answers: [
               'Both are the same',
               'The first the column country, the second twelve times the text country',
               'The first is an error',
               'The second the column, the first the text',
             ],
-            richtig: 1,
-            erklaerung: 'Double quotes denote names (columns, tables), single quotes are text values.',
+            correct: 1,
+            explanation: 'Double quotes denote names (columns, tables), single quotes are text values.',
           },
         ]}
       />

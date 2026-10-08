@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen und Tipps gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-lokal-debugging': {
     code: js`
       // averageLength should return the average text length of all DONE todos.
@@ -29,7 +29,7 @@ export const beispiele = {
       console.log(averageLength(todos)) // expected: 9.5
       console.log(averageLength([]))    // expected: 0
     `,
-    loesung: js`
+    solution: js`
       function averageLength(todos) {
         const done = todos.filter((todo) => todo.done)
         if (done.length === 0) return 0 // avoid 0 / 0 = NaN
@@ -49,7 +49,7 @@ export const beispiele = {
       console.log(averageLength(todos)) // 9.5
       console.log(averageLength([]))    // 0
     `,
-    tipps: {
+    hints: {
       de: [
         'Gib in der Schleife `i` und `sum` aus: `console.log(i, sum)`. Welche Durchläufe siehst du?',
         'Arrays beginnen bei Index **0**.',
@@ -64,14 +64,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Durchschnitt der erledigten Todos', en: 'Average of the completed todos' },
-        ausdruck: "averageLength([{ text: 'abcd', done: true }, { text: 'ab', done: true }, { text: 'abcdefgh', done: false }])",
-        erwartet: 3,
+        expression: "averageLength([{ text: 'abcd', done: true }, { text: 'ab', done: true }, { text: 'abcdefgh', done: false }])",
+        expected: 3,
       },
-      { name: { de: 'Ein einzelnes Todo zählt mit', en: 'A single todo counts' }, ausdruck: "averageLength([{ text: 'abc', done: true }])", erwartet: 3 },
-      { name: { de: 'Leere Liste ergibt 0', en: 'An empty list returns 0' }, ausdruck: 'averageLength([])', erwartet: 0 },
+      { name: { de: 'Ein einzelnes Todo zählt mit', en: 'A single todo counts' }, expression: "averageLength([{ text: 'abc', done: true }])", expected: 3 },
+      { name: { de: 'Leere Liste ergibt 0', en: 'An empty list returns 0' }, expression: 'averageLength([])', expected: 0 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   pruefen: js`

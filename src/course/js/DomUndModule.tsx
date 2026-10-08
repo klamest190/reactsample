@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './DomUndModule.code'
+import { examples, codeBloecke } from './DomUndModule.code'
 
 /**
  * KAPITEL 1.9 - DOM, Events & Module
@@ -15,8 +15,8 @@ export function DomUndModule() {
         <P>Ein Element erzeugen, auf einen Klick reagieren, ins Dokument hängen.</P>
         <TryIt
           id="js-dom-einstieg"
-          {...beispiele['js-dom-einstieg']}
-          vorschau
+          {...examples['js-dom-einstieg']}
+          preview
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-1"
-          {...beispiele['js-dom-1']}
-          vorschau
+          {...examples['js-dom-1']}
+          preview
         />
       </Abschnitt>
 
@@ -42,8 +42,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-2"
-          {...beispiele['js-dom-2']}
-          vorschau
+          {...examples['js-dom-2']}
+          preview
         />
       </Abschnitt>
 
@@ -56,8 +56,8 @@ export function DomUndModule() {
         </P>
         <TryIt
           id="js-dom-3"
-          {...beispiele['js-dom-3']}
-          vorschau
+          {...examples['js-dom-3']}
+          preview
         />
         <P>React löst genau dieses Problem mit einem anderen Ansatz - <strong>deklarativ</strong>:</P>
         <Liste>
@@ -72,7 +72,7 @@ export function DomUndModule() {
           </li>
         </Liste>
         <CodeBlock
-          titel="Dieselbe Liste in React (Vorgeschmack auf Teil 3)"
+          title="Dieselbe Liste in React (Vorgeschmack auf Teil 3)"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -84,11 +84,11 @@ export function DomUndModule() {
           Projekt siehst du das in jeder Datei unter <Code>src/</Code>.
         </P>
         <CodeBlock
-          titel="math.js"
+          title="math.js"
           code={codeBloecke.beispiel2}
         />
         <CodeBlock
-          titel="app.js"
+          title="app.js"
           code={codeBloecke.beispiel3}
         />
         <Hinweis variante="tipp">
@@ -101,9 +101,9 @@ export function DomUndModule() {
       <Abschnitt titel="Übung">
         <TryIt
           id="js-dom-uebung"
-          {...beispiele['js-dom-uebung']}
-          vorschau
-          aufgabe={
+          {...examples['js-dom-uebung']}
+          preview
+          task={
             <>
               <p>
                 Baue einen Zähler mit DOM-Methoden: Ein <Code>{'<span>'}</Code> zeigt die Zahl, ein
@@ -120,28 +120,28 @@ export function DomUndModule() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was bedeutet „deklarativ“ im Zusammenhang mit React?',
-            antworten: [
+            question: 'Was bedeutet „deklarativ“ im Zusammenhang mit React?',
+            answers: [
               'Man beschreibt Schritt für Schritt, wie das DOM geändert wird.',
               'Man beschreibt, wie die Oberfläche für bestimmte Daten aussieht.',
               'Man deklariert alle Variablen mit const.',
             ],
-            richtig: 1,
-            erklaerung: 'React leitet die nötigen DOM-Änderungen selbst aus deiner Beschreibung ab.',
+            correct: 1,
+            explanation: 'React leitet die nötigen DOM-Änderungen selbst aus deiner Beschreibung ab.',
           },
           {
-            frage: 'Wie viele Default-Exporte kann eine Datei haben?',
-            antworten: ['Keinen', 'Höchstens einen', 'Beliebig viele'],
-            richtig: 1,
-            erklaerung: 'Ein Default-Export pro Modul, benannte Exporte beliebig viele.',
+            question: 'Wie viele Default-Exporte kann eine Datei haben?',
+            answers: ['Keinen', 'Höchstens einen', 'Beliebig viele'],
+            correct: 1,
+            explanation: 'Ein Default-Export pro Modul, benannte Exporte beliebig viele.',
           },
           {
-            frage: 'Wie importierst du den benannten Export area?',
-            antworten: ["import area from './math.js'", "import { area } from './math.js'"],
-            richtig: 1,
-            erklaerung: 'Benannte Exporte stehen in geschweiften Klammern, der Default-Export ohne.',
+            question: 'Wie importierst du den benannten Export area?',
+            answers: ["import area from './math.js'", "import { area } from './math.js'"],
+            correct: 1,
+            explanation: 'Benannte Exporte stehen in geschweiften Klammern, der Default-Export ohne.',
           },
         ]}
       />

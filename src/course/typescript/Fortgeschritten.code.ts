@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.8 - Fortgeschrittene Typen & Praxis. */
 
-export const beispiele = {
+export const examples = {
   'ts-fortgeschritten-einstieg': {
     code: js`
       type User = { name: string; age: number; email: string }
@@ -159,7 +159,7 @@ export const beispiele = {
     `,
   },
   'ts-fortgeschritten-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Beide Methoden brauchen einen eigenen Typparameter für das Event: `on<K extends keyof E>(event: K, handler: (data: E[K]) => void): void`.',
         '`emit` sieht genauso aus - nur mit `data: E[K]` statt eines Handlers.',
@@ -202,7 +202,7 @@ export const beispiele = {
       shop.emit('login', { user: 'Ada' })
       shop.emit('purchase', { item: 'Mug', price: 9.5 })
     `,
-    loesung: js`
+    solution: js`
       // Which events exist - and which data each one carries
       type Events = {
         login: { user: string }
@@ -238,12 +238,12 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'emit ruft die Handler des Events auf', en: 'emit calls the handlers of the event' },
-        ausdruck:
+        expression:
           "(() => { const e = new Emitter(); const got = []; e.on('purchase', (d) => got.push(d.price)); e.on('purchase', (d) => got.push(d.item)); e.emit('purchase', { item: 'mug', price: 9.5 }); e.emit('login', { user: 'Ada' }); return got })()",
-        erwartet: [9.5, 'mug'],
+        expected: [9.5, 'mug'],
       },
     ],
-    typTests: [
+    typeTests: [
       { name: { de: 'Der Handler kennt die Daten', en: 'The handler knows the data' }, code: "declare const emitterA: Emitter<Events>\nemitterA.on('login', (data) => data.user.toUpperCase())" },
       { name: { de: 'Nur bekannte Events', en: 'Only known events' }, code: "declare const emitterB: Emitter<Events>\n// @ts-expect-error - there is no signup event\nemitterB.on('signup', () => {})" },
       { name: { de: 'emit prüft die Daten', en: 'emit checks the data' }, code: "declare const emitterC: Emitter<Events>\n// @ts-expect-error - price is missing\nemitterC.emit('purchase', { item: 'Mug' })" },
@@ -253,7 +253,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   zod: js`

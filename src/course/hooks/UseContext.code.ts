@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-usecontext-einstieg': {
     code: js`
       const ThemeContext = createContext('light')
@@ -26,7 +26,7 @@ export const beispiele = {
     `,
   },
   'hooks-usecontext-drilling': {
-    tipps: {
+    hints: {
       de: [
         'Drei Schritte: `createContext`, `<UserContext value={user}>` um den Baum, `useContext(UserContext)` in `Avatar`.',
         'Jetzt können `Page` und `Header` die `user`-Prop einfach weglassen.',
@@ -65,7 +65,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       // 1. Create the context
       const UserContext = createContext(null)
 
@@ -102,7 +102,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Context statt Prop Drilling', en: 'Context instead of prop drilling' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/createContext\(/)
           expect(code).toMatch(/useContext\(/)
           expect(code).toMatch(/<Page\s*\/>/)
@@ -110,7 +110,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Anmelden als Grace aktualisiert den Avatar', en: 'Logging in as Grace updates the avatar' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('👤 Ada')
           await click(button('Log in as Grace'))
@@ -190,7 +190,7 @@ export const beispiele = {
     `,
   },
   'hooks-usecontext-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`LanguageProvider` hält `language` als State und stellt `{ language, t, toggle }` bereit.',
         'Den Wert mit `useMemo(…, [language])` stabil halten.',
@@ -230,7 +230,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const TEXTS = {
         en: { greeting: 'Hello!', question: 'How are you?', switch: 'Auf Deutsch wechseln' },
         de: { greeting: 'Hallo!', question: 'Wie geht es dir?', switch: 'Switch to English' },
@@ -286,7 +286,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startet auf Englisch', en: 'Starts in English' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('Hello!')
           expect(text()).toContain('How are you?')
@@ -294,7 +294,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Der Knopf wechselt die Sprache hin und zurück', en: 'The button switches the language back and forth' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Auf Deutsch wechseln'))
           expect(text()).toContain('Hallo!')
@@ -305,7 +305,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Context mit eigenem Hook useTranslation', en: 'Context with a custom hook useTranslation' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/createContext\(/)
           expect(code).toMatch(/function useTranslation\s*\(/)
           expect(code).not.toMatch(/TEXTS\.(en|de)\./)
@@ -313,7 +313,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

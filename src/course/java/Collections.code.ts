@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.8 - Collections & Generics. */
 
-export const beispiele = {
+export const examples = {
   'java-collections-einstieg': {
     code: java`
       import java.util.ArrayList;
@@ -166,7 +166,7 @@ export const beispiele = {
     `,
   },
   'java-collections-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`text.split(" ")` liefert die Wörter. Laufe mit einer erweiterten for-Schleife darüber.',
         'Für die Zählung: `counts.put(word, counts.getOrDefault(word, 0) + 1);`',
@@ -192,7 +192,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           String text = "java is fun and java is fast";
@@ -217,18 +217,18 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: '"java" kommt 2-mal vor', en: '"java" appears 2 times' }, ausdruck: 'counts.get("java")', erwartet: 2 },
-      { name: { de: '"fun" kommt 1-mal vor', en: '"fun" appears 1 time' }, ausdruck: 'counts.get("fun")', erwartet: 1 },
-      { name: { de: 'Es gibt 5 verschiedene Wörter', en: 'There are 5 different words' }, ausdruck: 'counts.size()', erwartet: 5 },
-      { name: { de: 'highest ist 2', en: 'highest is 2' }, ausdruck: 'highest', erwartet: 2 },
+      { name: { de: '"java" kommt 2-mal vor', en: '"java" appears 2 times' }, expression: 'counts.get("java")', expected: 2 },
+      { name: { de: '"fun" kommt 1-mal vor', en: '"fun" appears 1 time' }, expression: 'counts.get("fun")', expected: 1 },
+      { name: { de: 'Es gibt 5 verschiedene Wörter', en: 'There are 5 different words' }, expression: 'counts.size()', expected: 5 },
+      { name: { de: 'highest ist 2', en: 'highest is 2' }, expression: 'highest', expected: 2 },
       {
         name: { de: 'mostCommon ist "java" oder "is"', en: 'mostCommon is "java" or "is"' },
-        ausdruck: 'mostCommon.equals("java") || mostCommon.equals("is")',
-        erwartet: true,
+        expression: 'mostCommon.equals("java") || mostCommon.equals("is")',
+        expected: true,
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   wahl: java`

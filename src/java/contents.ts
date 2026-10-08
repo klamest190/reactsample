@@ -10,55 +10,55 @@
  * so kann es auch die Kommandozeile (src/selftest/java.content.test.ts) benutzen.
  */
 
-import { javaAusfuehren } from './index'
-import type { CodeBeispiel, Test } from '../learning/jsSandbox'
+import { runJava } from './index'
+import type { CodeExample, Test } from '../learning/jsSandbox'
 import { localized } from '../i18n/localized'
 import { contentResult, type ContentResult } from '../selftest/results'
 
 /** Beispiele, die absichtlich nicht laufen - mit Begründung. */
-export const JAVA_ERWARTETE_FEHLER: Record<string, string> = {
+export const JAVA_EXPECTED_FAILURES: Record<string, string> = {
   'java-start-fehler': 'zeigt absichtlich einen Kompilierfehler (fehlendes Semikolon)',
   'java-variablen-fehler': 'zeigt absichtlich einen Typfehler',
   'java-arrays-npe': 'zeigt absichtlich eine NullPointerException',
   'java-fehler-ungefangen': 'zeigt absichtlich einen Absturz mit Stacktrace',
 }
 
-const alsJavaTests = (tests: Test[]) =>
+const toJavaTests = (tests: Test[]) =>
   tests.map((test) => ({
     name: localized(test.name, 'de'),
-    ausdruck: test.ausdruck,
-    erwartet: test.erwartet,
+    expression: test.expression,
+    expected: test.expected,
   }))
 
-export function javaBeispielPruefen(id: string, beispiel: CodeBeispiel): ContentResult {
+export function checkJavaExample(id: string, example: CodeExample): ContentResult {
   const ok = contentResult(id)
-  const tests = beispiel.tests as Test[] | undefined
+  const tests = example.tests as Test[] | undefined
 
   if (tests?.length) {
-    const javaTests = alsJavaTests(tests)
-    const optionen = { sprache: 'de' as const, tests: javaTests, vorbereitung: beispiel.vorbereitung }
-    const loesung = javaAusfuehren(beispiel.loesung ?? beispiel.code, optionen)
-    const gescheitert = (loesung.ergebnisse ?? []).filter((e) => !e.ok)
-    if (gescheitert.length) {
-      return ok('Musterlösung scheitert: ' + gescheitert.map((e) => `„${e.name}“ ${e.meldung}`).join(' · '))
+    const javaTests = toJavaTests(tests)
+    const options = { language: 'de' as const, tests: javaTests, setup: example.setup }
+    const solution = runJava(example.solution ?? example.code, options)
+    const failed = (solution.results ?? []).filter((e) => !e.ok)
+    if (failed.length) {
+      return ok('Musterlösung scheitert: ' + failed.map((e) => `„${e.name}“ ${e.message}`).join(' · '))
     }
-    const startCode = javaAusfuehren(beispiel.code, optionen)
-    if ((startCode.ergebnisse ?? []).every((e) => e.ok)) {
+    const startCode = runJava(example.code, options)
+    if ((startCode.results ?? []).every((e) => e.ok)) {
       return ok('Der Startcode besteht schon alle Tests - dann ist nichts zu üben.')
     }
     return ok()
   }
 
-  const grund = JAVA_ERWARTETE_FEHLER[id]
-  for (const [was, code] of [
-    ['Beispiel', beispiel.code],
-    ...(beispiel.loesung ? [['Musterlösung', beispiel.loesung] as const] : []),
+  const reason = JAVA_EXPECTED_FAILURES[id]
+  for (const [what, code] of [
+    ['Beispiel', example.code],
+    ...(example.solution ? [['Musterlösung', example.solution] as const] : []),
   ] as const) {
-    const lauf = javaAusfuehren(code, { sprache: 'de', vorbereitung: beispiel.vorbereitung })
-    const fehler = lauf.zeilen.filter((z) => z.typ === 'fehler').map((z) => z.text)
-    if (fehler.length && !grund) return ok(`${was}: ${fehler.join(' | ')}`)
-    if (!fehler.length && grund && was === 'Beispiel') {
-      return ok(`Sollte fehlschlagen (${grund}), läuft aber durch.`)
+    const run = runJava(code, { language: 'de', setup: example.setup })
+    const error = run.lines.filter((z) => z.type === 'exception').map((z) => z.text)
+    if (error.length && !reason) return ok(`${what}: ${error.join(' | ')}`)
+    if (!error.length && reason && what === 'Beispiel') {
+      return ok(`Sollte fehlschlagen (${reason}), läuft aber durch.`)
     }
   }
   return ok()

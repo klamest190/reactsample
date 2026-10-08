@@ -22,7 +22,7 @@ export const reactLeer: Vorlage = {
 /** Playground für Teil 3 (React-Grundlagen): Komponenten, Props, State, Datenfluss. */
 export const reactPlayground: PlaygroundDaten = {
   teil: 'react',
-  modus: 'react',
+  mode: 'react',
   hinweis: {
     de: 'Tailwind geht hier komplett: Tippe in className="…" los (z. B. bg- oder hover:), dann schlägt der Editor Klassen mit Farbe und CSS vor.',
     en: 'Tailwind works fully here: start typing inside className="…" (e.g. bg- or hover:) and the editor suggests classes with color and CSS.',

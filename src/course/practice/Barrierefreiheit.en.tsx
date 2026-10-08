@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Barrierefreiheit.code'
+import { examples } from './Barrierefreiheit.code'
 
 /**
  * KAPITEL 5.9 (English) - Accessibility (a11y)
@@ -26,7 +26,7 @@ export function Barrierefreiheit() {
           Two buttons that could look the same. Click into the preview and try it with the keyboard only: you cannot
           even reach the <Code>{'<div>'}</Code> with Tab.
         </P>
-        <TryIt id="praxis-a11y-einstieg" {...beispiele['praxis-a11y-einstieg']} modus="react" />
+        <TryIt id="praxis-a11y-einstieg" {...examples['praxis-a11y-einstieg']} mode="react" />
       </Abschnitt>
 
       <Abschnitt titel="Who is it for?">
@@ -63,7 +63,7 @@ export function Barrierefreiheit() {
           spalten={['align-top', 'align-top']}
           zeilen={elemente.map(([el, rolle, text]) => [<Code key={el}>{el}</Code>, rolle, text])}
         />
-        <TryIt id="praxis-a11y-semantik" {...beispiele['praxis-a11y-semantik']} modus="react" />
+        <TryIt id="praxis-a11y-semantik" {...examples['praxis-a11y-semantik']} mode="react" />
         <Liste>
           <li>
             <Code>alt</Code> describes what the image shows. If it is pure decoration, write <Code>alt=""</Code> - then
@@ -88,7 +88,7 @@ export function Barrierefreiheit() {
           per field, <strong>errors</strong> linked to their field, and errors that are <strong>announced</strong> as
           soon as they appear. Basics in <Verweis id="praxis-formulare" />.
         </P>
-        <TryIt id="praxis-a11y-formular" {...beispiele['praxis-a11y-formular']} modus="react" />
+        <TryIt id="praxis-a11y-formular" {...examples['praxis-a11y-formular']} mode="react" />
         <Liste>
           <li>
             A <Code>placeholder</Code> is not a label: it disappears while typing and is not read out everywhere.
@@ -109,7 +109,7 @@ export function Barrierefreiheit() {
           Everything that works with the mouse must work with the keyboard: Tab to the next element, Enter or Space to
           trigger, Escape to close. And you must always <strong>see</strong> where the focus is.
         </P>
-        <TryIt id="praxis-a11y-fokus" {...beispiele['praxis-a11y-fokus']} modus="react" />
+        <TryIt id="praxis-a11y-fokus" {...examples['praxis-a11y-fokus']} mode="react" />
         <Liste>
           <li>
             Dialogs are the hardest: focus has to move in, must not disappear behind the dialog and has to return
@@ -134,7 +134,7 @@ export function Barrierefreiheit() {
           messages like “3 results” or “Saved” there are <strong>live regions</strong>: when their content changes, it
           is read out.
         </P>
-        <TryIt id="praxis-a11y-live" {...beispiele['praxis-a11y-live']} modus="react" />
+        <TryIt id="praxis-a11y-live" {...examples['praxis-a11y-live']} mode="react" />
         <P>
           <Code>aria-live="polite"</Code> and <Code>role="status"</Code> wait until the screen reader is idle.{' '}
           <Code>role="alert"</Code> interrupts immediately - for errors only. Important: the region has to be in the
@@ -148,7 +148,7 @@ export function Barrierefreiheit() {
           <strong>accessibility tree</strong> - what a screen reader sees too. Swap <Code>GoodToolbar</Code> for{' '}
           <Code>BadToolbar</Code> in the example:
         </P>
-        <TryIt id="praxis-a11y-pruefen" {...beispiele['praxis-a11y-pruefen']} modus="test" />
+        <TryIt id="praxis-a11y-pruefen" {...examples['praxis-a11y-pruefen']} mode="test" />
         <Liste>
           <li>
             <strong>Keyboard test:</strong> put the mouse away and click through everything once. Finds most problems
@@ -173,9 +173,9 @@ export function Barrierefreiheit() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-a11y-uebung"
-          {...beispiele['praxis-a11y-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-a11y-uebung']}
+          mode="react"
+          task={
             <>
               <p>The newsletter box looks good but is hardly usable without a mouse and screen. Fix it:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -197,38 +197,38 @@ export function Barrierefreiheit() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why is <div onClick> a problem as a button?',
-            antworten: [
+            question: 'Why is <div onClick> a problem as a button?',
+            answers: [
               'It looks different',
               'It cannot be reached with Tab, ignores Enter and has no role',
               'onClick does not work on a div',
             ],
-            richtig: 1,
-            erklaerung: '<button> brings focus, keyboard support and the role “button” for free.',
+            correct: 1,
+            explanation: '<button> brings focus, keyboard support and the role “button” for free.',
           },
           {
-            frage: 'Which alt text does a purely decorative image get?',
-            antworten: ['No alt at all', 'alt=""', 'alt="Image"'],
-            richtig: 1,
-            erklaerung: 'An empty alt means “skip it”. Without alt the file name is often read out.',
+            question: 'Which alt text does a purely decorative image get?',
+            answers: ['No alt at all', 'alt=""', 'alt="Image"'],
+            correct: 1,
+            explanation: 'An empty alt means “skip it”. Without alt the file name is often read out.',
           },
           {
-            frage: 'How does a screen reader learn about “Saved” appearing next to the button?',
-            antworten: ['Not at all', 'Through a live region like role="status"', 'Through a title tooltip'],
-            richtig: 1,
-            erklaerung: 'Live regions read out changes even when the focus is elsewhere.',
+            question: 'How does a screen reader learn about “Saved” appearing next to the button?',
+            answers: ['Not at all', 'Through a live region like role="status"', 'Through a title tooltip'],
+            correct: 1,
+            explanation: 'Live regions read out changes even when the focus is elsewhere.',
           },
           {
-            frage: 'What is the first rule of ARIA?',
-            antworten: [
+            question: 'What is the first rule of ARIA?',
+            answers: [
               'Every element needs a role',
               'No ARIA if there is a suitable HTML element',
               'Always add aria-label in addition to the text',
             ],
-            richtig: 1,
-            erklaerung: 'Native HTML brings behavior - ARIA only changes what is announced.',
+            correct: 1,
+            explanation: 'Native HTML brings behavior - ARIA only changes what is announced.',
           },
         ]}
       />

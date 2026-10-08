@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { SpringLayers } from '../demos/BackendDiagrams'
-import { beispiele, codeBloecke } from './SpringData.code'
+import { examples, codeBloecke } from './SpringData.code'
 
 /**
  * CHAPTER 8.5 - Databases with Spring Data JPA (English version)
@@ -18,7 +18,7 @@ export function SpringData() {
           database joins in. The amazing part: there is <strong>not a single line of
           implementation</strong> for the repository. The console shows which SQL is produced.
         </P>
-        <TryIt modus="spring" id="spring-daten-einstieg" {...beispiele['spring-daten-einstieg']} />
+        <TryIt mode="spring" id="spring-daten-einstieg" {...examples['spring-daten-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Objects and tables">
@@ -28,7 +28,7 @@ export function SpringData() {
           (object-relational mapping). In Java the standard for it is <strong>JPA</strong>,
           implemented by <strong>Hibernate</strong>:
         </P>
-        <CodeBlock code={codeBloecke.tabelle} titel="entity ↔ table" sprache="konfig" />
+        <CodeBlock code={codeBloecke.tabelle} title="entity ↔ table" language="config" />
         <Liste>
           <li>
             <Code>@Entity</Code>: this class is a table.
@@ -55,7 +55,7 @@ export function SpringData() {
           into a bean. The type parameters say: entity <Code>Todo</Code>, id of type{' '}
           <Code>Long</Code>. Inherited methods include:
         </P>
-        <CodeBlock code={codeBloecke.methoden} titel="JpaRepository" />
+        <CodeBlock code={codeBloecke.methoden} title="JpaRepository" />
         <Hinweis variante="tipp">
           <Code>findById</Code> returns an <Code>Optional</Code> - “maybe a todo”. With{' '}
           <Code>ResponseEntity.of(optional)</Code> it becomes 200 or 404 right away, with{' '}
@@ -68,8 +68,8 @@ export function SpringData() {
           For your own queries you only write the method into the interface - Spring Data reads the{' '}
           <strong>name</strong> and builds the SQL query from it:
         </P>
-        <CodeBlock code={codeBloecke.namen} titel="method name → SQL" />
-        <TryIt modus="spring" id="spring-daten-abfragen" {...beispiele['spring-daten-abfragen']} />
+        <CodeBlock code={codeBloecke.namen} title="method name → SQL" />
+        <TryIt mode="spring" id="spring-daten-abfragen" {...examples['spring-daten-abfragen']} />
         <Hinweis variante="warnung">
           The names are checked at <strong>startup</strong> already. Try writing{' '}
           <Code>findByTitel</Code> instead of <Code>findByTitle</Code>: the application does not
@@ -85,7 +85,7 @@ export function SpringData() {
           In the example the <Code>TodoService</Code> takes care of the rules (trim the title, toggle,
           404 if the todo does not exist). The controller only translates between HTTP and Java.
         </P>
-        <TryIt modus="spring" id="spring-daten-schichten" {...beispiele['spring-daten-schichten']} />
+        <TryIt mode="spring" id="spring-daten-schichten" {...examples['spring-daten-schichten']} />
         <P>
           The second and third requests show an important trap: <Code>toggleWithoutSave</Code>{' '}
           changes the object and even answers with <Code>"done": true</Code> - but nothing changes in
@@ -105,8 +105,8 @@ export function SpringData() {
           for development. In a real project two dependencies are added, and the connection goes into
           the configuration:
         </P>
-        <CodeBlock code={codeBloecke.pom} titel="pom.xml" />
-        <CodeBlock code={codeBloecke.postgres} titel="application.properties" />
+        <CodeBlock code={codeBloecke.pom} title="pom.xml" />
+        <CodeBlock code={codeBloecke.postgres} title="application.properties" />
         <P>
           The easiest way to start a PostgreSQL database is Docker - that comes in{' '}
           <Verweis nr="8.8" /> and <Verweis nr="8.10" />.
@@ -115,10 +115,10 @@ export function SpringData() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-daten-uebung"
-          {...beispiele['spring-daten-uebung']}
-          aufgabe={
+          {...examples['spring-daten-uebung']}
+          task={
             <>
               <p>Add two queries to the book API - without a single loop:</p>
               <Liste>
@@ -136,24 +136,24 @@ export function SpringData() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Who implements interface TodoRepository extends JpaRepository<Todo, Long>?',
-            antworten: ['You, in a class TodoRepositoryImpl', 'Spring Data, at startup', 'The database', 'Nobody - it cannot be called'],
-            richtig: 1,
-            erklaerung: 'Spring Data generates an implementation at startup and registers it as a bean.',
+            question: 'Who implements interface TodoRepository extends JpaRepository<Todo, Long>?',
+            answers: ['You, in a class TodoRepositoryImpl', 'Spring Data, at startup', 'The database', 'Nobody - it cannot be called'],
+            correct: 1,
+            explanation: 'Spring Data generates an implementation at startup and registers it as a bean.',
           },
           {
-            frage: 'What does findByDoneFalse() return?',
-            antworten: ['All todos', 'All done todos', 'All open todos', 'false'],
-            richtig: 2,
-            erklaerung: 'The name becomes “where done = false” - so all open ones.',
+            question: 'What does findByDoneFalse() return?',
+            answers: ['All todos', 'All done todos', 'All open todos', 'false'],
+            correct: 2,
+            explanation: 'The name becomes “where done = false” - so all open ones.',
           },
           {
-            frage: 'todo = repository.findById(1L).orElseThrow(); todo.setDone(true); - without save(). What is in the database afterwards (in this runtime)?',
-            antworten: ['done = true', 'done = false, the change is not saved', 'The todo is deleted', 'There is an exception'],
-            richtig: 1,
-            erklaerung: 'findById returns a loaded object; without save() the change is not written.',
+            question: 'todo = repository.findById(1L).orElseThrow(); todo.setDone(true); - without save(). What is in the database afterwards (in this runtime)?',
+            answers: ['done = true', 'done = false, the change is not saved', 'The todo is deleted', 'There is an exception'],
+            correct: 1,
+            explanation: 'findById returns a loaded object; without save() the change is not written.',
           },
         ]}
       />

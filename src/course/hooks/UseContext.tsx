@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseContext.code'
+import { examples, codeBloecke } from './UseContext.code'
 import { ContextDemo } from '../demos/ContextDemo'
 
 /**
@@ -15,8 +15,8 @@ export function UseContext() {
         <P><Code>useContext</Code> liest einen Wert, den eine Komponente weiter oben bereitstellt - ganz ohne Props.</P>
         <TryIt
           id="hooks-usecontext-einstieg"
-          {...beispiele['hooks-usecontext-einstieg']}
-          modus="react"
+          {...examples['hooks-usecontext-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -28,8 +28,8 @@ export function UseContext() {
         </P>
         <TryIt
           id="hooks-usecontext-drilling"
-          {...beispiele['hooks-usecontext-drilling']}
-          modus="react"
+          {...examples['hooks-usecontext-drilling']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -63,8 +63,8 @@ export function UseContext() {
         </P>
         <TryIt
           id="hooks-usecontext-muster"
-          {...beispiele['hooks-usecontext-muster']}
-          modus="react"
+          {...examples['hooks-usecontext-muster']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           Jede Änderung am Context-Wert rendert <em>alle</em> Consumer neu. Halte den Wert mit{' '}
@@ -77,9 +77,9 @@ export function UseContext() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-usecontext-uebung"
-          {...beispiele['hooks-usecontext-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usecontext-uebung']}
+          mode="react"
+          task={
             <>
               <p>Mach die App mehrsprachig:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -102,32 +102,32 @@ export function UseContext() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welchen Wert liefert useContext, wenn kein Provider darüber liegt?',
-            antworten: ['undefined', 'Den Default-Wert aus createContext', 'Einen Fehler'],
-            richtig: 1,
-            erklaerung: 'Deshalb nimmt man oft null als Default und prüft im eigenen Hook darauf.',
+            question: 'Welchen Wert liefert useContext, wenn kein Provider darüber liegt?',
+            answers: ['undefined', 'Den Default-Wert aus createContext', 'Einen Fehler'],
+            correct: 1,
+            explanation: 'Deshalb nimmt man oft null als Default und prüft im eigenen Hook darauf.',
           },
           {
-            frage: 'Was passiert, wenn sich der value eines Providers ändert?',
-            antworten: [
+            question: 'Was passiert, wenn sich der value eines Providers ändert?',
+            answers: [
               'Nichts, bis die Seite neu lädt',
               'Alle Komponenten, die den Context lesen, rendern neu',
               'Nur direkte Kinder rendern neu',
             ],
-            richtig: 1,
-            erklaerung: 'Auch memo-Komponenten rendern neu, wenn sie den geänderten Context lesen.',
+            correct: 1,
+            explanation: 'Auch memo-Komponenten rendern neu, wenn sie den geänderten Context lesen.',
           },
           {
-            frage: 'Wofür ist Context NICHT gedacht?',
-            antworten: [
+            question: 'Wofür ist Context NICHT gedacht?',
+            answers: [
               'Werte tief im Baum verfügbar machen',
               'Jeden State ersetzen, auch wenn nur ein Kind ihn braucht',
               'Theme oder angemeldeten Benutzer bereitstellen',
             ],
-            richtig: 1,
-            erklaerung: 'Für nahe Komponenten sind Props einfacher und expliziter.',
+            correct: 1,
+            explanation: 'Für nahe Komponenten sind Props einfacher und expliziter.',
           },
         ]}
       />

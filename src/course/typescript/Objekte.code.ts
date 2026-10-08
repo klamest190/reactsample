@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.2 - Objekttypen & Interfaces. */
 
-export const beispiele = {
+export const examples = {
   'ts-objekte-einstieg': {
     code: js`
       type Product = {
@@ -153,7 +153,7 @@ export const beispiele = {
     `,
   },
   'ts-objekte-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Ein Feld, das sich nie ändern darf, bekommt `readonly` davor: `readonly id: number`.',
         'Optional heißt: Fragezeichen hinter den Namen - `isbn?: string`.',
@@ -186,7 +186,7 @@ export const beispiele = {
       const withDune = addBook(cityLibrary, { id: 1, title: 'Dune', author: 'Frank Herbert', year: 1965 })
       console.log(findByAuthor(withDune, 'Frank Herbert'))
     `,
-    loesung: js`
+    solution: js`
       // 1. A book: id (never changes), title, author, year - and an optional isbn
       type Book = {
         readonly id: number
@@ -215,10 +215,10 @@ export const beispiele = {
       console.log(findByAuthor(withDune, 'Frank Herbert'))
     `,
     tests: [
-      { name: { de: 'findByAuthor findet das Buch', en: 'findByAuthor finds the book' }, ausdruck: "findByAuthor(withDune, 'Frank Herbert').map((b) => b.title)", erwartet: ['Dune'] },
-      { name: { de: 'addBook verändert die alte Bibliothek nicht', en: 'addBook does not change the old library' }, ausdruck: 'cityLibrary.books.length', erwartet: 0 },
+      { name: { de: 'findByAuthor findet das Buch', en: 'findByAuthor finds the book' }, expression: "findByAuthor(withDune, 'Frank Herbert').map((b) => b.title)", expected: ['Dune'] },
+      { name: { de: 'addBook verändert die alte Bibliothek nicht', en: 'addBook does not change the old library' }, expression: 'cityLibrary.books.length', expected: 0 },
     ],
-    typTests: [
+    typeTests: [
       {
         name: { de: 'isbn ist optional', en: 'isbn is optional' },
         code: "const withoutIsbn: Book = { id: 2, title: 'Emma', author: 'Jane Austen', year: 1815 }\nconst withIsbn: Book = { id: 3, title: 'Ulysses', author: 'James Joyce', year: 1922, isbn: '978-0' }",
@@ -228,7 +228,7 @@ export const beispiele = {
       { name: { de: 'Eine Bibliothek hat name und books', en: 'A library has name and books' }, code: "const homeLibrary: Library = { name: 'Home', books: [] }" },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   vergleich: js`

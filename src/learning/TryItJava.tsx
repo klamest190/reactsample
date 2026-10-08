@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { localized } from '../i18n/localized'
 import { useSprache, useTexte } from '../i18n/LanguageContext'
-import type { JavaLauf } from '../java'
+import type { JavaRun } from '../java'
 import { lineMarkers, useDelayedCheck } from './editorChecks'
-import { Konsole, Rahmen, Testergebnisse } from './EditorFrame'
+import { Console, EditorFrame, TestResults } from './EditorFrame'
 import type { JavaProps } from './TryIt'
 import { useEditor, useOnMount } from './useEditor'
 
@@ -17,23 +17,23 @@ import { useEditor, useOnMount } from './useEditor'
  *  - Erst wenn es keine Fehler mehr gibt, startet das Programm überhaupt.
  */
 export function TryItJava(props: JavaProps) {
-  const { id, tests, vorbereitung } = props
-  const { sprache } = useSprache()
+  const { id, tests, setup } = props
+  const { sprache: language } = useSprache()
   const t = useTexte()
-  const { code, rahmen } = useEditor(props)
+  const { code, frame } = useEditor(props)
   // Die Laufzeit wird erst beim ersten Java-Kapitel geladen (siehe javaHolen).
-  const [java, setJava] = useState(javaModul)
+  const [java, setJava] = useState(javaModule)
 
   const javaTests = useMemo(
-    () => tests?.map((test) => ({ ...test, name: localized(test.name, sprache) })),
-    [tests, sprache],
+    () => tests?.map((test) => ({ ...test, name: localized(test.name, language) })),
+    [tests, language],
   )
 
-  const [lauf, setLauf] = useState<JavaLauf | null>(null)
-  const starten = (quelltext: string, mitTests: boolean) => {
-    void javaHolen().then((modul) => {
-      setJava(modul)
-      setLauf(sicherAusfuehren(modul, quelltext, sprache, mitTests ? javaTests : undefined, vorbereitung))
+  const [runId, setRun] = useState<JavaRun | null>(null)
+  const starten = (sourceCode: string, withTests: boolean) => {
+    void getJava().then((mod) => {
+      setJava(mod)
+      setRun(runSafely(mod, sourceCode, language, withTests ? javaTests : undefined, setup))
     })
   }
 
@@ -43,22 +43,22 @@ export function TryItJava(props: JavaProps) {
   })
 
   // Die Fehlerprüfung läuft wie in einer IDE kurz nach dem letzten Tastendruck.
-  const pruefen = useMemo(
-    () => (java ? (quelltext: string) => lineMarkers(quelltext, java.javaPruefen(quelltext, sprache)) : null),
-    [java, sprache],
+  const check = useMemo(
+    () => (java ? (sourceCode: string) => lineMarkers(sourceCode, java.checkJava(sourceCode, language)) : null),
+    [java, language],
   )
-  const markierungen = useDelayedCheck(code, pruefen) ?? undefined
+  const markers = useDelayedCheck(code, check) ?? undefined
 
   return (
-    <Rahmen
-      {...rahmen}
-      art="Java"
-      markierungen={markierungen}
-      ausfuehren={(c) => starten(c ?? code, true)}
+    <EditorFrame
+      {...frame}
+      kind="Java"
+      markers={markers}
+      run={(c) => starten(c ?? code, true)}
     >
-      <Testergebnisse id={id} ergebnisse={lauf?.ergebnisse ?? null} />
-      <Konsole zeilen={lauf?.zeilen ?? []} leerText={lauf ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
-    </Rahmen>
+      <TestResults id={id} results={runId?.results ?? null} />
+      <Console lines={runId?.lines ?? []} emptyText={runId ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
+    </EditorFrame>
   )
 }
 
@@ -66,32 +66,32 @@ export function TryItJava(props: JavaProps) {
  * Die Java-Laufzeit (rund 3000 Zeilen) wird erst geladen, wenn wirklich ein
  * Java-Kapitel offen ist - wie die Kapitel selbst (siehe kurs.ts).
  */
-type JavaModul = typeof import('../java')
-let javaModul: JavaModul | null = null
-let javaLaden: Promise<JavaModul> | null = null
-function javaHolen(): Promise<JavaModul> {
-  javaLaden ??= import('../java').then((modul) => {
-    javaModul = modul
-    return modul
+type JavaModule = typeof import('../java')
+let javaModule: JavaModule | null = null
+let loadJava: Promise<JavaModule> | null = null
+function getJava(): Promise<JavaModule> {
+  loadJava ??= import('../java').then((mod) => {
+    javaModule = mod
+    return mod
   })
-  return javaLaden
+  return loadJava
 }
 
 /** Ein Lauf darf die Seite nie mitreißen - auch nicht bei einem Fehler im Interpreter. */
-function sicherAusfuehren(
-  modul: JavaModul,
+function runSafely(
+  mod: JavaModule,
   code: string,
-  sprache: 'de' | 'en',
-  tests: { name: string; ausdruck: string; erwartet?: unknown }[] | undefined,
-  vorbereitung?: string,
-): JavaLauf {
+  language: 'de' | 'en',
+  tests: { name: string; expression: string; expected?: unknown }[] | undefined,
+  setup?: string,
+): JavaRun {
   try {
-    return modul.javaAusfuehren(code, { sprache, tests, vorbereitung })
-  } catch (fehler) {
+    return mod.runJava(code, { language, tests, setup })
+  } catch (error) {
     return {
-      zeilen: [{ typ: 'fehler', text: String(fehler instanceof Error ? fehler.message : fehler) }],
-      ergebnisse: null,
-      fehler: true,
+      lines: [{ type: 'exception', text: String(error instanceof Error ? error.message : error) }],
+      results: null,
+      failed: true,
     }
   }
 }

@@ -1,5 +1,5 @@
 import { http, java, js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Code for chapter 8.1 - Hello Spring Boot. Shared by the German and the English version.
@@ -8,7 +8,7 @@ import type { CodeBeispiel } from '../../learning/jsSandbox'
  * `requests` are sent to the application after every start.
  */
 
-export const beispiele = {
+export const examples = {
   'spring-start-einstieg': {
     code: java`
       import org.springframework.boot.SpringApplication;
@@ -105,7 +105,7 @@ export const beispiele = {
     `,
   },
   'spring-start-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Eine Klasse wird zum Controller mit `@RestController`, eine Methode beantwortet `GET /greet` mit `@GetMapping("/greet")`.',
         'Den Query-Parameter bekommst du mit `@RequestParam(defaultValue = "World") String name`.',
@@ -128,7 +128,7 @@ export const beispiele = {
       // Your controller:
 
     `,
-    loesung: java`
+    solution: java`
       @SpringBootApplication
       public class GreetingApplication {
         public static void main(String[] args) {
@@ -167,7 +167,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   anfrage: http`

@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Profi.code'
+import { examples, codeBloecke } from './Profi.code'
 
 /**
  * KAPITEL 9.7 - Unterabfragen, CTEs & Window Functions
@@ -18,7 +18,7 @@ export function Profi() {
           weiterverwenden. Hier liefert die innere Abfrage den Durchschnittspreis, die äußere vergleicht
           jedes Produkt damit:
         </P>
-        <TryIt modus="sql" id="sql-profi-einstieg" {...beispiele['sql-profi-einstieg']} />
+        <TryIt mode="sql" id="sql-profi-einstieg" {...examples['sql-profi-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Unterabfragen">
@@ -36,7 +36,7 @@ export function Profi() {
             Form.
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-profi-in-exists" {...beispiele['sql-profi-in-exists']} />
+        <TryIt mode="sql" id="sql-profi-in-exists" {...examples['sql-profi-in-exists']} />
         <P>
           <Code>EXISTS (…)</Code> fragt nur, ob die Unterabfrage <em>irgendeine</em> Zeile findet. Die
           Unterabfrage darf sich dabei auf die äußere Zeile beziehen (<Code>o.customer_id = c.id</Code>) -
@@ -52,7 +52,7 @@ export function Profi() {
           <Code>WITH name AS (…)</Code> einen Namen. Die Abfrage liest sich dann von oben nach unten, wie
           Variablen in einem Programm:
         </P>
-        <TryIt modus="sql" id="sql-profi-cte" {...beispiele['sql-profi-cte']} />
+        <TryIt mode="sql" id="sql-profi-cte" {...examples['sql-profi-cte']} />
         <Hinweis variante="tipp">
           Mehrere Schritte trennt man mit Komma: <Code>WITH a AS (…), b AS (SELECT … FROM a) SELECT …</Code>.
           Jeder Schritt darf die vorherigen benutzen. So entstehen auch lange Auswertungen, die man noch
@@ -67,8 +67,8 @@ export function Profi() {
           <strong>jede Zeile stehen</strong> und schreibt das Ergebnis daneben. Erkennbar ist sie an{' '}
           <Code>OVER</Code>:
         </P>
-        <CodeBlock code={codeBloecke.window} titel="SQL" />
-        <TryIt modus="sql" id="sql-profi-window" {...beispiele['sql-profi-window']} />
+        <CodeBlock code={codeBloecke.window} title="SQL" />
+        <TryIt mode="sql" id="sql-profi-window" {...examples['sql-profi-window']} />
         <Liste>
           <li>
             <Code>rank()</Code>, <Code>dense_rank()</Code>, <Code>row_number()</Code> nummerieren -
@@ -84,7 +84,7 @@ export function Profi() {
             <Code>lag()</Code> schaut auf die vorherige Zeile:
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-profi-laufend" {...beispiele['sql-profi-laufend']} />
+        <TryIt mode="sql" id="sql-profi-laufend" {...examples['sql-profi-laufend']} />
       </Abschnitt>
 
       <Abschnitt titel="Views und UNION">
@@ -93,20 +93,20 @@ export function Profi() {
           verhält sich wie eine Tabelle, rechnet aber bei jedem Lesen neu - die Daten stehen weiter nur in
           den echten Tabellen:
         </P>
-        <TryIt modus="sql" id="sql-profi-view" {...beispiele['sql-profi-view']} />
+        <TryIt mode="sql" id="sql-profi-view" {...examples['sql-profi-view']} />
         <P>
           Und wenn zwei Ergebnisse mit gleichen Spalten <em>untereinander</em> sollen, hilft{' '}
           <Code>UNION ALL</Code>:
         </P>
-        <CodeBlock code={codeBloecke.union} titel="SQL" />
+        <CodeBlock code={codeBloecke.union} title="SQL" />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-profi-uebung"
-          {...beispiele['sql-profi-uebung']}
-          aufgabe={
+          {...examples['sql-profi-uebung']}
+          task={
             <p>
               Die CTE <Code>revenue</Code> berechnet schon den Umsatz jedes Kunden. Zeige pro Land nur den{' '}
               <strong>Kunden mit dem höchsten Umsatz</strong>: <Code>country</Code>, <Code>name</Code>,{' '}
@@ -117,39 +117,39 @@ export function Profi() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'WHERE price = (SELECT price FROM products WHERE category = \'books\') - was passiert?',
-            antworten: [
+            question: 'WHERE price = (SELECT price FROM products WHERE category = \'books\') - was passiert?',
+            answers: [
               'Alle Produkte, die so viel kosten wie irgendein Buch',
               'Ein Fehler: Die Unterabfrage liefert mehr als eine Zeile',
               'Nur das erste Buch wird verglichen',
               'Ein leeres Ergebnis',
             ],
-            richtig: 1,
-            erklaerung: 'Mit = muss die Unterabfrage genau einen Wert liefern. Für eine Liste braucht es IN.',
+            correct: 1,
+            explanation: 'Mit = muss die Unterabfrage genau einen Wert liefern. Für eine Liste braucht es IN.',
           },
           {
-            frage: 'Was ist der Unterschied zwischen sum(revenue) mit GROUP BY und sum(revenue) OVER ()?',
-            antworten: [
+            question: 'Was ist der Unterschied zwischen sum(revenue) mit GROUP BY und sum(revenue) OVER ()?',
+            answers: [
               'Keiner',
               'GROUP BY fasst die Zeilen zusammen, OVER () lässt jede Zeile stehen und schreibt die Summe daneben',
               'OVER () ist schneller',
               'OVER () geht nur mit ORDER BY',
             ],
-            richtig: 1,
-            erklaerung: 'Window Functions rechnen über andere Zeilen, ohne sie zusammenzufassen.',
+            correct: 1,
+            explanation: 'Window Functions rechnen über andere Zeilen, ohne sie zusammenzufassen.',
           },
           {
-            frage: 'Wozu dient WITH?',
-            antworten: [
+            question: 'Wozu dient WITH?',
+            answers: [
               'Es legt eine dauerhafte Tabelle an',
               'Es gibt einer Zwischenabfrage einen Namen, damit die Abfrage in lesbaren Schritten entsteht',
               'Es startet eine Transaktion',
               'Es verbindet zwei Tabellen',
             ],
-            richtig: 1,
-            erklaerung: 'Eine CTE gilt nur für die eine Abfrage. Dauerhaft wird eine Abfrage mit CREATE VIEW.',
+            correct: 1,
+            explanation: 'Eine CTE gilt nur für die eine Abfrage. Dauerhaft wird eine Abfrage mit CREATE VIEW.',
           },
         ]}
       />

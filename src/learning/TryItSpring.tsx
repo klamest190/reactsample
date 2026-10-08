@@ -17,7 +17,7 @@ import {
 import { reason } from '../spring/http'
 import { CodeEditor } from './CodeEditor'
 import { lineMarkers, useDelayedCheck } from './editorChecks'
-import { Konsole, Rahmen, Testergebnisse } from './EditorFrame'
+import { Console, EditorFrame, TestResults } from './EditorFrame'
 import type { SpringProps } from './TryIt'
 import { useEditor } from './useEditor'
 import { useSavedCode } from './useSavedCode'
@@ -112,22 +112,22 @@ type Run = {
 
 export function TryItSpring(props: SpringProps) {
   const { id, tests, properties: startProperties, requests } = props
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const { code, rahmen } = useEditor(props)
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const { code, frame } = useEditor(props)
   const [properties, setProperties] = useSavedCode(id + ':properties', startProperties ?? '')
   const springTests = useMemo(
-    () => tests?.map((test) => ({ ...test, name: localized(test.name, sprache) })),
-    [tests, sprache],
+    () => tests?.map((test) => ({ ...test, name: localized(test.name, language) })),
+    [tests, language],
   )
 
   function compute(source: string, withTests: boolean): Run {
     try {
-      const result = springRun(source, { language: sprache, properties, requests, tests: withTests ? springTests : undefined })
+      const result = springRun(source, { language, properties, requests, tests: withTests ? springTests : undefined })
       return { lines: [...result.lines], exchanges: result.exchanges, results: result.results, server: result.server }
     } catch (error) {
       // The runtime must never take the page down.
-      return { lines: [{ typ: 'fehler', text: String(error instanceof Error ? error.message : error) }], exchanges: [], results: null, server: null }
+      return { lines: [{ type: 'exception', text: String(error instanceof Error ? error.message : error) }], exchanges: [], results: null, server: null }
     }
   }
   // Examples start right away (the runtime is synchronous), exercises on the button.
@@ -138,7 +138,7 @@ export function TryItSpring(props: SpringProps) {
   }
 
   // Red squiggles like in an IDE, shortly after the last key press.
-  const check = useCallback((source: string) => lineMarkers(source, springCheck(source, sprache)), [sprache])
+  const check = useCallback((source: string) => lineMarkers(source, springCheck(source, language)), [language])
   const markers = useDelayedCheck(code, check) ?? undefined
 
   function send(request: HttpRequest) {
@@ -155,30 +155,30 @@ export function TryItSpring(props: SpringProps) {
           <Icon name="datei" className="mr-1.5 inline size-3.5 align-[-2px]" />
           {t.properties}
         </summary>
-        <CodeEditor wert={properties} beiAenderung={setProperties} beiAusfuehren={() => start(code, true)} label={t.propertiesEditor} sprache="properties" maxZeilen={8} />
+        <CodeEditor value={properties} onChange={setProperties} onRun={() => start(code, true)} label={t.propertiesEditor} language="properties" maxLines={8} />
       </details>
     ) : null
 
   return (
-    <Rahmen
-      {...rahmen}
-      art="Spring"
-      markierungen={markers}
-      startText={t.start}
-      oben={propertiesEditor}
-      ausfuehren={(c) => start(c ?? code, true)}
+    <EditorFrame
+      {...frame}
+      kind="Spring"
+      markers={markers}
+      runLabel={t.start}
+      above={propertiesEditor}
+      run={(c) => start(c ?? code, true)}
     >
-      <Testergebnisse id={id} ergebnisse={run?.results?.map((r) => ({ name: r.name, ok: r.ok, meldung: r.message })) ?? null} />
+      <TestResults id={id} results={run?.results?.map((r) => ({ name: r.name, ok: r.ok, message: r.message })) ?? null} />
       {run ? (
         <>
           <ServerBar server={run.server} />
-          <Konsole zeilen={run.lines} />
+          <Console lines={run.lines} />
           {run.server && <HttpPanel server={run.server} exchanges={run.exchanges} onSend={send} onClear={() => setRun({ ...run, exchanges: [] })} />}
         </>
       ) : (
-        <Konsole zeilen={[]} leerText={tests ? t.exerciseStart : '…'} />
+        <Console lines={[]} emptyText={tests ? t.exerciseStart : '…'} />
       )}
-    </Rahmen>
+    </EditorFrame>
   )
 }
 
@@ -187,8 +187,8 @@ export function TryItSpring(props: SpringProps) {
 // ---------------------------------------------------------------------------
 
 function ServerBar({ server }: { server: SpringServer | null }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   if (!server) {
     return (
       <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
@@ -266,8 +266,8 @@ function MethodBadge({ method }: { method: string }) {
 // ---------------------------------------------------------------------------
 
 function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServer; exchanges: Exchange[]; onSend: (r: HttpRequest) => void; onClear: () => void }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   const routes = server.routes()
   const first = routes.find((r) => r.method === 'GET') ?? routes[0]
   const [method, setMethod] = useState<HttpRequest['method']>('GET')
@@ -366,8 +366,8 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
 const example = (path: string) => path.replace(/\{[^}]+\}/g, '1')
 
 function ExchangeView({ exchange }: { exchange: Exchange }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   const { request, response, mismatch } = exchange
   const status = response.status
   const color =
@@ -394,7 +394,7 @@ function ExchangeView({ exchange }: { exchange: Exchange }) {
       {response.headers.Location && <p className="px-3 pb-2 font-mono text-2xs text-slate-500 dark:text-slate-400">Location: {response.headers.Location}</p>}
       {mismatch && (
         <p className="border-t border-rose-200 bg-rose-50 px-3 py-1.5 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
-          {t.expectationFailed} {mismatch[sprache]}
+          {t.expectationFailed} {mismatch[language]}
         </p>
       )}
     </div>

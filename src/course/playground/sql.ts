@@ -18,7 +18,7 @@ const b = (titelDe: string, titelEn: string, infoDe: string, infoEn: string, cod
 
 export const sqlPlayground: PlaygroundDaten = {
   teil: 'sql',
-  modus: 'sql',
+  mode: 'sql',
   hinweis: {
     de: 'Jeder Lauf startet mit frischen Beispieltabellen und führt das ganze Skript von oben nach unten aus - du kannst also nach Herzenslust ändern und löschen. Die Tabellen stehen über dem Editor.',
     en: 'Every run starts with fresh example tables and runs the whole script from top to bottom - so change and delete to your heart’s content. The tables are listed above the editor.',

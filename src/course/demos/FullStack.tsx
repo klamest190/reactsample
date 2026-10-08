@@ -3,8 +3,8 @@ import { createRoot, type Root } from 'react-dom/client'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { useSprache } from '../../i18n/LanguageContext'
 import { CodeEditor } from '../../learning/CodeEditor'
-import { formatieren, kompilieren } from '../../learning/reactCompile'
-import { Konsole, type Zeile } from '../../learning/EditorFrame'
+import { formatieren, compile } from '../../learning/reactCompile'
+import { Console, type Line } from '../../learning/EditorFrame'
 import { useSavedCode } from '../../learning/useSavedCode'
 import { springStart, type SpringServer } from '../../spring'
 import { focusableWhenScrolling } from '../../components/scrollFocus'
@@ -55,8 +55,8 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
   const t = TEXTS[sprache]
   const [backend, setBackend] = useSavedCode(id + ':backend', backendStart)
   const [frontend, setFrontend] = useSavedCode(id + ':frontend', frontendStart)
-  const [serverLines, setServerLines] = useState<Zeile[]>([])
-  const [browserLines, setBrowserLines] = useState<Zeile[]>([])
+  const [serverLines, setServerLines] = useState<Line[]>([])
+  const [browserLines, setBrowserLines] = useState<Line[]>([])
   const [network, setNetwork] = useState<NetworkEntry[]>([])
   const [server, setServer] = useState<SpringServer | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
@@ -72,7 +72,7 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
     setServer(api)
     setServerLines([...started.lines])
     setNetwork([])
-    setBrowserLines(api ? [] : [{ typ: 'warn', text: t.backendDown }])
+    setBrowserLines(api ? [] : [{ type: 'warn', text: t.backendDown }])
 
     // 2. The bridge: fetch('/api/…') → the Spring application in this tab
     const bridge = async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
@@ -103,16 +103,16 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
     cleanupRef.current()
     rootRef.current?.unmount()
     rootRef.current = null
-    const log = (typ: Zeile['typ'], text: string) => setBrowserLines((old) => [...old, { typ, text }])
+    const log = (typ: Line['type'], text: string) => setBrowserLines((old) => [...old, { type: typ, text }])
     try {
-      const { App, aufraeumen } = await kompilieren(frontendCode, log, sprache, { fetch: bridge })
+      const { App, aufraeumen } = await compile(frontendCode, log, sprache, { fetch: bridge })
       if (run !== runRef.current || !previewRef.current) return
       cleanupRef.current = aufraeumen
-      const root = createRoot(previewRef.current, { onUncaughtError: (error) => log('fehler', formatieren(error)) })
+      const root = createRoot(previewRef.current, { onUncaughtError: (error) => log('exception', formatieren(error)) })
       rootRef.current = root
       root.render(createElement(ErrorBoundary, null, createElement(App)))
     } catch (error) {
-      log('fehler', formatieren(error))
+      log('exception', formatieren(error))
     }
   }
 
@@ -162,19 +162,19 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
       <div className="grid lg:grid-cols-2">
         <div className="min-w-0 border-b border-slate-200 lg:border-r lg:border-b-0 dark:border-slate-800">
           <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">🍃 {t.backend}</div>
-          <CodeEditor wert={backend} beiAenderung={setBackend} beiAusfuehren={(c) => void start(c, frontend)} label={t.editorBackend} sprache="spring" maxZeilen={22} />
+          <CodeEditor value={backend} onChange={setBackend} onRun={(c) => void start(c, frontend)} label={t.editorBackend} language="spring" maxLines={22} />
         </div>
         <div className="min-w-0">
           <div className="border-b border-slate-200 px-4 py-1 font-mono text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">⚛️ {t.frontend}</div>
-          <CodeEditor wert={frontend} beiAenderung={setFrontend} beiAusfuehren={(c) => void start(backend, c)} label={t.editorFrontend} sprache="react" maxZeilen={22} />
+          <CodeEditor value={frontend} onChange={setFrontend} onRun={(c) => void start(backend, c)} label={t.editorFrontend} language="react" maxLines={22} />
         </div>
       </div>
 
       <div className="grid border-t border-slate-200 lg:grid-cols-2 dark:border-slate-800">
         <div className="min-w-0 border-b border-slate-200 lg:border-r lg:border-b-0 dark:border-slate-800">
           <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.preview}</div>
-          <div ref={previewRef} data-vorschau className="vorschau min-h-40 px-4 pb-4" />
-          <Konsole zeilen={browserLines} />
+          <div ref={previewRef} data-preview className="preview min-h-40 px-4 pb-4" />
+          <Console lines={browserLines} />
         </div>
         <div className="min-w-0">
           <div className="px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.network}</div>
@@ -201,7 +201,7 @@ export function FullStack({ id, backend: backendStart, frontend: frontendStart }
           </div>
           <details>
             <summary className="cursor-pointer px-4 py-1 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.serverLog}</summary>
-            <Konsole zeilen={serverLines} />
+            <Console lines={serverLines} />
           </details>
         </div>
       </div>

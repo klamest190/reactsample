@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { SchemaDiagram } from '../demos/SqlDiagrams'
-import { beispiele, codeBloecke } from './Start.code'
+import { examples, codeBloecke } from './Start.code'
 
 /**
  * KAPITEL 9.1 - Tabellen & SELECT
@@ -20,7 +20,7 @@ export function Start() {
           Produkten und Bestellungen. Ändere die Abfrage und drück <Code>Strg+Enter</Code>: Jeder
           Lauf startet mit frischen Tabellen, du kannst also nichts kaputt machen.
         </P>
-        <TryIt modus="sql" id="sql-start-einstieg" {...beispiele['sql-start-einstieg']} />
+        <TryIt mode="sql" id="sql-start-einstieg" {...examples['sql-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Warum eine Datenbank?">
@@ -74,7 +74,7 @@ export function Start() {
           <strong>Meta-Befehlen</strong> von <Code>psql</Code>, dem Kommandozeilen-Werkzeug von
           PostgreSQL. Sie beginnen mit einem Backslash:
         </P>
-        <TryIt modus="sql" id="sql-start-erkunden" {...beispiele['sql-start-erkunden']} />
+        <TryIt mode="sql" id="sql-start-erkunden" {...examples['sql-start-erkunden']} />
         <P>
           <Code>\d products</Code> zeigt die Spalten mit Typ, ob sie Pflicht sind (<Code>not null</Code>)
           und darunter die Regeln der Tabelle: Primärschlüssel, Prüfungen (<Code>CHECK</Code>),
@@ -84,20 +84,20 @@ export function Start() {
 
       <Abschnitt titel="SELECT: Spalten auswählen">
         <P>Jede Abfrage hat dieselbe Grundform - die Teile stehen immer in dieser Reihenfolge:</P>
-        <CodeBlock code={codeBloecke.syntax} titel="SQL" />
+        <CodeBlock code={codeBloecke.syntax} title="SQL" />
         <P>
           Hinter <Code>SELECT</Code> stehen nicht nur Spalten, sondern beliebige{' '}
           <strong>Ausdrücke</strong>: Rechnungen, Texte, Funktionen. Mit <Code>AS</Code> bekommt eine
           Ergebnisspalte einen Namen. <Code>||</Code> hängt Texte aneinander.
         </P>
-        <TryIt modus="sql" id="sql-start-select" {...beispiele['sql-start-select']} />
+        <TryIt mode="sql" id="sql-start-select" {...examples['sql-start-select']} />
         <Hinweis variante="warnung">
           <Code>SELECT *</Code> ist zum Erkunden praktisch. In einer Anwendung nennt man die Spalten
           einzeln: Kommt später eine Spalte dazu, ändert sich sonst still das Ergebnis - und es wird
           mehr übertragen als nötig.
         </Hinweis>
         <P>Ein paar Regeln, über die fast jeder am Anfang stolpert:</P>
-        <CodeBlock code={codeBloecke.regeln} titel="SQL" />
+        <CodeBlock code={codeBloecke.regeln} title="SQL" />
         <Liste>
           <li>
             <strong>Einfache</strong> Anführungszeichen für Text: <Code>'UK'</Code>. Doppelte sind für
@@ -116,7 +116,7 @@ export function Start() {
           Oft kommen die Zeilen in Einfügereihenfolge - bis die Tabelle wächst oder sich etwas ändert.
           Brauchst du eine Reihenfolge, schreib sie hin.
         </P>
-        <TryIt modus="sql" id="sql-start-sortieren" {...beispiele['sql-start-sortieren']} />
+        <TryIt mode="sql" id="sql-start-sortieren" {...examples['sql-start-sortieren']} />
         <Liste>
           <li>
             <Code>ORDER BY price DESC, name</Code>: erst nach Preis absteigend, bei gleichem Preis nach
@@ -137,8 +137,8 @@ export function Start() {
           Hier läuft PostgreSQL im Browser. Auf deinem Rechner startest du es am einfachsten mit
           Docker (<Verweis id="docker-start" />) und öffnest darin <Code>psql</Code>:
         </P>
-        <CodeBlock code={codeBloecke.docker} titel="Terminal" />
-        <CodeBlock code={codeBloecke.psql} titel="psql" />
+        <CodeBlock code={codeBloecke.docker} title="Terminal" />
+        <CodeBlock code={codeBloecke.psql} title="psql" />
         <P>
           Wer lieber klickt: <strong>pgAdmin</strong>, <strong>DBeaver</strong> oder die
           PostgreSQL-Erweiterung für VS Code zeigen Tabellen und Ergebnisse grafisch. Die Abfragen
@@ -150,10 +150,10 @@ export function Start() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-start-uebung"
-          {...beispiele['sql-start-uebung']}
-          aufgabe={
+          {...examples['sql-start-uebung']}
+          task={
             <p>
               Für die Startseite des Shops: Zeige die <strong>fünf teuersten Produkte</strong> - nur{' '}
               <Code>name</Code> und <Code>price</Code>, das teuerste zuerst.
@@ -163,29 +163,29 @@ export function Start() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was macht eine Zeile in einer Tabelle eindeutig?',
-            antworten: ['Ihre Position in der Tabelle', 'Der Primärschlüssel', 'Die erste Textspalte', 'Die Reihenfolge beim Einfügen'],
-            richtig: 1,
-            erklaerung: 'Der Primärschlüssel (meist id) ist in jeder Zeile anders - daran erkennt man sie, und darauf verweisen Fremdschlüssel.',
+            question: 'Was macht eine Zeile in einer Tabelle eindeutig?',
+            answers: ['Ihre Position in der Tabelle', 'Der Primärschlüssel', 'Die erste Textspalte', 'Die Reihenfolge beim Einfügen'],
+            correct: 1,
+            explanation: 'Der Primärschlüssel (meist id) ist in jeder Zeile anders - daran erkennt man sie, und darauf verweisen Fremdschlüssel.',
           },
           {
-            frage: "SELECT name FROM customers - in welcher Reihenfolge kommen die Zeilen?",
-            antworten: ['Nach id', 'Alphabetisch', 'In keiner garantierten Reihenfolge', 'In der Reihenfolge des letzten ORDER BY'],
-            richtig: 2,
-            erklaerung: 'Ohne ORDER BY ist die Reihenfolge nicht festgelegt. Sie kann sich ändern, sobald sich die Tabelle ändert.',
+            question: "SELECT name FROM customers - in welcher Reihenfolge kommen die Zeilen?",
+            answers: ['Nach id', 'Alphabetisch', 'In keiner garantierten Reihenfolge', 'In der Reihenfolge des letzten ORDER BY'],
+            correct: 2,
+            explanation: 'Ohne ORDER BY ist die Reihenfolge nicht festgelegt. Sie kann sich ändern, sobald sich die Tabelle ändert.',
           },
           {
-            frage: "Was liefert SELECT \"country\" FROM customers im Vergleich zu SELECT 'country' FROM customers?",
-            antworten: [
+            question: "Was liefert SELECT \"country\" FROM customers im Vergleich zu SELECT 'country' FROM customers?",
+            answers: [
               'Beides ist dasselbe',
               'Das erste die Spalte country, das zweite zwölfmal den Text country',
               'Das erste ist ein Fehler',
               'Das zweite die Spalte, das erste den Text',
             ],
-            richtig: 1,
-            erklaerung: 'Doppelte Anführungszeichen bezeichnen Namen (Spalten, Tabellen), einfache sind Text-Werte.',
+            correct: 1,
+            explanation: 'Doppelte Anführungszeichen bezeichnen Namen (Spalten, Tabellen), einfache sind Text-Werte.',
           },
         ]}
       />

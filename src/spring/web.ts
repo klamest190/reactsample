@@ -13,9 +13,9 @@
  * @ResponseStatus decide the status; everything else becomes 500.
  */
 
-import type { Annotation, MethodenDekl, ParamDekl, TypRef } from '../java/ast'
-import { JavaAbbruch, JavaAusnahme } from '../java/interpreter'
-import { NULL, neuerString, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
+import type { Annotation, MethodDecl, ParamDecl, TypeRef } from '../java/ast'
+import { JavaAbort, JavaException } from '../java/interpreter'
+import { NULL, newString, type JavaObject, type ClassInfo, type NativeValue, type Value } from '../java/values'
 import { MAPPINGS, constantName, find, has, text, texts } from './annotations'
 import type { SpringApp } from './context'
 import { reason, type HttpMethod, type HttpRequest, type HttpResponse } from './http'
@@ -30,11 +30,11 @@ type Route = {
   path: string
   segments: string[]
   bean: string
-  klasse: Klasse
-  handler: MethodenDekl
+  classInfo: ClassInfo
+  handler: MethodDecl
 }
 
-type Handler = { bean: string; klasse: Klasse; method: MethodenDekl; types: string[] }
+type Handler = { bean: string; classInfo: ClassInfo; method: MethodDecl; types: string[] }
 
 const SIMPLE_TYPES = new Set([
   'String', 'int', 'Integer', 'long', 'Long', 'double', 'Double', 'boolean', 'Boolean', 'short', 'Short', 'float', 'Float', 'char', 'Character',
@@ -53,36 +53,36 @@ export class Web {
   /** Collects all mappings - called while the context starts (ambiguous mappings stop the start). */
   build() {
     for (const definition of this.app.definitions) {
-      const klasse = definition.klasse
-      if (!klasse || definition.factory) continue
-      const isController = has(klasse.dekl.annotations, 'RestController', 'Controller')
-      const isAdvice = has(klasse.dekl.annotations, 'RestControllerAdvice', 'ControllerAdvice')
+      const classInfo = definition.classInfo
+      if (!classInfo || definition.factory) continue
+      const isController = has(classInfo.decl.annotations, 'RestController', 'Controller')
+      const isAdvice = has(classInfo.decl.annotations, 'RestControllerAdvice', 'ControllerAdvice')
       if (!isController && !isAdvice) continue
 
-      for (const overloads of klasse.methoden.values()) {
+      for (const overloads of classInfo.methods.values()) {
         for (const method of overloads) {
           const exceptionHandler = find(method.annotations, 'ExceptionHandler')
           if (exceptionHandler) {
             const types = texts(exceptionHandler)
             this.handlers.push({
               bean: definition.name,
-              klasse,
+              classInfo,
               method,
               // Without a value, the parameter types say which exceptions are meant.
-              types: types.length ? types.map(constantName) : method.parameter.map((p) => p.typ.name).filter((t) => /Exception$|Error$|Throwable$/.test(t)),
+              types: types.length ? types.map(constantName) : method.params.map((p) => p.type.name).filter((t) => /Exception$|Error$|Throwable$/.test(t)),
             })
           }
           if (!isController) continue
-          this.addRoutes(definition.name, klasse, method)
+          this.addRoutes(definition.name, classInfo, method)
         }
       }
     }
   }
 
-  private addRoutes(bean: string, klasse: Klasse, method: MethodenDekl) {
+  private addRoutes(bean: string, classInfo: ClassInfo, method: MethodDecl) {
     const mapping = method.annotations?.find((a) => a.name in MAPPINGS)
     if (!mapping) return
-    const prefixes = texts(find(klasse.dekl.annotations, 'RequestMapping'), 'value', 'path')
+    const prefixes = texts(find(classInfo.decl.annotations, 'RequestMapping'), 'value', 'path')
     const paths = texts(mapping, 'value', 'path')
     const verbs: (HttpMethod | '*')[] = MAPPINGS[mapping.name]
       ? [MAPPINGS[mapping.name] as HttpMethod]
@@ -94,8 +94,8 @@ export class Web {
         const full = normalize(contextPath + '/' + prefix + '/' + path)
         for (const verb of verbs.length ? verbs : ['*' as const]) {
           const existing = this.routes.find((r) => r.path === full && (r.method === verb || r.method === '*' || verb === '*'))
-          if (existing) throw ambiguous(bean, klasse, method, verb, full, existing)
-          this.routes.push({ method: verb, path: full, segments: split(full), bean, klasse, handler: method })
+          if (existing) throw ambiguous(bean, classInfo, method, verb, full, existing)
+          this.routes.push({ method: verb, path: full, segments: split(full), bean, classInfo, handler: method })
         }
       }
     }
@@ -105,8 +105,8 @@ export class Web {
     return this.routes.map((r) => ({
       method: r.method,
       path: r.path,
-      handler: `${r.klasse.name}.${r.handler.name}(${r.handler.parameter.map((p) => p.typ.name).join(', ')})`,
-      line: r.handler.zeile,
+      handler: `${r.classInfo.name}.${r.handler.name}(${r.handler.params.map((p) => p.type.name).join(', ')})`,
+      line: r.handler.line,
     }))
   }
 
@@ -119,7 +119,7 @@ export class Web {
     const [rawPath, query = ''] = request.path.split('?')
     const path = normalize(decodeURIComponent(rawPath))
     const finish = (response: Omit<HttpResponse, 'millis'>): HttpResponse => {
-      app.interpreter.abschliessen()
+      app.interpreter.finish()
       app.flushOutput()
       return { ...response, millis: Math.max(1, Math.round(performance.now() - begin)) }
     }
@@ -145,23 +145,23 @@ export class Web {
 
     const { route, variables } = found
     const controller = app.definitionOf(route.bean)!
-    const self = app.instantiate(controller, []) as JavaObjekt
-    let args: Wert[]
+    const self = app.instantiate(controller, []) as JavaObject
+    let args: Value[]
     try {
-      args = route.handler.parameter.map((p) => this.bind(p, request, variables, new URLSearchParams(query)))
+      args = route.handler.params.map((p) => this.bind(p, request, variables, new URLSearchParams(query)))
     } catch (error) {
       if (error instanceof BindError) return finish(this.onException(error.exception, path, route, self))
       throw error
     }
 
     try {
-      const result = app.interpreter.invoke(route.klasse, route.handler, self, args)
+      const result = app.interpreter.invoke(route.classInfo, route.handler, self, args)
       return finish(this.write(result, route.handler, path))
     } catch (error) {
-      if (error instanceof JavaAusnahme) return finish(this.onException(error.wert, path, route, self, error.zeile))
-      if (error instanceof JavaAbbruch) {
-        const message = app.language === 'de' ? error.deutsch : error.englisch
-        app.log('ERROR', 'dispatcherServlet', `Servlet.service() threw exception: ${message}${error.zeile ? ` (Main.java:${error.zeile})` : ''}`)
+      if (error instanceof JavaException) return finish(this.onException(error.value, path, route, self, error.line))
+      if (error instanceof JavaAbort) {
+        const message = app.language === 'de' ? error.de : error.en
+        app.log('ERROR', 'dispatcherServlet', `Servlet.service() threw exception: ${message}${error.line ? ` (Main.java:${error.line})` : ''}`)
         return finish(this.errorResponse(500, path, message))
       }
       if (error instanceof RangeError) {
@@ -173,10 +173,10 @@ export class Web {
   }
 
   /** Turns a request part into the value of one method parameter. */
-  private bind(parameter: ParamDekl, request: HttpRequest, variables: Record<string, string>, query: URLSearchParams): Wert {
+  private bind(parameter: ParamDecl, request: HttpRequest, variables: Record<string, string>, query: URLSearchParams): Value {
     const i = this.app.interpreter
     const a = parameter.annotations
-    const type = parameter.typ
+    const type = parameter.type
 
     const pathVariable = find(a, 'PathVariable')
     if (pathVariable) {
@@ -185,7 +185,7 @@ export class Web {
     }
 
     const requestParam = find(a, 'RequestParam')
-    if (requestParam || (!has(a, 'RequestBody', 'RequestHeader') && SIMPLE_TYPES.has(type.name) && type.dimensionen === 0)) {
+    if (requestParam || (!has(a, 'RequestBody', 'RequestHeader') && SIMPLE_TYPES.has(type.name) && type.dimensions === 0)) {
       const name = text(requestParam, 'value', 'name') ?? parameter.name
       const fallback = text(requestParam, 'defaultValue')
       const required = requestParam ? (requestParam.values.required ?? true) !== false && fallback === undefined : false
@@ -197,12 +197,12 @@ export class Web {
             frameworkException('MissingServletRequestParameterException', `Required request parameter '${name}' for method parameter type ${type.name} is not present`),
           )
         }
-        return i.standardWert(type)
+        return i.defaultValue(type)
       }
       if (['List', 'Set', 'Collection'].includes(type.name)) {
-        const element = type.argumente[0] ?? { name: 'String', dimensionen: 0, argumente: [] }
+        const element = type.args[0] ?? { name: 'String', dimensions: 0, args: [] }
         const parts = values.flatMap((v) => v.split(','))
-        return { art: 'nativ', typ: 'ArrayList', daten: { liste: parts.map((p) => this.convert(p, element, name)) } }
+        return { kind: 'native', type: 'ArrayList', data: { list: parts.map((p) => this.convert(p, element, name)) } }
       }
       return this.convert(values[0], type, name)
     }
@@ -225,12 +225,12 @@ export class Web {
       if (!body) {
         throw new BindError(frameworkException('HttpMessageNotReadableException', 'Required request body is missing'))
       }
-      let value: Wert
+      let value: Value
       try {
         value = fromJson(parseJson(body), type, i)
       } catch (error) {
         if (error instanceof JsonError) throw new BindError(frameworkException('HttpMessageNotReadableException', error.message))
-        if (error instanceof JavaAusnahme) throw error
+        if (error instanceof JavaException) throw error
         throw error
       }
       if (has(a, 'Valid', 'Validated')) {
@@ -244,7 +244,7 @@ export class Web {
     return NULL
   }
 
-  private convert(raw: string, type: TypRef, name: string): Wert {
+  private convert(raw: string, type: TypeRef, name: string): Value {
     const i = this.app.interpreter
     const mismatch = (): never => {
       throw new BindError(
@@ -262,62 +262,62 @@ export class Web {
       case 'long':
       case 'Long':
         if (!/^-?\d+$/.test(raw.trim())) mismatch()
-        return type.name.toLowerCase().startsWith('long') ? { art: 'long', wert: Number(raw) } : { art: 'int', wert: Number(raw) | 0 }
+        return type.name.toLowerCase().startsWith('long') ? { kind: 'long', value: Number(raw) } : { kind: 'int', value: Number(raw) | 0 }
       case 'double':
       case 'Double':
       case 'float':
       case 'Float':
         if (raw.trim() === '' || Number.isNaN(Number(raw))) mismatch()
-        return { art: 'double', wert: Number(raw) }
+        return { kind: 'double', value: Number(raw) }
       case 'boolean':
       case 'Boolean': {
         const lower = raw.trim().toLowerCase()
         if (!['true', 'false', 'on', 'off', 'yes', 'no', '1', '0'].includes(lower)) mismatch()
-        return { art: 'boolean', wert: ['true', 'on', 'yes', '1'].includes(lower) }
+        return { kind: 'boolean', value: ['true', 'on', 'yes', '1'].includes(lower) }
       }
       case 'String':
-        return neuerString(raw)
+        return newString(raw)
     }
-    const klasse = i.klassen.get(type.name)
-    if (klasse?.istEnum) {
-      const constant = klasse.statisch.get(raw)
-      if (!constant || !klasse.dekl.konstanten.some((k) => k.name === raw)) mismatch()
+    const classInfo = i.classes.get(type.name)
+    if (classInfo?.isEnum) {
+      const constant = classInfo.isStatic.get(raw)
+      if (!constant || !classInfo.decl.constants.some((k) => k.name === raw)) mismatch()
       return constant!
     }
-    return neuerString(raw)
+    return newString(raw)
   }
 
   // --- Writing the answer ---------------------------------------------------------
 
-  private write(result: Wert, method: MethodenDekl, path: string): Omit<HttpResponse, 'millis'> {
+  private write(result: Value, method: MethodDecl, path: string): Omit<HttpResponse, 'millis'> {
     const i = this.app.interpreter
     const status = statusFromName(text(find(method.annotations, 'ResponseStatus'), 'value', 'code')) ?? 200
 
-    if (result.art === 'nativ' && result.typ === 'ResponseEntity') {
-      const code = result.daten.zahl ?? 200
+    if (result.kind === 'native' && result.type === 'ResponseEntity') {
+      const code = result.data.number ?? 200
       const headers: Record<string, string> = {}
-      for (const entry of result.daten.map?.values() ?? []) headers[i.alsText(entry.schluessel)] = i.alsText(entry.wert)
-      const body = result.daten.liste?.[0]
-      if (!body || body.art === 'null') return { status: code, headers, body: { kind: 'empty' } }
+      for (const entry of result.data.map?.values() ?? []) headers[i.toText(entry.key)] = i.toText(entry.value)
+      const body = result.data.list?.[0]
+      if (!body || body.kind === 'null') return { status: code, headers, body: { kind: 'empty' } }
       const written = this.body(body, path)
       return written.status === 500 ? written : { ...written, status: code, headers: { ...headers, ...written.headers } }
     }
-    if (result.art === 'nativ' && result.typ === 'ProblemDetail') {
-      const code = result.daten.zahl ?? 500
-      const map = result.daten.map!
-      if (!map.has('s:instance')) map.set('s:instance', { schluessel: neuerString('instance'), wert: neuerString(path) })
+    if (result.kind === 'native' && result.type === 'ProblemDetail') {
+      const code = result.data.number ?? 500
+      const map = result.data.map!
+      if (!map.has('s:instance')) map.set('s:instance', { key: newString('instance'), value: newString(path) })
       return { status: code, headers: { 'Content-Type': 'application/problem+json' }, body: { kind: 'json', value: toJson(result, i) } }
     }
-    if (method.rueckgabe.name === 'void' || result.art === 'null') {
+    if (method.returnType.name === 'void' || result.kind === 'null') {
       return { status, headers: {}, body: { kind: 'empty' } }
     }
     const response = this.body(result, path)
     return { ...response, status: response.status === 500 ? 500 : status }
   }
 
-  private body(value: Wert, path: string): Omit<HttpResponse, 'millis'> {
+  private body(value: Value, path: string): Omit<HttpResponse, 'millis'> {
     const i = this.app.interpreter
-    if (value.art === 'string') return { status: 200, headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: { kind: 'text', text: value.wert } }
+    if (value.kind === 'string') return { status: 200, headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: { kind: 'text', text: value.value } }
     try {
       return { status: 200, headers: { 'Content-Type': 'application/json' }, body: { kind: 'json', value: toJson(value, i) } }
     } catch (error) {
@@ -329,56 +329,56 @@ export class Web {
 
   // --- Errors ---------------------------------------------------------------------
 
-  private onException(exception: Wert, path: string, route: Route, controller: JavaObjekt, line?: number): Omit<HttpResponse, 'millis'> {
+  private onException(exception: Value, path: string, route: Route, controller: JavaObject, line?: number): Omit<HttpResponse, 'millis'> {
     const app = this.app
     const i = app.interpreter
 
     // 1. @ExceptionHandler: first the controller's own, then the advices - the most specific type wins.
-    const own = this.handlers.filter((h) => h.klasse === route.klasse)
-    const advices = this.handlers.filter((h) => h.klasse !== route.klasse && has(h.klasse.dekl.annotations, 'RestControllerAdvice', 'ControllerAdvice'))
+    const own = this.handlers.filter((h) => h.classInfo === route.classInfo)
+    const advices = this.handlers.filter((h) => h.classInfo !== route.classInfo && has(h.classInfo.decl.annotations, 'RestControllerAdvice', 'ControllerAdvice'))
     for (const group of [own, advices]) {
       const handler = this.bestHandler(group, exception)
       if (!handler) continue
-      const self = handler.klasse === route.klasse ? controller : (app.instantiate(app.definitionOf(handler.bean)!, []) as JavaObjekt)
-      const args = handler.method.parameter.map((p) => (i.istInstanz(exception, p.typ.name) || p.typ.name === 'Exception' ? exception : NULL))
+      const self = handler.classInfo === route.classInfo ? controller : (app.instantiate(app.definitionOf(handler.bean)!, []) as JavaObject)
+      const args = handler.method.params.map((p) => (i.isInstance(exception, p.type.name) || p.type.name === 'Exception' ? exception : NULL))
       try {
-        const result = i.invoke(handler.klasse, handler.method, self, args)
+        const result = i.invoke(handler.classInfo, handler.method, self, args)
         return this.write(result, handler.method, path)
       } catch (error) {
-        if (error instanceof JavaAusnahme) {
-          app.log('ERROR', 'ExceptionHandlerExceptionResolver', `Failure in @ExceptionHandler ${handler.klasse.name}#${handler.method.name}: ${i.ausnahmeText(error.wert)}`)
-          return this.errorResponse(500, path, i.ausnahmeText(error.wert))
+        if (error instanceof JavaException) {
+          app.log('ERROR', 'ExceptionHandlerExceptionResolver', `Failure in @ExceptionHandler ${handler.classInfo.name}#${handler.method.name}: ${i.exceptionText(error.value)}`)
+          return this.errorResponse(500, path, i.exceptionText(error.value))
         }
         throw error
       }
     }
 
     // 2. What Spring knows by itself
-    if (exception.art === 'nativ') {
-      const message = exception.daten.meldung ?? ''
-      switch (exception.typ) {
+    if (exception.kind === 'native') {
+      const message = exception.data.message ?? ''
+      switch (exception.type) {
         case 'ResponseStatusException': {
-          const code = exception.daten.zahl ?? 500
+          const code = exception.data.number ?? 500
           app.log('WARN', 'ExceptionHandlerExceptionResolver', `Resolved [org.springframework.web.server.ResponseStatusException: ${message}]`)
-          return this.errorResponse(code, path, exception.daten.text ?? '')
+          return this.errorResponse(code, path, exception.data.text ?? '')
         }
         case 'MethodArgumentNotValidException':
         case 'MethodArgumentTypeMismatchException':
         case 'MissingServletRequestParameterException':
         case 'MissingRequestHeaderException':
         case 'HttpMessageNotReadableException':
-          app.log('WARN', 'DefaultHandlerExceptionResolver', `Resolved [${exception.typ}: ${message}]`)
+          app.log('WARN', 'DefaultHandlerExceptionResolver', `Resolved [${exception.type}: ${message}]`)
           return this.errorResponse(400, path, message)
       }
     }
     // @ResponseStatus on your own exception class
-    if (exception.art === 'objekt') {
-      for (let k: Klasse | undefined = exception.klasse; k; k = k.oberklasse) {
-        const annotation = find(k.dekl.annotations, 'ResponseStatus')
+    if (exception.kind === 'object') {
+      for (let k: ClassInfo | undefined = exception.classInfo; k; k = k.superclass) {
+        const annotation = find(k.decl.annotations, 'ResponseStatus')
         const code = statusFromName(text(annotation, 'value', 'code'))
         if (code) {
           const reasonText = text(annotation, 'reason')
-          app.log('WARN', 'ResponseStatusExceptionResolver', `Resolved [${i.ausnahmeText(exception)}]`)
+          app.log('WARN', 'ResponseStatusExceptionResolver', `Resolved [${i.exceptionText(exception)}]`)
           return this.errorResponse(code, path, reasonText ?? messageOf(exception, i))
         }
       }
@@ -388,13 +388,13 @@ export class Web {
     app.log(
       'ERROR',
       'dispatcherServlet',
-      `Servlet.service() for servlet [dispatcherServlet] threw exception [Request processing failed: ${i.ausnahmeText(exception)}] with root cause`,
+      `Servlet.service() for servlet [dispatcherServlet] threw exception [Request processing failed: ${i.exceptionText(exception)}] with root cause`,
     )
-    app.print(`${i.ausnahmeText(exception)}${line ? `\n    at Main.java:${line}` : ''}`, 'error')
+    app.print(`${i.exceptionText(exception)}${line ? `\n    at Main.java:${line}` : ''}`, 'error')
     return this.errorResponse(500, path, messageOf(exception, i))
   }
 
-  private bestHandler(handlers: Handler[], exception: Wert): Handler | null {
+  private bestHandler(handlers: Handler[], exception: Value): Handler | null {
     let best: Handler | null = null
     let bestDistance = Infinity
     for (const handler of handlers) {
@@ -410,14 +410,14 @@ export class Web {
   }
 
   /** How many steps up the class hierarchy until `type` - Spring prefers the closest handler. */
-  private distance(exception: Wert, type: string): number {
+  private distance(exception: Value, type: string): number {
     const i = this.app.interpreter
-    if (!i.istInstanz(exception, type)) return Infinity
-    let name = exception.art === 'objekt' ? exception.klasse.name : exception.art === 'nativ' ? exception.typ : ''
+    if (!i.isInstance(exception, type)) return Infinity
+    let name = exception.kind === 'object' ? exception.classInfo.name : exception.kind === 'native' ? exception.type : ''
     for (let steps = 0; steps < 20; steps++) {
       if (name === type) return steps
-      const klasse = i.klassen.get(name)
-      const parent = klasse ? klasse.dekl.oberklasse : (this.app.library.superClasses[name] ?? PARENTS[name])
+      const classInfo = i.classes.get(name)
+      const parent = classInfo ? classInfo.decl.superclass : (this.app.library.superClasses[name] ?? PARENTS[name])
       if (!parent) return 10 + steps
       name = parent
     }
@@ -452,23 +452,23 @@ const PARENTS: Record<string, string> = {
 }
 
 class BindError extends Error {
-  readonly exception: NativWert
+  readonly exception: NativeValue
 
-  constructor(exception: NativWert) {
-    super(exception.daten.meldung)
+  constructor(exception: NativeValue) {
+    super(exception.data.message)
     this.exception = exception
   }
 }
 
-function messageOf(exception: Wert, i: SpringApp['interpreter']): string {
-  const message = i.methodeAufrufen(exception, 'getMessage', [], 0)
-  return message.art === 'null' ? '' : i.alsText(message)
+function messageOf(exception: Value, i: SpringApp['interpreter']): string {
+  const message = i.callMethod(exception, 'getMessage', [], 0)
+  return message.kind === 'null' ? '' : i.toText(message)
 }
 
-function ambiguous(bean: string, klasse: Klasse, method: MethodenDekl, verb: string, path: string, existing: Route) {
+function ambiguous(bean: string, classInfo: ClassInfo, method: MethodDecl, verb: string, path: string, existing: Route) {
   return new MappingError(
-    `Ambiguous mapping. Cannot map '${bean}' method ${klasse.name}#${method.name}() to {${verb} [${path}]}: There is already '${existing.bean}' bean method ${existing.klasse.name}#${existing.handler.name}() mapped.`,
-    method.zeile,
+    `Ambiguous mapping. Cannot map '${bean}' method ${classInfo.name}#${method.name}() to {${verb} [${path}]}: There is already '${existing.bean}' bean method ${existing.classInfo.name}#${existing.handler.name}() mapped.`,
+    method.line,
   )
 }
 
@@ -495,7 +495,7 @@ function match(pattern: string[], actual: string[]): Record<string, string> | nu
   return variables
 }
 
-const qualified = (type: TypRef) => {
+const qualified = (type: TypeRef) => {
   const name = typeText(type)
   return ['String', 'Long', 'Integer', 'Double', 'Boolean'].includes(name) ? 'java.lang.' + name : name
 }

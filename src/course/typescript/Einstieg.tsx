@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Einstieg.code'
+import { examples, codeBloecke } from './Einstieg.code'
 
 /**
  * KAPITEL 2.1 - Warum TypeScript?
@@ -18,7 +18,7 @@ export function Einstieg() {
           der Compiler meldet Fehler, <strong>bevor</strong> der Code läuft. Unter jedem Editor in diesem
           Teil siehst du das Ergebnis der Typprüfung.
         </P>
-        <TryIt id="ts-start-einstieg" modus="ts" {...beispiele['ts-start-einstieg']} />
+        <TryIt id="ts-start-einstieg" mode="ts" {...examples['ts-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Was TypeScript ist - und was nicht">
@@ -29,9 +29,9 @@ export function Einstieg() {
           vergessene Felder, falsche Argumente. Dazu kommen Autovervollständigung und gefahrloses
           Umbenennen in der IDE.
         </P>
-        <TryIt id="ts-start-tippfehler" modus="ts" {...beispiele['ts-start-tippfehler']} />
+        <TryIt id="ts-start-tippfehler" mode="ts" {...examples['ts-start-tippfehler']} />
         <P>Im echten Projekt laufen zwei Dinge getrennt voneinander:</P>
-        <CodeBlock titel="Prüfen und Übersetzen" code={codeBloecke.ablauf} />
+        <CodeBlock title="Prüfen und Übersetzen" code={codeBloecke.ablauf} />
         <Liste>
           <li>
             Der <strong>Compiler</strong> (<Code>tsc</Code>, in VS Code läuft er ständig mit) prüft die
@@ -49,8 +49,8 @@ export function Einstieg() {
           Das hat eine wichtige Folge: Ein Typfehler hält das Programm <strong>nicht</strong> auf. Hier
           meldet die Typprüfung einen Fehler - und trotzdem läuft der Code und gibt etwas aus:
         </P>
-        <TryIt id="ts-start-fehler" modus="ts" {...beispiele['ts-start-fehler']} />
-        <CodeBlock titel="Type Erasure: die Typen werden entfernt" code={codeBloecke.entfernt} />
+        <TryIt id="ts-start-fehler" mode="ts" {...examples['ts-start-fehler']} />
+        <CodeBlock title="Type Erasure: die Typen werden entfernt" code={codeBloecke.entfernt} />
         <Hinweis variante="warnung">
           Weil die Typen zur Laufzeit weg sind, kann TypeScript <strong>nichts prüfen, was erst zur
           Laufzeit ankommt</strong> - Eingaben, <Code>JSON.parse</Code>, Antworten vom Server. Solche
@@ -65,7 +65,7 @@ export function Einstieg() {
           (<strong>Inferenz</strong>). Bei <Code>const</Code> ist der Typ sogar noch genauer: Der Wert
           ändert sich nie, also ist der Typ genau dieser eine Wert.
         </P>
-        <TryIt id="ts-start-annotation" modus="ts" {...beispiele['ts-start-annotation']} />
+        <TryIt id="ts-start-annotation" mode="ts" {...examples['ts-start-annotation']} />
         <Hinweis variante="tipp">
           Faustregel: <strong>Parameter</strong> von Funktionen immer annotieren, den Rest meist der
           Inferenz überlassen. Das hält den Code kurz, und an den Grenzen (was geht rein?) ist trotzdem
@@ -79,7 +79,7 @@ export function Einstieg() {
           kommen Arrays und <strong>Tupel</strong>: Arrays fester Länge, bei denen jede Position ihren
           eigenen Typ hat.
         </P>
-        <TryIt id="ts-start-grundtypen" modus="ts" {...beispiele['ts-start-grundtypen']} />
+        <TryIt id="ts-start-grundtypen" mode="ts" {...examples['ts-start-grundtypen']} />
         <Liste>
           <li>
             <Code>string</Code>, <Code>number</Code>, <Code>boolean</Code>, <Code>null</Code>,{' '}
@@ -106,7 +106,7 @@ export function Einstieg() {
           geprüft hast, was drinsteckt. Diese Prüfung heißt <strong>Eingrenzen</strong> (Narrowing) -
           mehr dazu in <Verweis nr="2.4" />.
         </P>
-        <TryIt id="ts-start-any-unknown" modus="ts" {...beispiele['ts-start-any-unknown']} />
+        <TryIt id="ts-start-any-unknown" mode="ts" {...examples['ts-start-any-unknown']} />
         <Hinweis variante="warnung">
           <Code>any</Code> ist ansteckend: Was du aus einem <Code>any</Code> liest, ist wieder{' '}
           <Code>any</Code>. Ein einziges <Code>any</Code> kann so die Prüfung in einem ganzen Bereich
@@ -121,16 +121,16 @@ export function Einstieg() {
           Fehler (statt still <Code>any</Code> zu werden), und <Code>null</Code>/<Code>undefined</Code>{' '}
           müssen ausdrücklich behandelt werden. Die Editoren hier laufen mit <Code>strict</Code>.
         </P>
-        <TryIt id="ts-start-strict" modus="ts" {...beispiele['ts-start-strict']} />
+        <TryIt id="ts-start-strict" mode="ts" {...examples['ts-start-strict']} />
         <CodeBlock code={codeBloecke.tsconfig} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-start-uebung"
-          modus="ts"
-          {...beispiele['ts-start-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-start-uebung']}
+          task={
             <>
               <p>
                 Der Code funktioniert, aber die Typprüfung meldet Fehler: Parameter ohne Typ werden nicht
@@ -157,24 +157,24 @@ export function Einstieg() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Die Typprüfung meldet einen Fehler. Was passiert beim Ausführen?',
-            antworten: ['Das Programm startet gar nicht', 'Der Code läuft trotzdem - die Typen werden nur entfernt', 'TypeScript korrigiert den Fehler automatisch'],
-            richtig: 1,
-            erklaerung: 'Prüfen und Übersetzen sind getrennt. Beim Übersetzen werden die Typen einfach entfernt - auch fehlerhafter Code läuft. In echten Projekten verhindert meist der Build (tsc) das Veröffentlichen.',
+            question: 'Die Typprüfung meldet einen Fehler. Was passiert beim Ausführen?',
+            answers: ['Das Programm startet gar nicht', 'Der Code läuft trotzdem - die Typen werden nur entfernt', 'TypeScript korrigiert den Fehler automatisch'],
+            correct: 1,
+            explanation: 'Prüfen und Übersetzen sind getrennt. Beim Übersetzen werden die Typen einfach entfernt - auch fehlerhafter Code läuft. In echten Projekten verhindert meist der Build (tsc) das Veröffentlichen.',
           },
           {
-            frage: 'Welchen Typ leitet TypeScript für const status = "open" ab?',
-            antworten: ['string', 'Den Literal-Typ "open"', 'any'],
-            richtig: 1,
-            erklaerung: 'Eine const-Variable kann sich nie ändern - deshalb ist ihr Typ genau dieser Wert. Mit let wäre es string.',
+            question: 'Welchen Typ leitet TypeScript für const status = "open" ab?',
+            answers: ['string', 'Den Literal-Typ "open"', 'any'],
+            correct: 1,
+            explanation: 'Eine const-Variable kann sich nie ändern - deshalb ist ihr Typ genau dieser Wert. Mit let wäre es string.',
           },
           {
-            frage: 'Du weißt nicht, was JSON.parse zurückgibt. Welcher Typ ist am sichersten?',
-            antworten: ['any', 'unknown', 'object'],
-            richtig: 1,
-            erklaerung: 'unknown zwingt dich zu prüfen, bevor du den Wert benutzt. any würde jeden Fehler durchlassen.',
+            question: 'Du weißt nicht, was JSON.parse zurückgibt. Welcher Typ ist am sichersten?',
+            answers: ['any', 'unknown', 'object'],
+            correct: 1,
+            explanation: 'unknown zwingt dich zu prüfen, bevor du den Wert benutzt. any würde jeden Fehler durchlassen.',
           },
         ]}
       />

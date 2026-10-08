@@ -1,5 +1,5 @@
 import type { Zweisprachig } from '../i18n/LanguageContext'
-import type { CodeBeispiel, TestErgebnis } from '../learning/jsSandbox'
+import type { CodeExample, TestResult } from '../learning/jsSandbox'
 import type { RunOptions, SqlRun, SqlTable } from './engine'
 import { localized } from '../i18n/localized'
 import { contentResult, type ContentResult } from '../selftest/results'
@@ -19,17 +19,17 @@ import { contentResult, type ContentResult } from '../selftest/results'
 export type SqlTest = {
   name: string | Zweisprachig
   abfrage?: string
-  reihenfolge?: boolean
-  spalten?: boolean
+  order?: boolean
+  columns?: boolean
 }
 
 /** An example or exercise in a chapter's .code.ts (part 9) - spread into <TryIt modus="sql">. */
 export type SqlBeispiel = {
   code: string
-  loesung?: string
+  solution?: string
   tests?: SqlTest[]
   /** Tips of an exercise - in both languages, shown one after the other. */
-  tipps?: Zweisprachig<string[]>
+  hints?: Zweisprachig<string[]>
 }
 
 export type SqlRunner = (script: string, options?: RunOptions) => Promise<SqlRun>
@@ -77,12 +77,12 @@ export function lastTable(run: SqlRun): SqlTable | undefined {
  * Compares the learner's run with the solution's run - one entry per test.
  * Both runs must have been made with `checks: checkQueries(tests)`.
  */
-export function evaluate(tests: SqlTest[], learner: SqlRun, solution: SqlRun, language: Language): TestErgebnis[] {
+export function evaluate(tests: SqlTest[], learner: SqlRun, solution: SqlRun, language: Language): TestResult[] {
   const t = TEXTS[language]
   let check = 0
   return tests.map((test) => {
     const name = localized(test.name, language)
-    const result = (meldung = '') => ({ name, ok: !meldung, meldung })
+    const result = (message = '') => ({ name, ok: !message, message })
 
     let got: SqlTable | { error: string } | undefined
     let expected: SqlTable | { error: string } | undefined
@@ -104,10 +104,10 @@ export function evaluate(tests: SqlTest[], learner: SqlRun, solution: SqlRun, la
 }
 
 /** null if equal, otherwise what differs - in words a learner can act on. */
-export function compareTables(got: SqlTable, expected: SqlTable, options: { reihenfolge?: boolean; spalten?: boolean }, language: Language): string | null {
+export function compareTables(got: SqlTable, expected: SqlTable, options: { order?: boolean; columns?: boolean }, language: Language): string | null {
   const t = TEXTS[language]
   if (got.columns.length !== expected.columns.length) return t.columns(expected.columns.length, got.columns.length)
-  if (options.spalten && got.columns.join() !== expected.columns.join()) return t.names(got.columns.join(', '), expected.columns.join(', '))
+  if (options.columns && got.columns.join() !== expected.columns.join()) return t.names(got.columns.join(', '), expected.columns.join(', '))
 
   const gotRows = got.rows.map(rowKey)
   const expectedRows = expected.rows.map(rowKey)
@@ -131,7 +131,7 @@ export function compareTables(got: SqlTable, expected: SqlTable, options: { reih
         ? t.rowDiffers(extraIndex + 1, show(expected.rows[missing[0]]), show(got.rows[extraIndex]))
         : t.missing(show(expected.rows[missing[0]]))
   }
-  if (options.reihenfolge && gotRows.join('\n') !== expectedRows.join('\n')) return t.order
+  if (options.order && gotRows.join('\n') !== expectedRows.join('\n')) return t.order
   return null
 }
 
@@ -167,17 +167,17 @@ export const SQL_EXPECTED_FAILURES: Record<string, string> = {
  *   example without tests   runs without errors (the solution too, if there is one)
  *   exercise with tests     the solution passes all tests, the start code does NOT
  */
-export async function sqlExampleCheck(id: string, example: CodeBeispiel, run: SqlRunner): Promise<ContentResult> {
+export async function sqlExampleCheck(id: string, example: CodeExample, run: SqlRunner): Promise<ContentResult> {
   const result = contentResult(id)
   const tests = example.tests as SqlTest[] | undefined
 
   if (tests?.length) {
-    if (!example.loesung) return result('exercise with tests but without a solution')
+    if (!example.solution) return result('exercise with tests but without a solution')
     const checks = checkQueries(tests)
-    const solution = await run(example.loesung, { checks })
+    const solution = await run(example.solution, { checks })
     if (solution.error) return result(`solution fails in line ${solution.error.line}: ${solution.error.message}`)
     const own = evaluate(tests, solution, solution, 'en').filter((r) => !r.ok)
-    if (own.length) return result(`solution does not pass its own tests: ${own.map((r) => `${r.name}: ${r.meldung}`).join(' · ')}`)
+    if (own.length) return result(`solution does not pass its own tests: ${own.map((r) => `${r.name}: ${r.message}`).join(' · ')}`)
     const start = await run(example.code, { checks })
     if (evaluate(tests, start, solution, 'en').every((r) => r.ok)) return result('the start code already passes all tests - nothing to practise')
     return result()
@@ -187,8 +187,8 @@ export async function sqlExampleCheck(id: string, example: CodeBeispiel, run: Sq
   const own = await run(example.code)
   if (own.error && !expected) return result(`line ${own.error.line}: ${own.error.message}`)
   if (!own.error && expected) return result(`should fail (${expected}), but works`)
-  if (example.loesung) {
-    const solution = await run(example.loesung)
+  if (example.solution) {
+    const solution = await run(example.solution)
     if (solution.error) return result(`solution, line ${solution.error.line}: ${solution.error.message}`)
   }
   return result()

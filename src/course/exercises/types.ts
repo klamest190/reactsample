@@ -2,9 +2,9 @@ import type { Zweisprachig } from '../../i18n/LanguageContext'
 import type { DockerTest, ReactTest, SpringTestSpec, Test } from '../../learning/jsSandbox'
 import type { SqlTest } from '../../sql/check'
 import type { ProjectId } from '../../docker/projects'
-import type { TypTest } from '../../learning/tsRunner'
+import type { TypeTest } from '../../learning/tsRunner'
 import type { HighlightMode } from '../../learning/highlight'
-import type { UebungsModus } from '../../learning/modes'
+import type { ExerciseMode } from '../../learning/modes'
 
 /**
  * Zusätzliche Übungen pro Kapitel - in vier Stufen:
@@ -42,12 +42,12 @@ export type Vorhersage = Basis & {
 
 export type CodeUebung = Basis & {
   stufe: 'fehler' | 'ergaenzen' | 'frei'
-  aufgabe: Zweisprachig
-  modus: UebungsModus
+  task: Zweisprachig
+  mode: ExerciseMode
   code: string
-  loesung: string
-  vorbereitung?: string
-  vorschau?: boolean
+  solution: string
+  setup?: string
+  preview?: boolean
   tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[] | SqlTest[]
   /** Part 8: application.properties and requests (spring), project and .dockerignore (dockerfile). */
   properties?: string
@@ -55,8 +55,8 @@ export type CodeUebung = Basis & {
   project?: ProjectId
   ignore?: string
   /** Nur bei modus 'ts': Code, der zusammen mit der Lösung ohne Typfehler kompilieren muss (siehe tsLauf.ts). */
-  typTests?: TypTest[]
-  tipps: Zweisprachig<string[]>
+  typeTests?: TypeTest[]
+  hints: Zweisprachig<string[]>
 }
 
 export type Uebung = Vorhersage | CodeUebung

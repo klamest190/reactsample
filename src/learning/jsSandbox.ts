@@ -1,46 +1,45 @@
-import type { TypTest } from './tsRunner'
+import type { TypeTest } from './tsRunner'
 import type { BuildResult } from '../docker/build'
 import type { ComposeResult } from '../docker/compose'
 import type { ProjectId } from '../docker/projects'
 import type { SqlTest } from '../sql/check'
 
 /**
- * Baut das HTML-Dokument, in dem JavaScript-Übungen laufen.
+ * Builds the HTML document JavaScript exercises run in.
  *
- * Der Code läuft in einem <iframe sandbox="allow-scripts"> - also in einem
- * eigenen, fremden Ursprung ohne Zugriff auf diese Seite, ihren localStorage
- * oder ihre Cookies. Bei jedem Ausführen entsteht ein frisches iframe, damit
- * alte Timer und Variablen verschwinden.
+ * The code runs in an <iframe sandbox="allow-scripts"> - an origin of its own without access to
+ * this page, its localStorage or its cookies. Every run gets a fresh iframe, so old timers and
+ * variables are gone.
  *
- * Kommunikation nach außen nur per postMessage:
- *   console.log/warn/error  -> { typ: 'log' | 'warn' | 'error', text }
- *   unbehandelter Fehler    -> { typ: 'fehler', text, zeile }
- *   Testergebnisse          -> { typ: 'tests', ergebnisse }
- *   synchroner Teil fertig  -> { typ: 'fertig', inhalt }  (inhalt: steht schon etwas im Dokument?)
- *   später sichtbarer Inhalt -> { typ: 'inhalt' }          (z. B. aus einem Timer oder fetch)
+ * The only way out is postMessage (see SandboxMessage):
+ *   console.log/warn/error   -> { type: 'log' | 'warn' | 'error', text }
+ *   uncaught exception       -> { type: 'exception', text, line }
+ *   test results             -> { type: 'tests', results }
+ *   synchronous part done    -> { type: 'done', content }  (content: is there something in the document yet?)
+ *   content showing up later -> { type: 'content' }        (e.g. from a timer or fetch)
  */
 
 export type Test = {
-  /** Was geprüft wird - wird dem Lernenden angezeigt, deshalb zweisprachig möglich. */
+  /** What is checked - shown to learners, so it may be bilingual. */
   name: string | { de: string; en: string }
-  /** JavaScript-Ausdruck, der im Scope des Lernenden-Codes ausgewertet wird. */
-  ausdruck: string
-  /** Erwartetes Ergebnis (tiefer Vergleich). Fehlt es, muss `ausdruck` true ergeben. */
-  erwartet?: unknown
+  /** A JavaScript expression evaluated in the scope of the learner's code. */
+  expression: string
+  /** Expected result (deep comparison). Without it, `expression` must evaluate to true. */
+  expected?: unknown
 }
 
 /**
- * Ein Codebeispiel für <TryIt>, gemeinsam für beide Sprachfassungen (siehe course/<part>/Name.code.ts).
- * Der Code ist immer Englisch - nur der Text drumherum wird übersetzt.
+ * A code example for <TryIt>, shared by both language versions (see course/<part>/Name.code.ts).
+ * The code is always English - only the text around it is translated.
  */
-export type CodeBeispiel = {
+export type CodeExample = {
   code: string
-  loesung?: string
-  vorbereitung?: string
+  solution?: string
+  setup?: string
   tests?: Test[] | ReactTest[] | SpringTestSpec[] | DockerTest[] | SqlTest[]
-  /** Nur TypeScript (modus="ts"): Code, der mit dem Code der Lernenden fehlerfrei kompilieren muss. */
-  typTests?: TypTest[]
-  tipps?: { de: string[]; en: string[] }
+  /** TypeScript only (mode="ts"): code that has to compile together with the learner's code. */
+  typeTests?: TypeTest[]
+  hints?: { de: string[]; en: string[] }
   /** Spring (part 8): application.properties and requests sent after every start. */
   properties?: string
   requests?: string
@@ -57,8 +56,8 @@ export type CodeBeispiel = {
 export type SpringTestSpec = {
   name: string | { de: string; en: string }
   http?: string
-  ausdruck?: string
-  erwartet?: unknown
+  expression?: string
+  expected?: unknown
 }
 
 /**
@@ -72,195 +71,193 @@ export type DockerTest = {
 }
 
 /**
- * Test für eine React-Übung (siehe reactTests.ts). `pruefung` ist Testcode, der die
- * Komponente App rendert und bedient: `await render()`, `await click(button('+'))`, `expect(text())…`
+ * Test for a React exercise (see reactTestKit.ts). `script` is test code that renders and uses the
+ * component App: `await render()`, `await click(button('+'))`, `expect(text())…`
  */
 export type ReactTest = {
   name: string | { de: string; en: string }
-  pruefung: string
+  script: string
 }
 
-export type TestErgebnis = { name: string; ok: boolean; meldung: string }
+export type TestResult = { name: string; ok: boolean; message: string }
 
-export type SandboxNachricht =
-  | { tryit: true; lauf: number; typ: 'log' | 'info' | 'warn' | 'error'; text: string }
-  | { tryit: true; lauf: number; typ: 'fehler'; text: string; zeile: number | null }
-  | { tryit: true; lauf: number; typ: 'tests'; ergebnisse: TestErgebnis[] }
-  | { tryit: true; lauf: number; typ: 'fertig'; inhalt: boolean }
-  | { tryit: true; lauf: number; typ: 'clear' | 'inhalt' }
+export type SandboxMessage =
+  | { tryit: true; runId: number; type: 'log' | 'info' | 'warn' | 'error'; text: string }
+  | { tryit: true; runId: number; type: 'exception'; text: string; line: number | null }
+  | { tryit: true; runId: number; type: 'tests'; results: TestResult[] }
+  | { tryit: true; runId: number; type: 'done'; content: boolean }
+  | { tryit: true; runId: number; type: 'clear' | 'content' }
 
-// Läuft als klassisches Skript VOR dem Code. Alle Namen beginnen mit __,
-// damit sie nicht mit Variablen der Lernenden kollidieren.
-const BRUECKE = `
-const __senden = (typ, text, extra) =>
-  parent.postMessage({ tryit: true, lauf: __LAUF, typ, text, ...extra }, '*');
+// Runs as a classic script BEFORE the code. Every name starts with __ so it cannot clash with
+// the learner's variables. The messages it posts are the SandboxMessage type above.
+const BRIDGE = `
+const __send = (type, text, extra) =>
+  parent.postMessage({ tryit: true, runId: __RUN_ID, type, text, ...extra }, '*');
 
-const __fmt = (wert, tiefe = 0) => {
-  if (typeof wert === 'string') return tiefe === 0 ? wert : JSON.stringify(wert);
-  if (typeof wert === 'function') return 'ƒ ' + (wert.name || 'anonym') + '()';
-  if (typeof wert === 'bigint') return wert + 'n';
-  if (wert === null || typeof wert !== 'object') return String(wert);
-  if (wert instanceof Error) return wert.name + ': ' + wert.message;
-  if (wert instanceof Promise) return 'Promise { … }';
-  if (wert instanceof Date) return 'Date(' + wert.toISOString() + ')';
-  if (wert instanceof Node) return '<' + wert.nodeName.toLowerCase() + '>';
-  if (tiefe > 3) return Array.isArray(wert) ? '[…]' : '{…}';
-  if (Array.isArray(wert)) return '[' + wert.map((v) => __fmt(v, tiefe + 1)).join(', ') + ']';
-  if (wert instanceof Map)
-    return 'Map(' + wert.size + ') { ' + [...wert].map(([k, v]) => __fmt(k, 1) + ' => ' + __fmt(v, tiefe + 1)).join(', ') + ' }';
-  if (wert instanceof Set)
-    return 'Set(' + wert.size + ') { ' + [...wert].map((v) => __fmt(v, tiefe + 1)).join(', ') + ' }';
-  const name = wert.constructor && wert.constructor !== Object ? wert.constructor.name + ' ' : '';
-  const felder = Object.entries(wert).map(([k, v]) => k + ': ' + __fmt(v, tiefe + 1));
-  return name + (felder.length ? '{ ' + felder.join(', ') + ' }' : '{}');
+const __fmt = (value, depth = 0) => {
+  if (typeof value === 'string') return depth === 0 ? value : JSON.stringify(value);
+  if (typeof value === 'function') return 'ƒ ' + (value.name || 'anonymous') + '()';
+  if (typeof value === 'bigint') return value + 'n';
+  if (value === null || typeof value !== 'object') return String(value);
+  if (value instanceof Error) return value.name + ': ' + value.message;
+  if (value instanceof Promise) return 'Promise { … }';
+  if (value instanceof Date) return 'Date(' + value.toISOString() + ')';
+  if (value instanceof Node) return '<' + value.nodeName.toLowerCase() + '>';
+  if (depth > 3) return Array.isArray(value) ? '[…]' : '{…}';
+  if (Array.isArray(value)) return '[' + value.map((v) => __fmt(v, depth + 1)).join(', ') + ']';
+  if (value instanceof Map)
+    return 'Map(' + value.size + ') { ' + [...value].map(([k, v]) => __fmt(k, 1) + ' => ' + __fmt(v, depth + 1)).join(', ') + ' }';
+  if (value instanceof Set)
+    return 'Set(' + value.size + ') { ' + [...value].map((v) => __fmt(v, depth + 1)).join(', ') + ' }';
+  const name = value.constructor && value.constructor !== Object ? value.constructor.name + ' ' : '';
+  const fields = Object.entries(value).map(([k, v]) => k + ': ' + __fmt(v, depth + 1));
+  return name + (fields.length ? '{ ' + fields.join(', ') + ' }' : '{}');
 };
 
-const __gleich = (a, b) => {
+const __equal = (a, b) => {
   if (Object.is(a, b)) return true;
   if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) return false;
   if (Array.isArray(a) !== Array.isArray(b)) return false;
   const ka = Object.keys(a), kb = Object.keys(b);
-  return ka.length === kb.length && ka.every((k) => __gleich(a[k], b[k]));
+  return ka.length === kb.length && ka.every((k) => __equal(a[k], b[k]));
 };
 
-for (const typ of ['log', 'info', 'warn', 'error', 'debug']) {
-  const original = console[typ].bind(console);
-  console[typ] = (...werte) => {
-    original(...werte);
-    __senden(typ === 'debug' ? 'log' : typ, werte.map((w) => __fmt(w)).join(' '));
+for (const level of ['log', 'info', 'warn', 'error', 'debug']) {
+  const original = console[level].bind(console);
+  console[level] = (...values) => {
+    original(...values);
+    __send(level === 'debug' ? 'log' : level, values.map((v) => __fmt(v)).join(' '));
   };
 }
-console.table = (daten) => console.log(daten);
-const __zeiten = new Map();
-console.time = (label = 'default') => __zeiten.set(label, performance.now());
+console.table = (data) => console.log(data);
+const __timers = new Map();
+console.time = (label = 'default') => __timers.set(label, performance.now());
 console.timeEnd = (label = 'default') => {
-  if (!__zeiten.has(label)) return;
-  console.log(label + ': ' + (performance.now() - __zeiten.get(label)).toFixed(1) + ' ms');
-  __zeiten.delete(label);
+  if (!__timers.has(label)) return;
+  console.log(label + ': ' + (performance.now() - __timers.get(label)).toFixed(1) + ' ms');
+  __timers.delete(label);
 };
-console.clear = () => __senden('clear');
+console.clear = () => __send('clear');
 
 window.addEventListener('error', (e) => {
   const text = (e.message || String(e.error)).replace(/^Uncaught /, '');
-  __senden('fehler', text, { zeile: e.lineno ? e.lineno - __OFFSET : null });
+  __send('exception', text, { line: e.lineno ? e.lineno - __OFFSET : null });
 });
-// Formulare ohne eigenen Handler würden das iframe sonst neu laden.
+// Forms without a handler of their own would reload the iframe.
 window.addEventListener('submit', (e) => e.preventDefault());
 window.addEventListener('unhandledrejection', (e) => {
-  __senden('fehler', __T.promiseFehler + __fmt(e.reason), { zeile: null });
+  __send('exception', __T.promiseError + __fmt(e.reason), { line: null });
 });
 
-// Hat der Code etwas Sichtbares ins Dokument gebracht? Dann zeigt die Seite die Vorschau,
-// sonst nur die Konsole. Zählt Elemente und Text - außer Skripten, Leerraum und dem leeren <div id="app">.
-const __hatInhalt = () => {
+// Did the code put something visible into the document? Then the page shows the preview, otherwise
+// only the console. Counts elements and text - except scripts, whitespace and the empty <div id="app">.
+const __hasContent = () => {
   for (const k of document.body.childNodes) {
-    if (k.nodeType === 3 ? !k.textContent.trim() : k.nodeType !== 1) continue; // Leerraum, Kommentare
+    if (k.nodeType === 3 ? !k.textContent.trim() : k.nodeType !== 1) continue; // whitespace, comments
     if (k.tagName === 'SCRIPT') continue;
     if (k.id === 'app' && !k.hasChildNodes()) continue;
     return true;
   }
   return false;
 };
-// Inhalt, der erst nach dem ersten Durchlauf kommt (Timer, fetch, Klick), meldet der Beobachter.
-const __beobachter = new MutationObserver(() => {
-  if (!__hatInhalt()) return;
-  __beobachter.disconnect();
-  __senden('inhalt');
+// Content that only shows up after the first pass (timer, fetch, click) is reported by the observer.
+const __observer = new MutationObserver(() => {
+  if (!__hasContent()) return;
+  __observer.disconnect();
+  __send('content');
 });
-__beobachter.observe(document.body, { childList: true, subtree: true, characterData: true });
+__observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 `
 
-// Wird an den Code der Lernenden angehängt - im selben Modul, damit `eval`
-// deren Variablen und Funktionen sieht.
-const TESTLAEUFER = `
+// Appended to the learner's code - in the same module, so `eval` sees its variables and functions.
+const TEST_RUNNER = `
 ;{
   const __tests = __TESTS;
-  const __ergebnisse = [];
+  const __results = [];
   for (const __t of __tests) {
     try {
-      let __wert = eval(__t.ausdruck);
-      if (__wert instanceof Promise) {
-        __wert = await Promise.race([
-          __wert,
-          new Promise((_, nein) => setTimeout(() => nein(new Error(__T.zeitueberschreitung)), 3000)),
+      let __value = eval(__t.expression);
+      if (__value instanceof Promise) {
+        __value = await Promise.race([
+          __value,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(__T.timeout)), 3000)),
         ]);
       }
-      if ('erwartet' in __t) {
-        const ok = __gleich(__wert, __t.erwartet);
-        __ergebnisse.push({ name: __t.name, ok, meldung: ok ? '' : __T.erwartet + ' ' + __fmt(__t.erwartet, 1) + ', ' + __T.erhalten + ' ' + __fmt(__wert, 1) });
+      if ('expected' in __t) {
+        const ok = __equal(__value, __t.expected);
+        __results.push({ name: __t.name, ok, message: ok ? '' : __T.expected + ' ' + __fmt(__t.expected, 1) + ', ' + __T.received + ' ' + __fmt(__value, 1) });
       } else {
-        const ok = __wert === true;
-        __ergebnisse.push({ name: __t.name, ok, meldung: ok ? '' : __T.bedingung });
+        const ok = __value === true;
+        __results.push({ name: __t.name, ok, message: ok ? '' : __T.condition });
       }
-    } catch (__f) {
-      __ergebnisse.push({ name: __t.name, ok: false, meldung: __f.name + ': ' + __f.message });
+    } catch (__e) {
+      __results.push({ name: __t.name, ok: false, message: __e.name + ': ' + __e.message });
     }
   }
-  __senden('tests', '', { ergebnisse: __ergebnisse });
+  __send('tests', '', { results: __results });
 }
 `
 
-// Meldungen, die im iframe entstehen - dort gibt es keinen React-Context.
-const SANDBOX_TEXTE = {
+// Messages created inside the iframe - there is no React context there.
+const SANDBOX_MESSAGES = {
   de: {
-    erwartet: 'erwartet',
-    erhalten: 'erhalten',
-    bedingung: 'Bedingung ist nicht erfüllt',
-    zeitueberschreitung: 'Zeitüberschreitung nach 3 s',
-    promiseFehler: 'Unbehandelter Promise-Fehler: ',
+    expected: 'erwartet',
+    received: 'erhalten',
+    condition: 'Bedingung ist nicht erfüllt',
+    timeout: 'Zeitüberschreitung nach 3 s',
+    promiseError: 'Unbehandelter Promise-Fehler: ',
   },
   en: {
-    erwartet: 'expected',
-    erhalten: 'received',
-    bedingung: 'Condition is not met',
-    zeitueberschreitung: 'Timed out after 3 s',
-    promiseFehler: 'Unhandled promise rejection: ',
+    expected: 'expected',
+    received: 'received',
+    condition: 'Condition is not met',
+    timeout: 'Timed out after 3 s',
+    promiseError: 'Unhandled promise rejection: ',
   },
 }
 
-export function sandboxDokument(optionen: {
-  lauf: number
+export function sandboxDocument(options: {
+  runId: number
   code: string
-  vorbereitung?: string
+  setup?: string
   tests?: Test[]
-  dunkel: boolean
-  sprache: 'de' | 'en'
+  dark: boolean
+  language: 'de' | 'en'
 }): string {
-  const { lauf, code, vorbereitung = '', tests, dunkel, sprache } = optionen
+  const { runId, code, setup = '', tests, dark, language } = options
 
-  // "</script" im Code würde das umgebende Skript-Tag vorzeitig beenden.
-  const sicher = (s: string) => s.replace(/<\/script/gi, '<\\/script')
+  // "</script" in the code would end the surrounding script tag early.
+  const escape = (s: string) => s.replace(/<\/script/gi, '<\\/script')
 
-  const farben = dunkel
+  const colors = dark
     ? 'color:#e2e8f0;background:transparent'
     : 'color:#0f172a;background:transparent'
-  // Dasselbe Farbschema wie die Seite (ThemeContext setzt color-scheme auf <html>).
-  // Weichen die beiden ab, legt der Browser eine deckend weiße Fläche hinter das iframe -
-  // im Dunkelmodus stand dann heller Text auf Weiß.
-  const schema = dunkel ? 'dark' : 'light'
+  // The same color scheme as the page (ThemeContext sets color-scheme on <html>). If they differ,
+  // the browser puts an opaque white layer behind the iframe - light text on white in dark mode.
+  const scheme = dark ? 'dark' : 'light'
 
-  const kopf =
+  const head =
     `<!doctype html><html><head><meta charset="utf-8"><style>` +
-    `:root{color-scheme:${schema}}body{margin:12px;font:14px/1.5 system-ui,sans-serif;${farben}}` +
+    `:root{color-scheme:${scheme}}body{margin:12px;font:14px/1.5 system-ui,sans-serif;${colors}}` +
     `button{font:inherit;padding:2px 10px;margin:2px}input{font:inherit}.done{opacity:.55;text-decoration:line-through}</style></head>` +
     `<body><div id="app"></div>\n` +
-    `<script>const __LAUF=${lauf};const __OFFSET=__PLATZHALTER;const __T=${JSON.stringify(SANDBOX_TEXTE[sprache])};\n${BRUECKE}\n${sicher(vorbereitung)}\n</script>\n` +
+    `<script>const __RUN_ID=${runId};const __OFFSET=__LINE_OFFSET;const __T=${JSON.stringify(SANDBOX_MESSAGES[language])};\n${BRIDGE}\n${escape(setup)}\n</script>\n` +
     `<script type="module">\n`
 
-  // Zeilennummern in Fehlermeldungen sollen sich auf den Editor beziehen.
-  const offset = kopf.split('\n').length - 1
-  const kopfMitOffset = kopf.replace('__PLATZHALTER', String(offset))
+  // Line numbers in error messages should refer to the editor.
+  const offset = head.split('\n').length - 1
+  const headWithOffset = head.replace('__LINE_OFFSET', String(offset))
 
   const testCode = tests?.length
-    ? // Funktion statt String als Ersatz, sonst würden "$&" o. Ä. in den Tests interpretiert.
-      TESTLAEUFER.replace('__TESTS', () => sicher(JSON.stringify(tests)))
+    ? // A function as replacement - otherwise "$&" and the like in the tests would be interpreted.
+      TEST_RUNNER.replace('__TESTS', () => escape(JSON.stringify(tests)))
     : ''
 
   return (
-    kopfMitOffset +
-    sicher(code) +
+    headWithOffset +
+    escape(code) +
     '\n' +
     testCode +
-    "\n__senden('fertig', undefined, { inhalt: __hatInhalt() });\n</script></body></html>"
+    "\n__send('done', undefined, { content: __hasContent() });\n</script></body></html>"
   )
 }

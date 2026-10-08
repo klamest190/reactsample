@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-useref-einstieg': {
     code: js`
       function App() {
@@ -81,7 +81,7 @@ export const beispiele = {
     `,
   },
   'hooks-useref-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Interval-ID und Startzeit ändern nichts an der Anzeige - sie gehören in Refs.',
         'Beim Fortsetzen die schon vergangene Zeit abziehen: `startTime.current = Date.now() - ms`.',
@@ -109,7 +109,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function App() {
         const [ms, setMs] = useState(0)
         const [laps, setLaps] = useState([])
@@ -156,14 +156,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startet bei „0.0 s“', en: 'Starts at “0.0 s”' },
-        pruefung: js`
+        script: js`
           await render()
           expect(find('h1').textContent).toBe('0.0 s')
         `,
       },
       {
         name: { de: 'Start lässt die Zeit laufen', en: 'Start makes the time run' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(450)
@@ -172,7 +172,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Stop hält die Zeit an', en: 'Stop freezes the time' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(350)
@@ -184,7 +184,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Lap speichert eine Rundenzeit als Listeneintrag', en: 'Lap stores a lap time as a list item' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(250)
@@ -194,7 +194,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Reset setzt Zeit und Runden zurück', en: 'Reset clears time and laps' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(250)
@@ -206,7 +206,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Intervall-ID und Startzeit liegen in Refs', en: 'Interval ID and start time live in refs' },
-        pruefung: js`
+        script: js`
           expect((code.match(/useRef\(/g) ?? []).length).toBeGreaterThan(1)
         `,
       },
@@ -278,7 +278,7 @@ export const beispiele = {
       }
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

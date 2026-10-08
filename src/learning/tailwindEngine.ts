@@ -2,7 +2,7 @@ import { __unstable__loadDesignSystem, compile } from 'tailwindcss'
 import projektCss from '../index.css?raw'
 import themeCss from 'tailwindcss/theme.css?raw'
 import utilitiesCss from 'tailwindcss/utilities.css?raw'
-import type { Vorschlag } from './suggestions'
+import type { Suggestion } from './suggestions'
 
 /**
  * Tailwind im Browser - mit derselben Engine, die Vite beim Bauen benutzt (Paket `tailwindcss`).
@@ -17,11 +17,11 @@ import type { Vorschlag } from './suggestions'
  * (Brand-Farben, Dark-Mode-Variante). Preflight fehlt absichtlich - das hat die Seite schon.
  */
 
-const eigenes = [...(projektCss.match(/@custom-variant[^;]+;/g) ?? []), ...(projektCss.match(/@theme\s*\{[^}]*\}/g) ?? [])].join('\n')
+const own = [...(projektCss.match(/@custom-variant[^;]+;/g) ?? []), ...(projektCss.match(/@theme\s*\{[^}]*\}/g) ?? [])].join('\n')
 
-const EINGABE = `@import "tailwindcss/theme.css" layer(theme);
+const INPUT = `@import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
-${eigenes}`
+${own}`
 
 async function loadStylesheet(id: string, base: string) {
   const content = id.includes('theme') ? themeCss : id.includes('utilities') ? utilitiesCss : ''
@@ -29,68 +29,68 @@ async function loadStylesheet(id: string, base: string) {
 }
 
 /** Alle Theme-Variablen (--color-red-500, --spacing, --text-sm …) mit ihrem Wert - für Farbfelder und Kommentare. */
-const VARIABLEN = new Map<string, string>()
-for (const css of [themeCss, eigenes]) {
-  for (const [, name, wert] of css.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) VARIABLEN.set(name, wert.trim())
+const VARIABLES = new Map<string, string>()
+for (const css of [themeCss, own]) {
+  for (const [, name, value] of css.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+);/g)) VARIABLES.set(name, value.trim())
 }
 
-const designSystem = await __unstable__loadDesignSystem(EINGABE, { loadStylesheet })
-const KLASSEN = designSystem.getClassList().map(([name]) => name)
-const VARIANTEN = designSystem
+const designSystem = await __unstable__loadDesignSystem(INPUT, { loadStylesheet })
+const CLASSES = designSystem.getClassList().map(([name]) => name)
+const VARIANTS = designSystem
   .getVariants()
   .filter((v) => !v.isArbitrary)
-  .flatMap((v) => (v.values.length ? v.values.map((wert) => `${v.name}${v.hasDash ? '-' : ''}${wert}`) : [v.name]))
+  .flatMap((v) => (v.values.length ? v.values.map((value) => `${v.name}${v.hasDash ? '-' : ''}${value}`) : [v.name]))
 
-const MAX_TREFFER = 150
+const MAX_HITS = 150
 
 /**
  * Vorschläge für das Wort vor dem Cursor, z. B. `bg-re` oder `hover:text-`.
  * Varianten davor (`hover:`, `md:`, `dark:`) bleiben stehen - ersetzt wird nur der Teil danach.
  */
-export function vorschlaege(wort: string): { treffer: Vorschlag[]; ersetzeZeichen: number } {
-  const trenner = wort.lastIndexOf(':')
-  const varianten = wort.slice(0, trenner + 1)
-  const teil = wort.slice(trenner + 1)
+export function suggestions(word: string): { hits: Suggestion[]; replaceChars: number } {
+  const trenner = word.lastIndexOf(':')
+  const variants = word.slice(0, trenner + 1)
+  const part = word.slice(trenner + 1)
   // "!" (important) und "-" (negativ) gehören vor die Klasse, werden aber nicht mitgesucht.
-  const vorsatz = teil.match(/^!?-?/)![0]
-  const suche = teil.slice(vorsatz.length)
+  const prefix = part.match(/^!?-?/)![0]
+  const query = part.slice(prefix.length)
 
-  const klassen = KLASSEN.filter((k) => k.startsWith(suche))
+  const classes = CLASSES.filter((k) => k.startsWith(query))
   // Varianten nur vorschlagen, solange noch keine Klasse eindeutig getippt ist.
-  const variantenTreffer = suche && !vorsatz ? VARIANTEN.filter((v) => v.startsWith(suche) && !KLASSEN.includes(suche)) : []
+  const variantHits = query && !prefix ? VARIANTS.filter((v) => v.startsWith(query) && !CLASSES.includes(query)) : []
 
-  const auswahl = [...variantenTreffer.slice(0, 20), ...klassen].slice(0, MAX_TREFFER)
-  const cssListe = designSystem.candidatesToCss(auswahl.map((k) => varianten + vorsatz + k))
+  const selection = [...variantHits.slice(0, 20), ...classes].slice(0, MAX_HITS)
+  const cssList = designSystem.candidatesToCss(selection.map((k) => variants + prefix + k))
 
-  const treffer = auswahl.map((name, i): Vorschlag => {
-    if (i < Math.min(variantenTreffer.length, 20)) {
-      return { label: name + ':', art: 'tailwind', info: '', css: `/* Variante: ${name}:… */` }
+  const hits = selection.map((name, i): Suggestion => {
+    if (i < Math.min(variantHits.length, 20)) {
+      return { label: name + ':', kind: 'tailwind', info: '', css: `/* Variante: ${name}:… */` }
     }
-    const css = cssListe[i]
-    return { label: vorsatz + name, art: 'tailwind', info: '', css: css ? lesbar(css) : undefined, farbe: css ? farbeAus(css) : undefined }
+    const css = cssList[i]
+    return { label: prefix + name, kind: 'tailwind', info: '', css: css ? readable(css) : undefined, color: css ? colorOff(css) : undefined }
   })
-  return { treffer, ersetzeZeichen: teil.length }
+  return { hits, replaceChars: part.length }
 }
 
 /** Nur die Deklarationen, dazu die Werte der Theme-Variablen als Kommentar - wie VS Code es anzeigt. */
-function lesbar(css: string) {
+function readable(css: string) {
   return css
     .split('\n')
-    .map((zeile) => {
-      const variablen = [...zeile.matchAll(/var\((--[\w-]+)\)/g)].map((t) => t[1])
-      const werte = variablen.map((v) => VARIABLEN.get(v)).filter(Boolean)
-      const abstand = zeile.match(/calc\(var\(--spacing\) \* (-?[\d.]+)\)/)
-      if (abstand) return `${zeile} /* ${Number(abstand[1]) * 0.25}rem */`
-      return werte.length && zeile.includes(':') ? `${zeile} /* ${werte.join(', ')} */` : zeile
+    .map((line) => {
+      const variables = [...line.matchAll(/var\((--[\w-]+)\)/g)].map((t) => t[1])
+      const values = variables.map((v) => VARIABLES.get(v)).filter(Boolean)
+      const gap = line.match(/calc\(var\(--spacing\) \* (-?[\d.]+)\)/)
+      if (gap) return `${line} /* ${Number(gap[1]) * 0.25}rem */`
+      return values.length && line.includes(':') ? `${line} /* ${values.join(', ')} */` : line
     })
     .join('\n')
 }
 
 /** Farbe für das Farbfeld in der Liste: die erste Farbvariable im CSS oder ein Farbwort. */
-function farbeAus(css: string): string | undefined {
+function colorOff(css: string): string | undefined {
   if (!/(color|background|fill|stroke|border|outline|decoration|shadow|accent|caret|--tw-gradient|--tw-ring)/.test(css)) return undefined
   const variable = css.match(/var\((--color-[\w-]+)\)/)?.[1]
-  if (variable) return VARIABLEN.get(variable)
+  if (variable) return VARIABLES.get(variable)
   return css.match(/:\s*(transparent|currentcolor|#[0-9a-f]{3,8})\b/i)?.[1]
 }
 
@@ -98,22 +98,22 @@ function farbeAus(css: string): string | undefined {
 // CSS für die Vorschau
 // ---------------------------------------------------------------------------
 
-const compiler = await compile(EINGABE, { loadStylesheet })
-let stil: HTMLStyleElement | null = null
+const compiler = await compile(INPUT, { loadStylesheet })
+let style: HTMLStyleElement | null = null
 
 /**
  * Erzeugt CSS für die Kandidaten und hängt es an die Seite. `build` merkt sich alle bisherigen
  * Kandidaten und liefert jedes Mal das vollständige CSS - ein <style>-Element reicht also.
  * Ungültige Kandidaten (normale Wörter aus dem Code) ignoriert Tailwind einfach.
  */
-export function cssFuerVorschau(kandidaten: string[]) {
-  // Into the layer "vorschau" below the page's utilities (see index.css): a class the page
+export function cssForPreview(candidates: string[]) {
+  // Into the layer "preview" below the page's utilities (see index.css): a class the page
   // already has keeps the page's rules - including its dark: variants.
-  const css = compiler.build(kandidaten).replaceAll('@layer utilities', '@layer vorschau')
-  if (!stil) {
-    stil = document.createElement('style')
-    stil.dataset.tailwindVorschau = ''
-    document.head.appendChild(stil)
+  const css = compiler.build(candidates).replaceAll('@layer utilities', '@layer preview')
+  if (!style) {
+    style = document.createElement('style')
+    style.dataset.tailwindVorschau = ''
+    document.head.appendChild(style)
   }
-  if (stil.textContent !== css) stil.textContent = css
+  if (style.textContent !== css) style.textContent = css
 }

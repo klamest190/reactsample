@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-react19-einstieg': {
     code: js`
       async function save(previousMessage, formData) {
@@ -167,7 +167,7 @@ export const beispiele = {
     `,
   },
   'hooks-react19-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`useActionState` hält `{ comments, error }`; die Action bekommt den vorherigen State und `formData`.',
         'Im Knopf: `useFormStatus()` liefert `pending` - dafür muss er eine eigene Komponente im `<form>` sein.',
@@ -198,7 +198,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 
       async function saveComment(text) {
@@ -251,14 +251,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Die neuen Hooks werden genutzt', en: 'The new hooks are used' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useActionState\(/)
           expect(code).toMatch(/useFormStatus\(/)
         `,
       },
       {
         name: { de: 'Ein Kommentar erscheint nach dem Senden', en: 'A comment appears after sending' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('text'), 'Great chapter!')
           await submit(field('text'))
@@ -267,7 +267,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Während des Sendens zeigt der Knopf „Sending …“', en: 'While sending, the button shows “Sending …”' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('text'), 'Hi')
           await submit(field('text'))
@@ -276,7 +276,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Ein leerer Kommentar zeigt die Fehlermeldung, die Liste bleibt', en: 'An empty comment shows the error, the list stays' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('text'), 'First')
           await submit(field('text'))
@@ -290,7 +290,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

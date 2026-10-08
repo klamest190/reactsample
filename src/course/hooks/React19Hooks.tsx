@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './React19Hooks.code'
+import { examples, codeBloecke } from './React19Hooks.code'
 
 /**
  * KAPITEL 4.9 - use, useActionState, useOptimistic & useFormStatus
@@ -15,8 +15,8 @@ export function React19Hooks() {
         <P><Code>useActionState</Code> verbindet ein Formular mit einer (asynchronen) Aktion - inklusive Ergebnis und Ladezustand.</P>
         <TryIt
           id="hooks-react19-einstieg"
-          {...beispiele['hooks-react19-einstieg']}
-          modus="react"
+          {...examples['hooks-react19-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -52,8 +52,8 @@ export function React19Hooks() {
         </P>
         <TryIt
           id="hooks-react19-use"
-          {...beispiele['hooks-react19-use']}
-          modus="react"
+          {...examples['hooks-react19-use']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           <Code>use</Code> erzeugt das Promise nicht - es liest nur. In echten Apps kommt das Promise
@@ -79,8 +79,8 @@ export function React19Hooks() {
         />
         <TryIt
           id="hooks-react19-actionstate"
-          {...beispiele['hooks-react19-actionstate']}
-          modus="react"
+          {...examples['hooks-react19-actionstate']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -93,8 +93,8 @@ export function React19Hooks() {
         </P>
         <TryIt
           id="hooks-react19-formstatus"
-          {...beispiele['hooks-react19-formstatus']}
-          modus="react"
+          {...examples['hooks-react19-formstatus']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -110,17 +110,17 @@ export function React19Hooks() {
         />
         <TryIt
           id="hooks-react19-optimistic"
-          {...beispiele['hooks-react19-optimistic']}
-          modus="react"
+          {...examples['hooks-react19-optimistic']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-react19-uebung"
-          {...beispiele['hooks-react19-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-react19-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue eine Kommentarfunktion mit den neuen Hooks:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -147,38 +147,38 @@ export function React19Hooks() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was bekommt eine Funktion in <form action={fn}> als Argument?',
-            antworten: ['Das Submit-Event', 'Ein FormData-Objekt', 'Die Werte aus dem State'],
-            richtig: 1,
-            erklaerung: 'Mit formData.get("name") liest du die Felder anhand ihres name-Attributs.',
+            question: 'Was bekommt eine Funktion in <form action={fn}> als Argument?',
+            answers: ['Das Submit-Event', 'Ein FormData-Objekt', 'Die Werte aus dem State'],
+            correct: 1,
+            explanation: 'Mit formData.get("name") liest du die Felder anhand ihres name-Attributs.',
           },
           {
-            frage: 'Welcher Hook darf ausnahmsweise in einem if stehen?',
-            antworten: ['useState', 'useActionState', 'use'],
-            richtig: 2,
-            erklaerung: 'use ist die einzige Ausnahme von der Reihenfolge-Regel.',
+            question: 'Welcher Hook darf ausnahmsweise in einem if stehen?',
+            answers: ['useState', 'useActionState', 'use'],
+            correct: 2,
+            explanation: 'use ist die einzige Ausnahme von der Reihenfolge-Regel.',
           },
           {
-            frage: 'Wo muss useFormStatus aufgerufen werden?',
-            antworten: [
+            question: 'Wo muss useFormStatus aufgerufen werden?',
+            answers: [
               'In der Komponente, die das <form> rendert',
               'In einer Komponente, die innerhalb des <form> gerendert wird',
               'Egal wo',
             ],
-            richtig: 1,
-            erklaerung: 'Es liest den Status des umgebenden Formulars - also muss es darin liegen.',
+            correct: 1,
+            explanation: 'Es liest den Status des umgebenden Formulars - also muss es darin liegen.',
           },
           {
-            frage: 'Was passiert mit einem optimistischen Wert, wenn die Action fertig ist?',
-            antworten: [
+            question: 'Was passiert mit einem optimistischen Wert, wenn die Action fertig ist?',
+            answers: [
               'Er bleibt dauerhaft stehen',
               'React ersetzt ihn durch den echten State',
               'Er wird in localStorage gespeichert',
             ],
-            richtig: 1,
-            erklaerung: 'Deshalb springt die Anzeige zurück, wenn der echte State nicht aktualisiert wurde.',
+            correct: 1,
+            explanation: 'Deshalb springt die Anzeige zurück, wenn der echte State nicht aktualisiert wurde.',
           },
         ]}
       />

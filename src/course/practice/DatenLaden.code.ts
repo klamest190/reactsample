@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-daten-einstieg': {
     code: js`
       function App() {
@@ -101,7 +101,7 @@ export const beispiele = {
     `,
   },
   'praxis-daten-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Drei States: `data`, `loading`, `error` - und ein Effekt mit `[url]`.',
         '`AbortController` im Effekt anlegen, `signal` an `fetch` geben, im Cleanup `abort()`.',
@@ -140,7 +140,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function useFetch(url) {
         const [data, setData] = useState(null)
         const [loading, setLoading] = useState(true)
@@ -199,7 +199,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Zeigt „Loading …“ und dann die Beiträge', en: 'Shows “Loading …” and then the posts' },
-        pruefung: js`
+        script: js`
           mockFetch((url) => [{ id: 1, title: 'Post of user ' + new URL(url).searchParams.get('userId') }])
           await render()
           expect(text()).toContain('Loading')
@@ -208,7 +208,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Ein anderer Nutzer lädt neu', en: 'Another user loads again' },
-        pruefung: js`
+        script: js`
           mockFetch((url) => [{ id: 1, title: 'Post of user ' + new URL(url).searchParams.get('userId') }])
           await render()
           await waitFor(() => expect(text()).toContain('Post of user 1'))
@@ -218,7 +218,7 @@ export const beispiele = {
       },
       {
         name: { de: 'HTTP-Fehler zeigen „HTTP 500“', en: 'HTTP errors show “HTTP 500”' },
-        pruefung: js`
+        script: js`
           mockFetch(() => ({ status: 500, body: {} }))
           await render()
           await waitFor(() => expect(text()).toContain('HTTP 500'))
@@ -226,7 +226,7 @@ export const beispiele = {
       },
       {
         name: { de: 'reload startet die Anfrage erneut', en: 'reload starts the request again' },
-        pruefung: js`
+        script: js`
           const { calls } = mockFetch(() => [])
           await render()
           await waitFor(() => expect(calls.length).toBeGreaterThan(0))
@@ -237,7 +237,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Die alte Anfrage wird abgebrochen', en: 'The old request is aborted' },
-        pruefung: js`
+        script: js`
           const { calls } = mockFetch(() => [])
           await render()
           await click(button('User 2'))
@@ -247,7 +247,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

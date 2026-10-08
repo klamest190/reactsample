@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Unions.code'
+import { examples, codeBloecke } from './Unions.code'
 
 /**
  * KAPITEL 2.4 - Unions & Narrowing
@@ -17,7 +17,7 @@ export function Unions() {
           Eine Union <Code>A | B</Code> heißt „A oder B“. Aus festen Werten gebaut, beschreibt sie genau die
           erlaubten Möglichkeiten - statt irgendeinem <Code>string</Code> nur diese drei.
         </P>
-        <TryIt id="ts-unions-einstieg" modus="ts" {...beispiele['ts-unions-einstieg']} />
+        <TryIt id="ts-unions-einstieg" mode="ts" {...examples['ts-unions-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Union- und Literal-Typen">
@@ -26,7 +26,7 @@ export function Unions() {
           <strong>alle</strong> Möglichkeiten gemeinsam haben. <strong>Literal-Typen</strong> sind einzelne
           Werte als Typ - zusammen mit Unions ersetzen sie oft Enums und „magische Strings“.
         </P>
-        <TryIt id="ts-unions-union" modus="ts" {...beispiele['ts-unions-union']} />
+        <TryIt id="ts-unions-union" mode="ts" {...examples['ts-unions-union']} />
       </Abschnitt>
 
       <Abschnitt titel="Eingrenzen mit typeof und Wahrheitswerten">
@@ -35,7 +35,7 @@ export function Unions() {
           übrig ist. Das funktioniert mit ganz normalem JavaScript - <Code>typeof</Code>, <Code>if</Code>,
           frühes <Code>return</Code>. Nach dem <Code>if</Code> ist der geprüfte Fall weg.
         </P>
-        <TryIt id="ts-unions-typeof" modus="ts" {...beispiele['ts-unions-typeof']} />
+        <TryIt id="ts-unions-typeof" mode="ts" {...examples['ts-unions-typeof']} />
       </Abschnitt>
 
       <Abschnitt titel="in und instanceof">
@@ -44,8 +44,8 @@ export function Unions() {
           prüfst du mit <Code>in</Code>, ob eine Eigenschaft existiert, oder mit <Code>instanceof</Code>, ob
           der Wert von einer Klasse stammt.
         </P>
-        <TryIt id="ts-unions-in-instanceof" modus="ts" {...beispiele['ts-unions-in-instanceof']} />
-        <CodeBlock titel="Alle Arten, einzugrenzen" code={codeBloecke.eingrenzen} />
+        <TryIt id="ts-unions-in-instanceof" mode="ts" {...examples['ts-unions-in-instanceof']} />
+        <CodeBlock title="Alle Arten, einzugrenzen" code={codeBloecke.eingrenzen} />
       </Abschnitt>
 
       <Abschnitt titel="Discriminated Unions">
@@ -55,8 +55,8 @@ export function Unions() {
           die Variante ein - in jedem <Code>case</Code> kennt TypeScript genau ihre Felder. Reducer-Actions
           in <Verweis nr="4.5" /> funktionieren genau so.
         </P>
-        <TryIt id="ts-unions-discriminated" modus="ts" {...beispiele['ts-unions-discriminated']} />
-        <CodeBlock titel="Zustände statt Flags" code={codeBloecke.react} />
+        <TryIt id="ts-unions-discriminated" mode="ts" {...examples['ts-unions-discriminated']} />
+        <CodeBlock title="Zustände statt Flags" code={codeBloecke.react} />
       </Abschnitt>
 
       <Abschnitt titel="Vollständigkeit prüfen mit never">
@@ -65,7 +65,7 @@ export function Unions() {
           Trick: Im <Code>default</Code> ist der Wert vom Typ <Code>never</Code>, wenn alle Fälle abgedeckt
           sind. Fehlt einer, passt der Wert nicht mehr zu <Code>never</Code> - und die Typprüfung meldet sich.
         </P>
-        <TryIt id="ts-unions-never" modus="ts" {...beispiele['ts-unions-never']} />
+        <TryIt id="ts-unions-never" mode="ts" {...examples['ts-unions-never']} />
         <Hinweis variante="tipp">
           Probier es aus: Entferne im Beispiel das <Code>//</Code> vor der Dreiecks-Variante und sieh
           dir an, was die Typprüfung meldet.
@@ -79,7 +79,7 @@ export function Unions() {
           <Code>true</Code> zurück, behandelt TypeScript den Wert danach als <Code>User</Code>. Ideal für
           Daten vom Typ <Code>unknown</Code>.
         </P>
-        <TryIt id="ts-unions-guard" modus="ts" {...beispiele['ts-unions-guard']} />
+        <TryIt id="ts-unions-guard" mode="ts" {...examples['ts-unions-guard']} />
         <Hinweis variante="warnung">
           TypeScript glaubt deinem Type Guard aufs Wort. Prüft er zu wenig, stimmt der Typ nicht mehr mit
           der Wirklichkeit überein - teste solche Funktionen deshalb besonders gründlich.
@@ -92,7 +92,7 @@ export function Unions() {
           „vielleicht nicht vorhandener“ Wert ist also einfach eine Union wie{' '}
           <Code>number | null</Code>. Eingrenzen, <Code>?.</Code> und <Code>??</Code> erledigen den Rest.
         </P>
-        <TryIt id="ts-unions-null" modus="ts" {...beispiele['ts-unions-null']} />
+        <TryIt id="ts-unions-null" mode="ts" {...examples['ts-unions-null']} />
         <Liste>
           <li>
             <Code>wert!</Code> (Non-Null-Assertion) entfernt <Code>null</Code> und <Code>undefined</Code> aus
@@ -107,9 +107,9 @@ export function Unions() {
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-unions-uebung"
-          modus="ts"
-          {...beispiele['ts-unions-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-unions-uebung']}
+          task={
             <>
               <p>Ein Shop kennt drei Zahlungsarten:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -131,24 +131,24 @@ export function Unions() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'value hat den Typ string | number. Was darfst du ohne Prüfung aufrufen?',
-            antworten: ['value.toUpperCase()', 'value.toFixed(2)', 'value.toString()'],
-            richtig: 2,
-            erklaerung: 'Ohne Eingrenzen ist nur erlaubt, was beide Typen haben. toString gibt es bei string und number, toUpperCase und toFixed jeweils nur bei einem.',
+            question: 'value hat den Typ string | number. Was darfst du ohne Prüfung aufrufen?',
+            answers: ['value.toUpperCase()', 'value.toFixed(2)', 'value.toString()'],
+            correct: 2,
+            explanation: 'Ohne Eingrenzen ist nur erlaubt, was beide Typen haben. toString gibt es bei string und number, toUpperCase und toFixed jeweils nur bei einem.',
           },
           {
-            frage: 'Was macht eine Union zur Discriminated Union?',
-            antworten: ['Sie hat mindestens drei Varianten', 'Alle Varianten haben ein gemeinsames Feld mit unterschiedlichen Literal-Werten', 'Sie verwendet interface statt type'],
-            richtig: 1,
-            erklaerung: 'Das gemeinsame Feld (kind, type, status …) mit einem eigenen Literal pro Variante erlaubt es TypeScript, per switch oder if einzugrenzen.',
+            question: 'Was macht eine Union zur Discriminated Union?',
+            answers: ['Sie hat mindestens drei Varianten', 'Alle Varianten haben ein gemeinsames Feld mit unterschiedlichen Literal-Werten', 'Sie verwendet interface statt type'],
+            correct: 1,
+            explanation: 'Das gemeinsame Feld (kind, type, status …) mit einem eigenen Literal pro Variante erlaubt es TypeScript, per switch oder if einzugrenzen.',
           },
           {
-            frage: 'Wozu dient assertNever(shape) im default-Zweig?',
-            antworten: ['Es wirft zur Laufzeit immer einen Fehler', 'Es meldet schon beim Prüfen, wenn ein Fall fehlt', 'Es macht aus shape einen beliebigen Typ'],
-            richtig: 1,
-            erklaerung: 'Sind alle Fälle behandelt, ist shape dort vom Typ never. Fehlt einer, passt der Rest nicht zu never - ein Typfehler zeigt die vergessene Stelle.',
+            question: 'Wozu dient assertNever(shape) im default-Zweig?',
+            answers: ['Es wirft zur Laufzeit immer einen Fehler', 'Es meldet schon beim Prüfen, wenn ein Fall fehlt', 'Es macht aus shape einen beliebigen Typ'],
+            correct: 1,
+            explanation: 'Sind alle Fälle behandelt, ist shape dort vom Typ never. Fehlt einer, passt der Rest nicht zu never - ein Typfehler zeigt die vergessene Stelle.',
           },
         ]}
       />

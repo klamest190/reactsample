@@ -8,7 +8,7 @@
  *     - no JavaScript error on the page
  *     - every extra exercise opened and every sample solution applied: each must turn green,
  *       no editor may hang ("Tests laufen …")
- *     - axe-core finds no accessibility violation. Previews ([data-vorschau]) are left out, they
+ *     - axe-core finds no accessibility violation. Previews ([data-preview]) are left out, they
  *       show learners' code. Checked by hand instead, without previews: one <main>, no skipped
  *       heading level (axe can only check those for the whole document).
  *  2. Every page again as a phone (390 px), English, dark: no horizontal scrolling, enough contrast.
@@ -90,7 +90,7 @@ async function openPage(route, { language, theme, width }) {
 async function axe(page, options) {
   await page.addScriptTag({ content: axeSource })
   return page.evaluate(
-    (options) => window.axe.run({ exclude: [['[data-vorschau]'], ['iframe']] }, options).then((r) => r.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.nodes[0].target.join(' ')}`)),
+    (options) => window.axe.run({ exclude: [['[data-preview]'], ['iframe']] }, options).then((r) => r.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.nodes[0].target.join(' ')}`)),
     options,
   )
 }
@@ -148,19 +148,19 @@ await forEveryPage('Desktop', async (route, report) => {
 })
 
 async function checkDesktop(page, errors, report) {
-  for (const button of await page.$$('[data-uebung] > button[aria-expanded="false"]')) await button.click()
+  for (const button of await page.$$('[data-exercise] > button[aria-expanded="false"]')) await button.click()
   await page.waitForTimeout(1000)
   for (const button of await page.$$('button:has-text("Lösung zeigen")')) await button.click()
   for (const button of await page.$$('button:has-text("Lösung in den Editor übernehmen")')) await button.click()
   // Wait until no editor runs any more (SQL starts PostgreSQL, one React exercise waits 10 s).
   for (let quiet = 0, waited = 0; quiet < 3 && waited < 120; waited++) {
     await page.waitForTimeout(500)
-    quiet = (await page.$('[data-laeuft]')) ? 0 : quiet + 1
+    quiet = (await page.$('[data-running]')) ? 0 : quiet + 1
   }
 
   const state = await page.evaluate(() => {
-    const title = (el) => el.closest('[data-laeuft], .rounded-xl')?.querySelector('h3')?.textContent?.trim() ?? '?'
-    const outside = (el) => !el.closest('[data-vorschau]')
+    const title = (el) => el.closest('[data-running], .rounded-xl')?.querySelector('h3')?.textContent?.trim() ?? '?'
+    const outside = (el) => !el.closest('[data-preview]')
     const headings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')].filter((h) => outside(h) && h.offsetParent !== null)
     const skipped = []
     headings.forEach((h, j) => {
@@ -169,8 +169,8 @@ async function checkDesktop(page, errors, report) {
       if (level > previous + 1) skipped.push(`h${previous || '-'} → ${h.tagName.toLowerCase()} "${h.textContent.trim().slice(0, 40)}"`)
     })
     return {
-      red: [...document.querySelectorAll('[data-testergebnis="rot"]')].map(title),
-      hanging: [...document.querySelectorAll('[data-laeuft]')].map(title),
+      red: [...document.querySelectorAll('[data-test-result="fail"]')].map(title),
+      hanging: [...document.querySelectorAll('[data-running]')].map(title),
       mains: [...document.querySelectorAll('main, [role="main"]')].filter(outside).length,
       skipped,
     }
@@ -281,7 +281,7 @@ if (!filter) {
     await page.waitForTimeout(1500)
     // A console line starts with "›" - the word alone is also in the template's name and code.
     expect(/›\s*FizzBuzz/.test(await page.innerText('main')), 'keine FizzBuzz-Ausgabe in der Konsole')
-    expect(!(await page.$('[data-laeuft]')), 'Editor hängt')
+    expect(!(await page.$('[data-running]')), 'Editor hängt')
     expect(errors.length === 0, `Seitenfehler: ${errors[0]}`)
     await close()
   })

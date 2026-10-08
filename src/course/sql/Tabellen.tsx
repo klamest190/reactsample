@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Tabellen.code'
+import { examples, codeBloecke } from './Tabellen.code'
 
 /**
  * KAPITEL 9.6 - Tabellen entwerfen: CREATE TABLE
@@ -17,11 +17,11 @@ export function Tabellen() {
           Bisher waren die Tabellen fertig. Jetzt legst du selbst eine an: für Produktbewertungen, mit
           Schlüsseln zu Produkten und Kunden und einer Regel, dass es nur 1 bis 5 Sterne gibt.
         </P>
-        <TryIt modus="sql" id="sql-tabellen-einstieg" {...beispiele['sql-tabellen-einstieg']} />
+        <TryIt mode="sql" id="sql-tabellen-einstieg" {...examples['sql-tabellen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Aufbau von CREATE TABLE">
-        <CodeBlock code={codeBloecke.aufbau} titel="SQL" />
+        <CodeBlock code={codeBloecke.aufbau} title="SQL" />
         <P>
           Jede Spalte hat einen Namen, einen <strong>Typ</strong> und optional Regeln. Der Typ ist
           streng: In eine <Code>integer</Code>-Spalte passt kein Text, in eine <Code>date</Code>-Spalte
@@ -70,7 +70,7 @@ export function Tabellen() {
             <Code>DEFAULT …</Code> - der Wert, wenn beim INSERT keiner kommt.
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-tabellen-check" {...beispiele['sql-tabellen-check']} />
+        <TryIt mode="sql" id="sql-tabellen-check" {...examples['sql-tabellen-check']} />
         <P>
           Faustregel: Jede Regel, die <em>immer</em> gelten muss, gehört (auch) in die Datenbank. Das
           Backend prüft für schöne Fehlermeldungen, die Datenbank für die Sicherheit.
@@ -82,7 +82,7 @@ export function Tabellen() {
           Anwendungen wachsen, Tabellen mit ihnen. <Code>ALTER TABLE</Code> fügt Spalten hinzu, benennt
           um, ergänzt Regeln - ohne die vorhandenen Daten zu verlieren:
         </P>
-        <TryIt modus="sql" id="sql-tabellen-alter" {...beispiele['sql-tabellen-alter']} />
+        <TryIt mode="sql" id="sql-tabellen-alter" {...examples['sql-tabellen-alter']} />
         <P>
           <Code>DROP TABLE name</Code> löscht eine Tabelle samt Inhalt, <Code>DROP COLUMN</Code> eine
           Spalte. Beides lässt sich nicht rückgängig machen - außer in einer Transaktion, denn in
@@ -98,7 +98,7 @@ export function Tabellen() {
           direkt zur richtigen Stelle springt. <Code>EXPLAIN</Code> zeigt, welchen Weg die Datenbank
           plant:
         </P>
-        <TryIt modus="sql" id="sql-tabellen-index" {...beispiele['sql-tabellen-index']} />
+        <TryIt mode="sql" id="sql-tabellen-index" {...examples['sql-tabellen-index']} />
         <Liste>
           <li>
             <Code>Seq Scan</Code> heißt: alle 200.000 Zeilen lesen. Mit Index springt PostgreSQL über
@@ -121,22 +121,22 @@ export function Tabellen() {
           Eine JPA-Entity (<Verweis id="spring-daten" />) ist die Java-Seite einer Tabelle. Die
           Annotationen entsprechen dem, was du hier in SQL schreibst:
         </P>
-        <CodeBlock code={codeBloecke.entity} titel="Review.java" />
+        <CodeBlock code={codeBloecke.entity} title="Review.java" />
         <P>
           Im Kurs erzeugt Hibernate die Tabellen beim Start selbst (<Code>ddl-auto</Code>). In echten
           Projekten schreibt man das SQL lieber selbst, als nummerierte <strong>Migrationen</strong>, die
           ein Werkzeug wie Flyway oder Liquibase beim Start der Reihe nach ausführt - so ist jede
           Änderung am Schema versioniert und auf jeder Datenbank gleich:
         </P>
-        <CodeBlock code={codeBloecke.migration} titel="V2__add_reviews.sql" />
+        <CodeBlock code={codeBloecke.migration} title="V2__add_reviews.sql" />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-tabellen-uebung"
-          {...beispiele['sql-tabellen-uebung']}
-          aufgabe={
+          {...examples['sql-tabellen-uebung']}
+          task={
             <>
               <p>
                 Kunden sollen sich Produkte merken können. Lege die Tabelle <Code>wishlist</Code> an:
@@ -158,34 +158,34 @@ export function Tabellen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welcher Typ passt für den Preis eines Produkts?',
-            antworten: ['real', 'integer', 'numeric(10, 2)', 'text'],
-            richtig: 2,
-            erklaerung: 'numeric rechnet exakt. real hat Rundungsfehler, integer kennt keine Cents, text lässt sich nicht rechnen.',
+            question: 'Welcher Typ passt für den Preis eines Produkts?',
+            answers: ['real', 'integer', 'numeric(10, 2)', 'text'],
+            correct: 2,
+            explanation: 'numeric rechnet exakt. real hat Rundungsfehler, integer kennt keine Cents, text lässt sich nicht rechnen.',
           },
           {
-            frage: 'order_items.order_id hat ON DELETE CASCADE. Was passiert beim Löschen einer Bestellung?',
-            antworten: [
+            question: 'order_items.order_id hat ON DELETE CASCADE. Was passiert beim Löschen einer Bestellung?',
+            answers: [
               'Das Löschen wird verweigert',
               'Die Positionen werden mitgelöscht',
               'Die Positionen bekommen order_id NULL',
               'Nichts - die Positionen bleiben unverändert',
             ],
-            richtig: 1,
-            erklaerung: 'CASCADE löscht abhängige Zeilen mit. Ohne Zusatz würde PostgreSQL das Löschen mit einem Fremdschlüssel-Fehler ablehnen.',
+            correct: 1,
+            explanation: 'CASCADE löscht abhängige Zeilen mit. Ohne Zusatz würde PostgreSQL das Löschen mit einem Fremdschlüssel-Fehler ablehnen.',
           },
           {
-            frage: 'EXPLAIN zeigt „Seq Scan“ auf einer großen Tabelle. Was bedeutet das?',
-            antworten: [
+            question: 'EXPLAIN zeigt „Seq Scan“ auf einer großen Tabelle. Was bedeutet das?',
+            answers: [
               'Die Abfrage hat einen Fehler',
               'PostgreSQL liest die ganze Tabelle - vielleicht fehlt ein Index',
               'Die Tabelle ist sortiert',
               'Die Abfrage wurde aus dem Cache beantwortet',
             ],
-            richtig: 1,
-            erklaerung: 'Ein Seq Scan liest jede Zeile. Bei kleinen Tabellen ist das richtig, bei großen und seltenen Treffern hilft ein Index.',
+            correct: 1,
+            explanation: 'Ein Seq Scan liest jede Zeile. Bei kleinen Tabellen ist das richtig, bei großen und seltenen Treffern hilft ein Index.',
           },
         ]}
       />

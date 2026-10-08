@@ -1,6 +1,6 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
-import type { ProjektDatei } from '../../learning/reactCompile'
+import type { CodeExample } from '../../learning/jsSandbox'
+import type { ProjectFile } from '../../learning/reactCompile'
 import type { Zweisprachig } from '../../i18n/LanguageContext'
 
 /**
@@ -9,7 +9,7 @@ import type { Zweisprachig } from '../../i18n/LanguageContext'
  * dazu ein Nachbau von Vitest (siehe src/learning/testRunner.ts).
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-testen-einstieg': {
     code: js`
       import { test, expect } from 'vitest'
@@ -226,7 +226,7 @@ export const beispiele = {
     `,
   },
   'praxis-testen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Am Anfang darf man nicht unter 1: Prüfe `screen.getByRole(\'button\', { name: \'Decrease\' })` mit `toBeDisabled()`.',
         'Für das Maximum: `render(<QuantityPicker max={3} />)`, zweimal auf „Increase“ klicken, dann Anzeige und Knopf prüfen.',
@@ -253,7 +253,7 @@ export const beispiele = {
         // TODO: more tests - see the task above
       })
     `,
-    loesung: js`
+    solution: js`
       import { describe, test, expect, vi } from 'vitest'
       import { render, screen } from '@testing-library/react'
       import userEvent from '@testing-library/user-event'
@@ -290,7 +290,7 @@ export const beispiele = {
       })
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 // --- Die Komponente der Übung und ihre kaputten Varianten (Mutationstest) ---
 
@@ -322,26 +322,26 @@ const PICKER = js`
 `
 
 /** Baut eine Variante mit genau einem Fehler - und schlägt laut fehl, falls die Stelle nicht mehr existiert. */
-function mutante(suchen: string, ersetzen: string): ProjektDatei[] {
+function mutante(suchen: string, ersetzen: string): ProjectFile[] {
   if (!PICKER.includes(suchen)) throw new Error(`Mutante passt nicht mehr: ${suchen}`)
   return [{ pfad: 'QuantityPicker.jsx', code: PICKER.replace(suchen, ersetzen) }]
 }
 
-export const uebungDateien: ProjektDatei[] = [{ pfad: 'QuantityPicker.jsx', code: PICKER }]
+export const uebungDateien: ProjectFile[] = [{ pfad: 'QuantityPicker.jsx', code: PICKER }]
 
-export const uebungVarianten: { name: Zweisprachig; dateien: ProjektDatei[] }[] = [
-  { name: { de: 'startet bei 0', en: 'starts at 0' }, dateien: mutante('useState(1)', 'useState(0)') },
+export const uebungVarianten: { name: Zweisprachig; files: ProjectFile[] }[] = [
+  { name: { de: 'startet bei 0', en: 'starts at 0' }, files: mutante('useState(1)', 'useState(0)') },
   {
     name: { de: '„−“ geht unter 1', en: '“−” goes below 1' },
-    dateien: mutante('disabled={quantity <= 1}', 'disabled={quantity < 1}'),
+    files: mutante('disabled={quantity <= 1}', 'disabled={quantity < 1}'),
   },
   {
     name: { de: 'das Maximum wird überschritten', en: 'the maximum is exceeded' },
-    dateien: mutante('disabled={quantity >= max}', 'disabled={quantity > max}'),
+    files: mutante('disabled={quantity >= max}', 'disabled={quantity > max}'),
   },
   {
     name: { de: 'onChange bekommt den alten Wert', en: 'onChange receives the old value' },
-    dateien: mutante('onChange?.(next)', 'onChange?.(quantity)'),
+    files: mutante('onChange?.(next)', 'onChange?.(quantity)'),
   },
 ]
 

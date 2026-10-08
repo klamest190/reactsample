@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-funktionen-einstieg': {
     code: js`
       function greet(name) {
@@ -97,7 +97,7 @@ export const beispiele = {
     `,
   },
   'js-funktionen-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`total` und `count` sind lokale Variablen in `createCart` - von außen unerreichbar.',
         'Gib ein Objekt mit drei Funktionen zurück. Sie „sehen“ die Variablen dank Closure.',
@@ -125,7 +125,7 @@ export const beispiele = {
       cart.add(5.5)
       console.log(cart.total(), cart.count())
     `,
-    loesung: js`
+    solution: js`
       function createCart() {
         let total = 0
         let count = 0
@@ -146,13 +146,13 @@ export const beispiele = {
       console.log(cart.total(), cart.count())
     `,
     tests: [
-      { name: { de: 'Ein neuer Warenkorb ist leer', en: 'A new cart is empty' }, ausdruck: 'createCart().total() === 0 && createCart().count() === 0' },
-      { name: { de: 'total() addiert alle Preise', en: 'total() adds up all prices' }, ausdruck: '(() => { const c = createCart(); c.add(3); c.add(4); return c.total() })()', erwartet: 7 },
-      { name: { de: 'count() zählt die Artikel', en: 'count() counts the items' }, ausdruck: '(() => { const c = createCart(); c.add(3); c.add(4); c.add(1); return c.count() })()', erwartet: 3 },
-      { name: { de: 'Zwei Warenkörbe sind unabhängig', en: 'Two carts are independent' }, ausdruck: '(() => { const a = createCart(); const b = createCart(); a.add(10); return b.total() })()', erwartet: 0 },
+      { name: { de: 'Ein neuer Warenkorb ist leer', en: 'A new cart is empty' }, expression: 'createCart().total() === 0 && createCart().count() === 0' },
+      { name: { de: 'total() addiert alle Preise', en: 'total() adds up all prices' }, expression: '(() => { const c = createCart(); c.add(3); c.add(4); return c.total() })()', expected: 7 },
+      { name: { de: 'count() zählt die Artikel', en: 'count() counts the items' }, expression: '(() => { const c = createCart(); c.add(3); c.add(4); c.add(1); return c.count() })()', expected: 3 },
+      { name: { de: 'Zwei Warenkörbe sind unabhängig', en: 'Two carts are independent' }, expression: '(() => { const a = createCart(); const b = createCart(); a.add(10); return b.total() })()', expected: 0 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

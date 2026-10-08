@@ -3,12 +3,12 @@
  * Die eigentliche Engine (tailwindMotor.ts, gut 250 kB) kommt erst, wenn sie gebraucht wird.
  */
 
-type Motor = typeof import('./tailwindEngine')
-let motor: Promise<Motor> | null = null
+type Engine = typeof import('./tailwindEngine')
+let engine: Promise<Engine> | null = null
 
-export function tailwindMotor(): Promise<Motor> {
-  motor ??= import('./tailwindEngine')
-  return motor
+export function tailwindEngine(): Promise<Engine> {
+  engine ??= import('./tailwindEngine')
+  return engine
 }
 
 /**
@@ -16,17 +16,17 @@ export function tailwindMotor(): Promise<Motor> {
  * Erkannt werden `className="…"`, `className={'…'}`, `className={`…`}`, `class="…"`
  * und die Argumente von `cn(…)` / `clsx(…)`.
  */
-export function klassenWort(vorher: string): string | null {
-  const rest = vorher.slice(-500)
-  const kontext =
+export function classWord(before: string): string | null {
+  const rest = before.slice(-500)
+  const context =
     /\bclass(?:Name)?\s*=\s*\{?\s*(["'`])(?:(?!\1)[^\n])*$/.test(rest) || /\b(?:cn|clsx|classNames|twMerge)\([^()]*(["'`])(?:(?!\1)[^\n])*$/.test(rest)
-  if (!kontext) return null
+  if (!context) return null
   // Das Wort geht bis zum letzten Leerzeichen oder Anführungszeichen - mit - : / [ ] . # % !
   return rest.match(/[^\s"'`{}()$]*$/)![0]
 }
 
 /** Mögliche Klassen im Code - Tailwind sortiert ungültige selbst aus. */
-function kandidaten(code: string) {
+function candidates(code: string) {
   return [...new Set(code.split(/[\s"'`{}()<>;,=]+/))].filter((k) => k.length > 1 && k.length < 100 && /^[!@\-[a-z]/.test(k))
 }
 
@@ -34,9 +34,9 @@ function kandidaten(code: string) {
  * Sorgt dafür, dass alle Tailwind-Klassen aus dem Editor-Code in der Vorschau wirken.
  * Ohne Klassenlisten im Code wird die Engine gar nicht erst geladen.
  */
-export function tailwindFuerVorschau(code: string) {
+export function tailwindForPreview(code: string) {
   if (!/\bclass(Name)?\b|\b(cn|clsx)\(/.test(code)) return
-  void tailwindMotor()
-    .then((m) => m.cssFuerVorschau(kandidaten(code)))
-    .catch((fehler: unknown) => console.error('Tailwind:', fehler))
+  void tailwindEngine()
+    .then((m) => m.cssForPreview(candidates(code)))
+    .catch((error: unknown) => console.error('Tailwind:', error))
 }

@@ -2,8 +2,8 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
-import { Werkstatt } from '../../learning/Workbench'
-import { codeBloecke, dateien } from './BusinessApp.code'
+import { Workbench } from '../../learning/Workbench'
+import { codeBloecke, files } from './BusinessApp.code'
 
 const structure: [string, string][] = [
   ['App.tsx', 'Entry point: store, layout and the page for the selected menu entry'],
@@ -28,7 +28,7 @@ export function BusinessApp() {
           with a dashboard, a customer table and an order list.
         </P>
         <P>
-          The app consists of {dateien.length} TypeScript files, split up like in a real project. Pick a file
+          The app consists of {files.length} TypeScript files, split up like in a real project. Pick a file
           on the left and change it - the running app below picks up your change after a short pause, and the
           type check reports errors across all files (<Verweis id="praxis-typescript" />). With{' '}
           <strong>⛶ Full screen</strong>, files, editor and app sit side by side.
@@ -37,7 +37,7 @@ export function BusinessApp() {
           Use the app first: search and sort customers, click a customer and edit it, create an order,
           change its status - and watch how the dashboard changes along with it.
         </Hinweis>
-        <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.tsx" typen />
+        <Workbench id="praxis-business" title="BrightDesk" files={files} entry="App.tsx" typed />
       </Abschnitt>
 
       <Abschnitt titel="How the app is structured">
@@ -120,8 +120,8 @@ export function BusinessApp() {
           project and copy the files into <Code>src/</Code> - the only thing missing is{' '}
           <Code>main.tsx</Code>, which puts the app into the page:
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
-        <CodeBlock titel="src/main.tsx" code={codeBloecke.main} />
+        <CodeBlock title="Terminal" code={codeBloecke.anlegen} />
+        <CodeBlock title="src/main.tsx" code={codeBloecke.main} />
         <P>
           <Code>index.css</Code> then contains <Code>@import "tailwindcss";</Code> and the{' '}
           <Code>brand-…</Code> colors as <Code>@theme</Code> - or you replace them with a Tailwind color
@@ -130,38 +130,38 @@ export function BusinessApp() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'A page needs the customer list. Where does it get the data from?',
-            antworten: [
+            question: 'A page needs the customer list. Where does it get the data from?',
+            answers: [
               'Through props that App.tsx passes down through every level',
               'Through useStore() - which uses useContext underneath',
               'It loads them from data.ts itself',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'The store provides data and dispatch via context. A custom hook wraps that so no page has to call useContext itself.',
           },
           {
-            frage: 'Why do the filter, the select and the badge adapt on their own when you add a status in data.ts?',
-            antworten: [
+            question: 'Why do the filter, the select and the badge adapt on their own when you add a status in data.ts?',
+            answers: [
               'React picks up new values automatically',
               'Because all three are generated from the same ORDER_STATUSES list',
               'Because the reducer recomputes them',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'One source, three uses: extending the list changes everything with it. Copies would have to be maintained one by one.',
           },
           {
-            frage: 'The revenue on the dashboard - where does it come from?',
-            antworten: [
+            question: 'The revenue on the dashboard - where does it come from?',
+            answers: [
               'It is a field in state that is written along on every change',
               'It is computed from the orders on every render',
               'It is cached in localStorage',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Derived values do not belong in state - otherwise the figure can drift away from the orders.',
           },
         ]}

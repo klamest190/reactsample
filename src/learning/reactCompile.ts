@@ -13,10 +13,10 @@ import type { ComponentType } from 'react'
  * 3. Zurückgegeben wird die Komponente `App` (oder der default-Export).
  */
 
-export type Protokoll = (typ: 'log' | 'info' | 'warn' | 'error', text: string) => void
+export type Log = (type: 'log' | 'info' | 'warn' | 'error', text: string) => void
 
 // Alles, was im Editor ohne Import verfügbar ist.
-const GLOBALE: Record<string, unknown> = {
+const GLOBALS: Record<string, unknown> = {
   useState: React.useState,
   useEffect: React.useEffect,
   useLayoutEffect: React.useLayoutEffect,
@@ -48,47 +48,47 @@ const GLOBALE: Record<string, unknown> = {
 const MODULE: Record<string, unknown> = { react: React, 'react-dom': ReactDOM }
 
 // Bibliotheken, die erst geladen werden, wenn ein Code sie wirklich importiert.
-const NACHLADBAR: Record<string, () => Promise<unknown>> = {
+const LOADABLE: Record<string, () => Promise<unknown>> = {
   'react-router': () => import('react-router'),
 }
 
-async function moduleNachladen(quelltexte: string[]) {
-  for (const [name, laden] of Object.entries(NACHLADBAR)) {
+async function loadModules(sources: string[]) {
+  for (const [name, load] of Object.entries(LOADABLE)) {
     if (name in MODULE) continue
-    if (quelltexte.some((q) => q.includes(`'${name}'`) || q.includes(`"${name}"`))) MODULE[name] = await laden()
+    if (sources.some((q) => q.includes(`'${name}'`) || q.includes(`"${name}"`))) MODULE[name] = await load()
   }
 }
 
 /** Werte ähnlich wie die Browser-Konsole als Text darstellen. */
-export function formatieren(wert: unknown, tiefe = 0): string {
-  if (typeof wert === 'string') return tiefe === 0 ? wert : JSON.stringify(wert)
-  if (typeof wert === 'function') return `ƒ ${wert.name || 'anonym'}()`
-  if (wert === null || typeof wert !== 'object') return String(wert)
-  if (wert instanceof Error) return `${wert.name}: ${wert.message}`
-  if (wert instanceof Node) return `<${wert.nodeName.toLowerCase()}>`
-  if (tiefe > 3) return Array.isArray(wert) ? '[…]' : '{…}'
-  if (Array.isArray(wert)) return `[${wert.map((w) => formatieren(w, tiefe + 1)).join(', ')}]`
-  const felder = Object.entries(wert).map(([k, v]) => `${k}: ${formatieren(v, tiefe + 1)}`)
-  return felder.length ? `{ ${felder.join(', ')} }` : '{}'
+export function formatieren(value: unknown, depth = 0): string {
+  if (typeof value === 'string') return depth === 0 ? value : JSON.stringify(value)
+  if (typeof value === 'function') return `ƒ ${value.name || 'anonym'}()`
+  if (value === null || typeof value !== 'object') return String(value)
+  if (value instanceof Error) return `${value.name}: ${value.message}`
+  if (value instanceof Node) return `<${value.nodeName.toLowerCase()}>`
+  if (depth > 3) return Array.isArray(value) ? '[…]' : '{…}'
+  if (Array.isArray(value)) return `[${value.map((w) => formatieren(w, depth + 1)).join(', ')}]`
+  const fields = Object.entries(value).map(([k, v]) => `${k}: ${formatieren(v, depth + 1)}`)
+  return fields.length ? `{ ${fields.join(', ')} }` : '{}'
 }
 
 
-const MELDUNGEN = {
+const MESSAGES = {
   de: {
-    import: (name: string) => `Import "${name}" gibt es im Editor nicht - nur react, react-dom und react-router.`,
-    keineKomponente: 'Keine Komponente gefunden. Definiere eine Funktion namens App.',
-    dateiFehlt: (name: string, von: string) => `${von}: Die Datei "${name}" gibt es nicht.`,
-    keinDefaultExport: (datei: string) => `${datei} braucht einen default-Export mit der Komponente App.`,
+    importNotAvailable: (name: string) => `Import "${name}" gibt es im Editor nicht - nur react, react-dom und react-router.`,
+    noComponent: 'Keine Komponente gefunden. Definiere eine Funktion namens App.',
+    fileMissing: (name: string, from: string) => `${from}: Die Datei "${name}" gibt es nicht.`,
+    noDefaultExport: (file: string) => `${file} braucht einen default-Export mit der Komponente App.`,
   },
   en: {
-    import: (name: string) => `Import "${name}" is not available in the editor - only react, react-dom and react-router.`,
-    keineKomponente: 'No component found. Define a function called App.',
-    dateiFehlt: (name: string, von: string) => `${von}: The file "${name}" does not exist.`,
-    keinDefaultExport: (datei: string) => `${datei} needs a default export with the App component.`,
+    importNotAvailable: (name: string) => `Import "${name}" is not available in the editor - only react, react-dom and react-router.`,
+    noComponent: 'No component found. Define a function called App.',
+    fileMissing: (name: string, from: string) => `${from}: The file "${name}" does not exist.`,
+    noDefaultExport: (file: string) => `${file} needs a default export with the App component.`,
   },
 }
 
-const OPTIONEN = {
+const OPTIONS = {
   transforms: ['jsx', 'typescript', 'imports'] as ('jsx' | 'typescript' | 'imports')[],
   production: true, // kein __source/__self im Ergebnis
 }
@@ -97,27 +97,27 @@ const OPTIONEN = {
  * Was jeder übersetzte Code als "globale" Werte bekommt: eine Konsole, die ins
  * Ausgabefeld schreibt, und Timer, die beim nächsten Lauf aufgeräumt werden.
  */
-function umgebung(protokoll: Protokoll) {
+function environment(log: Log) {
   // Eigene Konsole: schreibt in die echte UND in das Ausgabefeld unter dem Editor.
   const konsole = { ...console }
-  for (const typ of ['log', 'info', 'warn', 'error'] as const) {
-    konsole[typ] = (...werte: unknown[]) => {
-      console[typ](...werte)
-      protokoll(typ, werte.map((w) => formatieren(w)).join(' '))
+  for (const type of ['log', 'info', 'warn', 'error'] as const) {
+    konsole[type] = (...values: unknown[]) => {
+      console[type](...values)
+      log(type, values.map((w) => formatieren(w)).join(' '))
     }
   }
-  const zeitmessungen = new Map<string, number>()
-  konsole.time = (label = 'default') => void zeitmessungen.set(label, performance.now())
+  const timings = new Map<string, number>()
+  konsole.time = (label = 'default') => void timings.set(label, performance.now())
   konsole.timeEnd = (label = 'default') => {
-    const start = zeitmessungen.get(label)
+    const start = timings.get(label)
     if (start === undefined) return
-    zeitmessungen.delete(label)
+    timings.delete(label)
     konsole.log(`${label}: ${(performance.now() - start).toFixed(1)} ms`)
   }
 
   // Timer mitschreiben, damit vergessene Intervalle beim nächsten Lauf nicht weiterlaufen.
   const timeouts = new Set<number>()
-  const intervalle = new Set<number>()
+  const intervals = new Set<number>()
   const timer = {
     setTimeout: (fn: () => void, ms?: number, ...args: unknown[]) => {
       const id = window.setTimeout(() => {
@@ -133,58 +133,58 @@ function umgebung(protokoll: Protokoll) {
     },
     setInterval: (fn: () => void, ms?: number, ...args: unknown[]) => {
       const id = window.setInterval(fn, ms, ...args)
-      intervalle.add(id)
+      intervals.add(id)
       return id
     },
     clearInterval: (id: number) => {
-      intervalle.delete(id)
+      intervals.delete(id)
       window.clearInterval(id)
     },
   }
-  const aufraeumen = () => {
+  const cleanup = () => {
     timeouts.forEach((id) => window.clearTimeout(id))
-    intervalle.forEach((id) => window.clearInterval(id))
+    intervals.forEach((id) => window.clearInterval(id))
   }
 
-  return { globale: { console: konsole, ...timer, ...GLOBALE }, aufraeumen }
+  return { globals: { console: konsole, ...timer, ...GLOBALS }, aufraeumen: cleanup }
 }
 
 /**
  * `extraGlobals`: additional values the code sees as globals - the full-stack workshop
  * (part 8) passes its own `fetch` that talks to the simulated Spring backend.
  */
-export async function kompilieren(quelltext: string, protokoll: Protokoll, sprache: 'de' | 'en', extraGlobals: Record<string, unknown> = {}) {
+export async function compile(sourceCode: string, log: Log, language: 'de' | 'en', extraGlobals: Record<string, unknown> = {}) {
   const { transform } = await import('sucrase')
-  await moduleNachladen([quelltext])
-  const { code } = transform(quelltext, OPTIONEN)
-  const { globale, aufraeumen } = umgebung(protokoll)
+  await loadModules([sourceCode])
+  const { code } = transform(sourceCode, OPTIONS)
+  const { globals, aufraeumen: cleanup } = environment(log)
 
   const require = (name: string) => {
     if (name in MODULE) return MODULE[name]
-    throw new Error(MELDUNGEN[sprache].import(name))
+    throw new Error(MESSAGES[language].importNotAvailable(name))
   }
 
-  const parameter = { React, require, exports: {}, ...globale, ...extraGlobals }
-  const fabrik = new Function(
+  const parameter = { React, require, exports: {}, ...globals, ...extraGlobals }
+  const factory = new Function(
     ...Object.keys(parameter),
     code + '\n;return typeof App !== "undefined" ? App : exports.default;',
   )
 
-  const App: unknown = fabrik(...Object.values(parameter))
+  const App: unknown = factory(...Object.values(parameter))
   if (typeof App !== 'function') {
-    throw new Error(MELDUNGEN[sprache].keineKomponente)
+    throw new Error(MESSAGES[language].noComponent)
   }
-  return { App: App as ComponentType, aufraeumen }
+  return { App: App as ComponentType, aufraeumen: cleanup }
 }
 
-export type ProjektDatei = { pfad: string; code: string }
+export type ProjectFile = { pfad: string; code: string }
 
 /** Hängt den Dateinamen genau einmal vor die Fehlermeldung. */
-function mitDatei(fehler: unknown, pfad: string) {
-  const f = fehler instanceof Error ? fehler : new Error(String(fehler))
-  if (!(f as { datei?: string }).datei) {
+function withFile(error: unknown, pfad: string) {
+  const f = error instanceof Error ? error : new Error(String(error))
+  if (!(f as { file?: string }).file) {
     f.message = `${pfad}: ${f.message}`
-    ;(f as { datei?: string }).datei = pfad
+    ;(f as { file?: string }).file = pfad
   }
   return f
 }
@@ -198,89 +198,89 @@ function mitDatei(fehler: unknown, pfad: string) {
  * aus und merkt sich ihre Exporte - im Kleinen genau das, was ein Bundler wie
  * Vite macht.
  */
-export async function kompilierenProjekt(
-  dateien: ProjektDatei[],
-  einstieg: string,
-  protokoll: Protokoll,
-  sprache: 'de' | 'en',
+export async function compileProject(
+  files: ProjectFile[],
+  entry: string,
+  log: Log,
+  language: 'de' | 'en',
 ) {
-  const { exports, aufraeumen } = await projektAusfuehren(dateien, einstieg, protokoll, sprache)
+  const { exports, aufraeumen: cleanup } = await runProject(files, entry, log, language)
   const App = exports.default
   if (typeof App !== 'function') {
-    aufraeumen()
-    throw new Error(MELDUNGEN[sprache].keinDefaultExport(einstieg))
+    cleanup()
+    throw new Error(MESSAGES[language].noDefaultExport(entry))
   }
-  return { App: App as ComponentType, aufraeumen }
+  return { App: App as ComponentType, aufraeumen: cleanup }
 }
 
 /**
  * Führt ein Projekt aus und liefert die Exporte der Einstiegsdatei.
  * `zusatzModule` ergänzt oder ersetzt Bibliotheken - z. B. für Tests eine eigene Fassung von "vitest".
  */
-export async function projektAusfuehren(
-  dateien: ProjektDatei[],
-  einstieg: string,
-  protokoll: Protokoll,
-  sprache: 'de' | 'en',
-  zusatzModule: Record<string, unknown> = {},
+export async function runProject(
+  files: ProjectFile[],
+  entry: string,
+  log: Log,
+  language: 'de' | 'en',
+  extraModules: Record<string, unknown> = {},
 ) {
   const { transform } = await import('sucrase')
-  await moduleNachladen(dateien.map((d) => d.code))
+  await loadModules(files.map((d) => d.code))
 
-  const uebersetzt = new Map<string, string>()
-  for (const datei of dateien) {
+  const compiled = new Map<string, string>()
+  for (const file of files) {
     try {
-      uebersetzt.set(datei.pfad, transform(datei.code, OPTIONEN).code)
-    } catch (fehler) {
-      throw mitDatei(fehler, datei.pfad)
+      compiled.set(file.pfad, transform(file.code, OPTIONS).code)
+    } catch (error) {
+      throw withFile(error, file.pfad)
     }
   }
 
-  const { globale, aufraeumen } = umgebung(protokoll)
-  const geladen = new Map<string, Record<string, unknown>>()
+  const { globals, aufraeumen: cleanup } = environment(log)
+  const loaded = new Map<string, Record<string, unknown>>()
 
-  function aufloesen(von: string, name: string) {
-    const teile = von.split('/').slice(0, -1)
-    for (const teil of name.split('/')) {
-      if (teil === '..') teile.pop()
-      else if (teil !== '.') teile.push(teil)
+  function aufloesen(from: string, name: string) {
+    const parts = from.split('/').slice(0, -1)
+    for (const part of name.split('/')) {
+      if (part === '..') parts.pop()
+      else if (part !== '.') parts.push(part)
     }
-    const basis = teile.join('/')
-    const kandidaten = ['', '.jsx', '.js', '.tsx', '.ts', '/index.jsx', '/index.js'].map((endung) => basis + endung)
-    return kandidaten.find((k) => uebersetzt.has(k))
+    const base = parts.join('/')
+    const candidates = ['', '.jsx', '.js', '.tsx', '.ts', '/index.jsx', '/index.js'].map((extension) => base + extension)
+    return candidates.find((k) => compiled.has(k))
   }
 
-  function laden(pfad: string): Record<string, unknown> {
-    const vorhanden = geladen.get(pfad)
-    if (vorhanden) return vorhanden
+  function load(pfad: string): Record<string, unknown> {
+    const existing = loaded.get(pfad)
+    if (existing) return existing
     const exports: Record<string, unknown> = {}
     // Vor dem Ausführen eintragen, damit zyklische Imports nicht endlos laufen.
-    geladen.set(pfad, exports)
+    loaded.set(pfad, exports)
 
     const require = (name: string) => {
-      if (name in zusatzModule) return zusatzModule[name]
+      if (name in extraModules) return extraModules[name]
       if (name in MODULE) return MODULE[name]
       if (name.startsWith('.')) {
-        const ziel = aufloesen(pfad, name)
-        if (!ziel) throw new Error(MELDUNGEN[sprache].dateiFehlt(name, pfad))
-        return laden(ziel)
+        const target = aufloesen(pfad, name)
+        if (!target) throw new Error(MESSAGES[language].fileMissing(name, pfad))
+        return load(target)
       }
-      throw new Error(MELDUNGEN[sprache].import(name))
+      throw new Error(MESSAGES[language].importNotAvailable(name))
     }
 
-    const parameter = { React, require, exports, module: { exports }, ...globale }
+    const parameter = { React, require, exports, module: { exports }, ...globals }
     try {
-      new Function(...Object.keys(parameter), uebersetzt.get(pfad)!)(...Object.values(parameter))
-    } catch (fehler) {
-      throw mitDatei(fehler, pfad)
+      new Function(...Object.keys(parameter), compiled.get(pfad)!)(...Object.values(parameter))
+    } catch (error) {
+      throw withFile(error, pfad)
     }
     return exports
   }
 
   try {
-    return { exports: laden(einstieg), aufraeumen }
-  } catch (fehler) {
-    aufraeumen()
-    throw fehler
+    return { exports: load(entry), aufraeumen: cleanup }
+  } catch (error) {
+    cleanup()
+    throw error
   }
 }

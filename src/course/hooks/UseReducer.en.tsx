@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseReducer.code'
+import { examples, codeBloecke } from './UseReducer.code'
 import { AufgabenDemo } from '../demos/AufgabenDemo'
 
 /**
@@ -16,8 +16,8 @@ export function UseReducer() {
         <P><Code>useReducer</Code>: the component only sends actions, the reducer decides the new state.</P>
         <TryIt
           id="hooks-usereducer-einstieg"
-          {...beispiele['hooks-usereducer-einstieg']}
-          modus="react"
+          {...examples['hooks-usereducer-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -45,7 +45,7 @@ export function UseReducer() {
         </P>
         <TryIt
           id="hooks-usereducer-js"
-          {...beispiele['hooks-usereducer-js']}
+          {...examples['hooks-usereducer-js']}
         />
         <Hinweis variante="warnung">
           A reducer must be <strong>pure</strong>: same input → same output, no side effects. So no{' '}
@@ -57,8 +57,8 @@ export function UseReducer() {
       <Abschnitt titel="useReducer in a component">
         <TryIt
           id="hooks-usereducer-react"
-          {...beispiele['hooks-usereducer-react']}
-          modus="react"
+          {...examples['hooks-usereducer-react']}
+          mode="react"
         />
         <AufgabenDemo />
       </Abschnitt>
@@ -86,8 +86,8 @@ export function UseReducer() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-usereducer-uebung"
-          {...beispiele['hooks-usereducer-uebung']}
-          aufgabe={
+          {...examples['hooks-usereducer-uebung']}
+          task={
             <>
               <p>
                 Write the reducer for a shopping cart. The state is an array{' '}
@@ -118,24 +118,24 @@ export function UseReducer() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What must a reducer NOT do?',
-            antworten: ['Return a new object', 'Send a request to the server', 'Use a switch'],
-            richtig: 1,
-            erklaerung: 'Reducers are pure. Side effects belong in event handlers or effects.',
+            question: 'What must a reducer NOT do?',
+            answers: ['Return a new object', 'Send a request to the server', 'Use a switch'],
+            correct: 1,
+            explanation: 'Reducers are pure. Side effects belong in event handlers or effects.',
           },
           {
-            frage: 'What does useReducer return?',
-            antworten: ['[state, setState]', '[state, dispatch]', '{ state, reducer }'],
-            richtig: 1,
-            erklaerung: 'dispatch(action) sends an action to the reducer.',
+            question: 'What does useReducer return?',
+            answers: ['[state, setState]', '[state, dispatch]', '{ state, reducer }'],
+            correct: 1,
+            explanation: 'dispatch(action) sends an action to the reducer.',
           },
           {
-            frage: 'How should actions be named?',
-            antworten: ["After the event: 'added'", "After the setter: 'setList'"],
-            richtig: 0,
-            erklaerung: 'The action describes what happened - the reducer decides the consequences.',
+            question: 'How should actions be named?',
+            answers: ["After the event: 'added'", "After the setter: 'setList'"],
+            correct: 0,
+            explanation: 'The action describes what happened - the reducer decides the consequences.',
           },
         ]}
       />

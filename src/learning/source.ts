@@ -11,14 +11,14 @@
  * - Nur \` und \${ müssen escaped werden, weil sie das Template sonst beenden.
  * - Gemeinsame Einrückung und Leerzeilen am Anfang/Ende werden entfernt.
  */
-export function js(teile: TemplateStringsArray): string {
-  const roh = teile.raw.join('').replace(/\\([`$])/g, '$1')
-  const zeilen = roh.replace(/^\s*\n/, '').replace(/\n\s*$/, '').split('\n')
+export function js(parts: TemplateStringsArray): string {
+  const raw = parts.raw.join('').replace(/\\([`$])/g, '$1')
+  const lines = raw.replace(/^\s*\n/, '').replace(/\n\s*$/, '').split('\n')
 
-  const einrueckung = Math.min(
-    ...zeilen.filter((z) => z.trim()).map((z) => z.match(/^ */)![0].length),
+  const indent = Math.min(
+    ...lines.filter((z) => z.trim()).map((z) => z.match(/^ */)![0].length),
   )
-  return zeilen.map((z) => z.slice(einrueckung)).join('\n')
+  return lines.map((z) => z.slice(indent)).join('\n')
 }
 
 /**

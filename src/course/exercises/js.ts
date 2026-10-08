@@ -9,7 +9,7 @@ import type { UebungsSammlung } from './types'
 
 const t = (de: string, en: string) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'js-variablen': [
     {
       id: 'js-variablen-typeof',
@@ -30,11 +30,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-variablen-plus',
       stufe: 'fehler',
       titel: t('Plötzlich 301 Jahre alt', 'Suddenly 301 years old'),
-      aufgabe: t(
+      task: t(
         '`greet(\'Ada\', 30)` soll `"Hello Ada, you will be 31 next year"` liefern. Stattdessen steht da 301. Finde und behebe den Fehler.',
         '`greet(\'Ada\', 30)` should return `"Hello Ada, you will be 31 next year"`. Instead it says 301. Find and fix the bug.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function greet(name, age) {
           return 'Hello ' + name + ', you will be ' + age + 1 + ' next year'
@@ -42,31 +42,31 @@ export const uebungen: UebungsSammlung = {
 
         console.log(greet('Ada', 30))
       `,
-      loesung: js`
+      solution: js`
         function greet(name, age) {
           return \`Hello \${name}, you will be \${age + 1} next year\`
         }
 
         console.log(greet('Ada', 30))
       `,
-      tipps: {
+      hints: {
         de: ['`+` arbeitet von links nach rechts. Was ist `\'…be \' + 30`?', 'Klammern um `age + 1` oder ein Template-Literal mit `${age + 1}` lösen das.'],
         en: ['`+` works from left to right. What is `\'…be \' + 30`?', 'Parentheses around `age + 1` or a template literal with `${age + 1}` fix it.'],
       },
       tests: [
-        { name: t('greet(\'Ada\', 30)', 'greet(\'Ada\', 30)'), ausdruck: "greet('Ada', 30)", erwartet: 'Hello Ada, you will be 31 next year' },
-        { name: t('greet(\'Linus\', 9)', 'greet(\'Linus\', 9)'), ausdruck: "greet('Linus', 9)", erwartet: 'Hello Linus, you will be 10 next year' },
+        { name: t('greet(\'Ada\', 30)', 'greet(\'Ada\', 30)'), expression: "greet('Ada', 30)", expected: 'Hello Ada, you will be 31 next year' },
+        { name: t('greet(\'Linus\', 9)', 'greet(\'Linus\', 9)'), expression: "greet('Linus', 9)", expected: 'Hello Linus, you will be 10 next year' },
       ],
     },
     {
       id: 'js-variablen-describe',
       stufe: 'ergaenzen',
       titel: t('Typ und Wahrheitswert beschreiben', 'Describe type and truthiness'),
-      aufgabe: t(
+      task: t(
         'Ergänze `describe(value)`: Es gibt den Typ und „truthy“ oder „falsy“ zurück, z. B. `"number, falsy"` für `0`.',
         'Complete `describe(value)`: it returns the type and “truthy” or “falsy”, e.g. `"number, falsy"` for `0`.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function describe(value) {
           // e.g. describe(0) -> "number, falsy"
@@ -75,7 +75,7 @@ export const uebungen: UebungsSammlung = {
         console.log(describe(0))
         console.log(describe('hi'))
       `,
-      loesung: js`
+      solution: js`
         function describe(value) {
           const truthiness = value ? 'truthy' : 'falsy'
           return \`\${typeof value}, \${truthiness}\`
@@ -84,15 +84,15 @@ export const uebungen: UebungsSammlung = {
         console.log(describe(0))
         console.log(describe('hi'))
       `,
-      tipps: {
+      hints: {
         de: ['`typeof value` liefert den Typ als Text.', '`value ? \'truthy\' : \'falsy\'` - eine Bedingung wandelt jeden Wert in true oder false um.'],
         en: ['`typeof value` returns the type as a string.', '`value ? \'truthy\' : \'falsy\'` - a condition turns any value into true or false.'],
       },
       tests: [
-        { name: 'describe(0)', ausdruck: 'describe(0)', erwartet: 'number, falsy' },
-        { name: "describe('hi')", ausdruck: "describe('hi')", erwartet: 'string, truthy' },
-        { name: 'describe(null)', ausdruck: 'describe(null)', erwartet: 'object, falsy' },
-        { name: 'describe([])', ausdruck: 'describe([])', erwartet: 'object, truthy' },
+        { name: 'describe(0)', expression: 'describe(0)', expected: 'number, falsy' },
+        { name: "describe('hi')", expression: "describe('hi')", expected: 'string, truthy' },
+        { name: 'describe(null)', expression: 'describe(null)', expected: 'object, falsy' },
+        { name: 'describe([])', expression: 'describe([])', expected: 'object, truthy' },
       ],
     },
   ],
@@ -117,11 +117,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-kontrollfluss-zuweisung',
       stufe: 'fehler',
       titel: t('Immer „0 todos“', 'Always “0 todos”'),
-      aufgabe: t(
+      task: t(
         '`getLabel` liefert für jede Zahl dasselbe Ergebnis. Finde die beiden Fehler.',
         '`getLabel` returns the same result for every number. Find the two bugs.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function getLabel(count) {
           if (count = 0) return 'No todos'
@@ -131,7 +131,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(getLabel(0), '|', getLabel(1), '|', getLabel(5))
       `,
-      loesung: js`
+      solution: js`
         function getLabel(count) {
           if (count === 0) return 'No todos'
           if (count === 1) return '1 todo'
@@ -140,32 +140,32 @@ export const uebungen: UebungsSammlung = {
 
         console.log(getLabel(0), '|', getLabel(1), '|', getLabel(5))
       `,
-      tipps: {
+      hints: {
         de: ['Ein einzelnes `=` ist eine **Zuweisung**, kein Vergleich.', 'Nimm immer `===` - dann fällt auch `== \'1\'` auf, das den String `"1"` akzeptieren würde.'],
         en: ['A single `=` is an **assignment**, not a comparison.', 'Always use `===` - then `== \'1\'`, which would accept the string `"1"`, stands out too.'],
       },
       tests: [
-        { name: 'getLabel(0)', ausdruck: 'getLabel(0)', erwartet: 'No todos' },
-        { name: 'getLabel(1)', ausdruck: 'getLabel(1)', erwartet: '1 todo' },
-        { name: 'getLabel(5)', ausdruck: 'getLabel(5)', erwartet: '5 todos' },
-        { name: t("getLabel('1') ist kein Sonderfall", "getLabel('1') is not a special case"), ausdruck: "getLabel('1')", erwartet: '1 todos' },
+        { name: 'getLabel(0)', expression: 'getLabel(0)', expected: 'No todos' },
+        { name: 'getLabel(1)', expression: 'getLabel(1)', expected: '1 todo' },
+        { name: 'getLabel(5)', expression: 'getLabel(5)', expected: '5 todos' },
+        { name: t("getLabel('1') ist kein Sonderfall", "getLabel('1') is not a special case"), expression: "getLabel('1')", expected: '1 todos' },
       ],
     },
     {
       id: 'js-kontrollfluss-fizzbuzz',
       stufe: 'frei',
       titel: t('FizzBuzz', 'FizzBuzz'),
-      aufgabe: t(
+      task: t(
         'Schreibe `fizzBuzz(n)`: Es gibt ein Array mit den Zahlen 1 bis n als Text zurück - aber durch 3 teilbar wird zu `"Fizz"`, durch 5 zu `"Buzz"`, durch beides zu `"FizzBuzz"`.',
         'Write `fizzBuzz(n)`: it returns an array of the numbers 1 to n as strings - but divisible by 3 becomes `"Fizz"`, by 5 `"Buzz"`, by both `"FizzBuzz"`.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function fizzBuzz(n) {
 
         }
       `,
-      loesung: js`
+      solution: js`
         function fizzBuzz(n) {
           const result = []
           for (let i = 1; i <= n; i++) {
@@ -179,14 +179,14 @@ export const uebungen: UebungsSammlung = {
 
         console.log(fizzBuzz(15))
       `,
-      tipps: {
+      hints: {
         de: ['`i % 3 === 0` prüft, ob `i` durch 3 teilbar ist.', 'Die Reihenfolge der Bedingungen zählt: „durch beides“ zuerst prüfen.'],
         en: ['`i % 3 === 0` checks whether `i` is divisible by 3.', 'The order of the conditions matters: check “both” first.'],
       },
       tests: [
-        { name: 'fizzBuzz(5)', ausdruck: 'fizzBuzz(5)', erwartet: ['1', '2', 'Fizz', '4', 'Buzz'] },
-        { name: t('fizzBuzz(15) endet mit FizzBuzz', 'fizzBuzz(15) ends with FizzBuzz'), ausdruck: 'fizzBuzz(15).at(-1)', erwartet: 'FizzBuzz' },
-        { name: 'fizzBuzz(0)', ausdruck: 'fizzBuzz(0)', erwartet: [] },
+        { name: 'fizzBuzz(5)', expression: 'fizzBuzz(5)', expected: ['1', '2', 'Fizz', '4', 'Buzz'] },
+        { name: t('fizzBuzz(15) endet mit FizzBuzz', 'fizzBuzz(15) ends with FizzBuzz'), expression: 'fizzBuzz(15).at(-1)', expected: 'FizzBuzz' },
+        { name: 'fizzBuzz(0)', expression: 'fizzBuzz(0)', expected: [] },
       ],
     },
   ],
@@ -220,11 +220,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-funktionen-once',
       stufe: 'fehler',
       titel: t('once() verschluckt Argumente', 'once() swallows arguments'),
-      aufgabe: t(
+      task: t(
         '`once(fn)` soll eine Funktion liefern, die `fn` nur beim ersten Aufruf ausführt und dessen Ergebnis zurückgibt. Sie funktioniert noch nicht richtig.',
         '`once(fn)` should return a function that runs `fn` only on the first call and returns its result. It does not work correctly yet.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function once(fn) {
           let called = false
@@ -239,7 +239,7 @@ export const uebungen: UebungsSammlung = {
         console.log(addOnce(2, 3)) // expected: 5
         console.log(addOnce(4, 5)) // expected: undefined
       `,
-      loesung: js`
+      solution: js`
         function once(fn) {
           let called = false
           return function (...args) {
@@ -253,24 +253,24 @@ export const uebungen: UebungsSammlung = {
         console.log(addOnce(2, 3)) // 5
         console.log(addOnce(4, 5)) // undefined
       `,
-      tipps: {
+      hints: {
         de: ['`args` ist ein Array. Was bekommt `fn` als ersten Parameter?', 'Zwei Dinge fehlen: Spread `fn(...args)` und ein `return`.'],
         en: ['`args` is an array. What does `fn` receive as its first parameter?', 'Two things are missing: spread `fn(...args)` and a `return`.'],
       },
       tests: [
-        { name: t('Erster Aufruf liefert das Ergebnis', 'First call returns the result'), ausdruck: 'once((a, b) => a + b)(2, 3)', erwartet: 5 },
-        { name: t('Zweiter Aufruf führt fn nicht aus', 'Second call does not run fn'), ausdruck: '(() => { let n = 0; const f = once(() => ++n); f(); f(); return n })()', erwartet: 1 },
+        { name: t('Erster Aufruf liefert das Ergebnis', 'First call returns the result'), expression: 'once((a, b) => a + b)(2, 3)', expected: 5 },
+        { name: t('Zweiter Aufruf führt fn nicht aus', 'Second call does not run fn'), expression: '(() => { let n = 0; const f = once(() => ++n); f(); f(); return n })()', expected: 1 },
       ],
     },
     {
       id: 'js-funktionen-multiplier',
       stufe: 'ergaenzen',
       titel: t('Funktionen, die Funktionen bauen', 'Functions that build functions'),
-      aufgabe: t(
+      task: t(
         'Ergänze `createMultiplier(factor)`: Es gibt eine Funktion zurück, die ihr Argument mit `factor` multipliziert. `createMultiplier(3)(5)` ergibt 15.',
         'Complete `createMultiplier(factor)`: it returns a function that multiplies its argument by `factor`. `createMultiplier(3)(5)` returns 15.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function createMultiplier(factor) {
           // return a function
@@ -280,7 +280,7 @@ export const uebungen: UebungsSammlung = {
         // const double = createMultiplier(2)
         // console.log(double(5))
       `,
-      loesung: js`
+      solution: js`
         function createMultiplier(factor) {
           return (value) => value * factor
         }
@@ -288,13 +288,13 @@ export const uebungen: UebungsSammlung = {
         const double = createMultiplier(2)
         console.log(double(5))
       `,
-      tipps: {
+      hints: {
         de: ['Die zurückgegebene Funktion kann `factor` weiter benutzen - das ist eine Closure.', '`return (value) => value * factor`'],
         en: ['The returned function can keep using `factor` - that is a closure.', '`return (value) => value * factor`'],
       },
       tests: [
-        { name: 'createMultiplier(3)(5)', ausdruck: 'createMultiplier(3)(5)', erwartet: 15 },
-        { name: t('Unabhängige Multiplikatoren', 'Independent multipliers'), ausdruck: '(() => { const d = createMultiplier(2); const h = createMultiplier(100); return [d(4), h(4)] })()', erwartet: [8, 400] },
+        { name: 'createMultiplier(3)(5)', expression: 'createMultiplier(3)(5)', expected: 15 },
+        { name: t('Unabhängige Multiplikatoren', 'Independent multipliers'), expression: '(() => { const d = createMultiplier(2); const h = createMultiplier(100); return [d(4), h(4)] })()', expected: [8, 400] },
       ],
     },
   ],
@@ -321,11 +321,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-arrays-map-filter',
       stufe: 'fehler',
       titel: t('Lücken in der Liste', 'Gaps in the list'),
-      aufgabe: t(
+      task: t(
         '`getOpenTexts` soll nur die Texte der offenen Todos liefern. Es kommen aber `undefined`-Einträge heraus.',
         '`getOpenTexts` should return only the texts of open todos. But it returns `undefined` entries.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         const todos = [
           { text: 'Learn map', done: true },
@@ -341,7 +341,7 @@ export const uebungen: UebungsSammlung = {
 
         console.log(getOpenTexts(todos))
       `,
-      loesung: js`
+      solution: js`
         const todos = [
           { text: 'Learn map', done: true },
           { text: 'Learn filter', done: false },
@@ -354,24 +354,24 @@ export const uebungen: UebungsSammlung = {
 
         console.log(getOpenTexts(todos))
       `,
-      tipps: {
+      hints: {
         de: ['`map` liefert **immer** gleich viele Elemente - auch für die, bei denen nichts zurückgegeben wird.', 'Erst `filter`, dann `map`.'],
         en: ['`map` **always** returns the same number of elements - even for those where nothing is returned.', 'First `filter`, then `map`.'],
       },
       tests: [
-        { name: t('Nur offene Texte', 'Only open texts'), ausdruck: 'getOpenTexts(todos)', erwartet: ['Learn filter', 'Learn reduce'] },
-        { name: t('Leere Liste', 'Empty list'), ausdruck: 'getOpenTexts([])', erwartet: [] },
+        { name: t('Nur offene Texte', 'Only open texts'), expression: 'getOpenTexts(todos)', expected: ['Learn filter', 'Learn reduce'] },
+        { name: t('Leere Liste', 'Empty list'), expression: 'getOpenTexts([])', expected: [] },
       ],
     },
     {
       id: 'js-arrays-reduce',
       stufe: 'frei',
       titel: t('Ausgaben pro Kategorie', 'Expenses per category'),
-      aufgabe: t(
+      task: t(
         'Schreibe `totalByCategory(expenses)`: Es summiert die Beträge pro Kategorie und gibt ein Objekt zurück, z. B. `{ food: 17, travel: 40 }`.',
         'Write `totalByCategory(expenses)`: it sums the amounts per category and returns an object, e.g. `{ food: 17, travel: 40 }`.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         const expenses = [
           { category: 'food', amount: 12 },
@@ -383,7 +383,7 @@ export const uebungen: UebungsSammlung = {
 
         }
       `,
-      loesung: js`
+      solution: js`
         const expenses = [
           { category: 'food', amount: 12 },
           { category: 'travel', amount: 40 },
@@ -399,13 +399,13 @@ export const uebungen: UebungsSammlung = {
 
         console.log(totalByCategory(expenses))
       `,
-      tipps: {
+      hints: {
         de: ['`reduce` mit einem leeren Objekt `{}` als Startwert.', 'Noch keine Summe für die Kategorie? `(totals[category] ?? 0) + amount`.'],
         en: ['`reduce` with an empty object `{}` as the initial value.', 'No sum for the category yet? `(totals[category] ?? 0) + amount`.'],
       },
       tests: [
-        { name: t('Beispieldaten', 'Sample data'), ausdruck: 'totalByCategory(expenses)', erwartet: { food: 17, travel: 40 } },
-        { name: t('Leere Liste ergibt {}', 'Empty list returns {}'), ausdruck: 'totalByCategory([])', erwartet: {} },
+        { name: t('Beispieldaten', 'Sample data'), expression: 'totalByCategory(expenses)', expected: { food: 17, travel: 40 } },
+        { name: t('Leere Liste ergibt {}', 'Empty list returns {}'), expression: 'totalByCategory([])', expected: {} },
       ],
     },
   ],
@@ -431,11 +431,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-objekte-spread-reihenfolge',
       stufe: 'fehler',
       titel: t('Einstellungen werden nicht übernommen', 'Settings are not applied'),
-      aufgabe: t(
+      task: t(
         '`updateSettings` soll die Änderungen über die alten Einstellungen legen. Das Theme bleibt aber „light“.',
         '`updateSettings` should apply the changes on top of the old settings. But the theme stays “light”.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function updateSettings(settings, changes) {
           return { ...changes, ...settings }
@@ -443,31 +443,31 @@ export const uebungen: UebungsSammlung = {
 
         console.log(updateSettings({ theme: 'light', language: 'en' }, { theme: 'dark' }))
       `,
-      loesung: js`
+      solution: js`
         function updateSettings(settings, changes) {
           return { ...settings, ...changes }
         }
 
         console.log(updateSettings({ theme: 'light', language: 'en' }, { theme: 'dark' }))
       `,
-      tipps: {
+      hints: {
         de: ['Bei doppelten Schlüsseln gewinnt der, der **später** im Objekt steht.'],
         en: ['With duplicate keys, the one that comes **later** in the object wins.'],
       },
       tests: [
-        { name: t('Änderung wird übernommen', 'Change is applied'), ausdruck: "updateSettings({ theme: 'light', language: 'en' }, { theme: 'dark' })", erwartet: { theme: 'dark', language: 'en' } },
-        { name: t('Original bleibt unverändert', 'Original stays unchanged'), ausdruck: "(() => { const s = { theme: 'light' }; updateSettings(s, { theme: 'dark' }); return s.theme })()", erwartet: 'light' },
+        { name: t('Änderung wird übernommen', 'Change is applied'), expression: "updateSettings({ theme: 'light', language: 'en' }, { theme: 'dark' })", expected: { theme: 'dark', language: 'en' } },
+        { name: t('Original bleibt unverändert', 'Original stays unchanged'), expression: "(() => { const s = { theme: 'light' }; updateSettings(s, { theme: 'dark' }); return s.theme })()", expected: 'light' },
       ],
     },
     {
       id: 'js-objekte-verschachtelt',
       stufe: 'ergaenzen',
       titel: t('Verschachteltes Destructuring', 'Nested destructuring'),
-      aufgabe: t(
+      task: t(
         'Ergänze `formatUser(user)` mit Destructuring in der Parameterliste: Ergebnis `"Ada from London"`. Fehlt `address`, steht dort `"unknown"`.',
         'Complete `formatUser(user)` using destructuring in the parameter list: result `"Ada from London"`. If `address` is missing, it says `"unknown"`.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function formatUser(user) {
           // Tip: destructure right in the parameter list
@@ -476,7 +476,7 @@ export const uebungen: UebungsSammlung = {
         console.log(formatUser({ name: 'Ada', address: { city: 'London' } }))
         console.log(formatUser({ name: 'Linus' }))
       `,
-      loesung: js`
+      solution: js`
         function formatUser({ name, address: { city = 'unknown' } = {} }) {
           return \`\${name} from \${city}\`
         }
@@ -484,13 +484,13 @@ export const uebungen: UebungsSammlung = {
         console.log(formatUser({ name: 'Ada', address: { city: 'London' } }))
         console.log(formatUser({ name: 'Linus' }))
       `,
-      tipps: {
+      hints: {
         de: ['`function formatUser({ name, address })` packt die obersten Felder aus.', 'Verschachtelt mit Standardwerten: `address: { city = \'unknown\' } = {}`.'],
         en: ['`function formatUser({ name, address })` unpacks the top-level fields.', 'Nested with defaults: `address: { city = \'unknown\' } = {}`.'],
       },
       tests: [
-        { name: t('Mit Adresse', 'With address'), ausdruck: "formatUser({ name: 'Ada', address: { city: 'London' } })", erwartet: 'Ada from London' },
-        { name: t('Ohne Adresse', 'Without address'), ausdruck: "formatUser({ name: 'Linus' })", erwartet: 'Linus from unknown' },
+        { name: t('Mit Adresse', 'With address'), expression: "formatUser({ name: 'Ada', address: { city: 'London' } })", expected: 'Ada from London' },
+        { name: t('Ohne Adresse', 'Without address'), expression: "formatUser({ name: 'Linus' })", expected: 'Linus from unknown' },
       ],
     },
   ],
@@ -520,11 +520,11 @@ export const uebungen: UebungsSammlung = {
       id: 'js-referenzen-flach',
       stufe: 'fehler',
       titel: t('Die Kopie verändert das Original', 'The copy changes the original'),
-      aufgabe: t(
+      task: t(
         '`addTag` soll einen neuen Post mit zusätzlichem Tag liefern, ohne den alten zu verändern. Trotzdem hat danach auch das Original den Tag.',
         '`addTag` should return a new post with an extra tag without changing the old one. Yet afterwards the original has the tag too.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         function addTag(post, tag) {
           const copy = { ...post }
@@ -536,7 +536,7 @@ export const uebungen: UebungsSammlung = {
         const updated = addTag(post, 'javascript')
         console.log(post.tags, updated.tags)
       `,
-      loesung: js`
+      solution: js`
         function addTag(post, tag) {
           return { ...post, tags: [...post.tags, tag] }
         }
@@ -545,24 +545,24 @@ export const uebungen: UebungsSammlung = {
         const updated = addTag(post, 'javascript')
         console.log(post.tags, updated.tags)
       `,
-      tipps: {
+      hints: {
         de: ['Spread kopiert nur **eine Ebene**. `copy.tags` ist noch dasselbe Array wie `post.tags`.', 'Auch das Array muss neu sein: `tags: [...post.tags, tag]`.'],
         en: ['Spread only copies **one level**. `copy.tags` is still the same array as `post.tags`.', 'The array has to be new as well: `tags: [...post.tags, tag]`.'],
       },
       tests: [
-        { name: t('Neuer Post hat den Tag', 'New post has the tag'), ausdruck: "addTag({ title: 'x', tags: ['a'] }, 'b').tags", erwartet: ['a', 'b'] },
-        { name: t('Original bleibt unverändert', 'Original stays unchanged'), ausdruck: "(() => { const p = { title: 'x', tags: ['a'] }; addTag(p, 'b'); return p.tags })()", erwartet: ['a'] },
+        { name: t('Neuer Post hat den Tag', 'New post has the tag'), expression: "addTag({ title: 'x', tags: ['a'] }, 'b').tags", expected: ['a', 'b'] },
+        { name: t('Original bleibt unverändert', 'Original stays unchanged'), expression: "(() => { const p = { title: 'x', tags: ['a'] }; addTag(p, 'b'); return p.tags })()", expected: ['a'] },
       ],
     },
     {
       id: 'js-referenzen-update',
       stufe: 'ergaenzen',
       titel: t('Ein Element unveränderlich ändern', 'Update one item immutably'),
-      aufgabe: t(
+      task: t(
         'Ergänze `updateTodo(todos, id, changes)`: neues Array, das passende Todo mit den Änderungen, **alle anderen Objekte unverändert** (dieselbe Referenz) - so kann `memo` sie später überspringen.',
         'Complete `updateTodo(todos, id, changes)`: a new array, the matching todo with the changes, **all other objects untouched** (same reference) - so `memo` can skip them later.',
       ),
-      modus: 'js',
+      mode: 'js',
       wiederholung: 'js-arrays',
       code: js`
         function updateTodo(todos, id, changes) {
@@ -575,7 +575,7 @@ export const uebungen: UebungsSammlung = {
         ]
         console.log(updateTodo(todos, 2, { done: true }))
       `,
-      loesung: js`
+      solution: js`
         function updateTodo(todos, id, changes) {
           return todos.map((todo) => (todo.id === id ? { ...todo, ...changes } : todo))
         }
@@ -586,14 +586,14 @@ export const uebungen: UebungsSammlung = {
         ]
         console.log(updateTodo(todos, 2, { done: true }))
       `,
-      tipps: {
+      hints: {
         de: ['`map` über alle Todos.', 'Passendes Todo: `{ ...todo, ...changes }`, sonst `todo` selbst zurückgeben.'],
         en: ['`map` over all todos.', 'Matching todo: `{ ...todo, ...changes }`, otherwise return `todo` itself.'],
       },
       tests: [
-        { name: t('Änderung übernommen', 'Change applied'), ausdruck: "updateTodo(todos, 2, { done: true })[1]", erwartet: { id: 2, text: 'B', done: true } },
-        { name: t('Neues Array, Original unverändert', 'New array, original unchanged'), ausdruck: '(() => { const r = updateTodo(todos, 2, { done: true }); return r !== todos && todos[1].done === false })()' },
-        { name: t('Andere Todos behalten ihre Referenz', 'Other todos keep their reference'), ausdruck: 'updateTodo(todos, 2, { done: true })[0] === todos[0]' },
+        { name: t('Änderung übernommen', 'Change applied'), expression: "updateTodo(todos, 2, { done: true })[1]", expected: { id: 2, text: 'B', done: true } },
+        { name: t('Neues Array, Original unverändert', 'New array, original unchanged'), expression: '(() => { const r = updateTodo(todos, 2, { done: true }); return r !== todos && todos[1].done === false })()' },
+        { name: t('Andere Todos behalten ihre Referenz', 'Other todos keep their reference'), expression: 'updateTodo(todos, 2, { done: true })[0] === todos[0]' },
       ],
     },
   ],
@@ -621,12 +621,12 @@ export const uebungen: UebungsSammlung = {
       id: 'js-async-foreach',
       stufe: 'fehler',
       titel: t('Das Ergebnis ist leer', 'The result is empty'),
-      aufgabe: t(
+      task: t(
         '`loadNames` soll die Namen aller Nutzer laden. Es kommt aber ein leeres Array zurück. `fetchUser(id)` ist vorhanden und liefert nach kurzer Zeit `{ id, name }`.',
         '`loadNames` should load the names of all users. But it returns an empty array. `fetchUser(id)` exists and resolves to `{ id, name }` after a short delay.',
       ),
-      modus: 'js',
-      vorbereitung: js`
+      mode: 'js',
+      setup: js`
         function fetchUser(id) {
           return new Promise((resolve) => setTimeout(() => resolve({ id, name: 'User ' + id }), 20))
         }
@@ -643,7 +643,7 @@ export const uebungen: UebungsSammlung = {
 
         loadNames([1, 2, 3]).then((names) => console.log(names))
       `,
-      loesung: js`
+      solution: js`
         async function loadNames(ids) {
           const users = await Promise.all(ids.map((id) => fetchUser(id)))
           return users.map((user) => user.name)
@@ -651,30 +651,30 @@ export const uebungen: UebungsSammlung = {
 
         loadNames([1, 2, 3]).then((names) => console.log(names))
       `,
-      tipps: {
+      hints: {
         de: ['`forEach` wartet nicht auf `async`-Callbacks - `return names` passiert sofort.', '`Promise.all(ids.map((id) => fetchUser(id)))` wartet auf alle gleichzeitig.'],
         en: ['`forEach` does not wait for `async` callbacks - `return names` happens right away.', '`Promise.all(ids.map((id) => fetchUser(id)))` waits for all of them at once.'],
       },
       tests: [
-        { name: t('Alle Namen in Reihenfolge', 'All names in order'), ausdruck: 'loadNames([1, 2, 3])', erwartet: ['User 1', 'User 2', 'User 3'] },
-        { name: t('Leere Liste', 'Empty list'), ausdruck: 'loadNames([])', erwartet: [] },
+        { name: t('Alle Namen in Reihenfolge', 'All names in order'), expression: 'loadNames([1, 2, 3])', expected: ['User 1', 'User 2', 'User 3'] },
+        { name: t('Leere Liste', 'Empty list'), expression: 'loadNames([])', expected: [] },
       ],
     },
     {
       id: 'js-async-retry',
       stufe: 'frei',
       titel: t('Nochmal versuchen', 'Try again'),
-      aufgabe: t(
+      task: t(
         'Schreibe `retry(fn, attempts)`: Es ruft die async-Funktion `fn` auf und versucht es bei einem Fehler erneut - höchstens `attempts`-mal. Klappt es, kommt das Ergebnis zurück, sonst wird der letzte Fehler geworfen.',
         'Write `retry(fn, attempts)`: it calls the async function `fn` and tries again on an error - at most `attempts` times. If it works, the result is returned; otherwise the last error is thrown.',
       ),
-      modus: 'js',
+      mode: 'js',
       code: js`
         async function retry(fn, attempts) {
 
         }
       `,
-      loesung: js`
+      solution: js`
         async function retry(fn, attempts) {
           let lastError
           for (let i = 0; i < attempts; i++) {
@@ -694,20 +694,20 @@ export const uebungen: UebungsSammlung = {
           return 'Success after ' + calls + ' calls'
         }, 5).then(console.log)
       `,
-      tipps: {
+      hints: {
         de: ['Eine `for`-Schleife mit `try { return await fn() } catch (error) { … }`.', 'Das `await` im `return` ist wichtig - sonst landet der Fehler nicht im `catch`.', 'Nach der Schleife: `throw lastError`.'],
         en: ['A `for` loop with `try { return await fn() } catch (error) { … }`.', 'The `await` in the `return` matters - otherwise the error does not reach the `catch`.', 'After the loop: `throw lastError`.'],
       },
       tests: [
         {
           name: t('Erfolg beim dritten Versuch', 'Success on the third attempt'),
-          ausdruck: "(async () => { let n = 0; const r = await retry(async () => { n++; if (n < 3) throw new Error('fail'); return 'ok' }, 3); return [r, n] })()",
-          erwartet: ['ok', 3],
+          expression: "(async () => { let n = 0; const r = await retry(async () => { n++; if (n < 3) throw new Error('fail'); return 'ok' }, 3); return [r, n] })()",
+          expected: ['ok', 3],
         },
         {
           name: t('Wirft den letzten Fehler nach allen Versuchen', 'Throws the last error after all attempts'),
-          ausdruck: "(async () => { let n = 0; try { await retry(async () => { n++; throw new Error('nope ' + n) }, 2); return 'no error' } catch (e) { return [e.message, n] } })()",
-          erwartet: ['nope 2', 2],
+          expression: "(async () => { let n = 0; try { await retry(async () => { n++; throw new Error('nope ' + n) }, 2); return 'no error' } catch (e) { return [e.message, n] } })()",
+          expected: ['nope 2', 2],
         },
       ],
     },
@@ -736,12 +736,12 @@ export const uebungen: UebungsSammlung = {
       id: 'js-dom-listener',
       stufe: 'fehler',
       titel: t('Der Knopf reagiert nicht', 'The button does not react'),
-      aufgabe: t(
+      task: t(
         'Beim Laden erscheint sofort „Item 1“, danach tut der Knopf nichts mehr. Finde den Fehler.',
         '“Item 1” appears right on load, and after that the button does nothing. Find the bug.',
       ),
-      modus: 'js',
-      vorschau: true,
+      mode: 'js',
+      preview: true,
       code: js`
         const app = document.querySelector('#app')
         app.innerHTML = '<button id="add">Add item</button><ul id="items"></ul>'
@@ -757,7 +757,7 @@ export const uebungen: UebungsSammlung = {
 
         document.querySelector('#add').addEventListener('click', addItem())
       `,
-      loesung: js`
+      solution: js`
         const app = document.querySelector('#app')
         app.innerHTML = '<button id="add">Add item</button><ul id="items"></ul>'
 
@@ -772,15 +772,15 @@ export const uebungen: UebungsSammlung = {
 
         document.querySelector('#add').addEventListener('click', addItem)
       `,
-      tipps: {
+      hints: {
         de: ['`addItem()` **ruft** die Funktion auf - übergeben wird ihr Rückgabewert `undefined`.', 'Übergib die Funktion selbst: `addEventListener(\'click\', addItem)`.'],
         en: ['`addItem()` **calls** the function - what gets passed is its return value `undefined`.', 'Pass the function itself: `addEventListener(\'click\', addItem)`.'],
       },
       tests: [
         {
           name: t('Anfangs leer, zwei Klicks = zwei Einträge', 'Empty at first, two clicks = two items'),
-          ausdruck: "(() => { const before = document.querySelectorAll('#items li').length; document.querySelector('#add').click(); document.querySelector('#add').click(); return [before, document.querySelectorAll('#items li').length] })()",
-          erwartet: [0, 2],
+          expression: "(() => { const before = document.querySelectorAll('#items li').length; document.querySelector('#add').click(); document.querySelector('#add').click(); return [before, document.querySelectorAll('#items li').length] })()",
+          expected: [0, 2],
         },
       ],
     },
@@ -788,12 +788,12 @@ export const uebungen: UebungsSammlung = {
       id: 'js-dom-zaehler',
       stufe: 'ergaenzen',
       titel: t('Zeichenzähler', 'Character counter'),
-      aufgabe: t(
+      task: t(
         'Ergänze den Listener: Bei jeder Eingabe zeigt `#counter` „n / 20“. Bei mehr als 20 Zeichen bekommt `#counter` die Klasse `too-long`.',
         'Complete the listener: on every input, `#counter` shows “n / 20”. With more than 20 characters, `#counter` gets the class `too-long`.',
       ),
-      modus: 'js',
-      vorschau: true,
+      mode: 'js',
+      preview: true,
       code: js`
         const app = document.querySelector('#app')
         app.innerHTML = '<textarea id="message"></textarea><p id="counter">0 / 20</p>'
@@ -805,7 +805,7 @@ export const uebungen: UebungsSammlung = {
           // TODO
         })
       `,
-      loesung: js`
+      solution: js`
         const app = document.querySelector('#app')
         app.innerHTML = '<textarea id="message"></textarea><p id="counter">0 / 20</p>'
 
@@ -818,20 +818,20 @@ export const uebungen: UebungsSammlung = {
           counter.classList.toggle('too-long', length > 20)
         })
       `,
-      tipps: {
+      hints: {
         de: ['`message.value.length` ist die aktuelle Länge.', '`counter.classList.toggle(\'too-long\', length > 20)` setzt oder entfernt die Klasse.'],
         en: ['`message.value.length` is the current length.', '`counter.classList.toggle(\'too-long\', length > 20)` adds or removes the class.'],
       },
       tests: [
         {
           name: t('Zeigt die Länge an', 'Shows the length'),
-          ausdruck: "(() => { const m = document.querySelector('#message'); m.value = 'Hello'; m.dispatchEvent(new Event('input')); return document.querySelector('#counter').textContent })()",
-          erwartet: '5 / 20',
+          expression: "(() => { const m = document.querySelector('#message'); m.value = 'Hello'; m.dispatchEvent(new Event('input')); return document.querySelector('#counter').textContent })()",
+          expected: '5 / 20',
         },
         {
           name: t('Klasse too-long ab 21 Zeichen', 'Class too-long from 21 characters'),
-          ausdruck: "(() => { const m = document.querySelector('#message'); const c = document.querySelector('#counter'); m.value = 'x'.repeat(21); m.dispatchEvent(new Event('input')); const zuLang = c.classList.contains('too-long'); m.value = 'x'.repeat(20); m.dispatchEvent(new Event('input')); return [zuLang, c.classList.contains('too-long')] })()",
-          erwartet: [true, false],
+          expression: "(() => { const m = document.querySelector('#message'); const c = document.querySelector('#counter'); m.value = 'x'.repeat(21); m.dispatchEvent(new Event('input')); const zuLang = c.classList.contains('too-long'); m.value = 'x'.repeat(20); m.dispatchEvent(new Event('input')); return [zuLang, c.classList.contains('too-long')] })()",
+          expected: [true, false],
         },
       ],
     },

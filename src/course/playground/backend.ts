@@ -8,7 +8,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const backendPlayground: PlaygroundDaten = {
   teil: 'backend',
-  modus: 'spring',
+  mode: 'spring',
   hinweis: {
     de: 'Nach ▶ Starten läuft die Anwendung - unten schickst du Anfragen. Beans und Endpunkte stehen im aufklappbaren Server-Status. Docker hat eigene Editoren in den Kapiteln 8.8 bis 8.10.',
     en: 'After ▶ Start the application runs - send requests below. Beans and endpoints are listed in the expandable server status. Docker has its own editors in chapters 8.8 to 8.10.',

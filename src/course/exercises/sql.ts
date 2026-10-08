@@ -11,7 +11,7 @@ import type { UebungsSammlung } from './types'
 
 const t = <T>(de: T, en: T) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'sql-start': [
     {
       id: 'sql-start-vorhersage-limit',
@@ -39,21 +39,21 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-start-fehler-anfuehrung',
       stufe: 'fehler',
       titel: t('Die Spalte mit dem Leerzeichen', 'The column with the space'),
-      aufgabe: t(
+      task: t(
         'Die Abfrage soll `name` und den Bruttopreis (`price * 1.19`) unter dem Namen **Gross price** zeigen - mit Leerzeichen und großem G. Sie bricht aber ab. Repariere sie.',
         'The query should show `name` and the gross price (`price * 1.19`) under the name **Gross price** - with a space and a capital G. But it fails. Fix it.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT name, price * 1.19 AS 'Gross price'
         FROM products;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT name, price * 1.19 AS "Gross price"
         FROM products;
       `,
-      tests: [{ name: t('Spalten name und „Gross price“', 'Columns name and “Gross price”'), spalten: true }],
-      tipps: t(
+      tests: [{ name: t('Spalten name und „Gross price“', 'Columns name and “Gross price”'), columns: true }],
+      hints: t(
         ['Einfache Anführungszeichen stehen in SQL für **Text-Werte**, nicht für Namen.', 'Namen mit Leerzeichen oder Großbuchstaben gehören in doppelte Anführungszeichen: `"Gross price"`.'],
         ['Single quotes in SQL stand for **text values**, not for names.', 'Names with spaces or capital letters belong in double quotes: `"Gross price"`.'],
       ),
@@ -62,23 +62,23 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-start-frei-neueste',
       stufe: 'frei',
       titel: t('Die neuesten Kunden', 'The newest customers'),
-      aufgabe: t(
+      task: t(
         'Zeige die **drei Kunden, die zuletzt dazugekommen sind** (Spalte `joined`): `name`, `country` und `joined`, der neueste zuerst.',
         'Show the **three customers who joined most recently** (column `joined`): `name`, `country` and `joined`, the newest first.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT name, country, joined
         FROM customers;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT name, country, joined
         FROM customers
         ORDER BY joined DESC
         LIMIT 3;
       `,
-      tests: [{ name: t('Die drei neuesten, der neueste zuerst', 'The three newest, the newest first'), reihenfolge: true }],
-      tipps: t(['Datumswerte lassen sich sortieren wie Zahlen.', '`ORDER BY joined DESC LIMIT 3`'], ['Dates can be sorted like numbers.', '`ORDER BY joined DESC LIMIT 3`']),
+      tests: [{ name: t('Die drei neuesten, der neueste zuerst', 'The three newest, the newest first'), order: true }],
+      hints: t(['Datumswerte lassen sich sortieren wie Zahlen.', '`ORDER BY joined DESC LIMIT 3`'], ['Dates can be sorted like numbers.', '`ORDER BY joined DESC LIMIT 3`']),
     },
   ],
 
@@ -108,25 +108,25 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-where-fehler-oder',
       stufe: 'fehler',
       titel: t('Zu viele Bestellungen', 'Too many orders'),
-      aufgabe: t(
+      task: t(
         'Gesucht sind die **offenen oder bezahlten** Bestellungen **von Kunde 2** (Grace Hopper). Die Abfrage liefert aber auch Bestellungen anderer Kunden. Warum?',
         'We want the **open or paid** orders **of customer 2** (Grace Hopper). But the query also returns orders of other customers. Why?',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT id, customer_id, status
         FROM orders
         WHERE customer_id = 2 AND status = 'open' OR status = 'paid'
         ORDER BY id;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT id, customer_id, status
         FROM orders
         WHERE customer_id = 2 AND status IN ('open', 'paid')
         ORDER BY id;
       `,
       tests: [{ name: t('Nur die offenen und bezahlten Bestellungen von Kunde 2', 'Only the open and paid orders of customer 2') }],
-      tipps: t(
+      hints: t(
         ['`AND` bindet stärker als `OR`: gelesen wird `(customer_id = 2 AND status = \'open\') OR status = \'paid\'`.', 'Klammern um das OR - oder gleich `status IN (\'open\', \'paid\')`.'],
         ['`AND` binds more strongly than `OR`: it is read as `(customer_id = 2 AND status = \'open\') OR status = \'paid\'`.', 'Parentheses around the OR - or simply `status IN (\'open\', \'paid\')`.'],
       ),
@@ -135,23 +135,23 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-where-frei-kontakt',
       stufe: 'frei',
       titel: t('Kontaktliste mit Lücken', 'Contact list with gaps'),
-      aufgabe: t(
+      task: t(
         'Für einen Brief-Versand: alle Kunden aus dem **UK** mit `name` und einer Spalte `contact`, in der die E-Mail steht - oder `letter only`, wenn es keine gibt. Nach Name sortiert.',
         'For a mailing: all customers from the **UK** with `name` and a column `contact` holding the email - or `letter only` if there is none. Sorted by name.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT name, email
         FROM customers;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT name, coalesce(email, 'letter only') AS contact
         FROM customers
         WHERE country = 'UK'
         ORDER BY name;
       `,
-      tests: [{ name: t('Vier Kunden aus dem UK, fehlende E-Mail ersetzt, nach Name', 'Four UK customers, missing email replaced, by name'), reihenfolge: true, spalten: true }],
-      tipps: t(
+      tests: [{ name: t('Vier Kunden aus dem UK, fehlende E-Mail ersetzt, nach Name', 'Four UK customers, missing email replaced, by name'), order: true, columns: true }],
+      hints: t(
         ['`coalesce(a, b)` liefert `a`, außer wenn `a` NULL ist - dann `b`.', 'Vergiss den Spaltennamen nicht: `… AS contact`.'],
         ['`coalesce(a, b)` returns `a`, unless `a` is NULL - then `b`.', 'Do not forget the column name: `… AS contact`.'],
       ),
@@ -183,25 +183,25 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-gruppieren-fehler-having',
       stufe: 'fehler',
       titel: t('Aggregat im WHERE', 'Aggregate in WHERE'),
-      aufgabe: t(
+      task: t(
         'Gesucht: Länder mit **mindestens zwei** Kunden und deren Anzahl. PostgreSQL lehnt die Abfrage ab - lies die Meldung und repariere sie.',
         'We want countries with **at least two** customers and their number. PostgreSQL rejects the query - read the message and fix it.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT country, count(*) AS customers
         FROM customers
         WHERE count(*) >= 2
         GROUP BY country;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT country, count(*) AS customers
         FROM customers
         GROUP BY country
         HAVING count(*) >= 2;
       `,
       tests: [{ name: t('UK und USA mit ihrer Kundenzahl', 'UK and USA with their number of customers') }],
-      tipps: t(
+      hints: t(
         ['WHERE läuft **vor** dem Gruppieren - da gibt es noch keine Gruppen, die man zählen könnte.', 'Bedingungen über Gruppen gehören in `HAVING`, und das steht **nach** `GROUP BY`.'],
         ['WHERE runs **before** grouping - there are no groups to count yet.', 'Conditions on groups belong in `HAVING`, which comes **after** `GROUP BY`.'],
       ),
@@ -210,24 +210,24 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-gruppieren-frei-artikel',
       stufe: 'frei',
       titel: t('Positionen pro Bestellung', 'Line items per order'),
-      aufgabe: t(
+      task: t(
         'Wie viele **Artikel** (Summe von `quantity`) umfasst jede Bestellung? Zeige `order_id` und `items` für alle Bestellungen mit **mindestens 4 Artikeln**, nach `order_id` sortiert.',
         'How many **items** (sum of `quantity`) does every order contain? Show `order_id` and `items` for all orders with **at least 4 items**, sorted by `order_id`.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT order_id, quantity
         FROM order_items;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT order_id, sum(quantity) AS items
         FROM order_items
         GROUP BY order_id
         HAVING sum(quantity) >= 4
         ORDER BY order_id;
       `,
-      tests: [{ name: t('Die richtigen Bestellungen mit ihrer Artikelzahl, nach order_id', 'The right orders with their number of items, by order_id'), reihenfolge: true }],
-      tipps: t(['`GROUP BY order_id` und `sum(quantity)`.', 'Die Bedingung über die Summe steht in `HAVING`.'], ['`GROUP BY order_id` and `sum(quantity)`.', 'The condition on the sum goes into `HAVING`.']),
+      tests: [{ name: t('Die richtigen Bestellungen mit ihrer Artikelzahl, nach order_id', 'The right orders with their number of items, by order_id'), order: true }],
+      hints: t(['`GROUP BY order_id` und `sum(quantity)`.', 'Die Bedingung über die Summe steht in `HAVING`.'], ['`GROUP BY order_id` and `sum(quantity)`.', 'The condition on the sum goes into `HAVING`.']),
     },
   ],
 
@@ -257,11 +257,11 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-joins-fehler-mehrdeutig',
       stufe: 'fehler',
       titel: t('Welche id?', 'Which id?'),
-      aufgabe: t(
+      task: t(
         'Die Abfrage soll zu jeder Bestellung von **Grace Hopper** die Bestellnummer und das Datum zeigen, nach Nummer sortiert. PostgreSQL meldet einen Fehler.',
         'The query should show the order number and date of every order by **Grace Hopper**, sorted by number. PostgreSQL reports an error.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT id, ordered_at
         FROM orders
@@ -269,15 +269,15 @@ export const uebungen: UebungsSammlung = {
         WHERE name = 'Grace Hopper'
         ORDER BY id;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT o.id, o.ordered_at
         FROM orders o
         JOIN customers c ON c.id = o.customer_id
         WHERE c.name = 'Grace Hopper'
         ORDER BY o.id;
       `,
-      tests: [{ name: t('Die vier Bestellungen von Grace, nach Nummer', 'Grace’s four orders, by number'), reihenfolge: true }],
-      tipps: t(
+      tests: [{ name: t('Die vier Bestellungen von Grace, nach Nummer', 'Grace’s four orders, by number'), order: true }],
+      hints: t(
         ['Beide Tabellen haben eine Spalte `id` - PostgreSQL weiß nicht, welche gemeint ist („ambiguous“).', 'Schreib die Tabelle davor: `orders.id` - kürzer mit Alias: `FROM orders o` und dann `o.id`.'],
         ['Both tables have a column `id` - PostgreSQL does not know which one is meant (“ambiguous”).', 'Put the table in front: `orders.id` - shorter with an alias: `FROM orders o` and then `o.id`.'],
       ),
@@ -286,17 +286,17 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-joins-frei-kategorien',
       stufe: 'frei',
       titel: t('Umsatz pro Kategorie', 'Revenue per category'),
-      aufgabe: t(
+      task: t(
         'Wie viel Umsatz hat jede Produkt-Kategorie gemacht? Zeige `category` und `revenue` (Summe von `quantity * unit_price`), **ohne stornierte Bestellungen**, höchster Umsatz zuerst.',
         'How much revenue did each product category make? Show `category` and `revenue` (sum of `quantity * unit_price`), **without cancelled orders**, highest revenue first.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT p.category, i.quantity * i.unit_price AS revenue
         FROM order_items i
         JOIN products p ON p.id = i.product_id;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT p.category, sum(i.quantity * i.unit_price) AS revenue
         FROM order_items i
         JOIN products p ON p.id = i.product_id
@@ -305,8 +305,8 @@ export const uebungen: UebungsSammlung = {
         GROUP BY p.category
         ORDER BY revenue DESC;
       `,
-      tests: [{ name: t('Fünf Kategorien mit dem richtigen Umsatz, höchster zuerst', 'Five categories with the right revenue, highest first'), reihenfolge: true }],
-      tipps: t(
+      tests: [{ name: t('Fünf Kategorien mit dem richtigen Umsatz, höchster zuerst', 'Five categories with the right revenue, highest first'), order: true }],
+      hints: t(
         ['Den Status kennt nur `orders` - dafür braucht es einen dritten JOIN.', 'Dann `GROUP BY p.category` und `sum(…)`.'],
         ['Only `orders` knows the status - that needs a third JOIN.', 'Then `GROUP BY p.category` and `sum(…)`.'],
       ),
@@ -338,16 +338,16 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-aendern-fehler-where',
       stufe: 'fehler',
       titel: t('Die Preiserhöhung, die zu weit ging', 'The price rise that went too far'),
-      aufgabe: t(
+      task: t(
         'Nur der **27-inch Monitor** soll 259.00 kosten. Das Skript ändert aber viel mehr. Repariere es - der Rest des Sortiments muss bleiben, wie er ist.',
         'Only the **27-inch Monitor** should cost 259.00. But the script changes much more. Fix it - the rest of the range must stay as it is.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         UPDATE products
         SET price = 259.00;
       `,
-      loesung: sql`
+      solution: sql`
         UPDATE products
         SET price = 259.00
         WHERE name = '27-inch Monitor';
@@ -356,7 +356,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('Der Monitor kostet 259.00', 'The monitor costs 259.00'), abfrage: `SELECT price FROM products WHERE name = '27-inch Monitor'` },
         { name: t('Alle anderen Preise sind unverändert', 'All other prices are unchanged'), abfrage: `SELECT name, price FROM products WHERE name <> '27-inch Monitor' ORDER BY id` },
       ],
-      tipps: t(
+      hints: t(
         ['Ohne `WHERE` gilt ein UPDATE für **jede** Zeile.', 'Mit `WHERE name = \'27-inch Monitor\'` - oder sicherer über den Schlüssel: `WHERE id = 3`.'],
         ['Without `WHERE` an UPDATE applies to **every** row.', 'With `WHERE name = \'27-inch Monitor\'` - or safer via the key: `WHERE id = 3`.'],
       ),
@@ -365,16 +365,16 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-aendern-frei-storno',
       stufe: 'frei',
       titel: t('Eine Bestellung stornieren', 'Cancelling an order'),
-      aufgabe: t(
+      task: t(
         'Hedy Lamarr storniert ihre offene Bestellung **118**. Setze ihren Status auf `cancelled` - und **lösche** Bestellung **106** (schon storniert) samt ihrer Positionen, weil sie aufgeräumt werden soll.',
         'Hedy Lamarr cancels her open order **118**. Set its status to `cancelled` - and **delete** order **106** (already cancelled) with its line items, because it should be cleaned up.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         -- your changes
 
       `,
-      loesung: sql`
+      solution: sql`
         UPDATE orders SET status = 'cancelled' WHERE id = 118;
         DELETE FROM orders WHERE id = 106;
       `,
@@ -382,7 +382,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('Die Status aller Bestellungen stimmen', 'The status of every order is right'), abfrage: `SELECT id, status FROM orders ORDER BY id` },
         { name: t('Die Positionen von 106 sind weg, alle anderen noch da', 'The line items of 106 are gone, all others still there'), abfrage: `SELECT order_id, product_id FROM order_items` },
       ],
-      tipps: t(
+      hints: t(
         ['Zwei Anweisungen: ein `UPDATE … WHERE id = 118` und ein `DELETE … WHERE id = 106`.', 'Die Positionen musst du nicht selbst löschen: `order_items.order_id` hat `ON DELETE CASCADE` (siehe `\\d order_items`).'],
         ['Two statements: an `UPDATE … WHERE id = 118` and a `DELETE … WHERE id = 106`.', 'You do not have to delete the line items yourself: `order_items.order_id` has `ON DELETE CASCADE` (see `\\d order_items`).'],
       ),
@@ -417,23 +417,23 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-tabellen-fehler-geld',
       stufe: 'fehler',
       titel: t('Rundungsfehler im Kontostand', 'Rounding errors in the balance'),
-      aufgabe: t(
+      task: t(
         'Zehn Gutschriften zu je 0.10 € sollen genau **1.00** ergeben. Mit dem gewählten Datentyp kommt aber nicht genau 1 heraus. Ändere nur den Typ der Spalte `amount`.',
         'Ten credits of 0.10 € each should add up to exactly **1.00**. With the chosen data type the result is not exactly 1. Change only the type of the column `amount`.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         CREATE TABLE credits (amount real NOT NULL);
         INSERT INTO credits SELECT 0.10 FROM generate_series(1, 10);
         SELECT sum(amount) = 1 AS exact, sum(amount) AS total FROM credits;
       `,
-      loesung: sql`
+      solution: sql`
         CREATE TABLE credits (amount numeric(10, 2) NOT NULL);
         INSERT INTO credits SELECT 0.10 FROM generate_series(1, 10);
         SELECT sum(amount) = 1 AS exact, sum(amount) AS total FROM credits;
       `,
       tests: [{ name: t('Die Summe ist genau 1.00', 'The sum is exactly 1.00') }],
-      tipps: t(
+      hints: t(
         ['`real` und `double precision` sind Gleitkommazahlen - 0.1 ist darin nicht exakt darstellbar.', 'Für Geld: `numeric(10, 2)` - exakt, mit zwei Nachkommastellen.'],
         ['`real` and `double precision` are floating point numbers - 0.1 cannot be stored exactly.', 'For money: `numeric(10, 2)` - exact, with two decimal places.'],
       ),
@@ -442,17 +442,17 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-tabellen-frei-gutscheine',
       stufe: 'frei',
       titel: t('Eine Tabelle für Gutscheine', 'A table for vouchers'),
-      aufgabe: t(
+      task: t(
         'Lege die Tabelle `vouchers` an: `code` (text, Primärschlüssel), `percent` (integer, Pflicht, **nur 1 bis 50** erlaubt) und `valid_until` (date, Pflicht). Füge danach den Gutschein `WELCOME10` mit 10 % bis `2026-12-31` ein.',
         'Create the table `vouchers`: `code` (text, primary key), `percent` (integer, required, **only 1 to 50** allowed) and `valid_until` (date, required). Then insert the voucher `WELCOME10` with 10 % until `2026-12-31`.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         CREATE TABLE vouchers (
           -- your columns
         );
       `,
-      loesung: sql`
+      solution: sql`
         CREATE TABLE vouchers (
           code        text PRIMARY KEY,
           percent     integer NOT NULL CHECK (percent BETWEEN 1 AND 50),
@@ -466,7 +466,7 @@ export const uebungen: UebungsSammlung = {
         {
           name: t('Drei Spalten mit den richtigen Typen, alle Pflicht', 'Three columns with the right types, all required'),
           abfrage: `SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'vouchers' ORDER BY ordinal_position`,
-          reihenfolge: true,
+          order: true,
         },
         {
           name: t('Primärschlüssel und eine CHECK-Regel', 'A primary key and a CHECK rule'),
@@ -488,7 +488,7 @@ export const uebungen: UebungsSammlung = {
         },
         { name: t('WELCOME10 ist eingetragen', 'WELCOME10 is in the table'), abfrage: `SELECT code, percent, valid_until FROM vouchers` },
       ],
-      tipps: t(
+      hints: t(
         ['Spalten: `code text PRIMARY KEY`, dann `percent` und `valid_until` mit `NOT NULL`.', 'Der Bereich: `CHECK (percent BETWEEN 1 AND 50)`.', 'Danach ein `INSERT INTO vouchers (code, percent, valid_until) VALUES (…)`.'],
         ['Columns: `code text PRIMARY KEY`, then `percent` and `valid_until` with `NOT NULL`.', 'The range: `CHECK (percent BETWEEN 1 AND 50)`.', 'Then an `INSERT INTO vouchers (code, percent, valid_until) VALUES (…)`.'],
       ),
@@ -526,25 +526,25 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-profi-fehler-subquery',
       stufe: 'fehler',
       titel: t('Mehr als eine Zeile', 'More than one row'),
-      aufgabe: t(
+      task: t(
         'Gesucht sind alle Bestellungen von Kunden aus dem **UK** (id und customer_id, nach id). PostgreSQL bricht ab: „more than one row returned by a subquery“. Repariere die Abfrage.',
         'We want all orders of customers from the **UK** (id and customer_id, by id). PostgreSQL fails: “more than one row returned by a subquery”. Fix the query.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT id, customer_id
         FROM orders
         WHERE customer_id = (SELECT id FROM customers WHERE country = 'UK')
         ORDER BY id;
       `,
-      loesung: sql`
+      solution: sql`
         SELECT id, customer_id
         FROM orders
         WHERE customer_id IN (SELECT id FROM customers WHERE country = 'UK')
         ORDER BY id;
       `,
-      tests: [{ name: t('Alle Bestellungen der UK-Kunden, nach id', 'All orders of UK customers, by id'), reihenfolge: true }],
-      tipps: t(
+      tests: [{ name: t('Alle Bestellungen der UK-Kunden, nach id', 'All orders of UK customers, by id'), order: true }],
+      hints: t(
         ['`=` vergleicht mit **einem** Wert. Die Unterabfrage liefert aber vier ids.', 'Mit einer Liste vergleicht man per `IN (…)`.'],
         ['`=` compares with **one** value. But the subquery returns four ids.', 'To compare with a list, use `IN (…)`.'],
       ),
@@ -553,25 +553,25 @@ export const uebungen: UebungsSammlung = {
       id: 'sql-profi-frei-anteil',
       stufe: 'frei',
       titel: t('Anteil am Kategorie-Umsatz', 'Share of the category revenue'),
-      aufgabe: t(
+      task: t(
         'Zeige für jedes **Buch** (`category = \'books\'`) `name` und `share`: den Anteil seines Lagerwerts (`price * stock`) am Lagerwert aller Bücher in Prozent, auf eine Nachkommastelle gerundet. Nach `share` absteigend.',
         'For every **book** (`category = \'books\'`) show `name` and `share`: the percentage of its stock value (`price * stock`) of the stock value of all books, rounded to one decimal place. By `share` descending.',
       ),
-      modus: 'sql',
+      mode: 'sql',
       code: sql`
         SELECT name, price * stock AS stock_value
         FROM products
         WHERE category = 'books';
       `,
-      loesung: sql`
+      solution: sql`
         SELECT name,
                round(100 * price * stock / sum(price * stock) OVER (), 1) AS share
         FROM products
         WHERE category = 'books'
         ORDER BY share DESC;
       `,
-      tests: [{ name: t('Drei Bücher mit ihrem Anteil in Prozent, größter zuerst', 'Three books with their share in percent, largest first'), reihenfolge: true }],
-      tipps: t(
+      tests: [{ name: t('Drei Bücher mit ihrem Anteil in Prozent, größter zuerst', 'Three books with their share in percent, largest first'), order: true }],
+      hints: t(
         ['`sum(price * stock) OVER ()` ist die Summe über **alle** Zeilen des Ergebnisses - neben jeder einzelnen Zeile.', '`round(100 * price * stock / sum(…) OVER (), 1)`'],
         ['`sum(price * stock) OVER ()` is the sum over **all** rows of the result - next to every single row.', '`round(100 * price * stock / sum(…) OVER (), 1)`'],
       ),

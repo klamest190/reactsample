@@ -1,5 +1,5 @@
-import { SHOP_TABELLEN } from '../sql/dataset'
-import type { Eintrag } from './suggestions'
+import { SHOP_TABLES } from '../sql/dataset'
+import type { Entry } from './suggestions'
 
 /**
  * Editor suggestions for part 9 (PostgreSQL): keywords, functions, the tables and
@@ -7,11 +7,11 @@ import type { Eintrag } from './suggestions'
  * for table aliases. The search ignores case, so `sel` finds SELECT.
  */
 
-const k = (label: string, de: string, en: string, einfuegen?: string): Eintrag => ({ label, einfuegen, art: 'keyword', info: { de, en } })
-const f = (label: string, de: string, en: string, einfuegen = `${label}($0)`): Eintrag => ({ label, einfuegen, art: 'funktion', info: { de, en } })
-const s = (label: string, einfuegen: string, de: string, en: string): Eintrag => ({ label, einfuegen, art: 'snippet', info: { de, en } })
+const k = (label: string, de: string, en: string, insert?: string): Entry => ({ label, insert, kind: 'keyword', info: { de, en } })
+const f = (label: string, de: string, en: string, insert = `${label}($0)`): Entry => ({ label, insert, kind: 'function', info: { de, en } })
+const s = (label: string, insert: string, de: string, en: string): Entry => ({ label, insert, kind: 'snippet', info: { de, en } })
 
-const KEYWORDS: Eintrag[] = [
+const KEYWORDS: Entry[] = [
   // --- Reading -------------------------------------------------------------------
   s('SELECT', 'SELECT $0\nFROM ', 'Spalten lesen: SELECT spalten FROM tabelle', 'Read columns: SELECT columns FROM table'),
   k('FROM', 'Aus welcher Tabelle gelesen wird.', 'Which table is read.', 'FROM $0'),
@@ -86,7 +86,7 @@ const KEYWORDS: Eintrag[] = [
   k('jsonb', 'JSON, binär gespeichert und durchsuchbar.', 'JSON, stored binary and searchable.'),
 ]
 
-const FUNCTIONS: Eintrag[] = [
+const FUNCTIONS: Entry[] = [
   f('count', 'Anzahl: count(*) alle Zeilen, count(spalte) ohne NULL.', 'Count: count(*) all rows, count(column) without NULL.', 'count(*)'),
   f('sum', 'Summe.', 'Sum.'),
   f('avg', 'Durchschnitt.', 'Average.'),
@@ -114,15 +114,15 @@ const FUNCTIONS: Eintrag[] = [
 ]
 
 /** Tables and columns of the example database, taken from SHOP_TABELLEN. */
-const SCHEMA: Eintrag[] = [
-  ...SHOP_TABELLEN.map((t): Eintrag => ({ label: t.name, art: 'variable', info: { de: `Tabelle: ${t.info.de}`, en: `Table: ${t.info.en}` } })),
-  ...[...new Map(SHOP_TABELLEN.flatMap((t) => t.spalten.map((c) => [c.name, t.name] as const))).entries()].flatMap(([column, table]): Eintrag[] => {
+const SCHEMA: Entry[] = [
+  ...SHOP_TABLES.map((t): Entry => ({ label: t.name, kind: 'variable', info: { de: `Tabelle: ${t.info.de}`, en: `Table: ${t.info.en}` } })),
+  ...[...new Map(SHOP_TABLES.flatMap((t) => t.columns.map((c) => [c.name, t.name] as const))).entries()].flatMap(([column, table]): Entry[] => {
     const info = { de: `Spalte (${table}${column === 'id' || column === 'name' ? ' u. a.' : ''})`, en: `Column (${table}${column === 'id' || column === 'name' ? ' and others' : ''})` }
     return [
-      { label: column, art: 'variable', info },
-      { label: '.' + column, einfuegen: column, art: 'methode', info },
+      { label: column, kind: 'variable', info },
+      { label: '.' + column, insert: column, kind: 'method', info },
     ]
   }),
 ]
 
-export const SQL: Eintrag[] = [...KEYWORDS, ...FUNCTIONS, ...SCHEMA]
+export const SQL: Entry[] = [...KEYWORDS, ...FUNCTIONS, ...SCHEMA]

@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './TypeScript.code'
+import { examples, codeBloecke } from './TypeScript.code'
 
 /**
  * KAPITEL 5.6 (English) - TypeScript with React
@@ -38,7 +38,7 @@ export function TypeScriptKapitel() {
           A component with typed props. Change <Code>count={'{3}'}</Code> to <Code>count="3"</Code> - the type check
           below the editor reports the error before anyone uses the app.
         </P>
-        <TryIt id="praxis-typescript-einstieg" {...beispiele['praxis-typescript-einstieg']} modus="react" typen />
+        <TryIt id="praxis-typescript-einstieg" {...examples['praxis-typescript-einstieg']} mode="react" typed />
         <Hinweis variante="tipp">
           This chapter shows TypeScript <strong>in React</strong>. You learn the language itself - object types,
           unions, generics, utility types - in depth in part 2, starting with <Verweis id="ts-start" />.
@@ -82,7 +82,7 @@ export function TypeScriptKapitel() {
           <Code>type</Code> and <strong>union types</strong> with <Code>|</Code> - “one or the other”. Unions of
           fixed values such as <Code>'all' | 'open' | 'done'</Code> are especially useful.
         </P>
-        <TryIt id="praxis-typescript-grundlagen" {...beispiele['praxis-typescript-grundlagen']} modus="react" typen />
+        <TryIt id="praxis-typescript-grundlagen" {...examples['praxis-typescript-grundlagen']} mode="react" typed />
         <P>
           You do not have to annotate everything. TypeScript <strong>infers types</strong>:{' '}
           <Code>let attempts = 0</Code> is a <Code>number</Code> automatically. You mostly write types at the
@@ -97,7 +97,7 @@ export function TypeScriptKapitel() {
           default value when destructuring. For <Code>children</Code> use <Code>ReactNode</Code>: anything React can
           render (<Verweis id="react-props" />).
         </P>
-        <TryIt id="praxis-typescript-props" {...beispiele['praxis-typescript-props']} modus="react" typen />
+        <TryIt id="praxis-typescript-props" {...examples['praxis-typescript-props']} mode="react" typed />
         <Liste>
           <li>
             <Code>ComponentProps&lt;'button'&gt;</Code> gives you all props of a real <Code>{'<button>'}</Code> (
@@ -118,7 +118,7 @@ export function TypeScriptKapitel() {
           angle brackets: <Code>useState&lt;User | null&gt;(null)</Code>. Refs to DOM elements get the element type (
           <Verweis id="hooks-useref" />).
         </P>
-        <TryIt id="praxis-typescript-state" {...beispiele['praxis-typescript-state']} modus="react" typen />
+        <TryIt id="praxis-typescript-state" {...examples['praxis-typescript-state']} mode="react" typed />
         <P>
           After <Code>if (user)</Code> or <Code>user ? … : …</Code> TypeScript knows that <Code>user</Code> is not{' '}
           <Code>null</Code>. This is called <strong>narrowing</strong> - and exactly these forgotten checks are one of
@@ -140,7 +140,7 @@ export function TypeScriptKapitel() {
           type with a fixed <Code>type</Code>, all of them together form a union. Inside the <Code>switch</Code>,
           TypeScript then knows in every <Code>case</Code> which fields the action has.
         </P>
-        <TryIt id="praxis-typescript-reducer" {...beispiele['praxis-typescript-reducer']} modus="react" typen />
+        <TryIt id="praxis-typescript-reducer" {...examples['praxis-typescript-reducer']} mode="react" typed />
         <P>
           The <Code>default</Code> branch with <Code>never</Code> is a safety net: add the action{' '}
           <Code>{"| { type: 'removed'; id: number }"}</Code> at the top - the type check immediately reports that the
@@ -154,7 +154,7 @@ export function TypeScriptKapitel() {
           pattern from <Verweis id="hooks-usecontext" /> gets even better with TypeScript: the custom hook checks for{' '}
           <Code>null</Code> once - every caller gets a clean type without <Code>null</Code>.
         </P>
-        <TryIt id="praxis-typescript-context" {...beispiele['praxis-typescript-context']} modus="react" typen />
+        <TryIt id="praxis-typescript-context" {...examples['praxis-typescript-context']} mode="react" typed />
       </Abschnitt>
 
       <Abschnitt titel="Generic components">
@@ -163,7 +163,7 @@ export function TypeScriptKapitel() {
           <Code>&lt;T&gt;</Code> everything stays type-safe anyway: TypeScript fills in <Code>T</Code> at every usage
           from the <Code>items</Code> you pass.
         </P>
-        <TryIt id="praxis-typescript-generisch" {...beispiele['praxis-typescript-generisch']} modus="react" typen />
+        <TryIt id="praxis-typescript-generisch" {...examples['praxis-typescript-generisch']} mode="react" typed />
       </Abschnitt>
 
       <Abschnitt titel="Types from types and outside data">
@@ -175,7 +175,7 @@ export function TypeScriptKapitel() {
           with the return type <Code>value is Customer</Code> (a <strong>type guard</strong>) tells TypeScript the
           result of the check.
         </P>
-        <TryIt id="praxis-typescript-typen" {...beispiele['praxis-typescript-typen']} modus="react" typen />
+        <TryIt id="praxis-typescript-typen" {...examples['praxis-typescript-typen']} mode="react" typed />
         <Hinweis variante="warnung">
           <Code>any</Code> switches checking off - and an <Code>any</Code> silently infects everything it touches.{' '}
           <Code>unknown</Code> is the safe variant: it accepts anything but can only be used after a check. And{' '}
@@ -192,13 +192,13 @@ export function TypeScriptKapitel() {
         <P>
           Vite comes with a ready-made template (more in <Verweis id="praxis-lokal" />):
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
+        <CodeBlock title="Terminal" code={codeBloecke.anlegen} />
         <P>
           The settings live in <Code>tsconfig.json</Code>. The most important one is <Code>strict</Code> - without it
           you lose exactly the checks that find the most bugs:
         </P>
-        <CodeBlock titel="tsconfig.json (excerpt)" code={codeBloecke.tsconfig} />
-        <CodeBlock titel="Terminal" code={codeBloecke.pruefen} />
+        <CodeBlock title="tsconfig.json (excerpt)" code={codeBloecke.tsconfig} />
+        <CodeBlock title="Terminal" code={codeBloecke.pruefen} />
         <Hinweis variante="tipp">
           Migrating from JavaScript works step by step: rename one file at a time from <Code>.jsx</Code> to{' '}
           <Code>.tsx</Code> and fix the errors the compiler reports. That is exactly what you practice now.
@@ -208,10 +208,10 @@ export function TypeScriptKapitel() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-typescript-uebung"
-          {...beispiele['praxis-typescript-uebung']}
-          modus="react"
-          typen
-          aufgabe={
+          {...examples['praxis-typescript-uebung']}
+          mode="react"
+          typed
+          task={
             <>
               <p>The cart works, but it is still plain JavaScript. Make the type check green:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -233,38 +233,38 @@ export function TypeScriptKapitel() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What happens to the types when Vite builds the app?',
-            antworten: [
+            question: 'What happens to the types when Vite builds the app?',
+            answers: [
               'They are turned into runtime checks',
               'They are removed - checking is done separately by tsc or the editor',
               'The browser checks them while loading',
             ],
-            richtig: 1,
-            erklaerung: 'Plain JavaScript reaches the browser. That is why tsc -b belongs in the build.',
+            correct: 1,
+            explanation: 'Plain JavaScript reaches the browser. That is why tsc -b belongs in the build.',
           },
           {
-            frage: 'When does useState need a type in angle brackets?',
-            antworten: ['Always', 'When the start value does not reveal the type, e.g. null or []', 'Only for objects'],
-            richtig: 1,
-            erklaerung: "useState('') is a string automatically - useState<User | null>(null) has to be spelled out.",
+            question: 'When does useState need a type in angle brackets?',
+            answers: ['Always', 'When the start value does not reveal the type, e.g. null or []', 'Only for objects'],
+            correct: 1,
+            explanation: "useState('') is a string automatically - useState<User | null>(null) has to be spelled out.",
           },
           {
-            frage: 'What is the never branch in the reducer for?',
-            antworten: [
+            question: 'What is the never branch in the reducer for?',
+            answers: [
               'It catches runtime errors',
               'It reports at compile time when an action is missing in the switch',
               'It makes the reducer faster',
             ],
-            richtig: 1,
-            erklaerung: 'If all cases are handled, only never is left for action - otherwise you get a type error.',
+            correct: 1,
+            explanation: 'If all cases are handled, only never is left for action - otherwise you get a type error.',
           },
           {
-            frage: 'Which type do you give data from JSON.parse before checking it?',
-            antworten: ['any', 'unknown', 'object'],
-            richtig: 1,
-            erklaerung: 'unknown forces a check. any would switch every check off.',
+            question: 'Which type do you give data from JSON.parse before checking it?',
+            answers: ['any', 'unknown', 'object'],
+            correct: 1,
+            explanation: 'unknown forces a check. any would switch every check off.',
           },
         ]}
       />

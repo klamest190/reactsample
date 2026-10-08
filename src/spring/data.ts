@@ -18,9 +18,9 @@
  *   - Errors in derived query names show up at STARTUP, not at the first call.
  */
 
-import type { FeldDekl, MethodenDekl, TypDeklaration, TypRef } from '../java/ast'
+import type { FieldDecl, MethodDecl, TypeDecl, TypeRef } from '../java/ast'
 import type { Interpreter } from '../java/interpreter'
-import { NULL, alsZahl, inhaltGleich, istZahl, wahrheit, type JavaObjekt, type Klasse, type NativWert, type Wert } from '../java/values'
+import { NULL, toNumber, contentEquals, isNumber, bool, type JavaObject, type ClassInfo, type NativeValue, type Value } from '../java/values'
 import { find, has, text } from './annotations'
 
 export const REPOSITORY_TYPES = ['JpaRepository', 'CrudRepository', 'ListCrudRepository', 'PagingAndSortingRepository', 'Repository']
@@ -47,30 +47,30 @@ type DerivedQuery = {
   distinct: boolean
 }
 
-type Table = { rows: JavaObjekt[]; nextId: number }
+type Table = { rows: JavaObject[]; nextId: number }
 
 export class Repository {
   readonly queries = new Map<string, DerivedQuery>()
-  readonly idField: FeldDekl
+  readonly idField: FieldDecl
   readonly generated: boolean
   readonly tableName: string
   readonly columns: string[]
 
   readonly name: string
-  readonly declaration: TypDeklaration
-  readonly entity: Klasse
+  readonly declaration: TypeDecl
+  readonly entity: ClassInfo
   private readonly table: Table
   private readonly interpreter: Interpreter
   private readonly log: (sql: string) => void
 
-  constructor(name: string, declaration: TypDeklaration, entity: Klasse, table: Table, interpreter: Interpreter, log: (sql: string) => void) {
+  constructor(name: string, declaration: TypeDecl, entity: ClassInfo, table: Table, interpreter: Interpreter, log: (sql: string) => void) {
     this.name = name
     this.declaration = declaration
     this.entity = entity
     this.table = table
     this.interpreter = interpreter
     this.log = log
-    if (!has(entity.dekl.annotations, 'Entity')) {
+    if (!has(entity.decl.annotations, 'Entity')) {
       throw new RepositoryError(`Not a managed type: class ${entity.name} - the entity class needs the annotation @Entity`)
     }
     const fields = entityFields(entity)
@@ -78,17 +78,17 @@ export class Repository {
     if (!idField) throw new RepositoryError(`No identifier specified for entity: ${entity.name} - mark the id field with @Id`)
     this.idField = idField
     this.generated = has(idField.annotations, 'GeneratedValue')
-    this.tableName = text(find(entity.dekl.annotations, 'Table'), 'name') ?? snake(entity.name)
+    this.tableName = text(find(entity.decl.annotations, 'Table'), 'name') ?? snake(entity.name)
     this.columns = [idField.name, ...fields.filter((f) => f !== idField).map((f) => f.name).sort()].map(snake)
 
     const properties = new Set(fields.map((f) => f.name))
-    for (const method of declaration.methoden) {
-      if (method.rumpf || method.statisch) continue
+    for (const method of declaration.methods) {
+      if (method.body || method.isStatic) continue
       this.queries.set(method.name, parseQuery(method, entity.name, properties))
     }
   }
 
-  call(name: string, args: Wert[], line: number): Wert | undefined {
+  call(name: string, args: Value[], line: number): Value | undefined {
     const [a] = args
     const i = this.interpreter
     switch (name) {
@@ -96,7 +96,7 @@ export class Repository {
       case 'saveAndFlush':
         return this.save(a, line)
       case 'saveAll':
-        return list(i.elementeVon(a, line).map((e) => this.save(e, line)))
+        return list(i.elementsOf(a, line).map((e) => this.save(e, line)))
       case 'findAll':
         this.select('')
         return list(this.table.rows.map(copy))
@@ -108,34 +108,34 @@ export class Repository {
       case 'getReferenceById':
       case 'getById': {
         const row = this.byId(a)
-        if (!row) i.werfen('EntityNotFoundException', `Unable to find ${this.entity.name} with id ${i.alsText(a)}`, line)
+        if (!row) i.raise('EntityNotFoundException', `Unable to find ${this.entity.name} with id ${i.toText(a)}`, line)
         return copy(row!)
       }
       case 'findAllById': {
-        const ids = i.elementeVon(a, line)
+        const ids = i.elementsOf(a, line)
         return list(this.table.rows.filter((r) => ids.some((id) => sameId(this.idOf(r), id))).map(copy))
       }
       case 'existsById':
         this.log(`select ${this.alias}.${snake(this.idField.name)} from ${this.tableName} ${this.alias} where ${this.alias}.${snake(this.idField.name)}=? fetch first ? rows only`)
-        return wahrheit(Boolean(this.byId(a)))
+        return bool(Boolean(this.byId(a)))
       case 'count':
         if (args.length) return undefined
         this.log(`select count(*) from ${this.tableName} ${this.alias}`)
-        return { art: 'long', wert: this.table.rows.length }
+        return { kind: 'long', value: this.table.rows.length }
       case 'deleteById': {
         const row = this.byId(a)
         if (row) this.remove(row)
         return NULL
       }
       case 'delete': {
-        const row = a?.art === 'objekt' ? this.byId(this.idOf(a)) : null
+        const row = a?.kind === 'object' ? this.byId(this.idOf(a)) : null
         if (row) this.remove(row)
         return NULL
       }
       case 'deleteAll':
       case 'deleteAllInBatch':
         if (args.length) {
-          for (const e of i.elementeVon(a, line)) if (e.art === 'objekt') this.call('delete', [e], line)
+          for (const e of i.elementsOf(a, line)) if (e.kind === 'object') this.call('delete', [e], line)
         } else {
           this.log(`delete from ${this.tableName}`)
           this.table.rows.length = 0
@@ -157,31 +157,31 @@ export class Repository {
     this.log(`select ${columns} from ${this.tableName} ${this.alias}${where ? ' ' + where : ''}`)
   }
 
-  private idOf(row: JavaObjekt): Wert {
-    return row.felder.get(this.idField.name) ?? NULL
+  private idOf(row: JavaObject): Value {
+    return row.fields.get(this.idField.name) ?? NULL
   }
 
-  private byId(id: Wert | undefined): JavaObjekt | undefined {
-    if (!id || id.art === 'null') this.interpreter.werfen('IllegalArgumentException', 'The given id must not be null', 0)
+  private byId(id: Value | undefined): JavaObject | undefined {
+    if (!id || id.kind === 'null') this.interpreter.raise('IllegalArgumentException', 'The given id must not be null', 0)
     return this.table.rows.find((row) => sameId(this.idOf(row), id!))
   }
 
-  private save(entity: Wert, line: number): Wert {
+  private save(entity: Value, line: number): Value {
     const i = this.interpreter
-    if (entity.art !== 'objekt' || entity.klasse !== this.entity) {
-      i.werfen('IllegalArgumentException', `Entity must be of type ${this.entity.name}`, line)
+    if (entity.kind !== 'object' || entity.classInfo !== this.entity) {
+      i.raise('IllegalArgumentException', `Entity must be of type ${this.entity.name}`, line)
     }
-    const object = entity as JavaObjekt
+    const object = entity as JavaObject
     let id = this.idOf(object)
-    const isNew = id.art === 'null' || (istZahl(id) && alsZahl(id) === 0 && this.generated)
+    const isNew = id.kind === 'null' || (isNumber(id) && toNumber(id) === 0 && this.generated)
     const fields = entityFields(this.entity).filter((f) => f !== this.idField).map((f) => snake(f.name)).sort()
 
     if (isNew) {
       if (!this.generated) {
-        i.werfen('IllegalStateException', `ids for this class must be manually assigned before calling save(): ${this.entity.name}`, line)
+        i.raise('IllegalStateException', `ids for this class must be manually assigned before calling save(): ${this.entity.name}`, line)
       }
-      id = idValue(this.idField.typ, this.table.nextId++)
-      object.felder.set(this.idField.name, id)
+      id = idValue(this.idField.type, this.table.nextId++)
+      object.fields.set(this.idField.name, id)
       this.log(`insert into ${this.tableName} (${fields.join(',')}) values (${fields.map(() => '?').join(',')})`)
       this.table.rows.push(copy(object))
       return object
@@ -195,12 +195,12 @@ export class Repository {
     } else {
       this.log(`insert into ${this.tableName} (${[...fields, snake(this.idField.name)].join(',')}) values (${[...fields, 'id'].map(() => '?').join(',')})`)
       this.table.rows.push(copy(object))
-      if (istZahl(id)) this.table.nextId = Math.max(this.table.nextId, alsZahl(id) + 1)
+      if (isNumber(id)) this.table.nextId = Math.max(this.table.nextId, toNumber(id) + 1)
     }
     return object
   }
 
-  private remove(row: JavaObjekt) {
+  private remove(row: JavaObject) {
     this.select(`where ${this.alias}.${snake(this.idField.name)}=?`)
     this.log(`delete from ${this.tableName} where ${snake(this.idField.name)}=?`)
     this.table.rows.splice(this.table.rows.indexOf(row), 1)
@@ -208,7 +208,7 @@ export class Repository {
 
   // --- Derived queries ------------------------------------------------------
 
-  private run(query: DerivedQuery, args: Wert[], line: number): Wert {
+  private run(query: DerivedQuery, args: Value[], line: number): Value {
     const i = this.interpreter
     let position = 0
     const bound = query.groups.map((group) =>
@@ -227,29 +227,29 @@ export class Repository {
       bound.length === 0 ? true : bound.some((group) => group.every(({ condition, values }) => matches(row, condition, values, i))),
     )
     for (const { property, descending } of [...query.orderBy].reverse()) {
-      rows = [...rows].sort((x, y) => compareValues(x.felder.get(property) ?? NULL, y.felder.get(property) ?? NULL, i) * (descending ? -1 : 1))
+      rows = [...rows].sort((x, y) => compareValues(x.fields.get(property) ?? NULL, y.fields.get(property) ?? NULL, i) * (descending ? -1 : 1))
     }
     if (query.limit) rows = rows.slice(0, query.limit)
 
     switch (query.kind) {
       case 'count':
         this.log(`select count(${this.alias}.${snake(this.idField.name)}) from ${this.tableName} ${this.alias}${where ? ' where ' + where : ''}`)
-        return { art: 'long', wert: rows.length }
+        return { kind: 'long', value: rows.length }
       case 'exists':
         this.log(`select ${this.alias}.${snake(this.idField.name)} from ${this.tableName} ${this.alias}${where ? ' where ' + where : ''} fetch first ? rows only`)
-        return wahrheit(rows.length > 0)
+        return bool(rows.length > 0)
       case 'delete':
         this.select(where ? 'where ' + where : '')
         for (const row of rows) this.remove(row)
-        return { art: 'long', wert: rows.length }
+        return { kind: 'long', value: rows.length }
       case 'find': {
         this.select(`${where ? 'where ' + where : ''}${order ? ' order by ' + order : ''}`.trim())
         const method = this.declarationOf(query)
-        const returns = method?.rueckgabe.name ?? 'List'
+        const returns = method?.returnType.name ?? 'List'
         if (returns === 'Optional') return optional(rows[0] ? copy(rows[0]) : null)
         if (returns === this.entity.name) {
           if (rows.length > 1) {
-            i.werfen('IncorrectResultSizeDataAccessException', `Query did not return a unique result: ${rows.length} results were returned`, line)
+            i.raise('IncorrectResultSizeDataAccessException', `Query did not return a unique result: ${rows.length} results were returned`, line)
           }
           return rows[0] ? copy(rows[0]) : NULL
         }
@@ -258,8 +258,8 @@ export class Repository {
     }
   }
 
-  private declarationOf(query: DerivedQuery): MethodenDekl | undefined {
-    for (const [name, q] of this.queries) if (q === query) return this.declaration.methoden.find((m) => m.name === name)
+  private declarationOf(query: DerivedQuery): MethodDecl | undefined {
+    for (const [name, q] of this.queries) if (q === query) return this.declaration.methods.find((m) => m.name === name)
     return undefined
   }
 }
@@ -285,7 +285,7 @@ const OPERATORS: [string, Condition['operator'], number][] = [
   ['NotIn', 'notIn', 1], ['In', 'in', 1], ['IsNot', 'not', 1], ['Not', 'not', 1], ['Is', 'eq', 1], ['Equals', 'eq', 1],
 ]
 
-function parseQuery(method: MethodenDekl, entity: string, properties: Set<string>): DerivedQuery {
+function parseQuery(method: MethodDecl, entity: string, properties: Set<string>): DerivedQuery {
   const fail = (reason: string): never => {
     throw new RepositoryError(`Could not create query for method ${method.name}(); ${reason}`)
   }
@@ -344,8 +344,8 @@ function parseQuery(method: MethodenDekl, entity: string, properties: Set<string
       query.groups.push(parsed)
     }
   }
-  if (argumentsNeeded !== method.parameter.length) {
-    fail(`it needs ${argumentsNeeded} parameter(s), but declares ${method.parameter.length}`)
+  if (argumentsNeeded !== method.params.length) {
+    fail(`it needs ${argumentsNeeded} parameter(s), but declares ${method.params.length}`)
   }
   return query
 }
@@ -358,26 +358,26 @@ function propertyName(part: string, properties: Set<string>): string | null {
 
 const decap = (s: string) => s.charAt(0).toLowerCase() + s.slice(1)
 
-function matches(row: JavaObjekt, condition: Condition, values: Wert[], i: Interpreter): boolean {
-  const value = row.felder.get(condition.property) ?? NULL
+function matches(row: JavaObject, condition: Condition, values: Value[], i: Interpreter): boolean {
+  const value = row.fields.get(condition.property) ?? NULL
   const [a, b] = values
-  const lower = (w: Wert) => (condition.ignoreCase ? i.alsText(w).toLowerCase() : i.alsText(w))
-  const same = (x: Wert, y: Wert) => (condition.ignoreCase && x.art === 'string' && y.art === 'string' ? lower(x) === lower(y) : inhaltGleich(x, y))
+  const lower = (w: Value) => (condition.ignoreCase ? i.toText(w).toLowerCase() : i.toText(w))
+  const same = (x: Value, y: Value) => (condition.ignoreCase && x.kind === 'string' && y.kind === 'string' ? lower(x) === lower(y) : contentEquals(x, y))
   switch (condition.operator) {
     case 'eq':
       return same(value, a)
     case 'not':
       return !same(value, a)
     case 'true':
-      return value.art === 'boolean' && value.wert
+      return value.kind === 'boolean' && value.value
     case 'false':
-      return value.art === 'boolean' && !value.wert
+      return value.kind === 'boolean' && !value.value
     case 'containing':
-      return value.art !== 'null' && lower(value).includes(lower(a))
+      return value.kind !== 'null' && lower(value).includes(lower(a))
     case 'startingWith':
-      return value.art !== 'null' && lower(value).startsWith(lower(a))
+      return value.kind !== 'null' && lower(value).startsWith(lower(a))
     case 'endingWith':
-      return value.art !== 'null' && lower(value).endsWith(lower(a))
+      return value.kind !== 'null' && lower(value).endsWith(lower(a))
     case 'gt':
       return compareValues(value, a, i) > 0
     case 'lt':
@@ -389,55 +389,55 @@ function matches(row: JavaObjekt, condition: Condition, values: Wert[], i: Inter
     case 'between':
       return compareValues(value, a, i) >= 0 && compareValues(value, b, i) <= 0
     case 'isNull':
-      return value.art === 'null'
+      return value.kind === 'null'
     case 'isNotNull':
-      return value.art !== 'null'
+      return value.kind !== 'null'
     case 'in':
-      return i.elementeVon(a, 0).some((x) => same(value, x))
+      return i.elementsOf(a, 0).some((x) => same(value, x))
     case 'notIn':
-      return !i.elementeVon(a, 0).some((x) => same(value, x))
+      return !i.elementsOf(a, 0).some((x) => same(value, x))
   }
 }
 
-function compareValues(a: Wert, b: Wert, i: Interpreter): number {
-  if (a.art === 'null' || b.art === 'null') return a.art === b.art ? 0 : a.art === 'null' ? -1 : 1
-  if (istZahl(a) && istZahl(b)) return alsZahl(a) - alsZahl(b)
-  if (a.art === 'boolean' && b.art === 'boolean') return Number(a.wert) - Number(b.wert)
-  return i.alsText(a).localeCompare(i.alsText(b))
+function compareValues(a: Value, b: Value, i: Interpreter): number {
+  if (a.kind === 'null' || b.kind === 'null') return a.kind === b.kind ? 0 : a.kind === 'null' ? -1 : 1
+  if (isNumber(a) && isNumber(b)) return toNumber(a) - toNumber(b)
+  if (a.kind === 'boolean' && b.kind === 'boolean') return Number(a.value) - Number(b.value)
+  return i.toText(a).localeCompare(i.toText(b))
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-export function entityFields(entity: Klasse): FeldDekl[] {
-  const chain: Klasse[] = []
-  for (let k: Klasse | undefined = entity; k; k = k.oberklasse) chain.unshift(k)
-  return chain.flatMap((k) => k.dekl.felder.filter((f) => !f.statisch && !has(f.annotations, 'Transient')))
+export function entityFields(entity: ClassInfo): FieldDecl[] {
+  const chain: ClassInfo[] = []
+  for (let k: ClassInfo | undefined = entity; k; k = k.superclass) chain.unshift(k)
+  return chain.flatMap((k) => k.decl.fields.filter((f) => !f.isStatic && !has(f.annotations, 'Transient')))
 }
 
 /** `TodoItem` → `todo_item`: Hibernate's default naming for tables and columns. */
 export const snake = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()
 
-function idValue(type: TypRef, n: number): Wert {
-  return type.name === 'Long' || type.name === 'long' ? { art: 'long', wert: n } : { art: 'int', wert: n }
+function idValue(type: TypeRef, n: number): Value {
+  return type.name === 'Long' || type.name === 'long' ? { kind: 'long', value: n } : { kind: 'int', value: n }
 }
 
-function sameId(a: Wert, b: Wert) {
-  return inhaltGleich(a, b)
+function sameId(a: Value, b: Value) {
+  return contentEquals(a, b)
 }
 
 /** A detached copy - changing it does not change the "database". */
-function copy(row: JavaObjekt): JavaObjekt {
-  return { art: 'objekt', klasse: row.klasse, felder: new Map(row.felder) }
+function copy(row: JavaObject): JavaObject {
+  return { kind: 'object', classInfo: row.classInfo, fields: new Map(row.fields) }
 }
 
-const list = (values: Wert[]): NativWert => ({ art: 'nativ', typ: 'ArrayList', daten: { liste: values } })
-const optional = (value: Wert | null): NativWert => ({ art: 'nativ', typ: 'Optional', daten: { liste: value ? [value] : [] } })
+const list = (values: Value[]): NativeValue => ({ kind: 'native', type: 'ArrayList', data: { list: values } })
+const optional = (value: Value | null): NativeValue => ({ kind: 'native', type: 'Optional', data: { list: value ? [value] : [] } })
 
 /** The entity type of `interface X extends JpaRepository<Todo, Long>` - or null if X is no repository. */
-export function repositoryEntity(declaration: TypDeklaration): string | null {
-  if (declaration.art !== 'interface') return null
+export function repositoryEntity(declaration: TypeDecl): string | null {
+  if (declaration.kind !== 'interface') return null
   const base = declaration.superTypes?.find((t) => REPOSITORY_TYPES.includes(t.name))
-  return base?.argumente[0]?.name ?? null
+  return base?.args[0]?.name ?? null
 }

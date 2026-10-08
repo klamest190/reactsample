@@ -1,5 +1,5 @@
 import { http, java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.2 - Beans & dependency injection. */
 
@@ -14,7 +14,7 @@ const APP = java`
 `
 const withApp = (code: string) => `${APP}\n\n${code}`
 
-export const beispiele = {
+export const examples = {
   'spring-beans-einstieg': {
     code: withApp(java`
       @Service
@@ -266,7 +266,7 @@ export const beispiele = {
     `),
   },
   'spring-beans-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Klassen werden zu Beans, wenn sie eine Annotation tragen: `@Service` für `PriceService`, `@Component` für beide Rabatt-Klassen.',
         'Der Controller soll nichts mehr mit `new` erzeugen: Er bekommt den `PriceService` als Konstruktor-Parameter.',
@@ -314,7 +314,7 @@ export const beispiele = {
         }
       }
     `),
-    loesung: withApp(java`
+    solution: withApp(java`
       interface DiscountPolicy {
         double apply(double amount);
       }
@@ -364,15 +364,15 @@ export const beispiele = {
       },
       {
         name: { de: 'PriceService ist eine Bean', en: 'PriceService is a bean' },
-        ausdruck: 'context.containsBean("priceService")',
+        expression: 'context.containsBean("priceService")',
       },
       {
         name: { de: 'Beide Rabatte sind Beans', en: 'Both discounts are beans' },
-        ausdruck: 'context.containsBean("noDiscount") && context.containsBean("studentDiscount")',
+        expression: 'context.containsBean("noDiscount") && context.containsBean("studentDiscount")',
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   ohneSpring: java`

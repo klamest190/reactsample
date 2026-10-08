@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Methoden.code'
+import { examples, codeBloecke } from './Methoden.code'
 
 /**
  * CHAPTER 6.4 (English) - Methods
@@ -16,7 +16,7 @@ export function Methoden() {
           What JavaScript calls a function is a <strong>method</strong> in Java - simply because it
           always belongs to a class. Free-standing functions do not exist.
         </P>
-        <TryIt modus="java" id="java-methoden-einstieg" {...beispiele['java-methoden-einstieg']} />
+        <TryIt mode="java" id="java-methoden-einstieg" {...examples['java-methoden-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="The signature">
@@ -39,7 +39,7 @@ export function Methoden() {
           In JavaScript there can only be one function per name. In Java several methods may share a
           name as long as their <strong>parameters</strong> differ. The compiler picks the right one.
         </P>
-        <TryIt modus="java" id="java-methoden-ueberladung" {...beispiele['java-methoden-ueberladung']} />
+        <TryIt mode="java" id="java-methoden-ueberladung" {...examples['java-methoden-ueberladung']} />
         <P>
           That is exactly why <Code>System.out.println(…)</Code> handles text, numbers, booleans and
           objects: the method exists a good dozen times, once per type.
@@ -57,7 +57,7 @@ export function Methoden() {
           <em>reference</em> is copied: both then point at the same object, and whoever changes it
           changes it for everyone.
         </P>
-        <TryIt modus="java" id="java-methoden-parameter" {...beispiele['java-methoden-parameter']} />
+        <TryIt mode="java" id="java-methoden-parameter" {...examples['java-methoden-parameter']} />
         <P>
           This is the same distinction as value vs. reference in JavaScript (<Verweis nr="1.6" />) -
           except that Java makes it visible through the types.
@@ -78,7 +78,7 @@ export function Methoden() {
             ).
           </li>
         </Liste>
-        <TryIt modus="java" id="java-methoden-static" {...beispiele['java-methoden-static']} />
+        <TryIt mode="java" id="java-methoden-static" {...examples['java-methoden-static']} />
         <Hinweis variante="tipp">
           That is why <Code>main</Code> is static: at startup there is not a single object the JVM
           could use.
@@ -90,15 +90,15 @@ export function Methoden() {
           A method may call itself. The only important part is the exit - without it the call stack
           fills up and Java throws a <Code>StackOverflowError</Code>.
         </P>
-        <TryIt modus="java" id="java-methoden-rekursion" {...beispiele['java-methoden-rekursion']} />
+        <TryIt mode="java" id="java-methoden-rekursion" {...examples['java-methoden-rekursion']} />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-methoden-uebung"
-          {...beispiele['java-methoden-uebung']}
-          aufgabe={
+          {...examples['java-methoden-uebung']}
+          task={
             <>
               <p>Write two methods:</p>
               <Liste>
@@ -117,39 +117,39 @@ export function Methoden() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'How may two overloaded methods differ?',
-            antworten: [
+            question: 'How may two overloaded methods differ?',
+            answers: [
               'only in the return type',
               'in the number or type of parameters',
               'in their order in the source file',
               'in the names of the parameters',
             ],
-            richtig: 1,
-            erklaerung: 'The parameter list makes the method unique. The return type alone is not enough.',
+            correct: 1,
+            explanation: 'The parameter list makes the method unique. The return type alone is not enough.',
           },
           {
-            frage: "What happens to the caller's variable in change(int number) { number = 99; }?",
-            antworten: [
+            question: "What happens to the caller's variable in change(int number) { number = 99; }?",
+            answers: [
               'It becomes 99 as well.',
               'It stays unchanged - the method received a copy.',
               'It is a compile error.',
               'It depends on the type.',
             ],
-            richtig: 1,
-            erklaerung: 'Java always passes a copy. For objects the reference is copied - which is why changes TO the object are visible outside.',
+            correct: 1,
+            explanation: 'Java always passes a copy. For objects the reference is copied - which is why changes TO the object are visible outside.',
           },
           {
-            frage: 'Why is main static?',
-            antworten: [
+            question: 'Why is main static?',
+            answers: [
               'So that it runs faster.',
               'Because at startup no object exists for it to run on.',
               'So that it is only called once.',
               'It is pure convention.',
             ],
-            richtig: 1,
-            erklaerung: 'static methods belong to the class - so the JVM can call main without creating anything first.',
+            correct: 1,
+            explanation: 'static methods belong to the class - so the JVM can call main without creating anything first.',
           },
         ]}
       />

@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'react-props-einstieg': {
     code: js`
       function Greeting({ name }) {
@@ -131,7 +131,7 @@ export const beispiele = {
     `,
   },
   'react-props-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`Contact` destrukturiert seine Props: `function Contact({ name, email, favorite })`.',
         'Stern nur für Favoriten: `{favorite && \'⭐ \'}`; fehlende E-Mail per Ternär.',
@@ -158,7 +158,7 @@ export const beispiele = {
         return <ul></ul>
       }
     `,
-    loesung: js`
+    solution: js`
       const contacts = [
         { id: 1, name: 'Ada Lovelace', email: 'ada@example.com', favorite: true },
         { id: 2, name: 'Alan Turing', email: null, favorite: false },
@@ -193,14 +193,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Alle drei Kontakte sind Listeneinträge', en: 'All three contacts are list items' },
-        pruefung: js`
+        script: js`
           await render()
           expect(findAll('li')).toHaveLength(3)
         `,
       },
       {
         name: { de: 'Nur Favoriten haben einen ⭐', en: 'Only favorites have a ⭐' },
-        pruefung: js`
+        script: js`
           await render()
           const [ada, alan, grace] = findAll('li')
           expect(ada.textContent).toContain('⭐')
@@ -210,7 +210,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Fehlende E-Mail zeigt „no email“', en: 'A missing email shows “no email”' },
-        pruefung: js`
+        script: js`
           await render()
           const [ada, alan] = findAll('li')
           expect(ada.textContent).toContain('ada@example.com')
@@ -219,7 +219,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Die Zusammenfassung ist aus den Daten berechnet', en: 'The summary is calculated from the data' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('3 contacts, 1 of them favorite')
           expect(code).not.toMatch(/(>|['"\`])\s*3 contacts/)
@@ -227,14 +227,14 @@ export const beispiele = {
       },
       {
         name: { de: 'Die Liste nutzt map und key', en: 'The list uses map and key' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/\.map\(/)
           expect(code).toMatch(/key=\{/)
         `,
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

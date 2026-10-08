@@ -7,7 +7,7 @@ import type { PlaygroundDaten } from './types'
  */
 export const projektPlayground: PlaygroundDaten = {
   teil: 'projekt',
-  modus: 'react',
+  mode: 'react',
   hinweis: {
     de: 'Die Bausteine erwarten die Grundversion (todos, setTodos, text in App). Manche brauchen danach noch einen Handgriff - das steht jeweils dabei.',
     en: 'The building blocks expect the basic version (todos, setTodos, text in App). Some need one more manual step afterwards - it says so on each block.',

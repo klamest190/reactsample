@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Komponenten.code'
+import { examples, codeBloecke } from './Komponenten.code'
 
 /**
  * KAPITEL 3.1 (English) - Components & JSX
@@ -14,8 +14,8 @@ export function Komponenten() {
         <P>A component is a function that returns JSX.</P>
         <TryIt
           id="react-komponenten-einstieg"
-          {...beispiele['react-komponenten-einstieg']}
-          modus="react"
+          {...examples['react-komponenten-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -44,8 +44,8 @@ export function Komponenten() {
         </Liste>
         <TryIt
           id="react-komponenten-1"
-          {...beispiele['react-komponenten-1']}
-          modus="react"
+          {...examples['react-komponenten-1']}
+          mode="react"
         />
         <Hinweis variante="info">
           In a real project there is one call at the very start:{' '}
@@ -92,17 +92,17 @@ export function Komponenten() {
         </Liste>
         <TryIt
           id="react-komponenten-2"
-          {...beispiele['react-komponenten-2']}
-          modus="react"
+          {...examples['react-komponenten-2']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="react-komponenten-uebung"
-          {...beispiele['react-komponenten-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-komponenten-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 This code is written with an HTML mindset and cannot be compiled. Find and fix the{' '}
@@ -118,28 +118,28 @@ export function Komponenten() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why must a component name start with a capital letter?',
-            antworten: [
+            question: 'Why must a component name start with a capital letter?',
+            answers: [
               'It is just a style convention.',
               'Otherwise React treats it as an HTML element.',
               'Because JavaScript functions are always capitalized.',
             ],
-            richtig: 1,
-            erklaerung: '<profile> would be an (unknown) HTML tag, <Profile> calls your function.',
+            correct: 1,
+            explanation: '<profile> would be an (unknown) HTML tag, <Profile> calls your function.',
           },
           {
-            frage: 'What may go between { } in JSX?',
-            antworten: ['Only variables', 'Any JavaScript expression', 'if and for statements too'],
-            richtig: 1,
-            erklaerung: 'Expressions like a + b, condition ? x : y or list.map(…) - no statements like if or for.',
+            question: 'What may go between { } in JSX?',
+            answers: ['Only variables', 'Any JavaScript expression', 'if and for statements too'],
+            correct: 1,
+            explanation: 'Expressions like a + b, condition ? x : y or list.map(…) - no statements like if or for.',
           },
           {
-            frage: 'How do you return two sibling elements without an extra <div>?',
-            antworten: ['As an array without brackets', 'With a fragment <>…</>', 'Not at all'],
-            richtig: 1,
-            erklaerung: 'The fragment groups elements without appearing in the DOM itself.',
+            question: 'How do you return two sibling elements without an extra <div>?',
+            answers: ['As an array without brackets', 'With a fragment <>…</>', 'Not at all'],
+            correct: 1,
+            explanation: 'The fragment groups elements without appearing in the DOM itself.',
           },
         ]}
       />

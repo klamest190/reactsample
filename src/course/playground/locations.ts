@@ -1,4 +1,4 @@
-import type { Schritt } from '../../learning/insertion'
+import type { Step } from '../../learning/insertion'
 import type { Baustein, Ort } from './types'
 
 /**
@@ -97,7 +97,7 @@ function passendeKlammer(code: string, auf: number) {
 }
 
 /** Stand des Editors beim Klick auf einen Baustein. */
-export type EditorStand = { code: string; start: number; ende: number; vonHand: boolean }
+export type EditorStand = { code: string; start: number; end: number; manual: boolean }
 
 /**
  * Welche Teile eines Bausteins wohin kommen:
@@ -106,20 +106,20 @@ export type EditorStand = { code: string; start: number; ende: number; vonHand: 
  *    die Nutzung an den Cursor oder an ihren Ort (z. B. `<Counter />` ins JSX)
  *  - fehlende Imports nach ganz oben
  */
-export function bausteinSchritte(b: Baustein, stand: EditorStand): Schritt[] {
+export function bausteinSchritte(b: Baustein, stand: EditorStand): Step[] {
   const { code } = stand
-  const amCursor = (text: string): Schritt => ({ baustein: text, start: stand.start, ende: stand.ende, haupt: true })
-  const automatisch = (ort: Ort, text: string, haupt: boolean): Schritt => {
+  const amCursor = (text: string): Step => ({ snippet: text, start: stand.start, end: stand.end, main: true })
+  const automatisch = (ort: Ort, text: string, haupt: boolean): Step => {
     const stelle = automatischeStelle(code, ort, text)
-    return { baustein: stelle.text, start: stelle.position, ende: stelle.position, haupt }
+    return { snippet: stelle.text, start: stelle.position, end: stelle.position, main: haupt }
   }
 
-  const schritte: Schritt[] = []
+  const schritte: Step[] = []
   if (b.nutzung) {
     schritte.push(automatisch(b.ort, b.code, true))
-    schritte.push(stand.vonHand ? { ...amCursor(b.nutzung.code), haupt: false } : automatisch(b.nutzung.ort, b.nutzung.code, false))
+    schritte.push(stand.manual ? { ...amCursor(b.nutzung.code), main: false } : automatisch(b.nutzung.ort, b.nutzung.code, false))
   } else {
-    schritte.push(stand.vonHand ? amCursor(b.code) : automatisch(b.ort, b.code, true))
+    schritte.push(stand.manual ? amCursor(b.code) : automatisch(b.ort, b.code, true))
   }
 
   const fehlend = (b.importe ?? []).filter((zeile) => !code.includes(zeile))
@@ -127,8 +127,8 @@ export function bausteinSchritte(b: Baustein, stand: EditorStand): Schritt[] {
     const erster = code.search(/^import\s/m)
     schritte.push(
       erster >= 0
-        ? { baustein: fehlend.join('\n'), start: erster, ende: erster }
-        : { baustein: fehlend.join('\n') + '\n', start: 0, ende: 0 },
+        ? { snippet: fehlend.join('\n'), start: erster, end: erster }
+        : { snippet: fehlend.join('\n') + '\n', start: 0, end: 0 },
     )
   }
   return schritte

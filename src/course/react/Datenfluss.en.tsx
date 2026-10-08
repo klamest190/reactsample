@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Datenfluss.code'
+import { examples, codeBloecke } from './Datenfluss.code'
 
 /**
  * KAPITEL 3.4 (English) - Sharing State & Data Flow
@@ -14,8 +14,8 @@ export function Datenfluss() {
         <P>The state lives in the parent: data goes down as a prop, the click goes up as a callback.</P>
         <TryIt
           id="react-datenfluss-einstieg"
-          {...beispiele['react-datenfluss-einstieg']}
-          modus="react"
+          {...examples['react-datenfluss-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -35,8 +35,8 @@ export function Datenfluss() {
         </Liste>
         <TryIt
           id="react-datenfluss-1"
-          {...beispiele['react-datenfluss-1']}
-          modus="react"
+          {...examples['react-datenfluss-1']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -49,8 +49,8 @@ export function Datenfluss() {
         </P>
         <TryIt
           id="react-datenfluss-2"
-          {...beispiele['react-datenfluss-2']}
-          modus="react"
+          {...examples['react-datenfluss-2']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -93,9 +93,9 @@ export function Datenfluss() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="react-datenfluss-uebung"
-          {...beispiele['react-datenfluss-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-datenfluss-uebung']}
+          mode="react"
+          task={
             <>
               <p>The components are already built statically (step 2). Make the list filterable:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -117,28 +117,28 @@ export function Datenfluss() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Two sibling components need the same value. Where does the state belong?',
-            antworten: ['In both components', 'In the closest common parent', 'In a global variable'],
-            richtig: 1,
-            erklaerung: 'From there it can be passed down to both children as props.',
+            question: 'Two sibling components need the same value. Where does the state belong?',
+            answers: ['In both components', 'In the closest common parent', 'In a global variable'],
+            correct: 1,
+            explanation: 'From there it can be passed down to both children as props.',
           },
           {
-            frage: 'How does a child tell its parent that something happened?',
-            antworten: [
+            question: 'How does a child tell its parent that something happened?',
+            answers: [
               'It changes the props',
               'It calls a function it received as a prop',
               'It reads the parent’s state',
             ],
-            richtig: 1,
-            erklaerung: 'Callback props are the way up.',
+            correct: 1,
+            explanation: 'Callback props are the way up.',
           },
           {
-            frage: 'You have the state “list”. How do you get “count”?',
-            antworten: ['const [count, setCount] = useState(list.length)', 'const count = list.length'],
-            richtig: 1,
-            erklaerung: 'Derived values are calculated while rendering - that way they can never get out of date.',
+            question: 'You have the state “list”. How do you get “count”?',
+            answers: ['const [count, setCount] = useState(list.length)', 'const count = list.length'],
+            correct: 1,
+            explanation: 'Derived values are calculated while rendering - that way they can never get out of date.',
           },
         ]}
       />

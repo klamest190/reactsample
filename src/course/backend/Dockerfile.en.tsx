@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { DockerTerminal } from '../demos/DockerTerminal'
-import { beispiele, codeBloecke, terminalDockerfile, terminalIgnore, terminalTasks } from './Dockerfile.code'
+import { examples, codeBloecke, terminalDockerfile, terminalIgnore, terminalTasks } from './Dockerfile.code'
 
 /**
  * CHAPTER 8.9 - Your own image: the Dockerfile (English version)
@@ -19,7 +19,7 @@ export function Dockerfile() {
           hints, the size and the second build: after a small code change it takes almost as long as
           the first one.
         </P>
-        <TryIt modus="dockerfile" id="docker-dockerfile-einstieg" {...beispiele['docker-dockerfile-einstieg']} />
+        <TryIt mode="dockerfile" id="docker-dockerfile-einstieg" {...examples['docker-dockerfile-einstieg']} />
         <Hinweis variante="info">
           Building happens in a simulation here: the project <Code>todo-api</Code> is a list of files
           (with <Code>pom.xml</Code>, <Code>src/</Code>, <Code>.git/</Code>, <Code>target/</Code> …),
@@ -29,14 +29,14 @@ export function Dockerfile() {
       </Abschnitt>
 
       <Abschnitt titel="The most important instructions">
-        <CodeBlock code={codeBloecke.befehle} titel="Dockerfile" />
-        <CodeBlock code={codeBloecke.bauen} titel="Terminal" />
+        <CodeBlock code={codeBloecke.befehle} title="Dockerfile" />
+        <CodeBlock code={codeBloecke.bauen} title="Terminal" />
         <Hinweis variante="warnung">
           <Code>RUN</Code> runs while <strong>building</strong>, <Code>CMD</Code>/
           <Code>ENTRYPOINT</Code> when the container <strong>starts</strong>. Start the server with RUN
           and you get a build that never finishes.
         </Hinweis>
-        <CodeBlock code={codeBloecke.run} titel="Dockerfile" />
+        <CodeBlock code={codeBloecke.run} title="Dockerfile" />
       </Abschnitt>
 
       <Abschnitt titel="Layers and the build cache">
@@ -50,7 +50,7 @@ export function Dockerfile() {
           invalidates this layer - and with it the download of all dependencies afterwards. The fix
           is the order: <strong>what changes rarely comes first.</strong>
         </P>
-        <TryIt modus="dockerfile" id="docker-dockerfile-cache" {...beispiele['docker-dockerfile-cache']} />
+        <TryIt mode="dockerfile" id="docker-dockerfile-cache" {...examples['docker-dockerfile-cache']} />
         <P>
           Below the editor, choose what changes before the second build: with “source code”,{' '}
           <Code>COPY pom.xml</Code> and the download stay in the cache (<Code>CACHED</Code>), with
@@ -79,7 +79,7 @@ export function Dockerfile() {
           <Code>COPY --from=build</Code>. Only the last stage ends up in the final image - Maven, the
           source code and the download cache stay out.
         </P>
-        <TryIt modus="dockerfile" id="docker-dockerfile-multistage" {...beispiele['docker-dockerfile-multistage']} />
+        <TryIt mode="dockerfile" id="docker-dockerfile-multistage" {...examples['docker-dockerfile-multistage']} />
         <Liste>
           <li>
             <Code>useradd</Code> + <Code>USER spring</Code>: the server does not run as{' '}
@@ -95,7 +95,7 @@ export function Dockerfile() {
             <Verweis nr="8.8" />).
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.layers} titel="after a code change" />
+        <CodeBlock code={codeBloecke.layers} title="after a code change" />
       </Abschnitt>
 
       <Abschnitt titel="The frontend: Node builds, nginx serves">
@@ -105,7 +105,7 @@ export function Dockerfile() {
           enough. The final image is about 50 MB. The <Code>nginx.conf</Code> is the one from{' '}
           <Verweis nr="8.7" />: it forwards <Code>/api/</Code> to the backend.
         </P>
-        <TryIt modus="dockerfile" id="docker-dockerfile-react" {...beispiele['docker-dockerfile-react']} />
+        <TryIt mode="dockerfile" id="docker-dockerfile-react" {...examples['docker-dockerfile-react']} />
       </Abschnitt>
 
       <Abschnitt titel="Build and run">
@@ -118,10 +118,10 @@ export function Dockerfile() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="dockerfile"
+          mode="dockerfile"
           id="docker-dockerfile-uebung"
-          {...beispiele['docker-dockerfile-uebung']}
-          aufgabe={
+          {...examples['docker-dockerfile-uebung']}
+          task={
             <>
               <p>Turn the naive Dockerfile into a good one:</p>
               <Liste>
@@ -135,29 +135,29 @@ export function Dockerfile() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'You change a Java file in src/. Which layers does Docker rebuild for COPY pom.xml → RUN go-offline → COPY src → RUN package?',
-            antworten: ['All of them', 'Only COPY src and RUN package', 'Only RUN package', 'None'],
-            richtig: 1,
-            erklaerung: 'COPY src changes - from there on everything is rebuilt. The layers before come from the cache.',
+            question: 'You change a Java file in src/. Which layers does Docker rebuild for COPY pom.xml → RUN go-offline → COPY src → RUN package?',
+            answers: ['All of them', 'Only COPY src and RUN package', 'Only RUN package', 'None'],
+            correct: 1,
+            explanation: 'COPY src changes - from there on everything is rebuilt. The layers before come from the cache.',
           },
           {
-            frage: 'What ends up in the final image of a multi-stage build?',
-            antworten: ['All stages', 'Only the last stage', 'Only the first stage', 'Only the files from COPY'],
-            richtig: 1,
-            erklaerung: 'Earlier stages are just workbenches - what counts is what the last stage takes with COPY --from.',
+            question: 'What ends up in the final image of a multi-stage build?',
+            answers: ['All stages', 'Only the last stage', 'Only the first stage', 'Only the files from COPY'],
+            correct: 1,
+            explanation: 'Earlier stages are just workbenches - what counts is what the last stage takes with COPY --from.',
           },
           {
-            frage: 'What is the .dockerignore for?',
-            antworten: [
+            question: 'What is the .dockerignore for?',
+            answers: [
               'It prevents containers from starting',
               'It keeps files out of the build context, e.g. node_modules and .git',
               'It lists images that should not be pulled',
               'It replaces the Dockerfile',
             ],
-            richtig: 1,
-            erklaerung: 'What is listed there is not sent to Docker - faster builds, smaller images, no secrets by accident.',
+            correct: 1,
+            explanation: 'What is listed there is not sent to Docker - faster builds, smaller images, no secrets by accident.',
           },
         ]}
       />

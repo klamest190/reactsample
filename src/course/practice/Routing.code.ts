@@ -1,5 +1,5 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für das Routing-Kapitel - für die deutsche UND die englische Fassung.
@@ -9,7 +9,7 @@ import type { CodeBeispiel } from '../../learning/jsSandbox'
  * Immer mit MemoryRouter: Die Vorschau ist Teil dieser Seite und darf deren URL nicht ändern.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-routing-einstieg': {
     code: js`
       import { MemoryRouter, Routes, Route, Link } from 'react-router'
@@ -361,7 +361,7 @@ export const beispiele = {
     `,
   },
   'praxis-routing-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Die Detailseite braucht eine Route mit Platzhalter: `<Route path="/posts/:slug" element={<Post />} />`.',
         'In `Post` liest du den Platzhalter mit `const { slug } = useParams()` und suchst den Beitrag mit `POSTS.find(…)`.',
@@ -409,7 +409,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       import { MemoryRouter, Routes, Route, Link, useParams } from 'react-router'
 
       const POSTS = [
@@ -460,7 +460,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Die Liste zeigt beide Beiträge als Links', en: 'The list shows both posts as links' },
-        pruefung: js`
+        script: js`
           await render()
           const links = findAll('a').map((a) => a.textContent)
           expect(links).toContain('Hooks explained')
@@ -469,7 +469,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Ein Klick öffnet den Beitrag mit Text', en: 'A click opens the post with its text' },
-        pruefung: js`
+        script: js`
           await render()
           await click(getByText('Why routing matters'))
           await wait(50)
@@ -478,7 +478,7 @@ export const beispiele = {
       },
       {
         name: { de: '„← Back“ führt zurück zur Liste', en: '“← Back” leads back to the list' },
-        pruefung: js`
+        script: js`
           await render()
           await click(getByText('Hooks explained'))
           await wait(50)
@@ -490,7 +490,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Unbekannte Adressen zeigen „404“', en: 'Unknown addresses show “404”' },
-        pruefung: js`
+        script: js`
           await render()
           await click(getByText('Broken link'))
           await wait(50)
@@ -499,14 +499,14 @@ export const beispiele = {
       },
       {
         name: { de: 'Der Beitrag kommt per useParams aus der URL', en: 'The post comes from the URL via useParams' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useParams\(\)/)
           expect(code).toMatch(/:slug/)
         `,
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   installieren: js`

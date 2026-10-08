@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UtilityTypes.code'
+import { examples, codeBloecke } from './UtilityTypes.code'
 
 /**
  * KAPITEL 2.6 - Typ-Operatoren & Utility Types
@@ -17,7 +17,7 @@ export function UtilityTypes() {
           dafür neue Typen abzuschreiben, leitest du sie mit <strong>Utility Types</strong> vom
           Original ab. Ändert sich <Code>Todo</Code>, ändern sich alle abgeleiteten Typen mit.
         </P>
-        <TryIt id="ts-utility-einstieg" modus="ts" {...beispiele['ts-utility-einstieg']} />
+        <TryIt id="ts-utility-einstieg" mode="ts" {...examples['ts-utility-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="typeof, keyof und Indexzugriff">
@@ -33,7 +33,7 @@ export function UtilityTypes() {
             <Code>{"Typ['feld']"}</Code> - der Typ eines einzelnen Feldes (Indexzugriff)
           </li>
         </Liste>
-        <TryIt id="ts-utility-keyof-typeof" modus="ts" {...beispiele['ts-utility-keyof-typeof']} />
+        <TryIt id="ts-utility-keyof-typeof" mode="ts" {...examples['ts-utility-keyof-typeof']} />
         <Hinweis variante="info">
           Achte auf die Stelle: <Code>typeof x</Code> in normalem Code ist das JavaScript-
           <Code>typeof</Code> und liefert zur Laufzeit einen String wie <Code>"object"</Code>. Hinter{' '}
@@ -48,7 +48,7 @@ export function UtilityTypes() {
           alles wird <Code>readonly</Code>. So wird eine Liste von Werten zur einzigen Quelle - der
           Union-Typ ergibt sich daraus.
         </P>
-        <TryIt id="ts-utility-as-const" modus="ts" {...beispiele['ts-utility-as-const']} />
+        <TryIt id="ts-utility-as-const" mode="ts" {...examples['ts-utility-as-const']} />
       </Abschnitt>
 
       <Abschnitt titel="satisfies">
@@ -57,7 +57,7 @@ export function UtilityTypes() {
           allgemeineren. <Code>satisfies Typ</Code> prüft genauso - behält aber den genauen Typ des Werts.
           Das ist ideal für Konfigurationen und Nachschlage-Tabellen.
         </P>
-        <TryIt id="ts-utility-satisfies" modus="ts" {...beispiele['ts-utility-satisfies']} />
+        <TryIt id="ts-utility-satisfies" mode="ts" {...examples['ts-utility-satisfies']} />
         <Hinweis variante="tipp">
           Die Codebeispiele dieses Kurses nutzen genau das: <Code>{'satisfies Record<string, CodeBeispiel>'}</Code>{' '}
           prüft jedes Beispiel - und trotzdem kennt TypeScript jede einzelne ID.
@@ -69,8 +69,8 @@ export function UtilityTypes() {
           TypeScript bringt eine Reihe fertiger Typ-Werkzeuge mit. Du musst sie nicht auswendig kennen -
           aber wissen, dass es sie gibt.
         </P>
-        <TryIt id="ts-utility-mehr" modus="ts" {...beispiele['ts-utility-mehr']} />
-        <CodeBlock titel="Übersicht" code={codeBloecke.uebersicht} />
+        <TryIt id="ts-utility-mehr" mode="ts" {...examples['ts-utility-mehr']} />
+        <CodeBlock title="Übersicht" code={codeBloecke.uebersicht} />
         <Liste>
           <li>
             <Code>{'ReturnType<typeof fn>'}</Code> ist praktisch, wenn der Typ aus einer Funktion kommt, die du
@@ -86,9 +86,9 @@ export function UtilityTypes() {
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-utility-uebung"
-          modus="ts"
-          {...beispiele['ts-utility-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-utility-uebung']}
+          task={
             <>
               <p>
                 Leite alle Typen von <Code>Product</Code> ab - ohne ein einziges Feld abzuschreiben:
@@ -114,24 +114,24 @@ export function UtilityTypes() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welcher Typ hat alle Felder von User außer password?',
-            antworten: ["Pick<User, 'password'>", "Omit<User, 'password'>", "Partial<User>"],
-            richtig: 1,
-            erklaerung: 'Omit lässt die genannten Felder weg, Pick behält nur die genannten.',
+            question: 'Welcher Typ hat alle Felder von User außer password?',
+            answers: ["Pick<User, 'password'>", "Omit<User, 'password'>", "Partial<User>"],
+            correct: 1,
+            explanation: 'Omit lässt die genannten Felder weg, Pick behält nur die genannten.',
           },
           {
-            frage: "Was ist (typeof SIZES)[number] für const SIZES = ['s', 'm'] as const?",
-            antworten: ['number', 'string', "'s' | 'm'"],
-            richtig: 2,
-            erklaerung: 'as const macht aus dem Array ein readonly-Tupel mit Literal-Typen. [number] liest den Typ aller Elemente - die Union der Werte.',
+            question: "Was ist (typeof SIZES)[number] für const SIZES = ['s', 'm'] as const?",
+            answers: ['number', 'string', "'s' | 'm'"],
+            correct: 2,
+            explanation: 'as const macht aus dem Array ein readonly-Tupel mit Literal-Typen. [number] liest den Typ aller Elemente - die Union der Werte.',
           },
           {
-            frage: 'Was unterscheidet satisfies von einer Typannotation?',
-            antworten: ['satisfies prüft gar nicht', 'satisfies prüft den Wert, behält aber seinen genauen Typ', 'satisfies funktioniert nur mit Funktionen'],
-            richtig: 1,
-            erklaerung: 'Beide prüfen gegen den Typ. Die Annotation ersetzt den Typ durch den allgemeineren, satisfies lässt den abgeleiteten Typ stehen.',
+            question: 'Was unterscheidet satisfies von einer Typannotation?',
+            answers: ['satisfies prüft gar nicht', 'satisfies prüft den Wert, behält aber seinen genauen Typ', 'satisfies funktioniert nur mit Funktionen'],
+            correct: 1,
+            explanation: 'Beide prüfen gegen den Typ. Die Annotation ersetzt den Typ durch den allgemeineren, satisfies lässt den abgeleiteten Typ stehen.',
           },
         ]}
       />

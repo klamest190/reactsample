@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Arrays.code'
+import { examples, codeBloecke } from './Arrays.code'
 
 /**
  * KAPITEL 7.5 - Arrays & Strings
@@ -17,7 +17,7 @@ export function Arrays() {
           Ein Array in Java hat <strong>einen Typ</strong> und <strong>eine feste Länge</strong>.
           Beides steht fest, sobald es existiert.
         </P>
-        <TryIt modus="java" id="java-arrays-einstieg" {...beispiele['java-arrays-einstieg']} />
+        <TryIt mode="java" id="java-arrays-einstieg" {...examples['java-arrays-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Anlegen - und die Sache mit length">
@@ -35,7 +35,7 @@ export function Arrays() {
           Es gibt kein <Code>push</Code>. Wer mehr Platz braucht, legt ein neues Array an und
           kopiert - oder nimmt gleich eine <Code>ArrayList</Code> (<Verweis nr="7.8" />).
         </P>
-        <TryIt modus="java" id="java-arrays-laenge" {...beispiele['java-arrays-laenge']} />
+        <TryIt mode="java" id="java-arrays-laenge" {...examples['java-arrays-laenge']} />
         <Hinweis variante="tipp">
           <Code>System.out.println(array)</Code> gibt <Code>[I@1b6d2f1d</Code> aus - Typkürzel und
           Speicheradresse. Für den Inhalt brauchst du <Code>Arrays.toString(array)</Code>, bei
@@ -49,7 +49,7 @@ export function Arrays() {
           <Code>false</Code>. Ein <Code>String[]</Code> ist dagegen voller <Code>null</Code> - und{' '}
           <Code>null</Code> hat keine Methoden:
         </P>
-        <TryIt modus="java" id="java-arrays-npe" {...beispiele['java-arrays-npe']} />
+        <TryIt mode="java" id="java-arrays-npe" {...examples['java-arrays-npe']} />
         <P>
           Die <Code>NullPointerException</Code> ist der häufigste Laufzeitfehler in Java überhaupt.
           Ihr Erfinder Tony Hoare nennt sie heute „meinen Milliarden-Dollar-Fehler“. In{' '}
@@ -62,7 +62,7 @@ export function Arrays() {
           Ein <Code>int[][]</Code> ist ein Array von Arrays - also eine Tabelle. Die Zeilen können
           sogar unterschiedlich lang sein.
         </P>
-        <TryIt modus="java" id="java-arrays-zweidimensional" {...beispiele['java-arrays-zweidimensional']} />
+        <TryIt mode="java" id="java-arrays-zweidimensional" {...examples['java-arrays-zweidimensional']} />
       </Abschnitt>
 
       <Abschnitt titel="Strings sind Objekte - und unveränderlich">
@@ -71,7 +71,7 @@ export function Arrays() {
           <Code>String</Code>. Und er ist <strong>immutable</strong>: Keine Methode ändert ihn,
           jede liefert einen neuen zurück.
         </P>
-        <TryIt modus="java" id="java-arrays-strings" {...beispiele['java-arrays-strings']} />
+        <TryIt mode="java" id="java-arrays-strings" {...examples['java-arrays-strings']} />
         <Hinweis variante="info">
           Dieselbe Idee steckt hinter React-State: nicht verändern, sondern ersetzen (
           <Verweis nr="1.6" />). In Java gilt sie für Strings von Haus aus.
@@ -94,7 +94,7 @@ export function Arrays() {
           primitiven Typen (<Code>int</Code>, <Code>double</Code>, <Code>char</Code>,{' '}
           <Code>boolean</Code>) dagegen immer <Code>==</Code>.
         </Hinweis>
-        <TryIt modus="java" id="java-arrays-gleichheit" {...beispiele['java-arrays-gleichheit']} />
+        <TryIt mode="java" id="java-arrays-gleichheit" {...examples['java-arrays-gleichheit']} />
       </Abschnitt>
 
       <Abschnitt titel="Viele Strings zusammenbauen: StringBuilder">
@@ -102,15 +102,15 @@ export function Arrays() {
           Weil jeder <Code>+</Code> einen neuen String erzeugt, wird das in Schleifen teuer. Der{' '}
           <Code>StringBuilder</Code> sammelt stattdessen in einem einzigen Objekt.
         </P>
-        <TryIt modus="java" id="java-arrays-builder" {...beispiele['java-arrays-builder']} />
+        <TryIt mode="java" id="java-arrays-builder" {...examples['java-arrays-builder']} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-arrays-uebung"
-          {...beispiele['java-arrays-uebung']}
-          aufgabe={
+          {...examples['java-arrays-uebung']}
+          task={
             <>
               <p>
                 Zerlege <Code>text</Code> an den Leerzeichen und berechne daraus:
@@ -135,29 +135,29 @@ export function Arrays() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was ergibt new String("hi") == "hi" ?',
-            antworten: ['true', 'false', 'einen Kompilierfehler', 'das ist zufällig'],
-            richtig: 1,
-            erklaerung: 'new String(…) erzeugt bewusst ein neues Objekt. == vergleicht die Identität, also false. equals ergibt true.',
+            question: 'Was ergibt new String("hi") == "hi" ?',
+            answers: ['true', 'false', 'einen Kompilierfehler', 'das ist zufällig'],
+            correct: 1,
+            explanation: 'new String(…) erzeugt bewusst ein neues Objekt. == vergleicht die Identität, also false. equals ergibt true.',
           },
           {
-            frage: 'Wie bekommst du den Inhalt eines int[] als Text?',
-            antworten: [
+            question: 'Wie bekommst du den Inhalt eines int[] als Text?',
+            answers: [
               'array.toString()',
               'Arrays.toString(array)',
               'String.valueOf(array)',
               'array + ""',
             ],
-            richtig: 1,
-            erklaerung: 'Arrays haben keine eigene toString-Methode - alle anderen Varianten liefern die Adresse.',
+            correct: 1,
+            explanation: 'Arrays haben keine eigene toString-Methode - alle anderen Varianten liefern die Adresse.',
           },
           {
-            frage: 'Was steht in einem frischen String[3]?',
-            antworten: ['drei leere Strings', 'dreimal null', 'dreimal undefined', 'nichts, es ist leer'],
-            richtig: 1,
-            erklaerung: 'Standardwert für alle Objekttypen ist null. Zugriff auf eine Methode davon gibt eine NullPointerException.',
+            question: 'Was steht in einem frischen String[3]?',
+            answers: ['drei leere Strings', 'dreimal null', 'dreimal undefined', 'nichts, es ist leer'],
+            correct: 1,
+            explanation: 'Standardwert für alle Objekttypen ist null. Zugriff auf eine Methode davon gibt eine NullPointerException.',
           },
         ]}
       />

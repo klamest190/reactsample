@@ -1,5 +1,5 @@
 import { http, java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.3 - REST APIs with controllers. */
 
@@ -13,7 +13,7 @@ const APP = java`
 `
 const withApp = (code: string) => `${APP}\n\n${code}`
 
-export const beispiele = {
+export const examples = {
   'spring-rest-crud': {
     code: withApp(java`
       // What the API returns ...
@@ -147,7 +147,7 @@ export const beispiele = {
     `,
   },
   'spring-rest-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`@PutMapping("/{id}")` und `@DeleteMapping("/{id}")` - die id kommt mit `@PathVariable long id` in die Methode, der Body mit `@RequestBody BookRequest request`.',
         'Gibt es das Buch nicht (`books.containsKey(id)` ist false bzw. `books.remove(id)` liefert null), antwortest du mit `ResponseEntity.notFound().build()`.',
@@ -185,7 +185,7 @@ export const beispiele = {
         // TODO: PUT /api/books/{id} and DELETE /api/books/{id}
       }
     `),
-    loesung: withApp(java`
+    solution: withApp(java`
       record Book(long id, String title, String author) {}
       record BookRequest(String title, String author) {}
 
@@ -242,7 +242,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   rest: http`

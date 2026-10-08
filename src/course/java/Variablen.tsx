@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Variablen.code'
+import { examples, codeBloecke } from './Variablen.code'
 
 /**
  * KAPITEL 7.2 - Typen & Variablen
@@ -17,7 +17,7 @@ export function Variablen() {
           In Java steht vor jedem Namen sein Typ. Das ist mehr Schreibarbeit - und der Grund, warum
           der Compiler so viel für dich findet.
         </P>
-        <TryIt modus="java" id="java-variablen-einstieg" {...beispiele['java-variablen-einstieg']} />
+        <TryIt mode="java" id="java-variablen-einstieg" {...examples['java-variablen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Der Typ gehört zur Variablen">
@@ -58,7 +58,7 @@ export function Variablen() {
           sondern eine <strong>Klasse</strong> - deshalb wird er großgeschrieben. Mehr dazu in{' '}
           <Verweis nr="7.5" />.
         </P>
-        <TryIt modus="java" id="java-variablen-typen" {...beispiele['java-variablen-typen']} />
+        <TryIt mode="java" id="java-variablen-typen" {...examples['java-variablen-typen']} />
         <Hinweis variante="warnung">
           Ein <Code>int</Code> hat eine feste Größe. Wird er zu groß, gibt es keinen Fehler - er
           fängt bei der kleinsten Zahl wieder an (Überlauf). JavaScript-Zahlen haben dieses Problem
@@ -71,7 +71,7 @@ export function Variablen() {
           Wenn links und rechts vom <Code>/</Code> ganze Zahlen stehen, rechnet Java auch ganzzahlig
           - der Rest fällt ersatzlos weg. Das ist der häufigste Anfängerfehler in Java überhaupt.
         </P>
-        <TryIt modus="java" id="java-variablen-division" {...beispiele['java-variablen-division']} />
+        <TryIt mode="java" id="java-variablen-division" {...examples['java-variablen-division']} />
         <Hinweis variante="tipp">
           Merksatz: <strong>Ein double genügt.</strong> Sobald einer der beiden Werte eine Kommazahl
           ist, rechnet Java in <Code>double</Code> weiter. Deshalb helfen <Code>2.0</Code>,{' '}
@@ -91,7 +91,7 @@ export function Variablen() {
             erlauben: <Code>(int) preis</Code>. Java schneidet dann ab - es rundet <em>nicht</em>.
           </li>
         </Liste>
-        <TryIt modus="java" id="java-variablen-casting" {...beispiele['java-variablen-casting']} />
+        <TryIt mode="java" id="java-variablen-casting" {...examples['java-variablen-casting']} />
       </Abschnitt>
 
       <Abschnitt titel="final, var - und was mit const vergleichbar ist">
@@ -100,7 +100,7 @@ export function Variablen() {
           zugewiesen werden. <Code>var</Code> sieht dagegen nur aus wie JavaScript - der Typ wird
           lediglich vom Compiler erraten und steht danach genauso fest.
         </P>
-        <TryIt modus="java" id="java-variablen-final" {...beispiele['java-variablen-final']} />
+        <TryIt mode="java" id="java-variablen-final" {...examples['java-variablen-final']} />
         <Hinweis variante="info">
           Konstanten schreibt man in Java traditionell <Code>GROSS_MIT_UNTERSTRICHEN</Code>, alles
           andere in <Code>kleinCamelCase</Code>, Klassen in <Code>GrossCamelCase</Code>.
@@ -112,7 +112,7 @@ export function Variablen() {
           Und so sieht es aus, wenn man es falsch macht. Der Fehler kommt nicht beim Ausführen -
           sondern davor:
         </P>
-        <TryIt modus="java" id="java-variablen-fehler" {...beispiele['java-variablen-fehler']} />
+        <TryIt mode="java" id="java-variablen-fehler" {...examples['java-variablen-fehler']} />
         <P>
           Zum Vergleich: In JavaScript wäre <Code>let count = 'three'</Code> völlig in Ordnung, und
           der Fehler würde irgendwann später auffallen - vielleicht erst beim Nutzer.
@@ -136,10 +136,10 @@ export function Variablen() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-variablen-uebung"
-          {...beispiele['java-variablen-uebung']}
-          aufgabe={
+          {...examples['java-variablen-uebung']}
+          task={
             <>
               <p>
                 Gegeben sind <Code>items</Code> (7 Stück) und <Code>pricePerItem</Code> (2.50 €).
@@ -162,34 +162,34 @@ export function Variablen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was gibt System.out.println(9 / 4) aus?',
-            antworten: ['2.25', '2', '2.0', 'einen Fehler'],
-            richtig: 1,
-            erklaerung: 'Beide Werte sind int, also rechnet Java ganzzahlig: 2 (Rest wird abgeschnitten).',
+            question: 'Was gibt System.out.println(9 / 4) aus?',
+            answers: ['2.25', '2', '2.0', 'einen Fehler'],
+            correct: 1,
+            explanation: 'Beide Werte sind int, also rechnet Java ganzzahlig: 2 (Rest wird abgeschnitten).',
           },
           {
-            frage: 'Welche Zeile ist ein Kompilierfehler?',
-            antworten: [
+            question: 'Welche Zeile ist ein Kompilierfehler?',
+            answers: [
               'double d = 5;',
               'int i = 5.0;',
               "char c = 'x';",
               'long l = 5;',
             ],
-            richtig: 1,
-            erklaerung: 'double → int verliert Nachkommastellen und braucht einen ausdrücklichen Cast: int i = (int) 5.0;',
+            correct: 1,
+            explanation: 'double → int verliert Nachkommastellen und braucht einen ausdrücklichen Cast: int i = (int) 5.0;',
           },
           {
-            frage: 'Was bedeutet var in Java?',
-            antworten: [
+            question: 'Was bedeutet var in Java?',
+            answers: [
               'Der Typ kann sich später ändern.',
               'Der Compiler leitet den Typ aus dem Wert ab - danach steht er fest.',
               'Dasselbe wie var in JavaScript.',
               'Die Variable ist unveränderlich.',
             ],
-            richtig: 1,
-            erklaerung: 'var spart nur Schreibarbeit. Der Typ ist danach genauso fest wie ausgeschrieben.',
+            correct: 1,
+            explanation: 'var spart nur Schreibarbeit. Der Typ ist danach genauso fest wie ausgeschrieben.',
           },
         ]}
       />

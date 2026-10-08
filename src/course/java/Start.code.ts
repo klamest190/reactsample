@@ -1,5 +1,5 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für Kapitel 7.1 - für die deutsche UND die englische Fassung.
@@ -9,7 +9,7 @@ import type { CodeBeispiel } from '../../learning/jsSandbox'
  * Laufzeit in `src/java/` - nicht vom Browser.
  */
 
-export const beispiele = {
+export const examples = {
   'java-start-einstieg': {
     code: java`
       public class Main {
@@ -74,7 +74,7 @@ export const beispiele = {
     `,
   },
   'java-start-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Text steht in doppelten Anführungszeichen: `"Ada"`. Einfache Anführungszeichen sind in Java nur für einzelne Zeichen.',
         'Eine Zahl braucht `int`, ein Text `String` - der Typ steht **vor** dem Namen.',
@@ -96,7 +96,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           String name = "Ada";
@@ -106,16 +106,16 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: 'name ist "Ada"', en: 'name is "Ada"' }, ausdruck: 'name', erwartet: 'Ada' },
-      { name: { de: 'year ist die Zahl 1815', en: 'year is the number 1815' }, ausdruck: 'year', erwartet: 1815 },
+      { name: { de: 'name ist "Ada"', en: 'name is "Ada"' }, expression: 'name', expected: 'Ada' },
+      { name: { de: 'year ist die Zahl 1815', en: 'year is the number 1815' }, expression: 'year', expected: 1815 },
       {
         name: { de: 'Die Ausgabe lautet "Ada was born in 1815."', en: 'The output is "Ada was born in 1815."' },
-        ausdruck: 'output.trim()',
-        erwartet: 'Ada was born in 1815.',
+        expression: 'output.trim()',
+        expected: 'Ada was born in 1815.',
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /**
  * Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens.

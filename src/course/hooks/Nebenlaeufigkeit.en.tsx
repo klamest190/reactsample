@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Nebenlaeufigkeit.code'
+import { examples, codeBloecke } from './Nebenlaeufigkeit.code'
 import { NebenlaeufigkeitsDemo } from '../demos/NebenlaeufigkeitsDemo'
 
 /**
@@ -16,8 +16,8 @@ export function Nebenlaeufigkeit() {
         <P><Code>useTransition</Code> marks an update as “not urgent” and tells you via <Code>isPending</Code> that it is still running.</P>
         <TryIt
           id="hooks-nebenlaeufig-einstieg"
-          {...beispiele['hooks-nebenlaeufig-einstieg']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function Nebenlaeufigkeit() {
         </P>
         <TryIt
           id="hooks-nebenlaeufig-problem"
-          {...beispiele['hooks-nebenlaeufig-problem']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-problem']}
+          mode="react"
         />
         <P>
           Since React 18, React can <strong>interrupt</strong> renders. You only have to tell it which updates
@@ -67,8 +67,8 @@ export function Nebenlaeufigkeit() {
       <Abschnitt titel="useTransition">
         <TryIt
           id="hooks-nebenlaeufig-transition"
-          {...beispiele['hooks-nebenlaeufig-transition']}
-          modus="react"
+          {...examples['hooks-nebenlaeufig-transition']}
+          mode="react"
         />
         <Liste>
           <li>
@@ -93,7 +93,7 @@ export function Nebenlaeufigkeit() {
           rendered for the first time - the bundler puts its code into a separate file for that. While it loads, the
           nearest <Code>{'<Suspense>'}</Code> above shows its <Code>fallback</Code>.
         </P>
-        <TryIt id="hooks-nebenlaeufig-lazy" {...beispiele['hooks-nebenlaeufig-lazy']} modus="react" />
+        <TryIt id="hooks-nebenlaeufig-lazy" {...examples['hooks-nebenlaeufig-lazy']} mode="react" />
         <P>
           Good candidates are pages (one file per route, <Verweis id="praxis-routing" />), large charts, editors and
           rarely opened dialogs. This learning app loads every chapter that way, only when you open it. Hide the
@@ -112,9 +112,9 @@ export function Nebenlaeufigkeit() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-nebenlaeufig-uebung"
-          {...beispiele['hooks-nebenlaeufig-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-nebenlaeufig-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 The color slider is laggy because every movement redraws 2,000 slow tiles. Make sure the{' '}
@@ -131,28 +131,28 @@ export function Nebenlaeufigkeit() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'An input sets state that filters a slow list. Which hook fits?',
-            antworten: ['useTransition around the input’s setState', 'useDeferredValue for the value the list receives'],
-            richtig: 1,
-            erklaerung: 'The input itself must update immediately - only the list may wait.',
+            question: 'An input sets state that filters a slow list. Which hook fits?',
+            answers: ['useTransition around the input’s setState', 'useDeferredValue for the value the list receives'],
+            correct: 1,
+            explanation: 'The input itself must update immediately - only the list may wait.',
           },
           {
-            frage: 'What does useTransition return?',
-            antworten: ['[isPending, startTransition]', '[value, setValue]', 'A promise'],
-            richtig: 0,
-            erklaerung: 'isPending tells you whether a transition is currently rendering.',
+            question: 'What does useTransition return?',
+            answers: ['[isPending, startTransition]', '[value, setValue]', 'A promise'],
+            correct: 0,
+            explanation: 'isPending tells you whether a transition is currently rendering.',
           },
           {
-            frage: 'Why does useDeferredValue usually need memo?',
-            antworten: [
+            question: 'Why does useDeferredValue usually need memo?',
+            answers: [
               'Otherwise there is an error',
               'Otherwise the slow component renders along with the urgent render anyway',
               'memo makes the value deferred',
             ],
-            richtig: 1,
-            erklaerung: 'With memo, React skips the list as long as it receives the old value.',
+            correct: 1,
+            explanation: 'With memo, React skips the list as long as it receives the old value.',
           },
         ]}
       />

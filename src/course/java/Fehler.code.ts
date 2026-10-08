@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.9 - Exceptions. */
 
-export const beispiele = {
+export const examples = {
   'java-fehler-einstieg': {
     code: java`
       public class Main {
@@ -176,7 +176,7 @@ export const beispiele = {
     `,
   },
   'java-fehler-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`parseOrDefault` umschließt `Integer.parseInt(text)` mit `try { … } catch (NumberFormatException e) { … }`.',
         'Im catch-Block gibst du einfach `fallback` zurück.',
@@ -207,7 +207,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         static int parseOrDefault(String text, int fallback) {
           try {
@@ -235,33 +235,33 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'parseOrDefault("42", 0) ist 42', en: 'parseOrDefault("42", 0) is 42' },
-        ausdruck: 'parseOrDefault("42", 0)',
-        erwartet: 42,
+        expression: 'parseOrDefault("42", 0)',
+        expected: 42,
       },
       {
         name: { de: 'parseOrDefault("abc", 7) ist 7', en: 'parseOrDefault("abc", 7) is 7' },
-        ausdruck: 'parseOrDefault("abc", 7)',
-        erwartet: 7,
+        expression: 'parseOrDefault("abc", 7)',
+        expected: 7,
       },
       {
         name: { de: 'validateAge(30) wirft nicht', en: 'validateAge(30) does not throw' },
-        ausdruck: 'Check.validate(30)',
-        erwartet: 'ok',
+        expression: 'Check.validate(30)',
+        expected: 'ok',
       },
       {
         name: { de: 'validateAge(-1) wirft IllegalArgumentException', en: 'validateAge(-1) throws IllegalArgumentException' },
-        ausdruck: 'Check.validate(-1)',
-        erwartet: 'threw',
+        expression: 'Check.validate(-1)',
+        expected: 'threw',
       },
       {
         name: { de: 'validateAge(200) wirft IllegalArgumentException', en: 'validateAge(200) throws IllegalArgumentException' },
-        ausdruck: 'Check.validate(200)',
-        erwartet: 'threw',
+        expression: 'Check.validate(200)',
+        expected: 'threw',
       },
     ],
     // Unsichtbare Hilfsklasse: Ein Test ist ein einzelner Ausdruck - try/catch
     // passt da nicht hinein, also steht es hier.
-    vorbereitung: java`
+    setup: java`
       class Check {
         static String validate(int age) {
           try {
@@ -274,7 +274,7 @@ export const beispiele = {
       }
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   aufbau: java`

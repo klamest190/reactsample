@@ -21,7 +21,7 @@ const APP = java`
 `
 const withApp = (code: string) => `${APP}\n\n${code}`
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'spring-start': [
     {
       id: 'spring-start-vorhersage-status',
@@ -48,11 +48,11 @@ export const uebungen: UebungsSammlung = {
       id: 'spring-start-fehler-mapping',
       stufe: 'fehler',
       titel: t('Der Endpunkt antwortet nicht', 'The endpoint does not answer'),
-      aufgabe: t(
+      task: t(
         '`GET /api/version` soll `"1.0"` liefern, bekommt aber 404. Finde die zwei Fehler.',
         '`GET /api/version` should return `"1.0"` but gets 404. Find the two mistakes.',
       ),
-      modus: 'spring',
+      mode: 'spring',
       code: withApp(java`
         class VersionController {
 
@@ -62,7 +62,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `),
-      loesung: withApp(java`
+      solution: withApp(java`
         @RestController
         class VersionController {
 
@@ -73,7 +73,7 @@ export const uebungen: UebungsSammlung = {
         }
       `),
       tests: [{ name: t('GET /api/version → "1.0"', 'GET /api/version → "1.0"'), http: 'GET /api/version\n→ 200 "1.0"' }],
-      tipps: t(
+      hints: t(
         ['Ohne `@RestController` ist die Klasse keine Bean - Spring kennt ihre Methoden gar nicht.', 'Und der Pfad in `@GetMapping` muss genau zur Anfrage passen: `/api/version`.'],
         ['Without `@RestController` the class is no bean - Spring does not know its methods at all.', 'And the path in `@GetMapping` must match the request exactly: `/api/version`.'],
       ),
@@ -102,11 +102,11 @@ export const uebungen: UebungsSammlung = {
       id: 'spring-beans-fehler-start',
       stufe: 'fehler',
       titel: t('APPLICATION FAILED TO START', 'APPLICATION FAILED TO START'),
-      aufgabe: t(
+      task: t(
         'Die Anwendung startet nicht. Lies die Meldung und behebe den Fehler - ohne den Controller zu ändern.',
         'The application does not start. Read the message and fix the mistake - without changing the controller.',
       ),
-      modus: 'spring',
+      mode: 'spring',
       code: withApp(java`
         interface Clock {
           String now();
@@ -125,7 +125,7 @@ export const uebungen: UebungsSammlung = {
           String time() { return clock.now(); }
         }
       `),
-      loesung: withApp(java`
+      solution: withApp(java`
         interface Clock {
           String now();
         }
@@ -145,7 +145,7 @@ export const uebungen: UebungsSammlung = {
         }
       `),
       tests: [{ name: t('GET /time → "12:00"', 'GET /time → "12:00"'), http: 'GET /time\n→ 200 "12:00"' }],
-      tipps: t(['„required a bean of type Clock that could not be found“ - welche Klasse soll diese Bean sein?', '`@Component` über `FixedClock`.'], ['“required a bean of type Clock that could not be found” - which class should be that bean?', '`@Component` on `FixedClock`.']),
+      hints: t(['„required a bean of type Clock that could not be found“ - welche Klasse soll diese Bean sein?', '`@Component` über `FixedClock`.'], ['“required a bean of type Clock that could not be found” - which class should be that bean?', '`@Component` on `FixedClock`.']),
     },
   ],
 
@@ -181,11 +181,11 @@ export const uebungen: UebungsSammlung = {
       id: 'spring-rest-ergaenzen-filter',
       stufe: 'ergaenzen',
       titel: t('Filtern per Query-Parameter', 'Filtering with a query parameter'),
-      aufgabe: t(
+      task: t(
         '`GET /api/products` liefert alle Produkte. Mit `?maxPrice=10` sollen nur Produkte bis 10 kommen; ohne Parameter weiterhin alle.',
         '`GET /api/products` returns all products. With `?maxPrice=10` only products up to 10 should come back; without the parameter still all of them.',
       ),
-      modus: 'spring',
+      mode: 'spring',
       code: withApp(java`
         record Product(String name, double price) {}
 
@@ -200,7 +200,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `),
-      loesung: withApp(java`
+      solution: withApp(java`
         record Product(String name, double price) {}
 
         @RestController
@@ -219,7 +219,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('?maxPrice=10 → Pen und Mug', '?maxPrice=10 → Pen and Mug'), http: 'GET /api/products?maxPrice=10\n→ 200 [{"name": "Pen"}, {"name": "Mug"}]' },
         { name: t('Ohne Parameter → alle drei', 'Without the parameter → all three'), http: 'GET /api/products\n→ 200 [{}, {}, {}]' },
       ],
-      tipps: t(
+      hints: t(
         ['Ein optionaler Parameter: `@RequestParam(required = false) Double maxPrice` - `Double`, damit er `null` sein kann.', 'Filtern mit `products.stream().filter(p -> p.price() <= maxPrice).toList()`.'],
         ['An optional parameter: `@RequestParam(required = false) Double maxPrice` - `Double`, so it can be `null`.', 'Filter with `products.stream().filter(p -> p.price() <= maxPrice).toList()`.'],
       ),
@@ -253,11 +253,11 @@ export const uebungen: UebungsSammlung = {
       id: 'spring-fehler-fehler-valid',
       stufe: 'fehler',
       titel: t('Die Validierung greift nicht', 'Validation does not kick in'),
-      aufgabe: t(
+      task: t(
         'Eine leere E-Mail-Adresse wird angenommen, obwohl `@NotBlank @Email` dasteht. Finde den Fehler.',
         'An empty email address is accepted although `@NotBlank @Email` is there. Find the bug.',
       ),
-      modus: 'spring',
+      mode: 'spring',
       code: withApp(java`
         record Signup(@NotBlank @Email String email) {}
 
@@ -270,7 +270,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `),
-      loesung: withApp(java`
+      solution: withApp(java`
         record Signup(@NotBlank @Email String email) {}
 
         @RestController
@@ -287,7 +287,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('Keine Adresse → 400', 'Not an address → 400'), http: 'POST /api/signup\n{"email": "ada"}\n→ 400' },
         { name: t('Gültige Adresse → 201', 'Valid address → 201'), http: 'POST /api/signup\n{"email": "ada@example.com"}\n→ 201' },
       ],
-      tipps: t(['Die Annotationen am Record werden nur geprüft, wenn der Parameter es verlangt.', '`@Valid` vor `@RequestBody`.'], ['The annotations on the record are only checked if the parameter asks for it.', '`@Valid` before `@RequestBody`.']),
+      hints: t(['Die Annotationen am Record werden nur geprüft, wenn der Parameter es verlangt.', '`@Valid` vor `@RequestBody`.'], ['The annotations on the record are only checked if the parameter asks for it.', '`@Valid` before `@RequestBody`.']),
     },
   ],
 
@@ -321,11 +321,11 @@ export const uebungen: UebungsSammlung = {
       id: 'spring-daten-ergaenzen-count',
       stufe: 'ergaenzen',
       titel: t('Zählen ohne Schleife', 'Counting without a loop'),
-      aufgabe: t(
+      task: t(
         '`GET /api/todos/open-count` soll die Zahl der offenen ToDos liefern (hier: 2). Ergänze eine Methode im Repository und benutze sie.',
         '`GET /api/todos/open-count` should return the number of open todos (here: 2). Add a method to the repository and use it.',
       ),
-      modus: 'spring',
+      mode: 'spring',
       code: withApp(java`
         @Entity
         class Todo {
@@ -365,7 +365,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `),
-      loesung: withApp(java`
+      solution: withApp(java`
         @Entity
         class Todo {
           @Id @GeneratedValue private Long id;
@@ -406,7 +406,7 @@ export const uebungen: UebungsSammlung = {
         }
       `),
       tests: [{ name: t('GET /api/todos/open-count → 2', 'GET /api/todos/open-count → 2'), http: 'GET /api/todos/open-count\n→ 200 2' }],
-      tipps: t(['Zählen beginnt mit `countBy…`, der Rückgabetyp ist `long`.', '`long countByDoneFalse();`'], ['Counting starts with `countBy…`, the return type is `long`.', '`long countByDoneFalse();`']),
+      hints: t(['Zählen beginnt mit `countBy…`, der Rückgabetyp ist `long`.', '`long countByDoneFalse();`'], ['Counting starts with `countBy…`, the return type is `long`.', '`long countByDoneFalse();`']),
     },
   ],
 
@@ -500,11 +500,11 @@ export const uebungen: UebungsSammlung = {
       id: 'docker-dockerfile-frei-react',
       stufe: 'frei',
       titel: t('Ein Image für die React-App', 'An image for the React app'),
-      aufgabe: t(
+      task: t(
         'Schreibe ein Dockerfile für das Projekt `todo-web`: Node baut die App (`npm ci`, `npm run build` → `dist/`), nginx liefert `dist/` aus `/usr/share/nginx/html` aus. Das Image soll kleiner als 100 MB sein, und nach einer Code-Änderung soll `npm ci` aus dem Cache kommen.',
         'Write a Dockerfile for the project `todo-web`: Node builds the app (`npm ci`, `npm run build` → `dist/`), nginx serves `dist/` from `/usr/share/nginx/html`. The image should be smaller than 100 MB, and after a code change `npm ci` should come from the cache.',
       ),
-      modus: 'dockerfile',
+      mode: 'dockerfile',
       project: 'react',
       ignore: 'node_modules/\ndist/\n.git/',
       code: docker`
@@ -512,7 +512,7 @@ export const uebungen: UebungsSammlung = {
 
         # Stage 2: serve
       `,
-      loesung: docker`
+      solution: docker`
         FROM node:22-alpine AS build
         WORKDIR /app
         COPY package.json package-lock.json ./
@@ -529,7 +529,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('Das Image ist kleiner als 100 MB', 'The image is smaller than 100 MB'), dockerfile: (r) => (r.image?.sizeMb ?? 9999) < 100 },
         { name: t('npm ci kommt nach einer Code-Änderung aus dem Cache', 'npm ci comes from the cache after a code change'), dockerfile: (r) => Boolean(r.second?.steps.some((s) => s.label.includes('npm ci') && s.cached)) },
       ],
-      tipps: t(
+      hints: t(
         ['Zwei Stages: `FROM node:22-alpine AS build` und `FROM nginx:1.27-alpine`.', 'Erst `COPY package.json package-lock.json ./` und `RUN npm ci`, dann `COPY . .` und `RUN npm run build`.', 'In der zweiten Stage: `COPY --from=build /app/dist /usr/share/nginx/html`.'],
         ['Two stages: `FROM node:22-alpine AS build` and `FROM nginx:1.27-alpine`.', 'First `COPY package.json package-lock.json ./` and `RUN npm ci`, then `COPY . .` and `RUN npm run build`.', 'In the second stage: `COPY --from=build /app/dist /usr/share/nginx/html`.'],
       ),
@@ -541,11 +541,11 @@ export const uebungen: UebungsSammlung = {
       id: 'docker-compose-fehler-port',
       stufe: 'fehler',
       titel: t('Der falsche Port', 'The wrong port'),
-      aufgabe: t(
+      task: t(
         'Die Datenbank ist für Tools auf Port 5433 veröffentlicht - und seitdem startet die API nicht mehr. Warum? Behebe es, ohne die Veröffentlichung zu entfernen.',
         'The database is published on port 5433 for tools - and since then the API no longer starts. Why? Fix it without removing the published port.',
       ),
-      modus: 'compose',
+      mode: 'compose',
       code: yaml`
         services:
           db:
@@ -567,7 +567,7 @@ export const uebungen: UebungsSammlung = {
               db:
                 condition: service_healthy
       `,
-      loesung: yaml`
+      solution: yaml`
         services:
           db:
             image: postgres:17
@@ -592,7 +592,7 @@ export const uebungen: UebungsSammlung = {
         { name: t('Beide Container laufen', 'Both containers are running'), compose: (r) => r.ok && r.containers.length === 2 },
         { name: t('db ist weiter auf Port 5433 veröffentlicht', 'db is still published on port 5433'), compose: (r) => Boolean(r.model?.services.find((s) => s.name === 'db')?.ports.some((p) => p.host === 5433)) },
       ],
-      tipps: t(
+      hints: t(
         ['Die linke Zahl in `ports` gilt nur für deinen Rechner. Zwischen den Containern zählt der Port im Container.', 'Die API muss `db:5432` benutzen.'],
         ['The left number in `ports` only applies to your machine. Between containers the port inside the container counts.', 'The API has to use `db:5432`.'],
       ),

@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Asynchron.code'
+import { examples, codeBloecke } from './Asynchron.code'
 
 // Simulated API so the examples work offline and without CORS problems.
 /**
@@ -16,7 +16,7 @@ export function Asynchron() {
         <P>A timer runs later - the rest of the code does not wait for it.</P>
         <TryIt
           id="js-async-einstieg"
-          {...beispiele['js-async-einstieg']}
+          {...examples['js-async-einstieg']}
         />
       </Abschnitt>
 
@@ -29,7 +29,7 @@ export function Asynchron() {
         </P>
         <TryIt
           id="js-async-1"
-          {...beispiele['js-async-1']}
+          {...examples['js-async-1']}
         />
       </Abschnitt>
 
@@ -42,7 +42,7 @@ export function Asynchron() {
         </P>
         <TryIt
           id="js-async-2"
-          {...beispiele['js-async-2']}
+          {...examples['js-async-2']}
         />
       </Abschnitt>
 
@@ -59,7 +59,7 @@ export function Asynchron() {
         </Hinweis>
         <TryIt
           id="js-async-3"
-          {...beispiele['js-async-3']}
+          {...examples['js-async-3']}
         />
         <Hinweis variante="tipp">
           Top-level <Code>await</Code> works here in the editor and in ES modules. In normal functions the
@@ -75,7 +75,7 @@ export function Asynchron() {
           <strong>task</strong> (timers, clicks, network responses). In between, the browser may repaint.
         </P>
         <CodeBlock code={codeBloecke.eventloop} />
-        <TryIt id="js-async-eventloop" {...beispiele['js-async-eventloop']} />
+        <TryIt id="js-async-eventloop" {...examples['js-async-eventloop']} />
         <Hinweis variante="info">
           That explains why a long loop freezes the whole page: while it runs, no task and no repaint get a turn. That is
           why React can split slow updates into small pieces and give the browser room in between (
@@ -102,15 +102,15 @@ export function Asynchron() {
         />
         <TryIt
           id="js-async-4"
-          {...beispiele['js-async-4']}
+          {...examples['js-async-4']}
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-async-uebung"
-          {...beispiele['js-async-uebung']}
-          aufgabe={
+          {...examples['js-async-uebung']}
+          task={
             <>
               <p>
                 Write the <Code>async</Code> function <Code>loadNames(ids)</Code>. It receives an array of IDs
@@ -127,28 +127,28 @@ export function Asynchron() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: "In what order does the output appear? console.log('A'); setTimeout(() => console.log('B'), 0); console.log('C')",
-            antworten: ['A B C', 'A C B', 'B A C'],
-            richtig: 1,
-            erklaerung: 'The timer callback only runs once the current code is finished - even with 0 ms.',
+            question: "In what order does the output appear? console.log('A'); setTimeout(() => console.log('B'), 0); console.log('C')",
+            answers: ['A B C', 'A C B', 'B A C'],
+            correct: 1,
+            explanation: 'The timer callback only runs once the current code is finished - even with 0 ms.',
           },
           {
-            frage: 'fetch receives a 404 response. What happens?',
-            antworten: [
+            question: 'fetch receives a 404 response. What happens?',
+            answers: [
               'The promise is rejected',
               'The promise is fulfilled, response.ok is false',
               'fetch returns null',
             ],
-            richtig: 1,
-            erklaerung: 'Only network errors lead to a rejection. You have to check HTTP errors via response.ok.',
+            correct: 1,
+            explanation: 'Only network errors lead to a rejection. You have to check HTTP errors via response.ok.',
           },
           {
-            frage: 'Where can await be used?',
-            antworten: ['Anywhere', 'In async functions (and at module level)', 'Only in .then()'],
-            richtig: 1,
-            erklaerung: 'await is only allowed in async functions - and at the top level of ES modules.',
+            question: 'Where can await be used?',
+            answers: ['Anywhere', 'In async functions (and at module level)', 'Only in .then()'],
+            correct: 1,
+            explanation: 'await is only allowed in async functions - and at the top level of ES modules.',
           },
         ]}
       />

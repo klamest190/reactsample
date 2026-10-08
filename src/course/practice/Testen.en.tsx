@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
+import { examples, codeBloecke, uebungDateien, uebungVarianten } from './Testen.code'
 
 /**
  * KAPITEL 5.8 (English) - Testing with Vitest and React Testing Library
@@ -30,7 +30,7 @@ export function Testen() {
           A test renders a component, clicks like a person and checks what is visible afterwards. The tests run
           right here in the editor - change <Code>count + 1</Code> to <Code>count + 2</Code> and the test turns red.
         </P>
-        <TryIt id="praxis-testen-einstieg" {...beispiele['praxis-testen-einstieg']} modus="test" />
+        <TryIt id="praxis-testen-einstieg" {...examples['praxis-testen-einstieg']} mode="test" />
       </Abschnitt>
 
       <Abschnitt titel="Why test?">
@@ -53,7 +53,7 @@ export function Testen() {
           <Code>test('what should happen', () =&gt; {'{ … }'})</Code>. Inside, <Code>expect(value)</Code> checks the
           result with a <strong>matcher</strong> such as <Code>toBe</Code>. <Code>describe</Code> groups tests.
         </P>
-        <TryIt id="praxis-testen-vitest" {...beispiele['praxis-testen-vitest']} modus="test" />
+        <TryIt id="praxis-testen-vitest" {...examples['praxis-testen-vitest']} mode="test" />
         <Liste>
           <li>
             <Code>toBe</Code> compares with <Code>===</Code>, <Code>toEqual</Code> compares the contents - for objects
@@ -75,7 +75,7 @@ export function Testen() {
           <strong>role</strong> and visible name, not by CSS classes or component internals. With{' '}
           <strong>user-event</strong> you type and click like real users.
         </P>
-        <TryIt id="praxis-testen-rtl" {...beispiele['praxis-testen-rtl']} modus="test" />
+        <TryIt id="praxis-testen-rtl" {...examples['praxis-testen-rtl']} mode="test" />
         <P>The queries come in four variants:</P>
         <Tabelle
           dicht
@@ -102,12 +102,12 @@ export function Testen() {
           <strong>mock</strong>. <Code>vi.fn()</Code> records every call and returns whatever you specify. That lets
           you check <em>whether</em> and <em>with what</em> it was called - and play through the error case too.
         </P>
-        <TryIt id="praxis-testen-mocks" {...beispiele['praxis-testen-mocks']} modus="test" />
+        <TryIt id="praxis-testen-mocks" {...examples['praxis-testen-mocks']} mode="test" />
         <P>
           If the component loads data itself (<Verweis id="praxis-daten" />), <Code>vi.spyOn()</Code> replaces the
           global <Code>fetch</Code> for the duration of a test. <Code>findBy…</Code> waits until the response is shown:
         </P>
-        <TryIt id="praxis-testen-fetch" {...beispiele['praxis-testen-fetch']} modus="test" />
+        <TryIt id="praxis-testen-fetch" {...examples['praxis-testen-fetch']} mode="test" />
         <Hinweis variante="info">
           Larger projects prefer to intercept requests at the network level with <strong>MSW</strong> (Mock Service
           Worker). Then the test does not need to know whether the component uses <Code>fetch</Code>, TanStack Query or
@@ -136,10 +136,10 @@ export function Testen() {
       </Abschnitt>
 
       <Abschnitt titel="Setting it up in your project">
-        <CodeBlock titel="Terminal" code={codeBloecke.installieren} />
+        <CodeBlock title="Terminal" code={codeBloecke.installieren} />
         <CodeBlock code={codeBloecke.konfiguration} />
         <CodeBlock code={codeBloecke.setup} />
-        <CodeBlock titel="Terminal" code={codeBloecke.ausfuehren} />
+        <CodeBlock title="Terminal" code={codeBloecke.ausfuehren} />
         <P>
           Test files live next to the code and are called <Code>Name.test.tsx</Code> - Vitest finds them
           automatically. <Code>jsdom</Code> provides a simulated <Code>document</Code> in Node.
@@ -155,11 +155,11 @@ export function Testen() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-testen-uebung"
-          {...beispiele['praxis-testen-uebung']}
-          modus="test"
-          dateien={uebungDateien}
-          varianten={uebungVarianten}
-          aufgabe={
+          {...examples['praxis-testen-uebung']}
+          mode="test"
+          files={uebungDateien}
+          variants={uebungVarianten}
+          task={
             <>
               <p>
                 This time you write the tests. <Code>QuantityPicker</Code> (above) picks a quantity from 1 to{' '}
@@ -182,34 +182,34 @@ export function Testen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'How do you check that an error message is NOT shown?',
-            antworten: [
+            question: 'How do you check that an error message is NOT shown?',
+            answers: [
               "expect(screen.getByRole('alert')).not.toBeInTheDocument()",
               "expect(screen.queryByRole('alert')).not.toBeInTheDocument()",
               "expect(screen.findByRole('alert')).toBeNull()",
             ],
-            richtig: 1,
-            erklaerung: 'getBy… already throws while searching if nothing is there. queryBy… returns null.',
+            correct: 1,
+            explanation: 'getBy… already throws while searching if nothing is there. queryBy… returns null.',
           },
           {
-            frage: 'How do you wait for an element that only appears after loading?',
-            antworten: ['getByText', 'await findByText', 'setTimeout in the test'],
-            richtig: 1,
-            erklaerung: 'findBy… retries until the element is there or the time runs out.',
+            question: 'How do you wait for an element that only appears after loading?',
+            answers: ['getByText', 'await findByText', 'setTimeout in the test'],
+            correct: 1,
+            explanation: 'findBy… retries until the element is there or the time runs out.',
           },
           {
-            frage: 'Which query does Testing Library prefer?',
-            antworten: ['getByTestId', 'container.querySelector(".btn")', 'getByRole'],
-            richtig: 2,
-            erklaerung: 'Role and name are what people and screen readers perceive.',
+            question: 'Which query does Testing Library prefer?',
+            answers: ['getByTestId', 'container.querySelector(".btn")', 'getByRole'],
+            correct: 2,
+            explanation: 'Role and name are what people and screen readers perceive.',
           },
           {
-            frage: 'What is vi.fn() for?',
-            antworten: ['A mock that records its calls', 'Making tests faster', 'Rendering a component'],
-            richtig: 0,
-            erklaerung: 'With it you check, e.g. with toHaveBeenCalledWith, whether a callback was called correctly.',
+            question: 'What is vi.fn() for?',
+            answers: ['A mock that records its calls', 'Making tests faster', 'Rendering a component'],
+            correct: 0,
+            explanation: 'With it you check, e.g. with toHaveBeenCalledWith, whether a callback was called correctly.',
           },
         ]}
       />

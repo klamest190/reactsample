@@ -3,7 +3,7 @@ import { Icon } from '../components/Icon'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache } from '../i18n/LanguageContext'
 import { runSql } from '../sql/client'
-import { SHOP_TABELLEN } from '../sql/dataset'
+import { SHOP_TABLES } from '../sql/dataset'
 import type { SqlTable } from '../sql/engine'
 import { focusableWhenScrolling } from '../components/scrollFocus'
 
@@ -45,67 +45,67 @@ const TEXTS = {
 }
 
 /** The example data never changes between runs - it is fetched once per page. */
-let startdaten: Promise<Record<string, SqlTable>> | null = null
+let seedData: Promise<Record<string, SqlTable>> | null = null
 
-function startdatenLaden() {
-  if (!startdaten) {
-    startdaten = runSql(SHOP_TABELLEN.map((t) => `SELECT * FROM ${t.name} ORDER BY 1, 2;`).join('\n')).then((run) => {
+function loadSeedData() {
+  if (!seedData) {
+    seedData = runSql(SHOP_TABLES.map((t) => `SELECT * FROM ${t.name} ORDER BY 1, 2;`).join('\n')).then((run) => {
       if (run.error) throw new Error(run.error.message)
-      return Object.fromEntries(SHOP_TABELLEN.map((t, i) => [t.name, run.results[i]]))
+      return Object.fromEntries(SHOP_TABLES.map((t, i) => [t.name, run.results[i]]))
     })
     // A failed load (e.g. PostgreSQL could not start) is tried again next time.
-    startdaten.catch(() => {
-      startdaten = null
+    seedData.catch(() => {
+      seedData = null
     })
   }
-  return startdaten
+  return seedData
 }
 
 /** Code without comments - a table named in a comment is not part of the query. */
-function ohneKommentare(code: string) {
+function withoutComments(code: string) {
   return code.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
 }
 
-const wort = (name: string) => new RegExp(`\\b${name}\\b`, 'i')
+const word = (name: string) => new RegExp(`\\b${name}\\b`, 'i')
 
 /** The example tables that appear in the code, in the order of their first appearance. */
-function benutzteTabellen(code: string) {
-  const text = ohneKommentare(code)
-  return SHOP_TABELLEN.map((t) => ({ name: t.name, stelle: text.search(wort(t.name)) }))
-    .filter((t) => t.stelle >= 0)
-    .sort((a, b) => a.stelle - b.stelle)
+function usedTables(code: string) {
+  const text = withoutComments(code)
+  return SHOP_TABLES.map((t) => ({ name: t.name, position: text.search(word(t.name)) }))
+    .filter((t) => t.position >= 0)
+    .sort((a, b) => a.position - b.position)
     .map((t) => t.name)
 }
 
-export function SqlDatenleiste({ code }: { code: string }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const benutzt = useMemo(() => benutzteTabellen(code), [code])
+export function SqlDataPanel({ code }: { code: string }) {
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const benutzt = useMemo(() => usedTables(code), [code])
   // null: automatisch die Tabellen der Abfrage. Nach einem Klick gilt die eigene Auswahl.
-  const [auswahl, setAuswahl] = useState<string[] | null>(null)
+  const [selection, setSelection] = useState<string[] | null>(null)
   // Gilt für alle SQL-Editoren: Wer die Daten ausblendet, will sie meist überall weg haben.
-  const [offen, setOffen] = useLocalStorage('sql-daten-offen', true)
-  const [daten, setDaten] = useState<Record<string, SqlTable> | null>(null)
-  const [fehler, setFehler] = useState(false)
+  const [open, setOpen] = useLocalStorage('sql-daten-offen', true)
+  const [data, setData] = useState<Record<string, SqlTable> | null>(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (!offen || daten) return
-    let aktiv = true
-    startdatenLaden().then(
-      (d) => aktiv && setDaten(d),
-      () => aktiv && setFehler(true),
+    if (!open || data) return
+    let active = true
+    loadSeedData().then(
+      (d) => active && setData(d),
+      () => active && setError(true),
     )
     return () => {
-      aktiv = false
+      active = false
     }
-  }, [offen, daten])
+  }, [open, data])
 
-  const sichtbar = auswahl ?? benutzt
+  const visible = selection ?? benutzt
 
-  function umschalten(name: string) {
-    setOffen(true)
+  function toggle(name: string) {
+    setOpen(true)
     // Bei ausgeblendeten Daten zeigt der erste Klick die Tabelle, statt sie wegzunehmen.
-    setAuswahl(offen && sichtbar.includes(name) ? sichtbar.filter((n) => n !== name) : [...sichtbar.filter((n) => n !== name), name])
+    setSelection(open && visible.includes(name) ? visible.filter((n) => n !== name) : [...visible.filter((n) => n !== name), name])
   }
 
   return (
@@ -115,44 +115,44 @@ export function SqlDatenleiste({ code }: { code: string }) {
           <Icon name="datenbank" className="size-3.5" />
           {t.database}
         </span>
-        {SHOP_TABELLEN.map((tabelle) => {
-          const aktiv = offen && sichtbar.includes(tabelle.name)
-          const imCode = benutzt.includes(tabelle.name)
+        {SHOP_TABLES.map((table) => {
+          const active = open && visible.includes(table.name)
+          const inCode = benutzt.includes(table.name)
           return (
             <button
-              key={tabelle.name}
-              onClick={() => umschalten(tabelle.name)}
-              aria-pressed={aktiv}
-              title={`${tabelle.info[sprache]}${imCode ? ' - ' + t.inQuery : ''}`}
+              key={table.name}
+              onClick={() => toggle(table.name)}
+              aria-pressed={active}
+              title={`${table.info[language]}${inCode ? ' - ' + t.inQuery : ''}`}
               className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono transition ${
-                aktiv
+                active
                   ? 'border-brand-500 bg-brand-50 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200'
                   : 'border-slate-200 bg-white text-slate-500 hover:border-brand-400 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400'
-              } ${imCode ? 'font-semibold' : ''}`}
+              } ${inCode ? 'font-semibold' : ''}`}
             >
-              {imCode && <span aria-hidden className="size-1.5 rounded-full bg-brand-500" />}
-              {tabelle.name}
-              {imCode && <span className="sr-only"> ({t.inQuery})</span>}
+              {inCode && <span aria-hidden className="size-1.5 rounded-full bg-brand-500" />}
+              {table.name}
+              {inCode && <span className="sr-only"> ({t.inQuery})</span>}
             </button>
           )
         })}
-        <button onClick={() => setOffen(!offen)} aria-expanded={offen} className="ml-auto text-slate-500 hover:text-brand-600 dark:text-slate-400">
-          {offen ? t.hide : t.show}
+        <button onClick={() => setOpen(!open)} aria-expanded={open} className="ml-auto text-slate-500 hover:text-brand-600 dark:text-slate-400">
+          {open ? t.hide : t.show}
         </button>
       </div>
 
-      {offen &&
-        (sichtbar.length === 0 ? (
+      {open &&
+        (visible.length === 0 ? (
           <p className="mt-1.5 text-slate-500 dark:text-slate-400">{t.pick}</p>
-        ) : fehler ? (
+        ) : error ? (
           <p className="mt-1.5 text-rose-600 dark:text-rose-400">{t.failed}</p>
-        ) : !daten ? (
+        ) : !data ? (
           <p className="mt-1.5 text-slate-500 italic dark:text-slate-400">{t.loading}</p>
         ) : (
           <>
             <div className="mt-2 flex flex-wrap items-start gap-3">
-              {sichtbar.map((name) => (
-                <DatenTabelle key={name} name={name} tabelle={daten[name]} code={code} />
+              {visible.map((name) => (
+                <DataTable key={name} name={name} table={data[name]} code={code} />
               ))}
             </div>
             <p className="mt-1.5 text-slate-500 dark:text-slate-400">{t.start}</p>
@@ -163,38 +163,38 @@ export function SqlDatenleiste({ code }: { code: string }) {
 }
 
 /** One example table: column names with type and key, below them the rows. */
-function DatenTabelle({ name, tabelle, code }: { name: string; tabelle: SqlTable; code: string }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const info = SHOP_TABELLEN.find((x) => x.name === name)!
-  const text = useMemo(() => ohneKommentare(code), [code])
-  const zahl = tabelle.columns.map((_, c) => tabelle.rows.some((r) => r[c] !== null) && tabelle.rows.every((r) => r[c] === null || /^-?\d+(\.\d+)?$/.test(r[c]!)))
+function DataTable({ name, table, code }: { name: string; table: SqlTable; code: string }) {
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const info = SHOP_TABLES.find((x) => x.name === name)!
+  const text = useMemo(() => withoutComments(code), [code])
+  const number = table.columns.map((_, c) => table.rows.some((r) => r[c] !== null) && table.rows.every((r) => r[c] === null || /^-?\d+(\.\d+)?$/.test(r[c]!)))
 
   return (
     <figure className="max-w-full min-w-0">
-      <figcaption className="mb-1 text-slate-500 dark:text-slate-400" title={info.info[sprache]}>
-        <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{name}</code> · {t.rows(tabelle.rows.length)}
+      <figcaption className="mb-1 text-slate-500 dark:text-slate-400" title={info.info[language]}>
+        <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{name}</code> · {t.rows(table.rows.length)}
       </figcaption>
       <div ref={focusableWhenScrolling} className="max-h-44 overflow-auto rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
         <table className="border-collapse font-mono text-2xs">
           <thead className="sticky top-0 bg-slate-100 dark:bg-slate-800">
             <tr>
-              {tabelle.columns.map((spalte, c) => {
-                const meta = info.spalten.find((s) => s.name === spalte)
-                const benutzt = wort(spalte).test(text)
+              {table.columns.map((column, c) => {
+                const meta = info.columns.find((s) => s.name === column)
+                const benutzt = word(column).test(text)
                 return (
                   <th
-                    key={spalte}
+                    key={column}
                     scope="col"
                     title={benutzt ? t.usedColumn : undefined}
-                    className={`border-b border-slate-200 px-2 py-1 align-bottom font-normal whitespace-nowrap dark:border-slate-700 ${zahl[c] ? 'text-right' : 'text-left'} ${
+                    className={`border-b border-slate-200 px-2 py-1 align-bottom font-normal whitespace-nowrap dark:border-slate-700 ${number[c] ? 'text-right' : 'text-left'} ${
                       benutzt ? 'bg-brand-50 dark:bg-brand-500/15' : ''
                     }`}
                   >
-                    <span className={`block font-semibold ${benutzt ? 'text-brand-800 dark:text-brand-200' : 'text-slate-700 dark:text-slate-200'}`}>{spalte}</span>
+                    <span className={`block font-semibold ${benutzt ? 'text-brand-800 dark:text-brand-200' : 'text-slate-700 dark:text-slate-200'}`}>{column}</span>
                     <span className="block text-slate-600 dark:text-slate-400">
-                      {meta?.typ}
-                      {meta?.schluessel && <span className="text-amber-700 dark:text-amber-400"> {meta.schluessel}</span>}
+                      {meta?.type}
+                      {meta?.key && <span className="text-amber-700 dark:text-amber-400"> {meta.key}</span>}
                     </span>
                   </th>
                 )
@@ -202,11 +202,11 @@ function DatenTabelle({ name, tabelle, code }: { name: string; tabelle: SqlTable
             </tr>
           </thead>
           <tbody>
-            {tabelle.rows.map((zeile, r) => (
+            {table.rows.map((line, r) => (
               <tr key={r} className="odd:bg-white even:bg-slate-50 dark:odd:bg-slate-900 dark:even:bg-slate-900/40">
-                {zeile.map((wert, c) => (
-                  <td key={c} className={`px-2 py-0.5 whitespace-nowrap ${zahl[c] ? 'text-right tabular-nums' : ''}`}>
-                    {wert === null ? <span className="text-slate-500 italic dark:text-slate-400">NULL</span> : wert}
+                {line.map((value, c) => (
+                  <td key={c} className={`px-2 py-0.5 whitespace-nowrap ${number[c] ? 'text-right tabular-nums' : ''}`}>
+                    {value === null ? <span className="text-slate-500 italic dark:text-slate-400">NULL</span> : value}
                   </td>
                 ))}
               </tr>

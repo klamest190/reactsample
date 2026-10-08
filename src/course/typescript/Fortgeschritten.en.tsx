@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Fortgeschritten.code'
+import { examples, codeBloecke } from './Fortgeschritten.code'
 
 /**
  * KAPITEL 2.8 (English) - Advanced Types & Practice
@@ -17,7 +17,7 @@ export function Fortgeschritten() {
           new one from it - just like <Code>map</Code> builds a new array. The utility types from{' '}
           <Verweis nr="2.6" /> are built exactly this way.
         </P>
-        <TryIt id="ts-fortgeschritten-einstieg" modus="ts" {...beispiele['ts-fortgeschritten-einstieg']} />
+        <TryIt id="ts-fortgeschritten-einstieg" mode="ts" {...examples['ts-fortgeschritten-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Mapped types">
@@ -26,7 +26,7 @@ export function Fortgeschritten() {
           <Code>T</Code>. With <Code>?</Code> and <Code>readonly</Code> you add modifiers, with a minus in
           front you remove them.
         </P>
-        <TryIt id="ts-fortgeschritten-mapped" modus="ts" {...beispiele['ts-fortgeschritten-mapped']} />
+        <TryIt id="ts-fortgeschritten-mapped" mode="ts" {...examples['ts-fortgeschritten-mapped']} />
       </Abschnitt>
 
       <Abschnitt titel="Conditional types and infer">
@@ -35,7 +35,7 @@ export function Fortgeschritten() {
           part out - like the element type of an array or the value of a promise. That is how{' '}
           <Code>ReturnType</Code> and <Code>Awaited</Code> are built.
         </P>
-        <TryIt id="ts-fortgeschritten-conditional" modus="ts" {...beispiele['ts-fortgeschritten-conditional']} />
+        <TryIt id="ts-fortgeschritten-conditional" mode="ts" {...examples['ts-fortgeschritten-conditional']} />
         <Hinweis variante="info">
           You rarely write such types yourself in everyday code - but you read them all the time in the types
           of libraries. If you can decipher them, you also understand long error messages.
@@ -48,7 +48,7 @@ export function Fortgeschritten() {
           <Code>Capitalize</Code>, <Code>Uppercase</Code> and friends you can reshape names - that is how{' '}
           <Code>'click'</Code> becomes the type <Code>'onClick'</Code>.
         </P>
-        <TryIt id="ts-fortgeschritten-template" modus="ts" {...beispiele['ts-fortgeschritten-template']} />
+        <TryIt id="ts-fortgeschritten-template" mode="ts" {...examples['ts-fortgeschritten-template']} />
       </Abschnitt>
 
       <Abschnitt titel="Type assertions: as">
@@ -57,7 +57,7 @@ export function Fortgeschritten() {
           converted - if the claim is wrong, you have a wrong type and no error. So: prefer checking (
           <Code>instanceof</Code>, type guards) over claiming.
         </P>
-        <TryIt id="ts-fortgeschritten-assertions" modus="ts" {...beispiele['ts-fortgeschritten-assertions']} />
+        <TryIt id="ts-fortgeschritten-assertions" mode="ts" {...examples['ts-fortgeschritten-assertions']} />
       </Abschnitt>
 
       <Abschnitt titel="Typing async code">
@@ -66,7 +66,7 @@ export function Fortgeschritten() {
           unwraps it again. Feel free to write out the return type of functions that load data - it is the
           place every caller relies on.
         </P>
-        <TryIt id="ts-fortgeschritten-async" modus="ts" {...beispiele['ts-fortgeschritten-async']} />
+        <TryIt id="ts-fortgeschritten-async" mode="ts" {...examples['ts-fortgeschritten-async']} />
       </Abschnitt>
 
       <Abschnitt titel="Checking data from the server">
@@ -75,8 +75,8 @@ export function Fortgeschritten() {
           <Code>response.json()</Code> returns <Code>any</Code> - an <Code>as Product</Code> would only be a
           claim. It only becomes safe when you check the data at runtime and turn it into a type.
         </P>
-        <TryIt id="ts-fortgeschritten-validieren" modus="ts" {...beispiele['ts-fortgeschritten-validieren']} />
-        <CodeBlock titel="The same with a library" code={codeBloecke.zod} />
+        <TryIt id="ts-fortgeschritten-validieren" mode="ts" {...examples['ts-fortgeschritten-validieren']} />
+        <CodeBlock title="The same with a library" code={codeBloecke.zod} />
       </Abschnitt>
 
       <Abschnitt titel="The tsconfig in a real project">
@@ -100,9 +100,9 @@ export function Fortgeschritten() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="ts-fortgeschritten-uebung"
-          modus="ts"
-          {...beispiele['ts-fortgeschritten-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-fortgeschritten-uebung']}
+          task={
             <>
               <p>A type-safe event emitter - the masterpiece of this part:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -124,24 +124,24 @@ export function Fortgeschritten() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is { [K in keyof T]: string } for T = { a: number; b: boolean }?',
-            antworten: ['{ a: number; b: boolean }', '{ a: string; b: string }', 'string'],
-            richtig: 1,
-            erklaerung: 'The mapped type keeps all keys of T, but gives each of them the type string.',
+            question: 'What is { [K in keyof T]: string } for T = { a: number; b: boolean }?',
+            answers: ['{ a: number; b: boolean }', '{ a: string; b: string }', 'string'],
+            correct: 1,
+            explanation: 'The mapped type keeps all keys of T, but gives each of them the type string.',
           },
           {
-            frage: 'What does const user = data as User do at runtime?',
-            antworten: ['It checks whether data is a User', 'It converts data into a User', 'Nothing - as only exists while checking'],
-            richtig: 2,
-            erklaerung: 'Type assertions are removed when translating. If the claim is wrong, nobody notices - until something crashes.',
+            question: 'What does const user = data as User do at runtime?',
+            answers: ['It checks whether data is a User', 'It converts data into a User', 'Nothing - as only exists while checking'],
+            correct: 2,
+            explanation: 'Type assertions are removed when translating. If the claim is wrong, nobody notices - until something crashes.',
           },
           {
-            frage: 'What is the safest way to handle data from response.json()?',
-            antworten: ['Cast it to the expected type with as', 'Treat it as unknown and check it at runtime', 'Keep working with any'],
-            richtig: 1,
-            erklaerung: 'Only a real check (by hand or with a library like zod) makes sure type and data match.',
+            question: 'What is the safest way to handle data from response.json()?',
+            answers: ['Cast it to the expected type with as', 'Treat it as unknown and check it at runtime', 'Keep working with any'],
+            correct: 1,
+            explanation: 'Only a real check (by hand or with a library like zod) makes sure type and data match.',
           },
         ]}
       />

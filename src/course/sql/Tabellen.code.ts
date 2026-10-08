@@ -3,7 +3,7 @@ import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.6 - Designing tables: CREATE TABLE. */
 
-export const beispiele: Record<string, SqlBeispiel> = {
+export const examples: Record<string, SqlBeispiel> = {
   'sql-tabellen-einstieg': {
     code: sql`
       -- A new table for product reviews - with rules the database enforces
@@ -81,7 +81,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
         -- your columns
       );
     `,
-    loesung: sql`
+    solution: sql`
       CREATE TABLE wishlist (
         customer_id integer NOT NULL REFERENCES customers (id),
         product_id  integer NOT NULL REFERENCES products (id),
@@ -95,7 +95,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
       {
         name: { de: 'Spalten customer_id, product_id (integer) und added (date), alle Pflicht', en: 'Columns customer_id, product_id (integer) and added (date), all required' },
         abfrage: `SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'wishlist' ORDER BY ordinal_position`,
-        reihenfolge: true,
+        order: true,
       },
       {
         name: { de: 'Zwei Fremdschlüssel und ein Primärschlüssel aus beiden ids', en: 'Two foreign keys and a primary key made of both ids' },
@@ -110,7 +110,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
         abfrage: `SELECT customer_id, product_id, added = current_date FROM wishlist`,
       },
     ],
-    tipps: {
+    hints: {
       de: [
         'Eine Spalte mit Fremdschlüssel: `customer_id integer NOT NULL REFERENCES customers (id)`.',
         'Das heutige Datum als Standard: `DEFAULT current_date`.',

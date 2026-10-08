@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseEffect.code'
+import { examples, codeBloecke } from './UseEffect.code'
 import { TitelUndFenster } from '../demos/TitelUndFenster'
 
 /**
@@ -15,8 +15,8 @@ export function UseEffect() {
         <P><Code>useEffect</Code> runs after rendering - here every time <Code>count</Code> changes.</P>
         <TryIt
           id="hooks-useeffect-einstieg"
-          {...beispiele['hooks-useeffect-einstieg']}
-          modus="react"
+          {...examples['hooks-useeffect-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -51,8 +51,8 @@ export function UseEffect() {
         />
         <TryIt
           id="hooks-useeffect-deps"
-          {...beispiele['hooks-useeffect-deps']}
-          modus="react"
+          {...examples['hooks-useeffect-deps']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -64,8 +64,8 @@ export function UseEffect() {
         </P>
         <TryIt
           id="hooks-useeffect-cleanup"
-          {...beispiele['hooks-useeffect-cleanup']}
-          modus="react"
+          {...examples['hooks-useeffect-cleanup']}
+          mode="react"
         />
         <TitelUndFenster />
         <Hinweis variante="info">
@@ -85,8 +85,8 @@ export function UseEffect() {
         </P>
         <TryIt
           id="hooks-useeffect-stale"
-          {...beispiele['hooks-useeffect-stale']}
-          modus="react"
+          {...examples['hooks-useeffect-stale']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -117,9 +117,9 @@ export function UseEffect() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-useeffect-uebung"
-          {...beispiele['hooks-useeffect-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-useeffect-uebung']}
+          mode="react"
+          task={
             <>
               <p>Build a Pomodoro countdown:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -139,38 +139,38 @@ export function UseEffect() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'When does an effect with an empty dependency array [] run?',
-            antworten: ['Before the first render', 'After the first render', 'After every render'],
-            richtig: 1,
-            erklaerung: 'Effects always run after rendering. With [] only after the first one.',
+            question: 'When does an effect with an empty dependency array [] run?',
+            answers: ['Before the first render', 'After the first render', 'After every render'],
+            correct: 1,
+            explanation: 'Effects always run after rendering. With [] only after the first one.',
           },
           {
-            frage: 'When does React call the cleanup function?',
-            antworten: [
+            question: 'When does React call the cleanup function?',
+            answers: [
               'Only when the component is removed',
               'Before every re-run of the effect and on removal',
               'After every render',
             ],
-            richtig: 1,
-            erklaerung: 'That way the old effect is always cleaned up before the new one starts.',
+            correct: 1,
+            explanation: 'That way the old effect is always cleaned up before the new one starts.',
           },
           {
-            frage: 'You want filteredList from list and search. What is right?',
-            antworten: ['useEffect + setFilteredList', 'Calculate it while rendering (useMemo if needed)', 'useRef'],
-            richtig: 1,
-            erklaerung: 'Derived values need neither an effect nor state.',
+            question: 'You want filteredList from list and search. What is right?',
+            answers: ['useEffect + setFilteredList', 'Calculate it while rendering (useMemo if needed)', 'useRef'],
+            correct: 1,
+            explanation: 'Derived values need neither an effect nor state.',
           },
           {
-            frage: 'Why does an effect run twice during development?',
-            antworten: [
+            question: 'Why does an effect run twice during development?',
+            answers: [
               'A bug in React',
               'StrictMode deliberately checks whether the cleanup is correct',
               'Because dependencies are missing',
             ],
-            richtig: 1,
-            erklaerung: 'Only during development and only in StrictMode.',
+            correct: 1,
+            explanation: 'Only during development and only in StrictMode.',
           },
         ]}
       />

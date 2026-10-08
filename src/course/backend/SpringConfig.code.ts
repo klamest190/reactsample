@@ -1,5 +1,5 @@
 import { http, java, js, properties } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.6 - Configuration, profiles & tests. */
 
@@ -14,7 +14,7 @@ const APP = java`
 `
 const withApp = (code: string) => `${APP}\n\n${code}`
 
-export const beispiele = {
+export const examples = {
   'spring-konfig-value': {
     code: withApp(java`
       @RestController
@@ -157,7 +157,7 @@ export const beispiele = {
     `,
   },
   'spring-konfig-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Werte aus den Properties bekommst du per Konstruktor-Parameter: `@Value("${app.greeting}") String greeting`.',
         'Für `app.shout` brauchst du einen Standardwert, falls die Zeile fehlt: `@Value("${app.shout:false}") boolean shout`.',
@@ -179,7 +179,7 @@ export const beispiele = {
         }
       }
     `),
-    loesung: withApp(java`
+    solution: withApp(java`
       @RestController
       class GreetingController {
         private final String greeting;
@@ -213,7 +213,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   reihenfolge: js`
@@ -230,7 +230,7 @@ export const codeBloecke = {
     server.port                 ⇄  SERVER_PORT
     todo.max-open               ⇄  TODO_MAXOPEN
   `,
-  dateien: js`
+  files: js`
     src/main/resources/
     ├── application.properties         ← always
     ├── application-dev.properties     ← only with the profile "dev"

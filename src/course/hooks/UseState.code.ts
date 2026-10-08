@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-usestate-einstieg': {
     code: js`
       function App() {
@@ -175,7 +175,7 @@ export const beispiele = {
     `,
   },
   'hooks-usestate-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Neue Einträge mit Updater-Funktion: `setItems((prev) => [...prev, neu])`.',
         'Menge ändern: `map` mit `{ ...item, quantity: item.quantity + delta }`.',
@@ -204,7 +204,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function App() {
         const [items, setItems] = useState([
           { id: 1, name: 'Milk', quantity: 2 },
@@ -248,7 +248,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startet mit „2× Milk“', en: 'Starts with “2× Milk”' },
-        pruefung: js`
+        script: js`
           await render()
           expect(findAll('li')).toHaveLength(1)
           expect(text()).toContain('2× Milk')
@@ -256,7 +256,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Add legt einen Artikel mit Menge 1 an und leert das Feld', en: 'Add creates an item with quantity 1 and clears the input' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('input'), 'Bread')
           await click(button('Add'))
@@ -266,7 +266,7 @@ export const beispiele = {
       },
       {
         name: { de: '+ und − ändern die Menge', en: '+ and − change the quantity' },
-        pruefung: js`
+        script: js`
           await render()
           await click(within(getByText('Milk').closest('li')).button('+'))
           expect(text()).toContain('3× Milk')
@@ -276,7 +276,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Bei Menge 0 verschwindet der Artikel', en: 'At quantity 0 the item disappears' },
-        pruefung: js`
+        script: js`
           await render()
           await click(within(getByText('Milk').closest('li')).button('−'))
           await click(within(getByText('Milk').closest('li')).button('−'))
@@ -285,7 +285,7 @@ export const beispiele = {
       },
       {
         name: { de: '„Total: n items“ wird berechnet', en: '“Total: n items” is calculated' },
-        pruefung: js`
+        script: js`
           await render()
           expect(text()).toContain('Total: 2 items')
           await type(field('input'), 'Eggs')
@@ -295,4 +295,4 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

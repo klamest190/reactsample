@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.7 - Klassen, Enums & Module. */
 
-export const beispiele = {
+export const examples = {
   'ts-klassen-einstieg': {
     code: js`
       class BankAccount {
@@ -169,7 +169,7 @@ export const beispiele = {
     `,
   },
   'ts-klassen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Beginne mit `class ShoppingCart implements CartLike {` - die Typprüfung sagt dir dann, welche Mitglieder noch fehlen.',
         '`private items: CartItem[] = []` und `constructor(public readonly owner: string) {}` erledigen Liste und Besitzer.',
@@ -204,7 +204,7 @@ export const beispiele = {
       cart.add({ sku: 'pen', price: 1.5, quantity: 4 })
       console.log(cart.owner, cart.total)
     `,
-    loesung: js`
+    solution: js`
       interface CartItem {
         readonly sku: string
         price: number
@@ -245,22 +245,22 @@ export const beispiele = {
       console.log(cart.owner, cart.total)
     `,
     tests: [
-      { name: 'cart.total', ausdruck: 'cart.total', erwartet: 34.5 },
-      { name: 'cart.owner', ausdruck: 'cart.owner', erwartet: 'Ada' },
+      { name: 'cart.total', expression: 'cart.total', expected: 34.5 },
+      { name: 'cart.owner', expression: 'cart.owner', expected: 'Ada' },
       {
         name: { de: 'remove entfernt den Artikel', en: 'remove removes the item' },
-        ausdruck: "(() => { const c = new ShoppingCart('B'); c.add({ sku: 'a', price: 2, quantity: 1 }); c.remove('a'); return c.total })()",
-        erwartet: 0,
+        expression: "(() => { const c = new ShoppingCart('B'); c.add({ sku: 'a', price: 2, quantity: 1 }); c.remove('a'); return c.total })()",
+        expected: 0,
       },
     ],
-    typTests: [
+    typeTests: [
       { name: { de: 'ShoppingCart erfüllt CartLike', en: 'ShoppingCart fulfills CartLike' }, code: "const asCartLike: CartLike = new ShoppingCart('Test')" },
       { name: { de: 'items ist privat', en: 'items is private' }, code: "// @ts-expect-error - private\nnew ShoppingCart('Test').items" },
       { name: { de: 'owner ist readonly', en: 'owner is readonly' }, code: "// @ts-expect-error - readonly\nnew ShoppingCart('Test').owner = 'Eve'" },
       { name: { de: 'total kann man nur lesen', en: 'total can only be read' }, code: "// @ts-expect-error - a getter without a setter\nnew ShoppingCart('Test').total = 5" },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   module: js`

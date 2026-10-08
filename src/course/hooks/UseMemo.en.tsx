@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseMemo.code'
+import { examples, codeBloecke } from './UseMemo.code'
 import { PerformanceDemo } from '../demos/PerformanceDemo'
 
 /**
@@ -16,8 +16,8 @@ export function UseMemo() {
         <P><Code>useMemo</Code> only recalculates when a dependency changes. Watch the console.</P>
         <TryIt
           id="hooks-usememo-einstieg"
-          {...beispiele['hooks-usememo-einstieg']}
-          modus="react"
+          {...examples['hooks-usememo-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function UseMemo() {
         </P>
         <TryIt
           id="hooks-usememo-render"
-          {...beispiele['hooks-usememo-render']}
-          modus="react"
+          {...examples['hooks-usememo-render']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -42,8 +42,8 @@ export function UseMemo() {
         </P>
         <TryIt
           id="hooks-usememo-memo"
-          {...beispiele['hooks-usememo-memo']}
-          modus="react"
+          {...examples['hooks-usememo-memo']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -69,8 +69,8 @@ export function UseMemo() {
         <PerformanceDemo />
         <TryIt
           id="hooks-usememo-teuer"
-          {...beispiele['hooks-usememo-teuer']}
-          modus="react"
+          {...examples['hooks-usememo-teuer']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -124,9 +124,9 @@ export function UseMemo() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-usememo-uebung"
-          {...beispiele['hooks-usememo-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usememo-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 The note field is sluggish because 20,000 entries are sorted on every keystroke and the slow table
@@ -147,32 +147,32 @@ export function UseMemo() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'A memo child receives style={{ color: "red" }}. Does it re-render on every parent render?',
-            antworten: ['No, the content is the same', 'Yes, the object literal is a new reference on every render'],
-            richtig: 1,
-            erklaerung: 'memo compares references. Fix: useMemo or define the object outside the component.',
+            question: 'A memo child receives style={{ color: "red" }}. Does it re-render on every parent render?',
+            answers: ['No, the content is the same', 'Yes, the object literal is a new reference on every render'],
+            correct: 1,
+            explanation: 'memo compares references. Fix: useMemo or define the object outside the component.',
           },
           {
-            frage: 'What is the difference between useMemo and useCallback?',
-            antworten: [
+            question: 'What is the difference between useMemo and useCallback?',
+            answers: [
               'useMemo remembers a result, useCallback a function',
               'useCallback is faster',
               'useMemo is only for arrays',
             ],
-            richtig: 0,
-            erklaerung: 'useCallback(fn, deps) is equivalent to useMemo(() => fn, deps).',
+            correct: 0,
+            explanation: 'useCallback(fn, deps) is equivalent to useMemo(() => fn, deps).',
           },
           {
-            frage: 'When should you use useMemo?',
-            antworten: [
+            question: 'When should you use useMemo?',
+            answers: [
               'For every calculation',
               'When a calculation is measurably expensive or a stable reference is needed',
               'Never, the compiler does it',
             ],
-            richtig: 1,
-            erklaerung: 'Optimization has costs. Measure first, then apply it deliberately.',
+            correct: 1,
+            explanation: 'Optimization has costs. Measure first, then apply it deliberately.',
           },
         ]}
       />

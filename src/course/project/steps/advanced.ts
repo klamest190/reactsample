@@ -503,23 +503,23 @@ function mutante(suchen: string, ersetzen: string) {
 const VARIANTEN = [
   {
     name: t('leere Eingaben landen in der Liste', 'empty input ends up in the list'),
-    dateien: mutante("if (trimmed === '') return 'Please enter a todo'", "if (text === '') return 'Please enter a todo'"),
+    files: mutante("if (trimmed === '') return 'Please enter a todo'", "if (text === '') return 'Please enter a todo'"),
   },
   {
     name: t('die Checkbox schaltet nur an, nie aus', 'the checkbox only turns on, never off'),
-    dateien: mutante('{ ...todo, done: !todo.done }', '{ ...todo, done: true }'),
+    files: mutante('{ ...todo, done: !todo.done }', '{ ...todo, done: true }'),
   },
   {
     name: t('„Clear done“ löscht alles', '“Clear done” deletes everything'),
-    dateien: mutante('return todos.filter((todo) => !todo.done)', 'return []'),
+    files: mutante('return todos.filter((todo) => !todo.done)', 'return []'),
   },
   {
     name: t('die Anzahl zählt auch erledigte Todos', 'the count includes completed todos'),
-    dateien: mutante('const openCount = todos.filter((todo) => !todo.done).length', 'const openCount = todos.length'),
+    files: mutante('const openCount = todos.filter((todo) => !todo.done).length', 'const openCount = todos.length'),
   },
   {
     name: t('Löschen entfernt das falsche Todo', 'deleting removes the wrong todo'),
-    dateien: mutante('return todos.filter((todo) => todo.id !== action.id)', 'return todos.filter((todo, index) => index !== 0)'),
+    files: mutante('return todos.filter((todo) => todo.id !== action.id)', 'return todos.filter((todo, index) => index !== 0)'),
   },
 ]
 
@@ -527,8 +527,8 @@ const VARIANTEN = [
 
 export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
   'projekt-12-typescript': {
-    modus: 'react',
-    typen: true,
+    mode: 'react',
+    typed: true,
     einleitung: {
       de: 'Die App ist fertig - jetzt kommt der Umzug nach **TypeScript** ([[praxis-typescript]]). Genau so läuft es in echten Projekten: Der Code bleibt, die Typen kommen dazu.\n\nDie Typprüfung unter dem Editor zeigt dir, was noch fehlt. Fang beim Datenmodell an (`Todo`, `Filter`, `Action`) - danach ergibt sich vieles von selbst, weil TypeScript die Typen weiterreicht.',
       en: 'The app is finished - now it moves to **TypeScript** ([[praxis-typescript]]). This is exactly how it goes in real projects: the code stays, the types are added.\n\nThe type check below the editor shows what is still missing. Start with the data model (`Todo`, `Filter`, `Action`) - much of the rest follows by itself, because TypeScript passes the types on.',
@@ -551,8 +551,8 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
         'The type check reports no errors - the behavior stays the same',
       ],
     },
-    loesung: P12_LOESUNG,
-    tipps: {
+    solution: P12_LOESUNG,
+    hints: {
       de: [
         'Zuerst nur die Typen oben hinschreiben: `Todo`, `Filter`, `Action`. Danach `todosReducer(todos: Todo[] | null, action: Action): Todo[]`.',
         'Der Reducer startet mit `null` - fang die beiden Sonderfälle oben ab: `if (action.type === "loaded") return action.todos` und `if (todos === null) return []`.',
@@ -571,7 +571,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
     tests: [
       {
         name: t('Die App funktioniert unverändert', 'The app still works as before'),
-        pruefung: js`
+        script: js`
           mockFetch(() => [
             { id: 1, text: 'Learn JavaScript', done: true },
             { id: 2, text: 'Learn React', done: false },
@@ -590,7 +590,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Es gibt die Typen Todo, Filter und Action', 'There are types Todo, Filter and Action'),
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/(type|interface)\s+Todo\b/)
           expect(code).toMatch(/type\s+Filter\s*=/)
           expect(code).toMatch(/(type|interface)\s+Action\b/)
@@ -598,13 +598,13 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Der Reducer prüft mit never auf vergessene Actions', 'The reducer uses never to catch forgotten actions'),
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/:\s*never\b/)
         `,
       },
       {
         name: t('Context und Ref sind typisiert', 'Context and ref are typed'),
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/createContext<[^>]+>/)
           expect(code).toMatch(/useRef<HTMLInputElement>/)
         `,
@@ -613,8 +613,8 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
   },
 
   'projekt-13-routing': {
-    modus: 'react',
-    typen: true,
+    mode: 'react',
+    typed: true,
     einleitung: {
       de: 'Bisher lebt der Filter im State - niemand kann eine gefilterte Ansicht verschicken. Mit **React Router** ([[praxis-routing]]) bekommt jede Ansicht eine eigene Adresse: `/`, `/open`, `/done` und `/todo/2`.\n\nIm Editor steht `MemoryRouter` statt `BrowserRouter`, weil die Vorschau Teil dieser Seite ist. Alles andere ist wie im echten Projekt.',
       en: 'So far the filter lives in state - nobody can share a filtered view. With **React Router** ([[praxis-routing]]) every view gets its own address: `/`, `/open`, `/done` and `/todo/2`.\n\nThe editor uses `MemoryRouter` instead of `BrowserRouter` because the preview is part of this page. Everything else is like a real project.',
@@ -635,8 +635,8 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
         'If the todo does not exist it says “Todo not found”; every other address ends up at `path="*"`',
       ],
     },
-    loesung: P13_LOESUNG,
-    tipps: {
+    solution: P13_LOESUNG,
+    hints: {
       de: [
         'Import: `import { Link, MemoryRouter, NavLink, Outlet, Route, Routes, useParams } from "react-router"`.',
         'Aus `FilterButtons` wird `FilterLinks`: `<NavLink to={f.value === "all" ? "/" : "/" + f.value} end>`. Der Filter-State in `TodoApp` entfällt.',
@@ -653,7 +653,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
     tests: [
       {
         name: t('Die Filter-Links zeigen die passenden Todos', 'The filter links show the matching todos'),
-        pruefung: js`
+        script: js`
           localStorage.setItem('todos', JSON.stringify([
             { id: 1, text: 'Learn JavaScript', done: true },
             { id: 2, text: 'Learn React', done: false },
@@ -674,7 +674,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Der aktive Filter hat aria-current="page"', 'The active filter has aria-current="page"'),
-        pruefung: js`
+        script: js`
           localStorage.setItem('todos', JSON.stringify([{ id: 1, text: 'Learn React', done: false }]))
           await render()
           await click(getByText('Open'))
@@ -685,7 +685,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Ein Todo öffnet seine Detailseite und führt zurück', 'A todo opens its detail page and leads back'),
-        pruefung: js`
+        script: js`
           localStorage.setItem('todos', JSON.stringify([
             { id: 1, text: 'Learn JavaScript', done: true },
             { id: 2, text: 'Learn React', done: false },
@@ -702,7 +702,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Hinzufügen funktioniert weiterhin', 'Adding still works'),
-        pruefung: js`
+        script: js`
           localStorage.setItem('todos', JSON.stringify([{ id: 1, text: 'Learn React', done: false }]))
           await render()
           await type(field('What needs to be done?'), 'Add routing')
@@ -713,7 +713,7 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       },
       {
         name: t('Es gibt eine Route für unbekannte Adressen', 'There is a route for unknown addresses'),
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/path="\*"/)
           expect(code).toMatch(/useParams\(\)/)
         `,
@@ -722,9 +722,9 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
   },
 
   'projekt-14-testen': {
-    modus: 'test',
-    dateien: [{ pfad: 'TodoApp.tsx', code: TODO_APP_MODUL }],
-    varianten: VARIANTEN,
+    mode: 'test',
+    files: [{ pfad: 'TodoApp.tsx', code: TODO_APP_MODUL }],
+    variants: VARIANTEN,
     einleitung: {
       de: 'Zum Abschluss drehst du die Richtung um: Die App steht (oben, nur lesbar) - du schreibst die **Tests** ([[praxis-testen]]).\n\nOb deine Tests gut sind, prüft ein Mutationstest: Sie laufen zusätzlich gegen fünf Fassungen der App, in die je ein typischer Fehler eingebaut ist. Jede davon muss mindestens einen deiner Tests rot machen.',
       en: 'To finish, you turn things around: the app is done (above, read-only) - you write the **tests** ([[praxis-testen]]).\n\nWhether your tests are good is checked by a mutation test: they also run against five versions of the app, each with one typical bug built in. Every one of them has to turn at least one of your tests red.',
@@ -748,8 +748,8 @@ export const schritteFortgeschritten: Record<string, SchrittInhalt> = {
       ],
     },
     start: P14_START,
-    loesung: P14_LOESUNG,
-    tipps: {
+    solution: P14_LOESUNG,
+    hints: {
       de: [
         'Jeder Test beginnt mit `const user = userEvent.setup()` und `render(<App />)`.',
         'Elemente über ihre Rolle finden: `screen.getByRole("button", { name: "Add" })`, `screen.getAllByRole("listitem")`, `screen.getAllByRole("checkbox")`.',

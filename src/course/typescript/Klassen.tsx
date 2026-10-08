@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Klassen.code'
+import { examples, codeBloecke } from './Klassen.code'
 
 /**
  * KAPITEL 2.7 - Klassen, Enums & Module
@@ -18,7 +18,7 @@ export function Klassen() {
           Zugriffsmodifikatoren wie <Code>private</Code> und <Code>readonly</Code>, die festlegen, wer was
           lesen und ändern darf.
         </P>
-        <TryIt id="ts-klassen-einstieg" modus="ts" {...beispiele['ts-klassen-einstieg']} />
+        <TryIt id="ts-klassen-einstieg" mode="ts" {...examples['ts-klassen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Zugriffsmodifikatoren und Parameter-Properties">
@@ -28,7 +28,7 @@ export function Klassen() {
           Konstruktor-Parameter, wird daraus automatisch ein Feld - das spart die Zeilen{' '}
           <Code>this.name = name</Code>.
         </P>
-        <TryIt id="ts-klassen-modifikatoren" modus="ts" {...beispiele['ts-klassen-modifikatoren']} />
+        <TryIt id="ts-klassen-modifikatoren" mode="ts" {...examples['ts-klassen-modifikatoren']} />
         <Hinweis variante="info">
           <Code>private</Code> gibt es nur beim Prüfen - zur Laufzeit ist das Feld ganz normal erreichbar.
           Die JavaScript-Felder mit <Code>#</Code> sind dagegen auch zur Laufzeit privat. Beides ist in
@@ -43,7 +43,7 @@ export function Klassen() {
           Basisklasse: Sie kann selbst nicht erzeugt werden, und ihre <Code>abstract</Code>-Methoden müssen
           die Unterklassen schreiben.
         </P>
-        <TryIt id="ts-klassen-implements" modus="ts" {...beispiele['ts-klassen-implements']} />
+        <TryIt id="ts-klassen-implements" mode="ts" {...examples['ts-klassen-implements']} />
         <Liste>
           <li>
             <Code>override</Code> markiert, dass eine Methode die der Basisklasse ersetzt - Tippfehler im
@@ -63,7 +63,7 @@ export function Klassen() {
           Literal-Typen (oder ein Objekt mit <Code>as const</Code>): Sie verschwinden beim Übersetzen
           komplett, und man kann einfach <Code>'active'</Code> schreiben.
         </P>
-        <TryIt id="ts-klassen-enums" modus="ts" {...beispiele['ts-klassen-enums']} />
+        <TryIt id="ts-klassen-enums" mode="ts" {...examples['ts-klassen-enums']} />
       </Abschnitt>
 
       <Abschnitt titel="Module: Typen exportieren und importieren">
@@ -72,7 +72,7 @@ export function Klassen() {
           weitergegeben. <Code>import type</Code> sagt ausdrücklich: Das ist nur ein Typ - die Zeile
           verschwindet beim Übersetzen vollständig.
         </P>
-        <CodeBlock titel="Typen zwischen Dateien" code={codeBloecke.module} />
+        <CodeBlock title="Typen zwischen Dateien" code={codeBloecke.module} />
         <Hinweis variante="tipp">
           Mit der tsconfig-Option <Code>verbatimModuleSyntax</Code> (in Vite-Projekten Standard) ist{' '}
           <Code>import type</Code> sogar Pflicht, wenn du nur Typen importierst.
@@ -85,16 +85,16 @@ export function Klassen() {
           erzeugen. Dateien mit der Endung <Code>.d.ts</Code> enthalten nur solche Beschreibungen - so
           bekommen JavaScript-Bibliotheken ihre Typen.
         </P>
-        <TryIt id="ts-klassen-declare" modus="ts" {...beispiele['ts-klassen-declare']} />
+        <TryIt id="ts-klassen-declare" mode="ts" {...examples['ts-klassen-declare']} />
         <CodeBlock code={codeBloecke.dts} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-klassen-uebung"
-          modus="ts"
-          {...beispiele['ts-klassen-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-klassen-uebung']}
+          task={
             <>
               <p>
                 Schreibe die Klasse <Code>ShoppingCart</Code>:
@@ -124,24 +124,24 @@ export function Klassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'constructor(private name: string) {} - was passiert?',
-            antworten: ['Nichts, der Parameter ist nur im Konstruktor sichtbar', 'Es entsteht ein privates Feld name, das automatisch gesetzt wird', 'Ein Syntaxfehler'],
-            richtig: 1,
-            erklaerung: 'Eine Parameter-Property: Der Modifikator vor dem Parameter deklariert das Feld und weist den Wert zu.',
+            question: 'constructor(private name: string) {} - was passiert?',
+            answers: ['Nichts, der Parameter ist nur im Konstruktor sichtbar', 'Es entsteht ein privates Feld name, das automatisch gesetzt wird', 'Ein Syntaxfehler'],
+            correct: 1,
+            explanation: 'Eine Parameter-Property: Der Modifikator vor dem Parameter deklariert das Feld und weist den Wert zu.',
           },
           {
-            frage: 'Was prüft class Circle implements Shape?',
-            antworten: ['Dass Circle alle Mitglieder von Shape hat', 'Dass Circle von Shape erbt', 'Nichts - implements ist nur Dokumentation'],
-            richtig: 0,
-            erklaerung: 'implements vererbt nichts, es lässt den Compiler prüfen, dass die Klasse das Interface erfüllt.',
+            question: 'Was prüft class Circle implements Shape?',
+            answers: ['Dass Circle alle Mitglieder von Shape hat', 'Dass Circle von Shape erbt', 'Nichts - implements ist nur Dokumentation'],
+            correct: 0,
+            explanation: 'implements vererbt nichts, es lässt den Compiler prüfen, dass die Klasse das Interface erfüllt.',
           },
           {
-            frage: 'Was unterscheidet ein enum von einer Union aus Literal-Typen?',
-            antworten: ['Nichts', 'Ein enum erzeugt echten JavaScript-Code, die Union verschwindet beim Übersetzen', 'Unions funktionieren nur mit Zahlen'],
-            richtig: 1,
-            erklaerung: 'Enums sind eines der wenigen TypeScript-Features mit Laufzeit-Code. Unions sind reine Typen.',
+            question: 'Was unterscheidet ein enum von einer Union aus Literal-Typen?',
+            answers: ['Nichts', 'Ein enum erzeugt echten JavaScript-Code, die Union verschwindet beim Übersetzen', 'Unions funktionieren nur mit Zahlen'],
+            correct: 1,
+            explanation: 'Enums sind eines der wenigen TypeScript-Features mit Laufzeit-Code. Unions sind reine Typen.',
           },
         ]}
       />

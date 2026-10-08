@@ -1,5 +1,5 @@
 import { js } from '../../learning/source'
-import type { WerkstattDatei } from '../../learning/Workbench'
+import type { WorkbenchFile } from '../../learning/Workbench'
 
 /**
  * Die Business-App für Kapitel 5.12 - ein echtes kleines Projekt.
@@ -20,7 +20,7 @@ function quelle(pfad: string) {
   return code.replace(/\r\n/g, '\n').trimEnd()
 }
 
-type Beschreibung = Omit<WerkstattDatei, 'code'>
+type Beschreibung = Omit<WorkbenchFile, 'code'>
 
 const beschreibungen: Beschreibung[] = [
   {
@@ -161,7 +161,7 @@ const beschreibungen: Beschreibung[] = [
   },
 ]
 
-export const dateien: WerkstattDatei[] = beschreibungen.map((b) => ({ ...b, code: quelle(b.pfad) }))
+export const files: WorkbenchFile[] = beschreibungen.map((b) => ({ ...b, code: quelle(b.pfad) }))
 
 export const codeBloecke = {
   main: js`

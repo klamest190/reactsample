@@ -1,21 +1,23 @@
-import { useEffect, useEffectEvent } from 'react'
-import type { Gemeinsam } from './TryIt'
+import { useEffect, useEffectEvent, type ComponentProps } from 'react'
+import type { EditorFrame } from './EditorFrame'
+import type { CommonProps } from './TryIt'
 import { useSavedCode } from './useSavedCode'
 
 /**
  * What every editor does with the props all modes share: the code (saved per id, see
- * useSavedCode.ts) and the props for <Rahmen>. The editor adds only what is its own - the badge,
+ * useSavedCode.ts) and the props for <EditorFrame>. The editor adds only what is its own - the badge,
  * how to run the code and what to show below it.
  *
- *   const { code, setCode, rahmen } = useEditor(props)
- *   return <Rahmen {...rahmen} art="SQL" ausfuehren={(c) => start(c ?? code)}>…</Rahmen>
+ *   const { code, setCode, frame } = useEditor(props)
+ *   return <EditorFrame {...frame} kind="SQL" run={(c) => start(c ?? code)}>…</EditorFrame>
  */
-export function useEditor({ id, code: startCode, titel, aufgabe, loesung, tipps, editorRef, kopf, maxZeilen }: Gemeinsam) {
+export function useEditor({ id, code: startCode, title, task, solution, hints, editorRef, heading, maxLines }: CommonProps) {
   const [code, setCode] = useSavedCode(id, startCode)
   return {
     code,
     setCode,
-    rahmen: { titel, aufgabe, code, setCode, startCode, loesung, tipps, editorRef, kopf, maxZeilen },
+    // `satisfies`: a misspelled prop would otherwise vanish silently when spread into <EditorFrame>.
+    frame: { title, task, code, setCode, startCode, solution, hints, editorRef, heading, maxLines } satisfies Partial<ComponentProps<typeof EditorFrame>>,
   }
 }
 

@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Generics.code'
+import { examples, codeBloecke } from './Generics.code'
 
 /**
  * KAPITEL 2.5 (English) - Generics
@@ -17,7 +17,7 @@ export function Generics() {
           you would lose the information about which type comes out. A <strong>type parameter</strong>{' '}
           <Code>{'<T>'}</Code> is a placeholder that TypeScript fills in anew on every call.
         </P>
-        <TryIt id="ts-generics-einstieg" modus="ts" {...beispiele['ts-generics-einstieg']} />
+        <TryIt id="ts-generics-einstieg" mode="ts" {...examples['ts-generics-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Generic functions">
@@ -26,7 +26,7 @@ export function Generics() {
           TypeScript infers them from the arguments - but you can also pass them explicitly:{' '}
           <Code>{"pair<string, boolean>('ok', true)"}</Code>.
         </P>
-        <TryIt id="ts-generics-funktionen" modus="ts" {...beispiele['ts-generics-funktionen']} />
+        <TryIt id="ts-generics-funktionen" mode="ts" {...examples['ts-generics-funktionen']} />
         <Hinweis variante="info">
           The names <Code>T</Code>, <Code>U</Code>, <Code>K</Code> (key) and <Code>V</Code> (value) are just
           convention. For more complex types, descriptive names like <Code>TItem</Code> help.
@@ -39,7 +39,7 @@ export function Generics() {
           <Code>.length</Code>. With <Code>{'T extends { length: number }'}</Code> you only allow types that
           have at least this shape. Unlike a fixed parameter type, <Code>T</Code> keeps all its other fields.
         </P>
-        <TryIt id="ts-generics-constraints" modus="ts" {...beispiele['ts-generics-constraints']} />
+        <TryIt id="ts-generics-constraints" mode="ts" {...examples['ts-generics-constraints']} />
       </Abschnitt>
 
       <Abschnitt titel="keyof and indexed access">
@@ -48,7 +48,7 @@ export function Generics() {
           <Code>K</Code>. Combined with generics you get functions that only accept valid keys and return the
           matching type - more on both operators in <Verweis nr="2.6" />.
         </P>
-        <TryIt id="ts-generics-keyof" modus="ts" {...beispiele['ts-generics-keyof']} />
+        <TryIt id="ts-generics-keyof" mode="ts" {...examples['ts-generics-keyof']} />
       </Abschnitt>
 
       <Abschnitt titel="Generic types">
@@ -57,7 +57,7 @@ export function Generics() {
           already know many generic types: <Code>{'Array<T>'}</Code>, <Code>{'Promise<T>'}</Code>,{' '}
           <Code>{'Map<K, V>'}</Code>, <Code>{'Set<T>'}</Code>.
         </P>
-        <TryIt id="ts-generics-typen" modus="ts" {...beispiele['ts-generics-typen']} />
+        <TryIt id="ts-generics-typen" mode="ts" {...examples['ts-generics-typen']} />
       </Abschnitt>
 
       <Abschnitt titel="Generic classes">
@@ -65,7 +65,7 @@ export function Generics() {
           A class with a type parameter fixes the type on creation: <Code>{'new Stack<number>()'}</Code>.
           After that, only numbers go in - and guaranteed numbers come out.
         </P>
-        <TryIt id="ts-generics-klassen" modus="ts" {...beispiele['ts-generics-klassen']} />
+        <TryIt id="ts-generics-klassen" mode="ts" {...examples['ts-generics-klassen']} />
       </Abschnitt>
 
       <Abschnitt titel="When are generics worth it?">
@@ -74,7 +74,7 @@ export function Generics() {
           If it appears in only one place, a normal type like <Code>unknown</Code> is usually enough.
         </P>
         <CodeBlock code={codeBloecke.wann} />
-        <CodeBlock titel="Generics in React" code={codeBloecke.react} />
+        <CodeBlock title="Generics in React" code={codeBloecke.react} />
         <Liste>
           <li>
             <Code>{'useState<Todo[]>([])'}</Code>: TypeScript can't infer the type from an empty array - so you
@@ -87,9 +87,9 @@ export function Generics() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="ts-generics-uebung"
-          modus="ts"
-          {...beispiele['ts-generics-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-generics-uebung']}
+          task={
             <>
               <p>
                 The three helper functions already run - but with <Code>any</Code>, every type is lost. Replace
@@ -113,24 +113,24 @@ export function Generics() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'function first<T>(list: T[]): T | undefined. What is the type of first(["a", "b"])?',
-            antworten: ['any', 'string | undefined', 'T'],
-            richtig: 1,
-            erklaerung: 'TypeScript fills in string for T, which it infers from the argument.',
+            question: 'function first<T>(list: T[]): T | undefined. What is the type of first(["a", "b"])?',
+            answers: ['any', 'string | undefined', 'T'],
+            correct: 1,
+            explanation: 'TypeScript fills in string for T, which it infers from the argument.',
           },
           {
-            frage: 'What does <T extends { id: number }> do?',
-            antworten: ['T is exactly { id: number }', 'T must have at least a field id: number and keeps its other fields', 'T must not have an id'],
-            richtig: 1,
-            erklaerung: 'extends is a minimum requirement. If you pass { id: 1, title: "x" }, title stays in the type.',
+            question: 'What does <T extends { id: number }> do?',
+            answers: ['T is exactly { id: number }', 'T must have at least a field id: number and keeps its other fields', 'T must not have an id'],
+            correct: 1,
+            explanation: 'extends is a minimum requirement. If you pass { id: 1, title: "x" }, title stays in the type.',
           },
           {
-            frage: 'type User = { name: string; age: number }. What is keyof User?',
-            antworten: ['"name" | "age"', 'string | number', 'string[]'],
-            richtig: 0,
-            erklaerung: 'keyof returns the union of the keys. You get the value types with User[keyof User].',
+            question: 'type User = { name: string; age: number }. What is keyof User?',
+            answers: ['"name" | "age"', 'string | number', 'string[]'],
+            correct: 0,
+            explanation: 'keyof returns the union of the keys. You get the value types with User[keyof User].',
           },
         ]}
       />

@@ -5,7 +5,7 @@ import type { UebungsSammlung } from './types'
 
 const t = (de: string, en: string) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'react-komponenten': [
     {
       id: 'react-komponenten-ausdruecke',
@@ -35,11 +35,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-komponenten-jsx-regeln',
       stufe: 'fehler',
       titel: t('Drei JSX-Fehler', 'Three JSX mistakes'),
-      aufgabe: t(
+      task: t(
         'Dieser Code lässt sich nicht einmal übersetzen. Finde die drei Verstöße gegen die JSX-Regeln, bis „Profile“ in einer Karte erscheint.',
         'This code does not even compile. Find the three violations of the JSX rules until “Profile” appears in a card.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function card() {
           return (
@@ -55,7 +55,7 @@ export const uebungen: UebungsSammlung = {
           return <card />
         }
       `,
-      loesung: js`
+      solution: js`
         function Card() {
           return (
             <div className="card">
@@ -70,7 +70,7 @@ export const uebungen: UebungsSammlung = {
           return <Card />
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Die Fehlermeldung nennt eine Zeile: Jedes Tag muss geschlossen werden, auch `<hr />`.',
           'Kleingeschriebene Tags wie `<card />` hält React für HTML-Elemente. Komponenten beginnen mit einem Großbuchstaben.',
@@ -85,14 +85,14 @@ export const uebungen: UebungsSammlung = {
       tests: [
         {
           name: t('Karte mit Überschrift wird angezeigt', 'Card with heading is shown'),
-          pruefung: js`
+          script: js`
             await render()
             expect(find('.card h2').textContent).toBe('Profile')
           `,
         },
         {
           name: t('Komponente heißt Card, className statt class', 'Component is called Card, className instead of class'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/function Card/)
             expect(code).not.toMatch(/\sclass=/)
           `,
@@ -103,11 +103,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-komponenten-ausdruck',
       stufe: 'ergaenzen',
       titel: t('JavaScript in JSX', 'JavaScript in JSX'),
-      aufgabe: t(
+      task: t(
         'Ergänze `Header` und `App`: `Header` zeigt `<h1>Ada Lovelace</h1>` aus dem Objekt `user`. `App` rendert `Header` und darunter „Born 1815, n years ago“ - n aus dem aktuellen Jahr berechnet.',
         'Complete `Header` and `App`: `Header` shows `<h1>Ada Lovelace</h1>` from the `user` object. `App` renders `Header` and below it “Born 1815, n years ago” - with n computed from the current year.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const user = { firstName: 'Ada', lastName: 'Lovelace', born: 1815 }
 
@@ -123,7 +123,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const user = { firstName: 'Ada', lastName: 'Lovelace', born: 1815 }
 
         function Header() {
@@ -146,28 +146,28 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`{user.firstName} {user.lastName}` - das Leerzeichen zwischen den Klammern bleibt erhalten.', '`new Date().getFullYear()` liefert das aktuelle Jahr.'],
         en: ['`{user.firstName} {user.lastName}` - the space between the braces is kept.', '`new Date().getFullYear()` returns the current year.'],
       },
       tests: [
         {
           name: t('Überschrift „Ada Lovelace“', 'Heading “Ada Lovelace”'),
-          pruefung: js`
+          script: js`
             await render()
             expect(find('h1').textContent).toBe('Ada Lovelace')
           `,
         },
         {
           name: t('Jahre werden berechnet', 'Years are computed'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).toContain('Born 1815, ' + (new Date().getFullYear() - 1815) + ' years ago')
           `,
         },
         {
           name: t('Header ist eine eigene Komponente', 'Header is its own component'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/<Header\s*\/>/)
           `,
         },
@@ -200,11 +200,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-props-liste',
       stufe: 'fehler',
       titel: t('Die Liste bleibt leer', 'The list stays empty'),
-      aufgabe: t(
+      task: t(
         'Es sollen drei Begrüßungen erscheinen - „Hello Ada!“, „Hello Grace!“, „Hello Linus!“. Finde die zwei Fehler.',
         'Three greetings should appear - “Hello Ada!”, “Hello Grace!”, “Hello Linus!”. Find the two bugs.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const users = ['Ada', 'Grace', 'Linus']
 
@@ -222,7 +222,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const users = ['Ada', 'Grace', 'Linus']
 
         function Greeting({ name }) {
@@ -239,21 +239,21 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Eine Arrow Function mit `{ }` braucht ein `return` - oder runde Klammern statt geschweifter.', 'Eine Komponente bekommt **ein** Props-Objekt. Destrukturiere es: `function Greeting({ name })`.'],
         en: ['An arrow function with `{ }` needs a `return` - or parentheses instead of braces.', 'A component receives **one** props object. Destructure it: `function Greeting({ name })`.'],
       },
       tests: [
         {
           name: t('Drei Einträge', 'Three items'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li')).toHaveLength(3)
           `,
         },
         {
           name: t('Namen werden angezeigt', 'Names are shown'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).toContain('Hello Grace!')
           `,
@@ -264,11 +264,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-props-produkte',
       stufe: 'ergaenzen',
       titel: t('Produktliste mit Bedingungen', 'Product list with conditions'),
-      aufgabe: t(
+      task: t(
         'Ergänze `ProductList({ products })`: Ist die Liste leer, steht dort „No products“. Sonst ein `<li>` pro Produkt mit Name und Preis (`4.50 €`), bei `stock === 0` zusätzlich „Sold out“.',
         'Complete `ProductList({ products })`: if the list is empty, it shows “No products”. Otherwise one `<li>` per product with name and price (`4.50 €`), plus “Sold out” when `stock === 0`.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const PRODUCTS = [
           { id: 1, name: 'Coffee', price: 4.5, stock: 12 },
@@ -288,7 +288,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const PRODUCTS = [
           { id: 1, name: 'Coffee', price: 4.5, stock: 12 },
           { id: 2, name: 'Tea', price: 3, stock: 0 },
@@ -317,14 +317,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Frühes `return` für die leere Liste.', '`price.toFixed(2)` formatiert mit zwei Nachkommastellen.', '`{product.stock === 0 && <strong> Sold out</strong>}`'],
         en: ['An early `return` for the empty list.', '`price.toFixed(2)` formats with two decimal places.', '`{product.stock === 0 && <strong> Sold out</strong>}`'],
       },
       tests: [
         {
           name: t('Zwei Produkte mit Preisen', 'Two products with prices'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li')).toHaveLength(2)
             expect(text()).toContain('4.50 €')
@@ -333,7 +333,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('„Sold out“ nur bei Tee', '“Sold out” only for tea'),
-          pruefung: js`
+          script: js`
             await render()
             expect(findAll('li')[1].textContent).toContain('Sold out')
             expect(findAll('li')[0].textContent).not.toContain('Sold out')
@@ -341,7 +341,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Leere Liste zeigt „No products“', 'Empty list shows “No products”'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).toContain('No products')
           `,
@@ -377,8 +377,8 @@ export const uebungen: UebungsSammlung = {
       id: 'react-state-variable',
       stufe: 'fehler',
       titel: t('Der Like-Knopf zählt nicht', 'The like button does not count'),
-      aufgabe: t('Ein Klick auf den Knopf soll die Zahl erhöhen. Warum passiert nichts?', 'Clicking the button should increase the number. Why does nothing happen?'),
-      modus: 'react',
+      task: t('Ein Klick auf den Knopf soll die Zahl erhöhen. Warum passiert nichts?', 'Clicking the button should increase the number. Why does nothing happen?'),
+      mode: 'react',
       code: js`
         function App() {
           let likes = 0
@@ -386,21 +386,21 @@ export const uebungen: UebungsSammlung = {
           return <button onClick={() => (likes = likes + 1)}>♥ {likes}</button>
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [likes, setLikes] = useState(0)
 
           return <button onClick={() => setLikes(likes + 1)}>♥ {likes}</button>
         }
       `,
-      tipps: {
+      hints: {
         de: ['Eine normale Variable wird bei jedem Render neu mit 0 angelegt - und ihre Änderung löst keinen Render aus.', '`const [likes, setLikes] = useState(0)`'],
         en: ['A normal variable is created with 0 again on every render - and changing it does not trigger a render.', '`const [likes, setLikes] = useState(0)`'],
       },
       tests: [
         {
           name: t('Zwei Klicks ergeben ♥ 2', 'Two clicks give ♥ 2'),
-          pruefung: js`
+          script: js`
             await render()
             await click(find('button'))
             await click(find('button'))
@@ -413,17 +413,17 @@ export const uebungen: UebungsSammlung = {
       id: 'react-state-details',
       stufe: 'frei',
       titel: t('Details ein- und ausblenden', 'Show and hide details'),
-      aufgabe: t(
+      task: t(
         'Baue `App` mit einem Knopf „Show details“. Nach dem Klick erscheint der Absatz „The secret is 42.“ und der Knopf heißt „Hide details“. Darunter steht, wie oft die Details schon geöffnet wurden: „Opened 1×“.',
         'Build `App` with a “Show details” button. After a click, the paragraph “The secret is 42.” appears and the button reads “Hide details”. Below, show how often the details have been opened: “Opened 1×”.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           return <button>Show details</button>
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [isOpen, setIsOpen] = useState(false)
           const [openCount, setOpenCount] = useState(0)
@@ -442,14 +442,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Zwei State-Werte: ob offen, und wie oft geöffnet.', 'Beim Öffnen (nicht beim Schließen) den Zähler erhöhen.'],
         en: ['Two state values: whether it is open, and how often it was opened.', 'Increase the counter when opening (not when closing).'],
       },
       tests: [
         {
           name: t('Anfangs verborgen', 'Hidden at first'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).not.toContain('The secret is 42.')
             expect(text()).toContain('Opened 0×')
@@ -457,7 +457,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Öffnen und schließen', 'Open and close'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Show details'))
             expect(text()).toContain('The secret is 42.')
@@ -467,7 +467,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Zählt nur das Öffnen', 'Only counts opening'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Show details'))
             await click(button('Hide details'))
@@ -502,11 +502,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-datenfluss-anheben',
       stufe: 'fehler',
       titel: t('Die Umrechnung reagiert nicht', 'The conversion does not react'),
-      aufgabe: t(
+      task: t(
         'Nach der Eingabe von 100 °C soll „212 °F“ erscheinen. Beide Komponenten haben aber ihren eigenen State. Hebe den State an.',
         'After entering 100 °C, “212 °F” should appear. But both components have their own state. Lift the state up.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function CelsiusInput() {
           const [celsius, setCelsius] = useState('')
@@ -527,7 +527,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function CelsiusInput({ value, onChange }) {
           return <input value={value} onChange={(e) => onChange(e.target.value)} placeholder="Celsius" />
         }
@@ -546,14 +546,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Der State gehört in den gemeinsamen Elternteil `App`.', 'Nach unten: `celsius` als Prop. Nach oben: `onChange` als Callback.'],
         en: ['The state belongs in the common parent `App`.', 'Downward: `celsius` as a prop. Upward: `onChange` as a callback.'],
       },
       tests: [
         {
           name: t('100 °C ergibt 212 °F', '100 °C gives 212 °F'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Celsius'), 100)
             expect(text()).toContain('212 °F')
@@ -561,7 +561,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('State lebt in App', 'State lives in App'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/function App\(\)\s*\{\s*const \[\w+, \w+\] = useState/)
           `,
         },
@@ -571,11 +571,11 @@ export const uebungen: UebungsSammlung = {
       id: 'react-datenfluss-akkordeon',
       stufe: 'ergaenzen',
       titel: t('Akkordeon: immer nur eins offen', 'Accordion: only one open at a time'),
-      aufgabe: t(
+      task: t(
         'Ergänze `App` und `Panel`: Jedes Panel hat einen Knopf mit seinem Titel. Nur das aktive Panel zeigt seinen Inhalt; anfangs das erste. `App` hält den Index des aktiven Panels.',
         'Complete `App` and `Panel`: each panel has a button with its title. Only the active panel shows its content; the first one at the start. `App` holds the index of the active panel.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function Panel({ title, children }) {
           // TODO: button with the title, children only when active
@@ -596,7 +596,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function Panel({ title, children, isActive, onShow }) {
           return (
             <section>
@@ -620,14 +620,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`const [activeIndex, setActiveIndex] = useState(0)` in `App`.', 'Jedes Panel bekommt `isActive` und `onShow` als Props.'],
         en: ['`const [activeIndex, setActiveIndex] = useState(0)` in `App`.', 'Each panel receives `isActive` and `onShow` as props.'],
       },
       tests: [
         {
           name: t('Anfangs nur das erste offen', 'Only the first open at the start'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).toContain('A learning path for React.')
             expect(text()).not.toContain('React, Vite and Tailwind.')
@@ -635,7 +635,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Klick wechselt das offene Panel', 'Click switches the open panel'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Stack'))
             expect(text()).toContain('React, Vite and Tailwind.')

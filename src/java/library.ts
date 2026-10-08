@@ -12,38 +12,38 @@
 
 import type { Interpreter } from './interpreter'
 import {
-  alsZahl,
+  toNumber,
   doubleText,
-  inhaltGleich,
-  istZahl,
-  komma,
-  neuerString,
+  contentEquals,
+  isNumber,
+  comma,
+  newString,
   NULL,
   poolString,
-  schluesselVon,
-  typName,
-  wahrheit,
-  zahl,
-  zeichen,
+  keyOf,
+  typeName,
+  bool,
+  number,
+  chars,
   type JavaString,
-  type NativWert,
-  type Wert,
+  type NativeValue,
+  type Value,
 } from './values'
 
 /** Klassen, die man ohne `new` ansprechen kann: `Math.max(…)`, `Integer.parseInt(…)`. */
-export const EINGEBAUTE_KLASSEN = new Set([
+export const BUILTIN_CLASSES = new Set([
   'System', 'Math', 'String', 'Integer', 'Double', 'Boolean', 'Character', 'Long', 'Float', 'Short', 'Byte',
   'Arrays', 'Collections', 'List', 'Map', 'Set', 'Objects', 'Optional', 'Comparator', 'Collectors', 'Stream', 'IntStream',
 ])
 
 /** Klassen, die man mit `new` erzeugen kann. */
-const NATIV_ERZEUGBAR = new Set([
+const NATIVE_CONSTRUCTIBLE = new Set([
   'ArrayList', 'LinkedList', 'HashMap', 'LinkedHashMap', 'TreeMap', 'HashSet', 'LinkedHashSet', 'TreeSet',
   'StringBuilder', 'StringBuffer', 'String', 'Random', 'Object',
 ])
 
 /** Die Vererbungskette der Exceptions - die braucht `catch`. */
-const OBERKLASSEN: Record<string, string> = {
+const SUPERCLASSES: Record<string, string> = {
   Exception: 'Throwable',
   Error: 'Throwable',
   RuntimeException: 'Exception',
@@ -81,12 +81,12 @@ const OBERKLASSEN: Record<string, string> = {
   Collection: 'Iterable',
 }
 
-export const oberklasseVon = (name: string): string | undefined => OBERKLASSEN[name]
+export const superclassOf = (name: string): string | undefined => SUPERCLASSES[name]
 
-export function istAusnahmeKlasse(name: string): boolean {
+export function isExceptionClass(name: string): boolean {
   if (name === 'Throwable') return true
   if (name.endsWith('Exception') || name.endsWith('Error')) return true
-  for (let k = OBERKLASSEN[name]; k; k = OBERKLASSEN[k]) if (k === 'Throwable') return true
+  for (let k = SUPERCLASSES[name]; k; k = SUPERCLASSES[k]) if (k === 'Throwable') return true
   return false
 }
 
@@ -94,67 +94,67 @@ export function istAusnahmeKlasse(name: string): boolean {
 // Kleine Helfer
 // ---------------------------------------------------------------------------
 
-const liste = (werte: Wert[], typ = 'ArrayList'): NativWert => ({ art: 'nativ', typ, daten: { liste: werte } })
-const optional = (werte: Wert[]): NativWert => ({ art: 'nativ', typ: 'Optional', daten: { liste: werte } })
-const map = (typ = 'HashMap'): NativWert => ({ art: 'nativ', typ, daten: { map: new Map() } })
+const list = (values: Value[], type = 'ArrayList'): NativeValue => ({ kind: 'native', type, data: { list: values } })
+const optional = (values: Value[]): NativeValue => ({ kind: 'native', type: 'Optional', data: { list: values } })
+const map = (type = 'HashMap'): NativeValue => ({ kind: 'native', type, data: { map: new Map() } })
 
-function listeVon(wert: Wert, i: Interpreter, zeile: number): Wert[] {
-  if (wert.art === 'array') return wert.werte
-  if (wert.art === 'nativ' && wert.daten.liste) return wert.daten.liste
-  i.abbruch(`${typName(wert)} ist keine Liste.`, `${typName(wert)} is not a list`, zeile)
+function listOf(value: Value, i: Interpreter, line: number): Value[] {
+  if (value.kind === 'array') return value.values
+  if (value.kind === 'native' && value.data.list) return value.data.list
+  i.abort(`${typeName(value)} ist keine Liste.`, `${typeName(value)} is not a list`, line)
 }
 
 /** Natürliche Ordnung: Zahlen nach Größe, Strings alphabetisch, sonst compareTo. */
-export function vergleichen(a: Wert, b: Wert, i: Interpreter): number {
-  if (istZahl(a) && istZahl(b)) return alsZahl(a) - alsZahl(b)
-  if (a.art === 'string' && b.art === 'string') return a.wert < b.wert ? -1 : a.wert > b.wert ? 1 : 0
-  if (a.art === 'boolean' && b.art === 'boolean') return Number(a.wert) - Number(b.wert)
-  if (a.art === 'objekt') return alsZahl(i.methodeAufrufen(a, 'compareTo', [b], 0))
+export function compare(a: Value, b: Value, i: Interpreter): number {
+  if (isNumber(a) && isNumber(b)) return toNumber(a) - toNumber(b)
+  if (a.kind === 'string' && b.kind === 'string') return a.value < b.value ? -1 : a.value > b.value ? 1 : 0
+  if (a.kind === 'boolean' && b.kind === 'boolean') return Number(a.value) - Number(b.value)
+  if (a.kind === 'object') return toNumber(i.callMethod(a, 'compareTo', [b], 0))
   return 0
 }
 
 /** Ruft ein Lambda oder ein Objekt mit passender Methode auf. */
-function funktionAufrufen(funktion: Wert, argumente: Wert[], i: Interpreter, zeile: number, methode = 'apply'): Wert {
-  if (funktion.art === 'funktion') return funktion.aufrufen(argumente)
-  if (funktion.art === 'objekt' || funktion.art === 'nativ') return i.methodeAufrufen(funktion, methode, argumente, zeile)
-  i.abbruch('Hier wird ein Lambda erwartet.', 'a lambda expression is required here', zeile)
+function callFunction(fn: Value, args: Value[], i: Interpreter, line: number, method = 'apply'): Value {
+  if (fn.kind === 'function') return fn.call(args)
+  if (fn.kind === 'object' || fn.kind === 'native') return i.callMethod(fn, method, args, line)
+  i.abort('Hier wird ein Lambda erwartet.', 'a lambda expression is required here', line)
 }
 
-const vergleicher = (funktion: Wert, i: Interpreter, zeile: number) => (a: Wert, b: Wert) =>
-  alsZahl(funktionAufrufen(funktion, [a, b], i, zeile, 'compare'))
+const comparator = (fn: Value, i: Interpreter, line: number) => (a: Value, b: Value) =>
+  toNumber(callFunction(fn, [a, b], i, line, 'compare'))
 
 /**
  * `String.format` und `printf`: %d %s %f %b %c %n, mit Breite und Genauigkeit.
  * Beispiele: %5d (rechtsbündig), %-10s (linksbündig), %.2f (zwei Nachkommastellen).
  */
-export function formatieren(vorlage: string, argumente: Wert[], i: Interpreter, zeile: number): string {
+export function format(template: string, args: Value[], i: Interpreter, line: number): string {
   let index = 0
-  return vorlage.replace(/%(-)?(\d+)?(?:\.(\d+))?([sdfnb%c])/g, (_treffer, links, breite, genauigkeit, art) => {
-    if (art === '%') return '%'
-    if (art === 'n') return '\n'
-    const wert = argumente[index++]
-    if (wert === undefined) i.werfen('IllegalArgumentException', 'MissingFormatArgumentException: %' + art, zeile)
+  return template.replace(/%(-)?(\d+)?(?:\.(\d+))?([sdfnb%c])/g, (_match, left, width, precision, kind) => {
+    if (kind === '%') return '%'
+    if (kind === 'n') return '\n'
+    const value = args[index++]
+    if (value === undefined) i.raise('IllegalArgumentException', 'MissingFormatArgumentException: %' + kind, line)
     let text: string
-    switch (art) {
+    switch (kind) {
       case 'd':
-        text = String(Math.trunc(alsZahl(wert)))
+        text = String(Math.trunc(toNumber(value)))
         break
       case 'f':
-        text = alsZahl(wert).toFixed(genauigkeit === undefined ? 6 : Number(genauigkeit))
+        text = toNumber(value).toFixed(precision === undefined ? 6 : Number(precision))
         break
       case 'b':
-        text = String(wert.art === 'boolean' ? wert.wert : wert.art !== 'null')
+        text = String(value.kind === 'boolean' ? value.value : value.kind !== 'null')
         break
       case 'c':
-        text = wert.art === 'char' ? String.fromCharCode(wert.wert) : i.alsText(wert)
+        text = value.kind === 'char' ? String.fromCharCode(value.value) : i.toText(value)
         break
       default:
-        text = i.alsText(wert)
-        if (genauigkeit !== undefined) text = text.slice(0, Number(genauigkeit))
+        text = i.toText(value)
+        if (precision !== undefined) text = text.slice(0, Number(precision))
     }
-    const platz = breite ? Number(breite) : 0
-    if (text.length >= platz) return text
-    return links ? text.padEnd(platz) : text.padStart(platz)
+    const padWidth = width ? Number(width) : 0
+    if (text.length >= padWidth) return text
+    return left ? text.padEnd(padWidth) : text.padStart(padWidth)
   })
 }
 
@@ -162,33 +162,33 @@ export function formatieren(vorlage: string, argumente: Wert[], i: Interpreter, 
 // Statische Felder: System.out, Math.PI, Integer.MAX_VALUE …
 // ---------------------------------------------------------------------------
 
-export function statischesFeld(klasse: string, name: string, _i: Interpreter): Wert | null {
-  if (klasse === 'System') {
-    if (name === 'out' || name === 'err') return { art: 'nativ', typ: 'PrintStream', daten: { text: name } }
-    if (name === 'in') return { art: 'nativ', typ: 'InputStream', daten: {} }
+export function staticField(classInfo: string, name: string, _i: Interpreter): Value | null {
+  if (classInfo === 'System') {
+    if (name === 'out' || name === 'err') return { kind: 'native', type: 'PrintStream', data: { text: name } }
+    if (name === 'in') return { kind: 'native', type: 'InputStream', data: {} }
   }
-  if (klasse === 'Math') {
-    if (name === 'PI') return komma(Math.PI)
-    if (name === 'E') return komma(Math.E)
+  if (classInfo === 'Math') {
+    if (name === 'PI') return comma(Math.PI)
+    if (name === 'E') return comma(Math.E)
   }
-  if (klasse === 'Integer') {
-    if (name === 'MAX_VALUE') return zahl(2147483647)
-    if (name === 'MIN_VALUE') return zahl(-2147483648)
+  if (classInfo === 'Integer') {
+    if (name === 'MAX_VALUE') return number(2147483647)
+    if (name === 'MIN_VALUE') return number(-2147483648)
   }
-  if (klasse === 'Long') {
+  if (classInfo === 'Long') {
     // Hinweis: JavaScript-Zahlen können den echten long-Bereich nicht genau
     // darstellen - für den Kurs genügt der gerundete Wert.
-    if (name === 'MAX_VALUE') return { art: 'long', wert: Number.MAX_SAFE_INTEGER }
-    if (name === 'MIN_VALUE') return { art: 'long', wert: Number.MIN_SAFE_INTEGER }
+    if (name === 'MAX_VALUE') return { kind: 'long', value: Number.MAX_SAFE_INTEGER }
+    if (name === 'MIN_VALUE') return { kind: 'long', value: Number.MIN_SAFE_INTEGER }
   }
-  if (klasse === 'Double') {
-    if (name === 'MAX_VALUE') return komma(Number.MAX_VALUE)
-    if (name === 'MIN_VALUE') return komma(Number.MIN_VALUE)
-    if (name === 'NaN') return komma(NaN)
-    if (name === 'POSITIVE_INFINITY') return komma(Infinity)
-    if (name === 'NEGATIVE_INFINITY') return komma(-Infinity)
+  if (classInfo === 'Double') {
+    if (name === 'MAX_VALUE') return comma(Number.MAX_VALUE)
+    if (name === 'MIN_VALUE') return comma(Number.MIN_VALUE)
+    if (name === 'NaN') return comma(NaN)
+    if (name === 'POSITIVE_INFINITY') return comma(Infinity)
+    if (name === 'NEGATIVE_INFINITY') return comma(-Infinity)
   }
-  if (klasse === 'Character' && name === 'MAX_VALUE') return zeichen(65535)
+  if (classInfo === 'Character' && name === 'MAX_VALUE') return chars(65535)
   return null
 }
 
@@ -196,58 +196,58 @@ export function statischesFeld(klasse: string, name: string, _i: Interpreter): W
 // Statische Methoden
 // ---------------------------------------------------------------------------
 
-export function statischerAufruf(klasse: string, name: string, a: Wert[], i: Interpreter, zeile: number): Wert {
-  const text = (index: number) => i.alsText(a[index])
-  const n = (index: number) => alsZahl(a[index])
+export function staticCall(classInfo: string, name: string, a: Value[], i: Interpreter, line: number): Value {
+  const text = (index: number) => i.toText(a[index])
+  const n = (index: number) => toNumber(a[index])
 
-  switch (klasse) {
+  switch (classInfo) {
     case 'Math':
       switch (name) {
         case 'abs':
-          return a[0].art === 'double' ? komma(Math.abs(n(0))) : zahl(Math.abs(n(0)))
+          return a[0].kind === 'double' ? comma(Math.abs(n(0))) : number(Math.abs(n(0)))
         case 'max':
-          return a[0].art === 'double' || a[1].art === 'double' ? komma(Math.max(n(0), n(1))) : zahl(Math.max(n(0), n(1)))
+          return a[0].kind === 'double' || a[1].kind === 'double' ? comma(Math.max(n(0), n(1))) : number(Math.max(n(0), n(1)))
         case 'min':
-          return a[0].art === 'double' || a[1].art === 'double' ? komma(Math.min(n(0), n(1))) : zahl(Math.min(n(0), n(1)))
+          return a[0].kind === 'double' || a[1].kind === 'double' ? comma(Math.min(n(0), n(1))) : number(Math.min(n(0), n(1)))
         case 'pow':
-          return komma(Math.pow(n(0), n(1)))
+          return comma(Math.pow(n(0), n(1)))
         case 'sqrt':
-          return komma(Math.sqrt(n(0)))
+          return comma(Math.sqrt(n(0)))
         case 'cbrt':
-          return komma(Math.cbrt(n(0)))
+          return comma(Math.cbrt(n(0)))
         case 'round':
-          return zahl(Math.round(n(0)))
+          return number(Math.round(n(0)))
         case 'floor':
-          return komma(Math.floor(n(0)))
+          return comma(Math.floor(n(0)))
         case 'ceil':
-          return komma(Math.ceil(n(0)))
+          return comma(Math.ceil(n(0)))
         case 'random':
-          return komma(Math.random())
+          return comma(Math.random())
         case 'hypot':
-          return komma(Math.hypot(n(0), n(1)))
+          return comma(Math.hypot(n(0), n(1)))
         case 'signum':
-          return komma(Math.sign(n(0)))
+          return comma(Math.sign(n(0)))
         case 'floorDiv':
-          return zahl(Math.floor(n(0) / n(1)))
+          return number(Math.floor(n(0) / n(1)))
         case 'floorMod':
-          return zahl(((n(0) % n(1)) + n(1)) % n(1))
+          return number(((n(0) % n(1)) + n(1)) % n(1))
         case 'toRadians':
-          return komma((n(0) * Math.PI) / 180)
+          return comma((n(0) * Math.PI) / 180)
         case 'toDegrees':
-          return komma((n(0) * 180) / Math.PI)
+          return comma((n(0) * 180) / Math.PI)
         default: {
-          const funktion = (Math as unknown as Record<string, (x: number) => number>)[name]
-          if (typeof funktion === 'function') return komma(funktion(n(0)))
+          const fn = (Math as unknown as Record<string, (x: number) => number>)[name]
+          if (typeof fn === 'function') return comma(fn(n(0)))
         }
       }
       break
 
     case 'String':
-      if (name === 'valueOf') return neuerString(text(0))
-      if (name === 'format') return neuerString(formatieren(text(0), a.slice(1), i, zeile))
+      if (name === 'valueOf') return newString(text(0))
+      if (name === 'format') return newString(format(text(0), a.slice(1), i, line))
       if (name === 'join') {
-        const teile = a.length === 2 && (a[1].art === 'array' || a[1].art === 'nativ') ? listeVon(a[1], i, zeile) : a.slice(1)
-        return neuerString(teile.map((w) => i.alsText(w)).join(text(0)))
+        const parts = a.length === 2 && (a[1].kind === 'array' || a[1].kind === 'native') ? listOf(a[1], i, line) : a.slice(1)
+        return newString(parts.map((w) => i.toText(w)).join(text(0)))
       }
       break
 
@@ -256,63 +256,63 @@ export function statischerAufruf(klasse: string, name: string, a: Wert[], i: Int
     case 'Short':
     case 'Byte':
       if (name === 'parseInt' || name === 'parseLong' || name === 'valueOf') {
-        if (a[0].art !== 'string') return zahl(n(0))
-        const roh = a[0].wert.trim()
-        if (!/^[+-]?\d+$/.test(roh)) i.werfen('NumberFormatException', `For input string: "${a[0].wert}"`, zeile)
-        return zahl(Number(roh))
+        if (a[0].kind !== 'string') return number(n(0))
+        const raw = a[0].value.trim()
+        if (!/^[+-]?\d+$/.test(raw)) i.raise('NumberFormatException', `For input string: "${a[0].value}"`, line)
+        return number(Number(raw))
       }
-      if (name === 'toString') return neuerString(String(Math.trunc(n(0))))
-      if (name === 'toBinaryString') return neuerString((n(0) >>> 0).toString(2))
-      if (name === 'toHexString') return neuerString((n(0) >>> 0).toString(16))
-      if (name === 'compare') return zahl(Math.sign(n(0) - n(1)))
-      if (name === 'max') return zahl(Math.max(n(0), n(1)))
-      if (name === 'min') return zahl(Math.min(n(0), n(1)))
-      if (name === 'sum') return zahl(n(0) + n(1))
+      if (name === 'toString') return newString(String(Math.trunc(n(0))))
+      if (name === 'toBinaryString') return newString((n(0) >>> 0).toString(2))
+      if (name === 'toHexString') return newString((n(0) >>> 0).toString(16))
+      if (name === 'compare') return number(Math.sign(n(0) - n(1)))
+      if (name === 'max') return number(Math.max(n(0), n(1)))
+      if (name === 'min') return number(Math.min(n(0), n(1)))
+      if (name === 'sum') return number(n(0) + n(1))
       break
 
     case 'Double':
     case 'Float':
       if (name === 'parseDouble' || name === 'valueOf' || name === 'parseFloat') {
-        if (a[0].art !== 'string') return komma(n(0))
-        const roh = a[0].wert.trim()
-        if (roh === '' || Number.isNaN(Number(roh))) i.werfen('NumberFormatException', `For input string: "${a[0].wert}"`, zeile)
-        return komma(Number(roh))
+        if (a[0].kind !== 'string') return comma(n(0))
+        const raw = a[0].value.trim()
+        if (raw === '' || Number.isNaN(Number(raw))) i.raise('NumberFormatException', `For input string: "${a[0].value}"`, line)
+        return comma(Number(raw))
       }
-      if (name === 'toString') return neuerString(doubleText(n(0)))
-      if (name === 'compare') return zahl(Math.sign(n(0) - n(1)))
-      if (name === 'isNaN') return wahrheit(Number.isNaN(n(0)))
+      if (name === 'toString') return newString(doubleText(n(0)))
+      if (name === 'compare') return number(Math.sign(n(0) - n(1)))
+      if (name === 'isNaN') return bool(Number.isNaN(n(0)))
       break
 
     case 'Boolean':
-      if (name === 'parseBoolean' || name === 'valueOf') return wahrheit(text(0).trim().toLowerCase() === 'true')
-      if (name === 'toString') return neuerString(text(0))
+      if (name === 'parseBoolean' || name === 'valueOf') return bool(text(0).trim().toLowerCase() === 'true')
+      if (name === 'toString') return newString(text(0))
       break
 
     case 'Character': {
-      const z = a[0] ? String.fromCharCode(alsZahl(a[0])) : ''
-      if (name === 'isDigit') return wahrheit(/[0-9]/.test(z))
-      if (name === 'isLetter') return wahrheit(/\p{L}/u.test(z))
-      if (name === 'isLetterOrDigit') return wahrheit(/[\p{L}0-9]/u.test(z))
-      if (name === 'isWhitespace') return wahrheit(/\s/.test(z))
-      if (name === 'isUpperCase') return wahrheit(z !== z.toLowerCase())
-      if (name === 'isLowerCase') return wahrheit(z !== z.toUpperCase())
-      if (name === 'toUpperCase') return zeichen(z.toUpperCase().charCodeAt(0))
-      if (name === 'toLowerCase') return zeichen(z.toLowerCase().charCodeAt(0))
-      if (name === 'toString') return neuerString(z)
-      if (name === 'getNumericValue') return zahl(/[0-9]/.test(z) ? Number(z) : -1)
+      const z = a[0] ? String.fromCharCode(toNumber(a[0])) : ''
+      if (name === 'isDigit') return bool(/[0-9]/.test(z))
+      if (name === 'isLetter') return bool(/\p{L}/u.test(z))
+      if (name === 'isLetterOrDigit') return bool(/[\p{L}0-9]/u.test(z))
+      if (name === 'isWhitespace') return bool(/\s/.test(z))
+      if (name === 'isUpperCase') return bool(z !== z.toLowerCase())
+      if (name === 'isLowerCase') return bool(z !== z.toUpperCase())
+      if (name === 'toUpperCase') return chars(z.toUpperCase().charCodeAt(0))
+      if (name === 'toLowerCase') return chars(z.toLowerCase().charCodeAt(0))
+      if (name === 'toString') return newString(z)
+      if (name === 'getNumericValue') return number(/[0-9]/.test(z) ? Number(z) : -1)
       break
     }
 
     case 'System':
-      if (name === 'currentTimeMillis') return { art: 'long', wert: Date.now() }
-      if (name === 'nanoTime') return { art: 'long', wert: Math.round(performance.now() * 1e6) }
+      if (name === 'currentTimeMillis') return { kind: 'long', value: Date.now() }
+      if (name === 'nanoTime') return { kind: 'long', value: Math.round(performance.now() * 1e6) }
       if (name === 'lineSeparator') return poolString('\n')
-      if (name === 'exit') i.abbruch('System.exit() gibt es im Kurs nicht.', 'System.exit() is not available in this course runtime', zeile)
+      if (name === 'exit') i.abort('System.exit() gibt es im Kurs nicht.', 'System.exit() is not available in this course runtime', line)
       if (name === 'arraycopy') {
-        const quelle = a[0]
-        const ziel = a[2]
-        if (quelle.art === 'array' && ziel.art === 'array') {
-          for (let k = 0; k < n(4); k++) ziel.werte[n(3) + k] = quelle.werte[n(1) + k]
+        const source = a[0]
+        const target = a[2]
+        if (source.kind === 'array' && target.kind === 'array') {
+          for (let k = 0; k < n(4); k++) target.values[n(3) + k] = source.values[n(1) + k]
         }
         return NULL
       }
@@ -321,72 +321,72 @@ export function statischerAufruf(klasse: string, name: string, a: Wert[], i: Int
     case 'Arrays': {
       const array = a[0]
       if (name === 'toString') {
-        if (array.art !== 'array') return neuerString('null')
-        return neuerString(`[${array.werte.map((w) => i.alsText(w)).join(', ')}]`)
+        if (array.kind !== 'array') return newString('null')
+        return newString(`[${array.values.map((w) => i.toText(w)).join(', ')}]`)
       }
       if (name === 'deepToString') {
-        const tief = (w: Wert): string => (w.art === 'array' ? `[${w.werte.map(tief).join(', ')}]` : i.alsText(w))
-        return neuerString(tief(array))
+        const deep = (w: Value): string => (w.kind === 'array' ? `[${w.values.map(deep).join(', ')}]` : i.toText(w))
+        return newString(deep(array))
       }
-      if (name === 'sort' && array.art === 'array') {
-        const ordnung = a[1] ? vergleicher(a[1], i, zeile) : (x: Wert, y: Wert) => vergleichen(x, y, i)
-        array.werte.sort(ordnung)
+      if (name === 'sort' && array.kind === 'array') {
+        const order = a[1] ? comparator(a[1], i, line) : (x: Value, y: Value) => compare(x, y, i)
+        array.values.sort(order)
         return NULL
       }
-      if (name === 'fill' && array.art === 'array') {
-        array.werte.fill(a[1])
+      if (name === 'fill' && array.kind === 'array') {
+        array.values.fill(a[1])
         return NULL
       }
-      if (name === 'copyOf' && array.art === 'array') {
-        const laenge = n(1)
-        const werte = Array.from({ length: laenge }, (_, k) =>
-          k < array.werte.length ? array.werte[k] : i.standardWert({ name: array.typ, dimensionen: 0, argumente: [] }),
+      if (name === 'copyOf' && array.kind === 'array') {
+        const length = n(1)
+        const values = Array.from({ length }, (_, k) =>
+          k < array.values.length ? array.values[k] : i.defaultValue({ name: array.type, dimensions: 0, args: [] }),
         )
-        return { art: 'array', typ: array.typ, werte }
+        return { kind: 'array', type: array.type, values }
       }
-      if (name === 'copyOfRange' && array.art === 'array') {
-        return { art: 'array', typ: array.typ, werte: array.werte.slice(n(1), n(2)) }
+      if (name === 'copyOfRange' && array.kind === 'array') {
+        return { kind: 'array', type: array.type, values: array.values.slice(n(1), n(2)) }
       }
       if (name === 'equals') {
         const b = a[1]
-        if (array.art !== 'array' || b.art !== 'array') return wahrheit(false)
-        return wahrheit(array.werte.length === b.werte.length && array.werte.every((w, k) => inhaltGleich(w, b.werte[k])))
+        if (array.kind !== 'array' || b.kind !== 'array') return bool(false)
+        return bool(array.values.length === b.values.length && array.values.every((w, k) => contentEquals(w, b.values[k])))
       }
-      if (name === 'asList') return liste(array.art === 'array' && a.length === 1 ? [...array.werte] : [...a])
-      if (name === 'stream') return liste(array.art === 'array' ? [...array.werte] : [], 'Stream')
-      if (name === 'binarySearch' && array.art === 'array') {
-        return zahl(array.werte.findIndex((w) => inhaltGleich(w, a[1])))
+      if (name === 'asList') return list(array.kind === 'array' && a.length === 1 ? [...array.values] : [...a])
+      if (name === 'stream') return list(array.kind === 'array' ? [...array.values] : [], 'Stream')
+      if (name === 'binarySearch' && array.kind === 'array') {
+        return number(array.values.findIndex((w) => contentEquals(w, a[1])))
       }
       break
     }
 
     case 'List':
     case 'Set':
-      if (name === 'of') return liste([...a], klasse === 'Set' ? 'LinkedHashSet' : 'ArrayList')
-      if (name === 'copyOf') return liste([...listeVon(a[0], i, zeile)])
+      if (name === 'of') return list([...a], classInfo === 'Set' ? 'LinkedHashSet' : 'ArrayList')
+      if (name === 'copyOf') return list([...listOf(a[0], i, line)])
       break
 
     case 'Map':
       if (name === 'of') {
         const m = map('LinkedHashMap')
-        for (let k = 0; k + 1 < a.length; k += 2) m.daten.map!.set(schluesselVon(a[k]), { schluessel: a[k], wert: a[k + 1] })
+        for (let k = 0; k + 1 < a.length; k += 2) m.data.map!.set(keyOf(a[k]), { key: a[k], value: a[k + 1] })
         return m
       }
-      if (name === 'entry') return { art: 'nativ', typ: 'Entry', daten: { liste: [a[0], a[1]] } }
+      if (name === 'entry') return { kind: 'native', type: 'Entry', data: { list: [a[0], a[1]] } }
       break
 
     case 'Collections':
       if (name === 'sort') {
-        const l = listeVon(a[0], i, zeile)
-        l.sort(a[1] ? vergleicher(a[1], i, zeile) : (x, y) => vergleichen(x, y, i))
+        const l = listOf(a[0], i, line)
+        l.sort(a[1] ? comparator(a[1], i, line) : (x, y) => compare(x, y, i))
         return NULL
       }
       if (name === 'reverse') {
-        listeVon(a[0], i, zeile).reverse()
+        listOf(a[0], i, line).reverse()
         return NULL
       }
       if (name === 'shuffle') {
-        const l = listeVon(a[0], i, zeile)
+        const l = listOf(a[0], i, line)
         for (let k = l.length - 1; k > 0; k--) {
           const j = Math.floor(Math.random() * (k + 1))
           ;[l[k], l[j]] = [l[j], l[k]]
@@ -394,44 +394,44 @@ export function statischerAufruf(klasse: string, name: string, a: Wert[], i: Int
         return NULL
       }
       if (name === 'max' || name === 'min') {
-        const l = listeVon(a[0], i, zeile)
-        if (!l.length) i.werfen('NoSuchElementException', null, zeile)
-        return l.reduce((beste, w) => (vergleichen(w, beste, i) * (name === 'max' ? 1 : -1) > 0 ? w : beste))
+        const l = listOf(a[0], i, line)
+        if (!l.length) i.raise('NoSuchElementException', null, line)
+        return l.reduce((best, w) => (compare(w, best, i) * (name === 'max' ? 1 : -1) > 0 ? w : best))
       }
-      if (name === 'emptyList') return liste([])
-      if (name === 'unmodifiableList') return liste([...listeVon(a[0], i, zeile)])
+      if (name === 'emptyList') return list([])
+      if (name === 'unmodifiableList') return list([...listOf(a[0], i, line)])
       break
 
     case 'Objects':
-      if (name === 'equals') return wahrheit(inhaltGleich(a[0], a[1]))
-      if (name === 'isNull') return wahrheit(a[0].art === 'null')
-      if (name === 'nonNull') return wahrheit(a[0].art !== 'null')
-      if (name === 'toString') return neuerString(text(0))
+      if (name === 'equals') return bool(contentEquals(a[0], a[1]))
+      if (name === 'isNull') return bool(a[0].kind === 'null')
+      if (name === 'nonNull') return bool(a[0].kind !== 'null')
+      if (name === 'toString') return newString(text(0))
       if (name === 'requireNonNull') {
-        if (a[0].art === 'null') i.werfen('NullPointerException', a[1] ? text(1) : null, zeile)
+        if (a[0].kind === 'null') i.raise('NullPointerException', a[1] ? text(1) : null, line)
         return a[0]
       }
-      if (name === 'hash') return zahl(a.reduce((h, w) => (Math.imul(31, h) + [...i.alsText(w)].reduce((s, c) => s + c.charCodeAt(0), 0)) | 0, 7))
+      if (name === 'hash') return number(a.reduce((h, w) => (Math.imul(31, h) + [...i.toText(w)].reduce((s, c) => s + c.charCodeAt(0), 0)) | 0, 7))
       break
 
     case 'Optional':
-      if (name === 'of' || name === 'ofNullable') return optional(a[0]?.art === 'null' ? [] : [a[0]])
+      if (name === 'of' || name === 'ofNullable') return optional(a[0]?.kind === 'null' ? [] : [a[0]])
       if (name === 'empty') return optional([])
       break
 
     case 'Comparator':
-      if (name === 'naturalOrder') return { art: 'funktion', aufrufen: (args) => zahl(Math.sign(vergleichen(args[0], args[1], i))) }
-      if (name === 'reverseOrder') return { art: 'funktion', aufrufen: (args) => zahl(-Math.sign(vergleichen(args[0], args[1], i))) }
+      if (name === 'naturalOrder') return { kind: 'function', call: (args) => number(Math.sign(compare(args[0], args[1], i))) }
+      if (name === 'reverseOrder') return { kind: 'function', call: (args) => number(-Math.sign(compare(args[0], args[1], i))) }
       if (name === 'comparing' || name === 'comparingInt' || name === 'comparingDouble') {
-        const schluessel = a[0]
+        const key = a[0]
         return {
-          art: 'funktion',
-          aufrufen: (args) =>
-            zahl(
+          kind: 'function',
+          call: (args) =>
+            number(
               Math.sign(
-                vergleichen(
-                  funktionAufrufen(schluessel, [args[0]], i, zeile),
-                  funktionAufrufen(schluessel, [args[1]], i, zeile),
+                compare(
+                  callFunction(key, [args[0]], i, line),
+                  callFunction(key, [args[1]], i, line),
                   i,
                 ),
               ),
@@ -441,81 +441,81 @@ export function statischerAufruf(klasse: string, name: string, a: Wert[], i: Int
       break
 
     case 'Collectors':
-      if (name === 'toList' || name === 'toSet') return { art: 'nativ', typ: 'Collector', daten: { text: name } }
-      if (name === 'joining') return { art: 'nativ', typ: 'Collector', daten: { text: 'joining', liste: [...a] } }
+      if (name === 'toList' || name === 'toSet') return { kind: 'native', type: 'Collector', data: { text: name } }
+      if (name === 'joining') return { kind: 'native', type: 'Collector', data: { text: 'joining', list: [...a] } }
       break
 
     case 'Stream':
-      if (name === 'of') return liste([...a], 'Stream')
+      if (name === 'of') return list([...a], 'Stream')
       break
 
     case 'IntStream':
       if (name === 'range' || name === 'rangeClosed') {
-        const werte: Wert[] = []
-        for (let k = n(0); name === 'range' ? k < n(1) : k <= n(1); k++) werte.push(zahl(k))
-        return liste(werte, 'Stream')
+        const values: Value[] = []
+        for (let k = n(0); name === 'range' ? k < n(1) : k <= n(1); k++) values.push(number(k))
+        return list(values, 'Stream')
       }
       break
   }
 
-  i.abbruch(`${klasse}.${name}(…) kennt diese Laufzeit nicht.`, `cannot find symbol: method ${name} in class ${klasse}`, zeile)
+  i.abort(`${classInfo}.${name}(…) kennt diese Laufzeit nicht.`, `cannot find symbol: method ${name} in class ${classInfo}`, line)
 }
 
 // ---------------------------------------------------------------------------
 // new …
 // ---------------------------------------------------------------------------
 
-export function nativErzeugen(klasse: string, a: Wert[], i: Interpreter, zeile: number): Wert | null {
-  if (istAusnahmeKlasse(klasse)) {
-    return { art: 'nativ', typ: klasse, daten: { meldung: a[0] && a[0].art !== 'null' ? i.alsText(a[0]) : undefined } }
+export function createNative(classInfo: string, a: Value[], i: Interpreter, line: number): Value | null {
+  if (isExceptionClass(classInfo)) {
+    return { kind: 'native', type: classInfo, data: { message: a[0] && a[0].kind !== 'null' ? i.toText(a[0]) : undefined } }
   }
-  if (klasse === 'Scanner') {
-    i.abbruch(
+  if (classInfo === 'Scanner') {
+    i.abort(
       'Scanner liest von der Tastatur - im Browser gibt es keine Eingabe. Setze die Werte direkt im Code.',
       'Scanner reads from the keyboard - there is no input in the browser. Set the values directly in the code.',
-      zeile,
+      line,
     )
   }
-  if (!NATIV_ERZEUGBAR.has(klasse)) return null
+  if (!NATIVE_CONSTRUCTIBLE.has(classInfo)) return null
 
-  switch (klasse) {
+  switch (classInfo) {
     case 'ArrayList':
     case 'LinkedList':
-      return liste(a[0] && a[0].art === 'nativ' ? [...(a[0].daten.liste ?? [])] : [], 'ArrayList')
+      return list(a[0] && a[0].kind === 'native' ? [...(a[0].data.list ?? [])] : [], 'ArrayList')
     case 'HashSet':
     case 'LinkedHashSet':
     case 'TreeSet': {
-      const eingabe = a[0] && a[0].art === 'nativ' ? (a[0].daten.liste ?? []) : []
-      const menge = liste([], klasse === 'TreeSet' ? 'TreeSet' : 'LinkedHashSet')
-      for (const w of eingabe) if (!menge.daten.liste!.some((v) => inhaltGleich(v, w))) menge.daten.liste!.push(w)
-      if (klasse === 'TreeSet') menge.daten.liste!.sort((x, y) => vergleichen(x, y, i))
-      return menge
+      const input = a[0] && a[0].kind === 'native' ? (a[0].data.list ?? []) : []
+      const set = list([], classInfo === 'TreeSet' ? 'TreeSet' : 'LinkedHashSet')
+      for (const w of input) if (!set.data.list!.some((v) => contentEquals(v, w))) set.data.list!.push(w)
+      if (classInfo === 'TreeSet') set.data.list!.sort((x, y) => compare(x, y, i))
+      return set
     }
     case 'HashMap':
     case 'LinkedHashMap':
     case 'TreeMap': {
-      const m = map(klasse)
-      if (a[0]?.art === 'nativ' && a[0].daten.map) for (const [k, e] of a[0].daten.map) m.daten.map!.set(k, e)
+      const m = map(classInfo)
+      if (a[0]?.kind === 'native' && a[0].data.map) for (const [k, e] of a[0].data.map) m.data.map!.set(k, e)
       return m
     }
     case 'StringBuilder':
     case 'StringBuffer':
-      return { art: 'nativ', typ: 'StringBuilder', daten: { text: a[0]?.art === 'string' ? a[0].wert : '' } }
+      return { kind: 'native', type: 'StringBuilder', data: { text: a[0]?.kind === 'string' ? a[0].value : '' } }
     case 'String':
       // Absicht: `new String("hi")` ist ein NEUES Objekt - genau darum geht es beim ==-Kapitel.
-      return neuerString(a[0] ? i.alsText(a[0]) : '')
+      return newString(a[0] ? i.toText(a[0]) : '')
     case 'Random':
-      return { art: 'nativ', typ: 'Random', daten: { zahl: a[0] ? alsZahl(a[0]) : Date.now() } }
+      return { kind: 'native', type: 'Random', data: { number: a[0] ? toNumber(a[0]) : Date.now() } }
     case 'Object':
-      return { art: 'nativ', typ: 'Object', daten: {} }
+      return { kind: 'native', type: 'Object', data: {} }
   }
   return null
 }
 
-export function nativesFeld(wert: NativWert, name: string, _i: Interpreter): Wert | null {
-  if (wert.typ === 'Entry' && wert.daten.liste) {
-    if (name === 'key') return wert.daten.liste[0]
-    if (name === 'value') return wert.daten.liste[1]
+export function nativeField(value: NativeValue, name: string, _i: Interpreter): Value | null {
+  if (value.type === 'Entry' && value.data.list) {
+    if (name === 'key') return value.data.list[0]
+    if (name === 'value') return value.data.list[1]
   }
   return null
 }
@@ -524,22 +524,22 @@ export function nativesFeld(wert: NativWert, name: string, _i: Interpreter): Wer
 // Methoden auf eingebauten Objekten
 // ---------------------------------------------------------------------------
 
-export function nativMethode(ziel: NativWert, name: string, a: Wert[], i: Interpreter, zeile: number): Wert {
-  const daten = ziel.daten
+export function nativeMethod(target: NativeValue, name: string, a: Value[], i: Interpreter, line: number): Value {
+  const data = target.data
 
   // --- System.out / System.err ---------------------------------------------
-  if (ziel.typ === 'PrintStream') {
-    const strom = daten.text === 'err' ? 'err' : 'out'
+  if (target.type === 'PrintStream') {
+    const stream = data.text === 'err' ? 'err' : 'out'
     switch (name) {
       case 'println':
-        i.drucken((a.length ? i.alsText(a[0]) : '') + '\n', strom)
+        i.print((a.length ? i.toText(a[0]) : '') + '\n', stream)
         return NULL
       case 'print':
-        i.drucken(a.length ? i.alsText(a[0]) : '', strom)
+        i.print(a.length ? i.toText(a[0]) : '', stream)
         return NULL
       case 'printf':
       case 'format':
-        i.drucken(formatieren(i.alsText(a[0]), a.slice(1), i, zeile), strom)
+        i.print(format(i.toText(a[0]), a.slice(1), i, line), stream)
         return NULL
       case 'flush':
         return NULL
@@ -547,180 +547,180 @@ export function nativMethode(ziel: NativWert, name: string, a: Wert[], i: Interp
   }
 
   // --- Optional: eine Liste mit höchstens einem Element ---------------------
-  if (ziel.typ === 'Optional' && daten.liste) {
-    const vorhanden = daten.liste.length > 0
+  if (target.type === 'Optional' && data.list) {
+    const existing = data.list.length > 0
     switch (name) {
       case 'isPresent':
-        return wahrheit(vorhanden)
+        return bool(existing)
       case 'isEmpty':
-        return wahrheit(!vorhanden)
+        return bool(!existing)
       case 'orElse':
-        return vorhanden ? daten.liste[0] : a[0]
+        return existing ? data.list[0] : a[0]
       case 'orElseGet':
-        return vorhanden ? daten.liste[0] : funktionAufrufen(a[0], [], i, zeile, 'get')
+        return existing ? data.list[0] : callFunction(a[0], [], i, line, 'get')
       case 'ifPresent':
-        if (vorhanden) funktionAufrufen(a[0], [daten.liste[0]], i, zeile, 'accept')
+        if (existing) callFunction(a[0], [data.list[0]], i, line, 'accept')
         return NULL
       case 'map':
-        return optional(vorhanden ? [funktionAufrufen(a[0], [daten.liste[0]], i, zeile)] : [])
+        return optional(existing ? [callFunction(a[0], [data.list[0]], i, line)] : [])
       case 'get':
       case 'getAsDouble':
       case 'orElseThrow':
         // orElseThrow(() -> new TodoNotFoundException(id)) throws what the supplier creates.
-        if (!vorhanden && name === 'orElseThrow' && a[0]) i.throwValue(funktionAufrufen(a[0], [], i, zeile, 'get'), zeile)
-        if (!vorhanden) i.werfen('NoSuchElementException', 'No value present', zeile)
-        return daten.liste[0]
+        if (!existing && name === 'orElseThrow' && a[0]) i.throwValue(callFunction(a[0], [], i, line, 'get'), line)
+        if (!existing) i.raise('NoSuchElementException', 'No value present', line)
+        return data.list[0]
       case 'toString':
-        return neuerString(vorhanden ? `Optional[${i.alsText(daten.liste[0])}]` : 'Optional.empty')
+        return newString(existing ? `Optional[${i.toText(data.list[0])}]` : 'Optional.empty')
     }
   }
 
   // --- Alles, was eine Liste ist: ArrayList, Set, Stream --------------------
-  if (daten.liste) {
-    const l = daten.liste
-    const istMenge = ziel.typ.includes('Set')
-    const istStream = ziel.typ === 'Stream'
-    const neueListe = (werte: Wert[]) => liste(werte, istStream ? 'Stream' : ziel.typ)
+  if (data.list) {
+    const l = data.list
+    const isSet = target.type.includes('Set')
+    const isStream = target.type === 'Stream'
+    const newList = (values: Value[]) => list(values, isStream ? 'Stream' : target.type)
 
     switch (name) {
       case 'add':
       case 'offer':
-        if (a.length === 2 && !istMenge) {
-          l.splice(alsZahl(a[0]), 0, a[1])
+        if (a.length === 2 && !isSet) {
+          l.splice(toNumber(a[0]), 0, a[1])
           return NULL
         }
-        if (istMenge && l.some((w) => inhaltGleich(w, a[0]))) return wahrheit(false)
+        if (isSet && l.some((w) => contentEquals(w, a[0]))) return bool(false)
         l.push(a[0])
-        if (ziel.typ === 'TreeSet') l.sort((x, y) => vergleichen(x, y, i))
-        return wahrheit(true)
+        if (target.type === 'TreeSet') l.sort((x, y) => compare(x, y, i))
+        return bool(true)
       case 'addAll':
-        for (const w of listeVon(a[a.length - 1], i, zeile)) {
-          if (istMenge && l.some((v) => inhaltGleich(v, w))) continue
+        for (const w of listOf(a[a.length - 1], i, line)) {
+          if (isSet && l.some((v) => contentEquals(v, w))) continue
           l.push(w)
         }
-        return wahrheit(true)
+        return bool(true)
       case 'get':
       case 'getFirst':
       case 'getLast': {
-        const index = name === 'get' ? alsZahl(a[0]) : name === 'getFirst' ? 0 : l.length - 1
+        const index = name === 'get' ? toNumber(a[0]) : name === 'getFirst' ? 0 : l.length - 1
         if (index < 0 || index >= l.length) {
-          i.werfen('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, zeile)
+          i.raise('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, line)
         }
         return l[index]
       }
       case 'set': {
-        const index = alsZahl(a[0])
-        if (index < 0 || index >= l.length) i.werfen('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, zeile)
-        const alt = l[index]
+        const index = toNumber(a[0])
+        if (index < 0 || index >= l.length) i.raise('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, line)
+        const previous = l[index]
         l[index] = a[1]
-        return alt
+        return previous
       }
       case 'remove': {
         // list.remove(int) löscht nach Index, list.remove(Object) nach Inhalt - eine echte Java-Falle.
-        if (a[0].art === 'int' && !istMenge) {
-          const index = alsZahl(a[0])
-          if (index < 0 || index >= l.length) i.werfen('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, zeile)
+        if (a[0].kind === 'int' && !isSet) {
+          const index = toNumber(a[0])
+          if (index < 0 || index >= l.length) i.raise('IndexOutOfBoundsException', `Index ${index} out of bounds for length ${l.length}`, line)
           return l.splice(index, 1)[0]
         }
-        const stelle = l.findIndex((w) => inhaltGleich(w, a[0]))
-        if (stelle < 0) return wahrheit(false)
-        l.splice(stelle, 1)
-        return wahrheit(true)
+        const position = l.findIndex((w) => contentEquals(w, a[0]))
+        if (position < 0) return bool(false)
+        l.splice(position, 1)
+        return bool(true)
       }
       case 'removeIf': {
-        const vorher = l.length
-        const behalten = l.filter((w) => !istWahr(funktionAufrufen(a[0], [w], i, zeile, 'test')))
+        const prefix = l.length
+        const keep = l.filter((w) => !isTrue(callFunction(a[0], [w], i, line, 'test')))
         l.length = 0
-        l.push(...behalten)
-        return wahrheit(vorher !== l.length)
+        l.push(...keep)
+        return bool(prefix !== l.length)
       }
       case 'size':
-        return zahl(l.length)
+        return number(l.length)
       case 'isEmpty':
-        return wahrheit(l.length === 0)
+        return bool(l.length === 0)
       case 'contains':
-        return wahrheit(l.some((w) => inhaltGleich(w, a[0])))
+        return bool(l.some((w) => contentEquals(w, a[0])))
       case 'indexOf':
-        return zahl(l.findIndex((w) => inhaltGleich(w, a[0])))
+        return number(l.findIndex((w) => contentEquals(w, a[0])))
       case 'lastIndexOf':
-        return zahl(l.map((w) => inhaltGleich(w, a[0])).lastIndexOf(true))
+        return number(l.map((w) => contentEquals(w, a[0])).lastIndexOf(true))
       case 'clear':
         l.length = 0
         return NULL
       case 'sort':
-        l.sort(a[0] && a[0].art !== 'null' ? vergleicher(a[0], i, zeile) : (x, y) => vergleichen(x, y, i))
+        l.sort(a[0] && a[0].kind !== 'null' ? comparator(a[0], i, line) : (x, y) => compare(x, y, i))
         return NULL
       case 'forEach':
-        for (const w of [...l]) funktionAufrufen(a[0], [w], i, zeile, 'accept')
+        for (const w of [...l]) callFunction(a[0], [w], i, line, 'accept')
         return NULL
       case 'stream':
-        return liste([...l], 'Stream')
+        return list([...l], 'Stream')
       case 'toList':
       case 'collect': {
-        if (name === 'collect' && a[0]?.art === 'nativ' && a[0].daten.text === 'joining') {
-          const trenner = a[0].daten.liste?.[0]
-          return neuerString(l.map((w) => i.alsText(w)).join(trenner ? i.alsText(trenner) : ''))
+        if (name === 'collect' && a[0]?.kind === 'native' && a[0].data.text === 'joining') {
+          const separator = a[0].data.list?.[0]
+          return newString(l.map((w) => i.toText(w)).join(separator ? i.toText(separator) : ''))
         }
-        const alsMenge = name === 'collect' && a[0]?.art === 'nativ' && a[0].daten.text === 'toSet'
-        return liste([...l], alsMenge ? 'LinkedHashSet' : 'ArrayList')
+        const asSet = name === 'collect' && a[0]?.kind === 'native' && a[0].data.text === 'toSet'
+        return list([...l], asSet ? 'LinkedHashSet' : 'ArrayList')
       }
       case 'filter':
-        return neueListe(l.filter((w) => istWahr(funktionAufrufen(a[0], [w], i, zeile, 'test'))))
+        return newList(l.filter((w) => isTrue(callFunction(a[0], [w], i, line, 'test'))))
       case 'map':
       case 'mapToInt':
       case 'mapToObj':
       case 'mapToDouble':
-        return neueListe(l.map((w) => funktionAufrufen(a[0], [w], i, zeile)))
+        return newList(l.map((w) => callFunction(a[0], [w], i, line)))
       case 'sorted':
-        return neueListe([...l].sort(a[0] ? vergleicher(a[0], i, zeile) : (x, y) => vergleichen(x, y, i)))
+        return newList([...l].sort(a[0] ? comparator(a[0], i, line) : (x, y) => compare(x, y, i)))
       case 'distinct': {
-        const gesehen: Wert[] = []
-        for (const w of l) if (!gesehen.some((v) => inhaltGleich(v, w))) gesehen.push(w)
-        return neueListe(gesehen)
+        const seen: Value[] = []
+        for (const w of l) if (!seen.some((v) => contentEquals(v, w))) seen.push(w)
+        return newList(seen)
       }
       case 'limit':
-        return neueListe(l.slice(0, alsZahl(a[0])))
+        return newList(l.slice(0, toNumber(a[0])))
       case 'skip':
-        return neueListe(l.slice(alsZahl(a[0])))
+        return newList(l.slice(toNumber(a[0])))
       case 'count':
-        return { art: 'long', wert: l.length }
+        return { kind: 'long', value: l.length }
       case 'sum':
-        return l.some((w) => w.art === 'double') ? komma(l.reduce((s, w) => s + alsZahl(w), 0)) : zahl(l.reduce((s, w) => s + alsZahl(w), 0))
+        return l.some((w) => w.kind === 'double') ? comma(l.reduce((s, w) => s + toNumber(w), 0)) : number(l.reduce((s, w) => s + toNumber(w), 0))
       case 'average':
-        return optional(l.length ? [komma(l.reduce((s, w) => s + alsZahl(w), 0) / l.length)] : [])
+        return optional(l.length ? [comma(l.reduce((s, w) => s + toNumber(w), 0) / l.length)] : [])
       case 'anyMatch':
-        return wahrheit(l.some((w) => istWahr(funktionAufrufen(a[0], [w], i, zeile, 'test'))))
+        return bool(l.some((w) => isTrue(callFunction(a[0], [w], i, line, 'test'))))
       case 'allMatch':
-        return wahrheit(l.every((w) => istWahr(funktionAufrufen(a[0], [w], i, zeile, 'test'))))
+        return bool(l.every((w) => isTrue(callFunction(a[0], [w], i, line, 'test'))))
       case 'noneMatch':
-        return wahrheit(!l.some((w) => istWahr(funktionAufrufen(a[0], [w], i, zeile, 'test'))))
+        return bool(!l.some((w) => isTrue(callFunction(a[0], [w], i, line, 'test'))))
       case 'findFirst':
         return optional(l.length ? [l[0]] : [])
       case 'reduce':
-        return l.reduce((summe, w) => funktionAufrufen(a[1] ?? a[0], [summe, w], i, zeile), a.length > 1 ? a[0] : l[0] ?? NULL)
+        return l.reduce((sum, w) => callFunction(a[1] ?? a[0], [sum, w], i, line), a.length > 1 ? a[0] : l[0] ?? NULL)
       case 'toArray':
-        return { art: 'array', typ: 'Object', werte: [...l] }
+        return { kind: 'array', type: 'Object', values: [...l] }
       case 'subList':
-        return liste(l.slice(alsZahl(a[0]), alsZahl(a[1])))
+        return list(l.slice(toNumber(a[0]), toNumber(a[1])))
       case 'iterator':
-        return { art: 'nativ', typ: 'Iterator', daten: { liste: [...l], zahl: 0 } }
+        return { kind: 'native', type: 'Iterator', data: { list: [...l], number: 0 } }
       case 'hasNext':
-        return wahrheit((daten.zahl ?? 0) < l.length)
+        return bool((data.number ?? 0) < l.length)
       case 'next':
-        if ((daten.zahl ?? 0) >= l.length) i.werfen('NoSuchElementException', null, zeile)
-        return l[daten.zahl!++]
+        if ((data.number ?? 0) >= l.length) i.raise('NoSuchElementException', null, line)
+        return l[data.number!++]
       // --- Optional ---
       case 'isPresent':
-        return wahrheit(l.length > 0)
+        return bool(l.length > 0)
       case 'isEmptyOptional':
-        return wahrheit(l.length === 0)
+        return bool(l.length === 0)
       case 'orElse':
         return l.length ? l[0] : a[0]
       case 'ifPresent':
-        if (l.length) funktionAufrufen(a[0], [l[0]], i, zeile, 'accept')
+        if (l.length) callFunction(a[0], [l[0]], i, line, 'accept')
         return NULL
       case 'getAsDouble':
-        if (!l.length) i.werfen('NoSuchElementException', 'No value present', zeile)
+        if (!l.length) i.raise('NoSuchElementException', 'No value present', line)
         return l[0]
       // --- Map.Entry ---
       case 'getKey':
@@ -728,281 +728,281 @@ export function nativMethode(ziel: NativWert, name: string, a: Wert[], i: Interp
       case 'getValue':
         return l[1]
       case 'equals':
-        return wahrheit(inhaltGleich(ziel, a[0]))
+        return bool(contentEquals(target, a[0]))
       case 'toString':
-        return neuerString(i.alsText(ziel))
+        return newString(i.toText(target))
     }
-    if (ziel.typ === 'Optional' && name === 'get') {
-      if (!l.length) i.werfen('NoSuchElementException', 'No value present', zeile)
+    if (target.type === 'Optional' && name === 'get') {
+      if (!l.length) i.raise('NoSuchElementException', 'No value present', line)
       return l[0]
     }
   }
 
   // --- Map ------------------------------------------------------------------
-  if (daten.map) {
-    const m = daten.map
-    const sortieren = () => {
-      if (ziel.typ !== 'TreeMap') return
-      const eintraege = [...m.entries()].sort((x, y) => vergleichen(x[1].schluessel, y[1].schluessel, i))
+  if (data.map) {
+    const m = data.map
+    const sort = () => {
+      if (target.type !== 'TreeMap') return
+      const entries = [...m.entries()].sort((x, y) => compare(x[1].key, y[1].key, i))
       m.clear()
-      for (const [k, e] of eintraege) m.set(k, e)
+      for (const [k, e] of entries) m.set(k, e)
     }
     switch (name) {
       case 'put': {
-        const schluessel = schluesselVon(a[0])
-        const alt = m.get(schluessel)?.wert ?? NULL
-        m.set(schluessel, { schluessel: a[0], wert: a[1] })
-        sortieren()
-        return alt
+        const key = keyOf(a[0])
+        const previous = m.get(key)?.value ?? NULL
+        m.set(key, { key: a[0], value: a[1] })
+        sort()
+        return previous
       }
       case 'putIfAbsent': {
-        const schluessel = schluesselVon(a[0])
-        if (m.has(schluessel)) return m.get(schluessel)!.wert
-        m.set(schluessel, { schluessel: a[0], wert: a[1] })
-        sortieren()
+        const key = keyOf(a[0])
+        if (m.has(key)) return m.get(key)!.value
+        m.set(key, { key: a[0], value: a[1] })
+        sort()
         return NULL
       }
       case 'get':
-        return m.get(schluesselVon(a[0]))?.wert ?? NULL
+        return m.get(keyOf(a[0]))?.value ?? NULL
       case 'getOrDefault':
-        return m.get(schluesselVon(a[0]))?.wert ?? a[1]
+        return m.get(keyOf(a[0]))?.value ?? a[1]
       case 'containsKey':
-        return wahrheit(m.has(schluesselVon(a[0])))
+        return bool(m.has(keyOf(a[0])))
       case 'containsValue':
-        return wahrheit([...m.values()].some((e) => inhaltGleich(e.wert, a[0])))
+        return bool([...m.values()].some((e) => contentEquals(e.value, a[0])))
       case 'remove': {
-        const schluessel = schluesselVon(a[0])
-        const alt = m.get(schluessel)?.wert ?? NULL
-        m.delete(schluessel)
-        return alt
+        const key = keyOf(a[0])
+        const previous = m.get(key)?.value ?? NULL
+        m.delete(key)
+        return previous
       }
       case 'size':
-        return zahl(m.size)
+        return number(m.size)
       case 'isEmpty':
-        return wahrheit(m.size === 0)
+        return bool(m.size === 0)
       case 'clear':
         m.clear()
         return NULL
       case 'keySet':
-        return liste([...m.values()].map((e) => e.schluessel), 'LinkedHashSet')
+        return list([...m.values()].map((e) => e.key), 'LinkedHashSet')
       case 'values':
-        return liste([...m.values()].map((e) => e.wert))
+        return list([...m.values()].map((e) => e.value))
       case 'entrySet':
-        return liste([...m.values()].map((e) => ({ art: 'nativ' as const, typ: 'Entry', daten: { liste: [e.schluessel, e.wert] } })), 'LinkedHashSet')
+        return list([...m.values()].map((e) => ({ kind: 'native' as const, type: 'Entry', data: { list: [e.key, e.value] } })), 'LinkedHashSet')
       case 'forEach':
-        for (const e of [...m.values()]) funktionAufrufen(a[0], [e.schluessel, e.wert], i, zeile, 'accept')
+        for (const e of [...m.values()]) callFunction(a[0], [e.key, e.value], i, line, 'accept')
         return NULL
       case 'merge': {
-        const schluessel = schluesselVon(a[0])
-        const alt = m.get(schluessel)
-        const neu = alt ? funktionAufrufen(a[2], [alt.wert, a[1]], i, zeile) : a[1]
-        m.set(schluessel, { schluessel: a[0], wert: neu })
-        sortieren()
-        return neu
+        const key = keyOf(a[0])
+        const previous = m.get(key)
+        const fresh = previous ? callFunction(a[2], [previous.value, a[1]], i, line) : a[1]
+        m.set(key, { key: a[0], value: fresh })
+        sort()
+        return fresh
       }
       case 'computeIfAbsent': {
-        const schluessel = schluesselVon(a[0])
-        if (!m.has(schluessel)) m.set(schluessel, { schluessel: a[0], wert: funktionAufrufen(a[1], [a[0]], i, zeile) })
-        sortieren()
-        return m.get(schluessel)!.wert
+        const key = keyOf(a[0])
+        if (!m.has(key)) m.set(key, { key: a[0], value: callFunction(a[1], [a[0]], i, line) })
+        sort()
+        return m.get(key)!.value
       }
       case 'equals':
-        return wahrheit(inhaltGleich(ziel, a[0]))
+        return bool(contentEquals(target, a[0]))
       case 'toString':
-        return neuerString(i.alsText(ziel))
+        return newString(i.toText(target))
     }
   }
 
   // --- StringBuilder --------------------------------------------------------
-  if (ziel.typ === 'StringBuilder') {
+  if (target.type === 'StringBuilder') {
     switch (name) {
       case 'append':
-        daten.text = (daten.text ?? '') + i.alsText(a[0])
-        return ziel
+        data.text = (data.text ?? '') + i.toText(a[0])
+        return target
       case 'insert':
-        daten.text = (daten.text ?? '').slice(0, alsZahl(a[0])) + i.alsText(a[1]) + (daten.text ?? '').slice(alsZahl(a[0]))
-        return ziel
+        data.text = (data.text ?? '').slice(0, toNumber(a[0])) + i.toText(a[1]) + (data.text ?? '').slice(toNumber(a[0]))
+        return target
       case 'reverse':
-        daten.text = [...(daten.text ?? '')].reverse().join('')
-        return ziel
+        data.text = [...(data.text ?? '')].reverse().join('')
+        return target
       case 'deleteCharAt':
-        daten.text = (daten.text ?? '').slice(0, alsZahl(a[0])) + (daten.text ?? '').slice(alsZahl(a[0]) + 1)
-        return ziel
+        data.text = (data.text ?? '').slice(0, toNumber(a[0])) + (data.text ?? '').slice(toNumber(a[0]) + 1)
+        return target
       case 'setCharAt':
-        daten.text = (daten.text ?? '').slice(0, alsZahl(a[0])) + i.alsText(a[1]) + (daten.text ?? '').slice(alsZahl(a[0]) + 1)
+        data.text = (data.text ?? '').slice(0, toNumber(a[0])) + i.toText(a[1]) + (data.text ?? '').slice(toNumber(a[0]) + 1)
         return NULL
       case 'length':
-        return zahl((daten.text ?? '').length)
+        return number((data.text ?? '').length)
       case 'charAt':
-        return zeichen((daten.text ?? '').charCodeAt(alsZahl(a[0])))
+        return chars((data.text ?? '').charCodeAt(toNumber(a[0])))
       case 'toString':
-        return neuerString(daten.text ?? '')
+        return newString(data.text ?? '')
       case 'isEmpty':
-        return wahrheit(!daten.text)
+        return bool(!data.text)
     }
   }
 
   // --- Random ---------------------------------------------------------------
-  if (ziel.typ === 'Random') {
+  if (target.type === 'Random') {
     // Ein einfacher, aber reproduzierbarer Zufallsgenerator (LCG).
-    const naechste = () => {
-      daten.zahl = (Math.imul(1664525, daten.zahl ?? 0) + 1013904223) >>> 0
-      return daten.zahl / 4294967296
+    const next = () => {
+      data.number = (Math.imul(1664525, data.number ?? 0) + 1013904223) >>> 0
+      return data.number / 4294967296
     }
-    if (name === 'nextInt') return zahl(a.length === 2 ? alsZahl(a[0]) + Math.floor(naechste() * (alsZahl(a[1]) - alsZahl(a[0]))) : Math.floor(naechste() * (a.length ? alsZahl(a[0]) : 2 ** 31)))
-    if (name === 'nextDouble') return komma(naechste())
-    if (name === 'nextBoolean') return wahrheit(naechste() < 0.5)
+    if (name === 'nextInt') return number(a.length === 2 ? toNumber(a[0]) + Math.floor(next() * (toNumber(a[1]) - toNumber(a[0]))) : Math.floor(next() * (a.length ? toNumber(a[0]) : 2 ** 31)))
+    if (name === 'nextDouble') return comma(next())
+    if (name === 'nextBoolean') return bool(next() < 0.5)
   }
 
   // --- Class ----------------------------------------------------------------
-  if (ziel.typ === 'Class') {
-    if (name === 'getSimpleName' || name === 'getName') return neuerString(daten.text ?? '')
+  if (target.type === 'Class') {
+    if (name === 'getSimpleName' || name === 'getName') return newString(data.text ?? '')
   }
 
   // --- Exceptions -----------------------------------------------------------
-  if (istAusnahmeKlasse(ziel.typ)) {
-    if (name === 'getMessage' || name === 'getLocalizedMessage') return daten.meldung === undefined ? NULL : neuerString(daten.meldung)
-    if (name === 'toString') return neuerString(i.ausnahmeText(ziel))
-    if (name === 'getClass') return { art: 'nativ', typ: 'Class', daten: { text: ziel.typ } }
+  if (isExceptionClass(target.type)) {
+    if (name === 'getMessage' || name === 'getLocalizedMessage') return data.message === undefined ? NULL : newString(data.message)
+    if (name === 'toString') return newString(i.exceptionText(target))
+    if (name === 'getClass') return { kind: 'native', type: 'Class', data: { text: target.type } }
     if (name === 'printStackTrace') {
-      i.drucken(i.ausnahmeText(ziel) + '\n', 'err')
+      i.print(i.exceptionText(target) + '\n', 'err')
       return NULL
     }
   }
 
   // --- Für alle -------------------------------------------------------------
-  if (name === 'equals') return wahrheit(inhaltGleich(ziel, a[0]))
-  if (name === 'toString') return neuerString(i.alsText(ziel))
-  if (name === 'getClass') return { art: 'nativ', typ: 'Class', daten: { text: ziel.typ } }
-  if (name === 'hashCode') return zahl(0)
+  if (name === 'equals') return bool(contentEquals(target, a[0]))
+  if (name === 'toString') return newString(i.toText(target))
+  if (name === 'getClass') return { kind: 'native', type: 'Class', data: { text: target.type } }
+  if (name === 'hashCode') return number(0)
 
-  i.abbruch(`${ziel.typ} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name} in ${ziel.typ}`, zeile)
+  i.abort(`${target.type} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name} in ${target.type}`, line)
 }
 
-const istWahr = (w: Wert) => w.art === 'boolean' && w.wert
+const isTrue = (w: Value) => w.kind === 'boolean' && w.value
 
 // ---------------------------------------------------------------------------
 // String-Methoden
 // ---------------------------------------------------------------------------
 
-export function stringMethode(ziel: JavaString, name: string, a: Wert[], i: Interpreter, zeile: number): Wert {
-  const s = ziel.wert
-  const n = (index: number) => alsZahl(a[index])
-  const t = (index: number) => i.alsText(a[index])
-  const grenze = (index: number, max = s.length) => {
+export function stringMethod(target: JavaString, name: string, a: Value[], i: Interpreter, line: number): Value {
+  const s = target.value
+  const n = (index: number) => toNumber(a[index])
+  const t = (index: number) => i.toText(a[index])
+  const bound = (index: number, max = s.length) => {
     if (index < 0 || index > max) {
-      i.werfen('StringIndexOutOfBoundsException', `index ${index}, length ${s.length}`, zeile)
+      i.raise('StringIndexOutOfBoundsException', `index ${index}, length ${s.length}`, line)
     }
   }
 
   switch (name) {
     case 'length':
-      return zahl(s.length)
+      return number(s.length)
     case 'charAt':
-      grenze(n(0), s.length - 1)
-      return zeichen(s.charCodeAt(n(0)))
+      bound(n(0), s.length - 1)
+      return chars(s.charCodeAt(n(0)))
     case 'substring': {
-      const von = n(0)
-      const bis = a.length > 1 ? n(1) : s.length
-      grenze(von)
-      grenze(bis)
-      if (von > bis) i.werfen('StringIndexOutOfBoundsException', `begin ${von}, end ${bis}, length ${s.length}`, zeile)
-      return neuerString(s.slice(von, bis))
+      const from = n(0)
+      const end = a.length > 1 ? n(1) : s.length
+      bound(from)
+      bound(end)
+      if (from > end) i.raise('StringIndexOutOfBoundsException', `begin ${from}, end ${end}, length ${s.length}`, line)
+      return newString(s.slice(from, end))
     }
     case 'indexOf':
-      return zahl(s.indexOf(a[0].art === 'char' ? String.fromCharCode(alsZahl(a[0])) : t(0), a.length > 1 ? n(1) : 0))
+      return number(s.indexOf(a[0].kind === 'char' ? String.fromCharCode(toNumber(a[0])) : t(0), a.length > 1 ? n(1) : 0))
     case 'lastIndexOf':
-      return zahl(s.lastIndexOf(t(0)))
+      return number(s.lastIndexOf(t(0)))
     case 'contains':
-      return wahrheit(s.includes(t(0)))
+      return bool(s.includes(t(0)))
     case 'startsWith':
-      return wahrheit(s.startsWith(t(0)))
+      return bool(s.startsWith(t(0)))
     case 'endsWith':
-      return wahrheit(s.endsWith(t(0)))
+      return bool(s.endsWith(t(0)))
     case 'equals':
-      return wahrheit(a[0].art === 'string' && a[0].wert === s)
+      return bool(a[0].kind === 'string' && a[0].value === s)
     case 'equalsIgnoreCase':
-      return wahrheit(a[0].art === 'string' && a[0].wert.toLowerCase() === s.toLowerCase())
+      return bool(a[0].kind === 'string' && a[0].value.toLowerCase() === s.toLowerCase())
     case 'compareTo':
-      return zahl(a[0].art === 'string' ? (s < a[0].wert ? -1 : s > a[0].wert ? 1 : 0) : 0)
+      return number(a[0].kind === 'string' ? (s < a[0].value ? -1 : s > a[0].value ? 1 : 0) : 0)
     case 'compareToIgnoreCase': {
       const b = t(0).toLowerCase()
       const x = s.toLowerCase()
-      return zahl(x < b ? -1 : x > b ? 1 : 0)
+      return number(x < b ? -1 : x > b ? 1 : 0)
     }
     case 'toUpperCase':
-      return neuerString(s.toUpperCase())
+      return newString(s.toUpperCase())
     case 'toLowerCase':
-      return neuerString(s.toLowerCase())
+      return newString(s.toLowerCase())
     case 'trim':
     case 'strip':
-      return neuerString(s.trim())
+      return newString(s.trim())
     case 'isEmpty':
-      return wahrheit(s.length === 0)
+      return bool(s.length === 0)
     case 'isBlank':
-      return wahrheit(s.trim().length === 0)
+      return bool(s.trim().length === 0)
     case 'replace':
-      return neuerString(s.split(a[0].art === 'char' ? String.fromCharCode(alsZahl(a[0])) : t(0)).join(a[1].art === 'char' ? String.fromCharCode(alsZahl(a[1])) : t(1)))
+      return newString(s.split(a[0].kind === 'char' ? String.fromCharCode(toNumber(a[0])) : t(0)).join(a[1].kind === 'char' ? String.fromCharCode(toNumber(a[1])) : t(1)))
     case 'replaceAll':
-      return neuerString(s.replace(new RegExp(t(0), 'g'), t(1)))
+      return newString(s.replace(new RegExp(t(0), 'g'), t(1)))
     case 'split': {
-      const muster = t(0)
+      const pattern = t(0)
       // split() erwartet in Java einen regulären Ausdruck - aber nur, wenn wirklich
       // einer drinsteht. Sonst wird stumpf am Text getrennt (z. B. bei "a.b").
-      const teile = /[\\[\](){}.*+?^$|]/.test(muster) ? s.split(new RegExp(muster)) : s.split(muster)
-      return { art: 'array', typ: 'String', werte: teile.map((teil) => neuerString(teil)) }
+      const parts = /[\\[\](){}.*+?^$|]/.test(pattern) ? s.split(new RegExp(pattern)) : s.split(pattern)
+      return { kind: 'array', type: 'String', values: parts.map((part) => newString(part)) }
     }
     case 'toCharArray':
-      return { art: 'array', typ: 'char', werte: [...s].map((c) => zeichen(c.charCodeAt(0))) }
+      return { kind: 'array', type: 'char', values: [...s].map((c) => chars(c.charCodeAt(0))) }
     case 'repeat':
-      return neuerString(s.repeat(n(0)))
+      return newString(s.repeat(n(0)))
     case 'concat':
-      return neuerString(s + t(0))
+      return newString(s + t(0))
     case 'matches':
-      return wahrheit(new RegExp('^(?:' + t(0) + ')$').test(s))
+      return bool(new RegExp('^(?:' + t(0) + ')$').test(s))
     case 'hashCode': {
       let h = 0
       for (const c of s) h = (Math.imul(31, h) + c.charCodeAt(0)) | 0
-      return zahl(h)
+      return number(h)
     }
     case 'chars':
-      return { art: 'nativ', typ: 'Stream', daten: { liste: [...s].map((c) => zahl(c.charCodeAt(0))) } }
+      return { kind: 'native', type: 'Stream', data: { list: [...s].map((c) => number(c.charCodeAt(0))) } }
     case 'formatted':
-      return neuerString(formatieren(s, a, i, zeile))
+      return newString(format(s, a, i, line))
     case 'intern':
       return poolString(s)
     case 'toString':
-      return ziel
+      return target
     case 'getClass':
-      return { art: 'nativ', typ: 'Class', daten: { text: 'String' } }
+      return { kind: 'native', type: 'Class', data: { text: 'String' } }
   }
-  i.abbruch(`String hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name} in class String`, zeile)
+  i.abort(`String hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name} in class String`, line)
 }
 
 // ---------------------------------------------------------------------------
 // Methoden auf Zahlen, char und boolean (Autoboxing)
 // ---------------------------------------------------------------------------
 
-export function primitivMethode(ziel: Wert, name: string, a: Wert[], i: Interpreter, zeile: number): Wert {
+export function primitiveMethod(target: Value, name: string, a: Value[], i: Interpreter, line: number): Value {
   switch (name) {
     case 'equals':
-      return wahrheit(inhaltGleich(ziel, a[0]))
+      return bool(contentEquals(target, a[0]))
     case 'toString':
-      return neuerString(i.alsText(ziel))
+      return newString(i.toText(target))
     case 'compareTo':
-      return zahl(Math.sign(vergleichen(ziel, a[0], i)))
+      return number(Math.sign(compare(target, a[0], i)))
     case 'intValue':
-      return zahl(Math.trunc(alsZahl(ziel)))
+      return number(Math.trunc(toNumber(target)))
     case 'doubleValue':
-      return komma(alsZahl(ziel))
+      return comma(toNumber(target))
     case 'charValue':
-      return ziel
+      return target
     case 'booleanValue':
-      return ziel
+      return target
     case 'hashCode':
-      return zahl(Math.trunc(alsZahl(ziel)))
+      return number(Math.trunc(toNumber(target)))
     case 'getClass':
-      return { art: 'nativ', typ: 'Class', daten: { text: typName(ziel) } }
+      return { kind: 'native', type: 'Class', data: { text: typeName(target) } }
   }
-  i.abbruch(`${typName(ziel)} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, zeile)
+  i.abort(`${typeName(target)} hat keine Methode \`${name}\`.`, `cannot find symbol: method ${name}`, line)
 }

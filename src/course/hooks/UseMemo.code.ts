@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-usememo-einstieg': {
     code: js`
       function App() {
@@ -57,7 +57,7 @@ export const beispiele = {
     `,
   },
   'hooks-usememo-memo': {
-    tipps: {
+    hints: {
       de: [
         '`memo` hilft nur, wenn alle Props gleich bleiben - auch `onDelete`.',
         '`useCallback` liefert dieselbe Funktion, solange sich die Abhängigkeiten nicht ändern.',
@@ -97,7 +97,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const List = memo(function List({ items, onDelete }) {
         console.log('🐢 List renders')
         return (
@@ -128,7 +128,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Beim Tippen rendert die Liste nicht neu', en: 'The list doesn\'t re-render while typing' },
-        pruefung: js`
+        script: js`
           await render()
           clearLogs()
           await type(field('input'), 'abc')
@@ -137,7 +137,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Löschen funktioniert weiterhin', en: 'Deleting still works' },
-        pruefung: js`
+        script: js`
           await render()
           await click(within(getByText('Bread').closest('li')).button('✕'))
           expect(text()).not.toContain('Bread')
@@ -173,7 +173,7 @@ export const beispiele = {
     `,
   },
   'hooks-usememo-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Welche Arbeit ist teuer? Das Sortieren von 20.000 Einträgen - also `useMemo` mit `[direction]`.',
         '`Table` ist mit `memo` umhüllt, bekommt aber bei jedem Render ein neues `onSelect`.',
@@ -223,7 +223,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const DATA = Array.from({ length: 20000 }, (_, i) => ({
         id: i,
         value: Math.round(Math.sin(i) * 10000),
@@ -266,7 +266,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Beim Tippen wird nicht neu sortiert', en: 'Typing doesn\'t sort again' },
-        pruefung: js`
+        script: js`
           await render()
           clearLogs()
           await type(field('Type a note'), 'hello')
@@ -275,7 +275,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Beim Tippen rendert die Tabelle nicht', en: 'The table doesn\'t render while typing' },
-        pruefung: js`
+        script: js`
           await render()
           clearLogs()
           await type(field('Type a note'), 'hello')
@@ -284,7 +284,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Sortierung umdrehen funktioniert weiterhin', en: 'Reversing the sort still works' },
-        pruefung: js`
+        script: js`
           await render()
           const vorher = findAll('li')[0].textContent
           await click(button('Reverse sorting'))
@@ -293,7 +293,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Eine Zeile auswählen funktioniert', en: 'Selecting a row works' },
-        pruefung: js`
+        script: js`
           await render()
           await click(findAll('li')[0])
           expect(text()).toMatch(/Selected: \d+/)
@@ -301,7 +301,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

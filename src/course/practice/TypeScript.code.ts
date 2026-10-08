@@ -1,5 +1,5 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für das TypeScript-Kapitel - für die deutsche UND die englische Fassung.
@@ -7,7 +7,7 @@ import type { CodeBeispiel } from '../../learning/jsSandbox'
  * Alle Beispiele laufen mit <TryIt typen>, also mit echter Typprüfung.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-typescript-einstieg': {
     code: js`
       type GreetingProps = {
@@ -352,7 +352,7 @@ export const beispiele = {
     `,
   },
   'praxis-typescript-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Beginne mit den Daten: `type Product = { id: number; name: string; price: number }` und `type CartItem = { product: Product; quantity: number }`.',
         '`useState([])` kennt den Typ der Einträge nicht (er wird `never[]`). Schreibe `useState<CartItem[]>([])`.',
@@ -421,7 +421,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       type Product = { id: number; name: string; price: number }
       type CartItem = { product: Product; quantity: number }
 
@@ -486,7 +486,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Der Warenkorb zählt Mengen und Summe', en: 'The cart counts quantities and the total' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('+ Coffee'))
           await click(button('+ Coffee'))
@@ -497,7 +497,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Entfernen funktioniert weiterhin', en: 'Removing still works' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('+ Cake'))
           await click(button('Remove'))
@@ -507,20 +507,20 @@ export const beispiele = {
       },
       {
         name: { de: 'Es gibt die Typen Product und CartItem', en: 'There are types Product and CartItem' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/(type|interface)\s+Product\b/)
           expect(code).toMatch(/(type|interface)\s+CartItem\b/)
         `,
       },
       {
         name: { de: 'Der State hat einen Typ: useState<…>', en: 'The state has a type: useState<…>' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useState<[^>]+>\(\s*\[\s*\]\s*\)/)
         `,
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   anlegen: js`

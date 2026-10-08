@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { ComposeNetwork } from '../demos/BackendDiagrams'
-import { beispiele, codeBloecke } from './DockerCompose.code'
+import { examples, codeBloecke } from './DockerCompose.code'
 
 /**
  * CHAPTER 8.10 - Docker Compose: the whole app (English version)
@@ -18,7 +18,7 @@ export function DockerCompose() {
           One <Code>docker compose up</Code>, and everything starts in the right order. Read the log:
           first the database becomes “healthy”, then the API connects, then nginx comes up.
         </P>
-        <TryIt modus="compose" id="docker-compose-einstieg" {...beispiele['docker-compose-einstieg']} />
+        <TryIt mode="compose" id="docker-compose-einstieg" {...examples['docker-compose-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Why Compose?">
@@ -28,7 +28,7 @@ export function DockerCompose() {
           <Code>compose.yaml</Code> instead describes what should run, and Docker Compose takes care
           of it. It sits next to the project folders:
         </P>
-        <CodeBlock code={codeBloecke.ordner} titel="todo/" sprache="konfig" />
+        <CodeBlock code={codeBloecke.ordner} title="todo/" language="config" />
         <Liste>
           <li>
             <Code>services</Code>: one entry per container. Either a ready-made <Code>image</Code> or{' '}
@@ -47,7 +47,7 @@ export function DockerCompose() {
             <Code>depends_on</Code>: the start order.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.befehle} titel="Terminal" />
+        <CodeBlock code={codeBloecke.befehle} title="Terminal" />
       </Abschnitt>
 
       <Abschnitt titel="One network, service names as addresses">
@@ -58,13 +58,13 @@ export function DockerCompose() {
           with <Code>ports</Code>.
         </P>
         <ComposeNetwork />
-        <CodeBlock code={codeBloecke.netz} titel="Who reaches whom?" sprache="konfig" />
+        <CodeBlock code={codeBloecke.netz} title="Who reaches whom?" language="config" />
         <P>
           The most common mistake of all: <Code>localhost</Code> in the database address. On your
           machine it worked - in the container, <Code>localhost</Code> points to the API container
           itself, and no database runs there:
         </P>
-        <TryIt modus="compose" id="docker-compose-localhost" {...beispiele['docker-compose-localhost']} />
+        <TryIt mode="compose" id="docker-compose-localhost" {...examples['docker-compose-localhost']} />
       </Abschnitt>
 
       <Abschnitt titel="depends_on is not enough: healthchecks">
@@ -88,16 +88,16 @@ export function DockerCompose() {
           automatically reads a file <Code>.env</Code> next to it and inserts values with{' '}
           <Code>{'${NAME}'}</Code>:
         </P>
-        <CodeBlock code={codeBloecke.env} titel=".env" />
-        <CodeBlock code={codeBloecke.envNutzen} titel="compose.yaml" />
+        <CodeBlock code={codeBloecke.env} title=".env" />
+        <CodeBlock code={codeBloecke.envNutzen} title="compose.yaml" />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="compose"
+          mode="compose"
           id="docker-compose-uebung"
-          {...beispiele['docker-compose-uebung']}
-          aufgabe={
+          {...examples['docker-compose-uebung']}
+          task={
             <>
               <p>
                 This <Code>compose.yaml</Code> has four mistakes. Fix them one after the other - the
@@ -123,7 +123,7 @@ export function DockerCompose() {
           with <Code>image:</Code> instead of <Code>build:</Code>. Usually a CI pipeline (GitHub
           Actions, GitLab CI) does that on every push.
         </P>
-        <CodeBlock code={codeBloecke.weiter} titel="Terminal" />
+        <CodeBlock code={codeBloecke.weiter} title="Terminal" />
         <Hinweis variante="info">
           When it becomes more than one server, <strong>Kubernetes</strong> usually comes into play:
           it starts containers on many machines, replaces crashed ones automatically and spreads the
@@ -138,29 +138,29 @@ export function DockerCompose() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'At which address does the api container reach the database of the service “db”?',
-            antworten: ['localhost:5432', 'db:5432', '127.0.0.1:5432', 'host.docker.internal:5432'],
-            richtig: 1,
-            erklaerung: 'In the compose network the service name is the address. localhost would be the api container itself.',
+            question: 'At which address does the api container reach the database of the service “db”?',
+            answers: ['localhost:5432', 'db:5432', '127.0.0.1:5432', 'host.docker.internal:5432'],
+            correct: 1,
+            explanation: 'In the compose network the service name is the address. localhost would be the api container itself.',
           },
           {
-            frage: 'What does depends_on: [db] without a condition do?',
-            antworten: [
+            question: 'What does depends_on: [db] without a condition do?',
+            answers: [
               'The API only starts once the database accepts connections',
               'The API only starts after the db container has started - it does not have to be ready',
               'Nothing',
               'The database starts after the API',
             ],
-            richtig: 1,
-            erklaerung: 'Only the start order. Waiting for “ready” needs condition: service_healthy with a healthcheck.',
+            correct: 1,
+            explanation: 'Only the start order. Waiting for “ready” needs condition: service_healthy with a healthcheck.',
           },
           {
-            frage: 'What does docker compose down -v do in addition to docker compose down?',
-            antworten: ['It shows more output', 'It also deletes the volumes - the data is gone', 'It rebuilds the images', 'It pulls new versions'],
-            richtig: 1,
-            erklaerung: '-v stands for volumes: on the next up the database is empty.',
+            question: 'What does docker compose down -v do in addition to docker compose down?',
+            answers: ['It shows more output', 'It also deletes the volumes - the data is gone', 'It rebuilds the images', 'It pulls new versions'],
+            correct: 1,
+            explanation: '-v stands for volumes: on the next up the database is empty.',
           },
         ]}
       />

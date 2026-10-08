@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useSprache } from '../../i18n/LanguageContext'
-import { SHOP_TABELLEN } from '../../sql/dataset'
+import { SHOP_TABLES } from '../../sql/dataset'
 
 /**
  * Diagrams for part 9 - plain HTML like the ones of part 8, readable in light and
@@ -67,18 +67,18 @@ function Figure({ label, children }: { label: string; children: ReactNode }) {
 /** One table of the example database as a card: name, columns, keys. */
 function TableCard({ name }: { name: string }) {
   const { sprache } = useSprache()
-  const table = SHOP_TABELLEN.find((t) => t.name === name)!
+  const table = SHOP_TABLES.find((t) => t.name === name)!
   return (
     <div className="min-w-0 flex-1 overflow-hidden rounded-lg border border-indigo-300 bg-white text-xs dark:border-indigo-800 dark:bg-slate-900">
       <div className="flex items-baseline justify-between gap-2 border-b border-indigo-200 bg-indigo-50 px-2.5 py-1.5 dark:border-indigo-900 dark:bg-indigo-950/50">
         <span className="font-mono font-semibold text-indigo-900 dark:text-indigo-200">{table.name}</span>
-        <span className="text-2xs text-slate-600 tabular-nums dark:text-slate-400">{TEXTS[sprache].rows(table.zeilen)}</span>
+        <span className="text-2xs text-slate-600 tabular-nums dark:text-slate-400">{TEXTS[sprache].rows(table.lines)}</span>
       </div>
       <ul className="px-2.5 py-1.5 font-mono leading-5">
-        {table.spalten.map((c) => (
+        {table.columns.map((c) => (
           <li key={c.name} className="flex flex-wrap items-baseline gap-x-1.5">
-            <span className={c.schluessel?.startsWith('PK') ? 'font-semibold underline decoration-amber-500 underline-offset-2' : ''}>{c.name}</span>
-            {c.schluessel?.includes('→') && <span className="text-2xs text-amber-700 dark:text-amber-400">{c.schluessel.replace('PK · ', '')}</span>}
+            <span className={c.key?.startsWith('PK') ? 'font-semibold underline decoration-amber-500 underline-offset-2' : ''}>{c.name}</span>
+            {c.key?.includes('→') && <span className="text-2xs text-amber-700 dark:text-amber-400">{c.key.replace('PK · ', '')}</span>}
           </li>
         ))}
       </ul>

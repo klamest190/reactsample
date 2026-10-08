@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './DatenLaden.code'
+import { examples, codeBloecke } from './DatenLaden.code'
 import { LadeDemo } from '../demos/LadeDemo'
 
 /**
@@ -16,8 +16,8 @@ export function DatenLaden() {
         <P>Daten laden heißt: in einem Effekt <Code>fetch</Code> aufrufen und das Ergebnis in den State legen.</P>
         <TryIt
           id="praxis-daten-einstieg"
-          {...beispiele['praxis-daten-einstieg']}
-          modus="react"
+          {...examples['praxis-daten-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -39,8 +39,8 @@ export function DatenLaden() {
         </Liste>
         <TryIt
           id="praxis-daten-grundmuster"
-          {...beispiele['praxis-daten-grundmuster']}
-          modus="react"
+          {...examples['praxis-daten-grundmuster']}
+          mode="react"
         />
         <Hinweis variante="info">
           Das Beispiel braucht Internet (JSONPlaceholder ist eine freie Test-API). Offline siehst du
@@ -57,11 +57,11 @@ export function DatenLaden() {
         </P>
         <TryIt
           id="praxis-daten-race"
-          {...beispiele['praxis-daten-race']}
-          modus="react"
+          {...examples['praxis-daten-race']}
+          mode="react"
         />
         <CodeBlock
-          titel="Mit echtem fetch"
+          title="Mit echtem fetch"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -95,9 +95,9 @@ export function DatenLaden() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-daten-uebung"
-          {...beispiele['praxis-daten-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-daten-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Schreibe den eigenen Hook <Code>useFetch(url)</Code>, der{' '}
@@ -120,28 +120,28 @@ export function DatenLaden() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum darf die Effekt-Funktion selbst nicht async sein?',
-            antworten: [
+            question: 'Warum darf die Effekt-Funktion selbst nicht async sein?',
+            answers: [
               'async ist in React verboten',
               'Sie würde ein Promise statt einer Cleanup-Funktion zurückgeben',
               'Weil fetch synchron ist',
             ],
-            richtig: 1,
-            erklaerung: 'Deshalb definiert man eine async-Funktion im Effekt und ruft sie auf.',
+            correct: 1,
+            explanation: 'Deshalb definiert man eine async-Funktion im Effekt und ruft sie auf.',
           },
           {
-            frage: 'Was verhindert, dass eine veraltete Antwort neuere Daten überschreibt?',
-            antworten: ['useMemo', 'Abbrechen/Ignorieren im Cleanup des Effekts', 'Ein key an der Liste'],
-            richtig: 1,
-            erklaerung: 'Der Cleanup läuft, bevor der Effekt mit der neuen ID startet.',
+            question: 'Was verhindert, dass eine veraltete Antwort neuere Daten überschreibt?',
+            answers: ['useMemo', 'Abbrechen/Ignorieren im Cleanup des Effekts', 'Ein key an der Liste'],
+            correct: 1,
+            explanation: 'Der Cleanup läuft, bevor der Effekt mit der neuen ID startet.',
           },
           {
-            frage: 'Welche drei Zustände sollte jede Anfrage in der Oberfläche abdecken?',
-            antworten: ['Laden, Fehler, Daten', 'Start, Mitte, Ende', 'Online, Offline, Cache'],
-            richtig: 0,
-            erklaerung: 'Plus den Sonderfall „Daten, aber leer“.',
+            question: 'Welche drei Zustände sollte jede Anfrage in der Oberfläche abdecken?',
+            answers: ['Laden, Fehler, Daten', 'Start, Mitte, Ende', 'Online, Offline, Cache'],
+            correct: 0,
+            explanation: 'Plus den Sonderfall „Daten, aber leer“.',
           },
         ]}
       />

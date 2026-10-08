@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Objekte.code'
+import { examples, codeBloecke } from './Objekte.code'
 
 /**
  * KAPITEL 2.2 (English) - Object Types & Interfaces
@@ -16,7 +16,7 @@ export function Objekte() {
           An object type lists which fields an object has and the type of each field. With <Code>?</Code> a
           field becomes optional, with <Code>readonly</Code> immutable.
         </P>
-        <TryIt id="ts-objekte-einstieg" modus="ts" {...beispiele['ts-objekte-einstieg']} />
+        <TryIt id="ts-objekte-einstieg" mode="ts" {...examples['ts-objekte-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="type or interface?">
@@ -25,8 +25,8 @@ export function Objekte() {
           <Code>interface</Code> is extended with <Code>extends</Code>, types are combined with{' '}
           <Code>&</Code> (intersection: "both at once").
         </P>
-        <TryIt id="ts-objekte-type-interface" modus="ts" {...beispiele['ts-objekte-type-interface']} />
-        <CodeBlock titel="The differences" code={codeBloecke.vergleich} />
+        <TryIt id="ts-objekte-type-interface" mode="ts" {...examples['ts-objekte-type-interface']} />
+        <CodeBlock title="The differences" code={codeBloecke.vergleich} />
         <Hinweis variante="tipp">
           Pick one style and stick to it. Many React projects use <Code>type</Code> because it also works for
           unions and functions. You need <Code>interface</Code> when other types should be extended
@@ -41,7 +41,7 @@ export function Objekte() {
           handled the <Code>undefined</Code> case. The operators <Code>??</Code> and <Code>?.</Code> from{' '}
           <Verweis nr="1.2" /> are made for this.
         </P>
-        <TryIt id="ts-objekte-optional" modus="ts" {...beispiele['ts-objekte-optional']} />
+        <TryIt id="ts-objekte-optional" mode="ts" {...examples['ts-objekte-optional']} />
       </Abschnitt>
 
       <Abschnitt titel="readonly">
@@ -51,7 +51,7 @@ export function Objekte() {
           <Code>sort</Code>, simply don't exist. Exactly the behavior React expects from state (
           <Verweis nr="1.6" />).
         </P>
-        <TryIt id="ts-objekte-readonly" modus="ts" {...beispiele['ts-objekte-readonly']} />
+        <TryIt id="ts-objekte-readonly" mode="ts" {...examples['ts-objekte-readonly']} />
         <Hinweis variante="info">
           <Code>readonly</Code> also only exists while checking. At runtime the object could still be
           changed - if you really want to prevent that, add <Code>Object.freeze</Code>.
@@ -65,7 +65,7 @@ export function Objekte() {
           One exception: when you write an object literal directly, TypeScript reports extra fields, because
           that is almost always a typo.
         </P>
-        <TryIt id="ts-objekte-strukturell" modus="ts" {...beispiele['ts-objekte-strukturell']} />
+        <TryIt id="ts-objekte-strukturell" mode="ts" {...examples['ts-objekte-strukturell']} />
       </Abschnitt>
 
       <Abschnitt titel="Any keys: index signatures and Record">
@@ -74,7 +74,7 @@ export function Objekte() {
           describe the types of keys and values. <Code>{'Record<K, V>'}</Code> is the shorter way to write
           it.
         </P>
-        <TryIt id="ts-objekte-index" modus="ts" {...beispiele['ts-objekte-index']} />
+        <TryIt id="ts-objekte-index" mode="ts" {...examples['ts-objekte-index']} />
       </Abschnitt>
 
       <Abschnitt titel="Nested types">
@@ -82,7 +82,7 @@ export function Objekte() {
           Types can be nested as deeply as you like. Prefer several small, named types over one big nested
           one: they are easier to read, and you can reuse them separately.
         </P>
-        <TryIt id="ts-objekte-verschachtelt" modus="ts" {...beispiele['ts-objekte-verschachtelt']} />
+        <TryIt id="ts-objekte-verschachtelt" mode="ts" {...examples['ts-objekte-verschachtelt']} />
         <Liste>
           <li>
             Arrays of objects: <Code>Order[]</Code> - an array in which every element is an{' '}
@@ -95,9 +95,9 @@ export function Objekte() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="ts-objekte-uebung"
-          modus="ts"
-          {...beispiele['ts-objekte-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-objekte-uebung']}
+          task={
             <>
               <p>Describe the data of a library so the type check reports no more errors:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -116,24 +116,24 @@ export function Objekte() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'type Point = { x: number; y: number }. Does { x: 1, y: 2, z: 3 } from a variable fit?',
-            antworten: ['Yes - it has at least x and y', 'No - z is too much', 'Only with interface'],
-            richtig: 0,
-            erklaerung: 'Structural typing: what counts is that the required fields exist. Only for object literals written directly does TypeScript report extra fields.',
+            question: 'type Point = { x: number; y: number }. Does { x: 1, y: 2, z: 3 } from a variable fit?',
+            answers: ['Yes - it has at least x and y', 'No - z is too much', 'Only with interface'],
+            correct: 0,
+            explanation: 'Structural typing: what counts is that the required fields exist. Only for object literals written directly does TypeScript report extra fields.',
           },
           {
-            frage: 'What is the type of settings.fontSize with fontSize?: number?',
-            antworten: ['number', 'number | undefined', 'number | null'],
-            richtig: 1,
-            erklaerung: 'An optional field may be missing - then you read undefined. That is why undefined is part of the type.',
+            question: 'What is the type of settings.fontSize with fontSize?: number?',
+            answers: ['number', 'number | undefined', 'number | null'],
+            correct: 1,
+            explanation: 'An optional field may be missing - then you read undefined. That is why undefined is part of the type.',
           },
           {
-            frage: 'How do you combine two object types A and B into one type with all fields?',
-            antworten: ['A | B', 'A & B', 'A + B'],
-            richtig: 1,
-            erklaerung: 'The intersection A & B has all fields of A and of B. A | B would be "A or B" - more on that in chapter 2.4.',
+            question: 'How do you combine two object types A and B into one type with all fields?',
+            answers: ['A | B', 'A & B', 'A + B'],
+            correct: 1,
+            explanation: 'The intersection A & B has all fields of A and of B. A | B would be "A or B" - more on that in chapter 2.4.',
           },
         ]}
       />

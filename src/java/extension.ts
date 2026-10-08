@@ -11,7 +11,7 @@
  */
 
 import type { Interpreter } from './interpreter'
-import type { NativWert, Wert } from './values'
+import type { NativeValue, Value } from './values'
 
 export type Extension = {
   /** Classes that can be used without declaring them: `ResponseEntity`, `HttpStatus` … */
@@ -21,13 +21,13 @@ export type Extension = {
   /** Package name for crash messages (defaults to `java.lang`). */
   packageOf?: (type: string) => string | undefined
   /** `HttpStatus.CREATED` */
-  staticField?: (className: string, name: string, interpreter: Interpreter) => Wert | undefined
+  staticField?: (className: string, name: string, interpreter: Interpreter) => Value | undefined
   /** `ResponseEntity.ok(…)` */
-  staticCall?: (className: string, name: string, args: Wert[], interpreter: Interpreter, line: number) => Wert | undefined
+  staticCall?: (className: string, name: string, args: Value[], interpreter: Interpreter, line: number) => Value | undefined
   /** `new ResponseStatusException(…)` */
-  create?: (className: string, args: Wert[], interpreter: Interpreter, line: number) => Wert | undefined
+  create?: (className: string, args: Value[], interpreter: Interpreter, line: number) => Value | undefined
   /** Methods on the extension's objects: `response.getBody()`, `repository.findAll()` */
-  method?: (target: NativWert, name: string, args: Wert[], interpreter: Interpreter, line: number) => Wert | undefined
+  method?: (target: NativeValue, name: string, args: Value[], interpreter: Interpreter, line: number) => Value | undefined
   /** `toString()` - also what println prints */
-  text?: (value: NativWert, interpreter: Interpreter) => string | undefined
+  text?: (value: NativeValue, interpreter: Interpreter) => string | undefined
 }

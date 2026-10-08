@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { EvaluationOrder } from '../demos/SqlDiagrams'
-import { beispiele, codeBloecke } from './Gruppieren.code'
+import { examples, codeBloecke } from './Gruppieren.code'
 
 /**
  * CHAPTER 9.3 - Counting & grouping (English version)
@@ -18,7 +18,7 @@ export function Gruppieren() {
           average - <Code>GROUP BY</Code> combines rows with the same value into <strong>one</strong>{' '}
           result row, and functions like <Code>count</Code> compute over every group:
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-einstieg" {...beispiele['sql-gruppieren-einstieg']} />
+        <TryIt mode="sql" id="sql-gruppieren-einstieg" {...examples['sql-gruppieren-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Aggregate functions">
@@ -27,8 +27,8 @@ export function Gruppieren() {
           in JavaScript (<Verweis id="js-arrays" />). Without <Code>GROUP BY</Code> the whole table is a
           single group:
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-aggregate" {...beispiele['sql-gruppieren-aggregate']} />
-        <CodeBlock code={codeBloecke.funktionen} titel="SQL" />
+        <TryIt mode="sql" id="sql-gruppieren-aggregate" {...examples['sql-gruppieren-aggregate']} />
+        <CodeBlock code={codeBloecke.funktionen} title="SQL" />
         <Liste>
           <li>
             <Code>count(*)</Code> counts rows, <Code>count(column)</Code> only those where the column is
@@ -50,13 +50,13 @@ export function Gruppieren() {
           compute per group. The second example is the heart of every shop report: the value of an
           order is the sum of quantity times unit price of its line items.
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-group-by" {...beispiele['sql-gruppieren-group-by']} />
+        <TryIt mode="sql" id="sql-gruppieren-group-by" {...examples['sql-gruppieren-group-by']} />
         <P>
           The most important rule: after <Code>SELECT</Code> there may only be what is{' '}
           <strong>unique per group</strong> - the grouped columns and aggregates. Which name should be
           in the one row “books”? There are three.
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-fehler" {...beispiele['sql-gruppieren-fehler']} />
+        <TryIt mode="sql" id="sql-gruppieren-fehler" {...examples['sql-gruppieren-fehler']} />
         <Hinweis variante="info">
           The message says exactly what to do: either add <Code>name</Code> to <Code>GROUP BY</Code>{' '}
           (then there is one group per category <em>and</em> name) or wrap it in an aggregate, e.g.{' '}
@@ -70,7 +70,7 @@ export function Gruppieren() {
           group itself - “at least two orders” - the group does not even exist yet at that point. That
           is what <Code>HAVING</Code> is for: a filter <strong>after</strong> grouping.
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-having" {...beispiele['sql-gruppieren-having']} />
+        <TryIt mode="sql" id="sql-gruppieren-having" {...examples['sql-gruppieren-having']} />
       </Abschnitt>
 
       <Abschnitt titel="In which order is it computed?">
@@ -83,7 +83,7 @@ export function Gruppieren() {
           <Code>SELECT</Code> only comes fifth. That is why <Code>WHERE</Code> does not know an alias
           from the SELECT yet - <Code>ORDER BY</Code>, on the other hand, does:
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-alias" {...beispiele['sql-gruppieren-alias']} />
+        <TryIt mode="sql" id="sql-gruppieren-alias" {...examples['sql-gruppieren-alias']} />
         <P>
           The fix (behind “Show solution”): repeat the expression. For long expressions a subquery or{' '}
           <Code>WITH</Code> helps - that follows in <Verweis id="sql-profi" />.
@@ -96,7 +96,7 @@ export function Gruppieren() {
           the month as text, <Code>extract(year FROM date)</Code> fetches a part as a number. And{' '}
           <Code>string_agg</Code> combines the texts of a group:
         </P>
-        <TryIt modus="sql" id="sql-gruppieren-zeit" {...beispiele['sql-gruppieren-zeit']} />
+        <TryIt mode="sql" id="sql-gruppieren-zeit" {...examples['sql-gruppieren-zeit']} />
         <Hinweis variante="info">
           <Code>GROUP BY month</Code> with the alias from the SELECT is a convenience of PostgreSQL.
           Portable would be <Code>GROUP BY to_char(ordered_at, 'YYYY-MM')</Code> or{' '}
@@ -106,10 +106,10 @@ export function Gruppieren() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-gruppieren-uebung"
-          {...beispiele['sql-gruppieren-uebung']}
-          aufgabe={
+          {...examples['sql-gruppieren-uebung']}
+          task={
             <p>
               Which orders are worth <strong>more than 400 €</strong>? Show <Code>order_id</Code> and{' '}
               <Code>total</Code> (sum of <Code>quantity * unit_price</Code>), the highest value first,
@@ -120,29 +120,29 @@ export function Gruppieren() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'The column email is NULL for one of 12 customers. What does count(email) return?',
-            antworten: ['12', '11', '1', 'NULL'],
-            richtig: 1,
-            erklaerung: 'count(column) only counts values that are not NULL. count(*) would return 12.',
+            question: 'The column email is NULL for one of 12 customers. What does count(email) return?',
+            answers: ['12', '11', '1', 'NULL'],
+            correct: 1,
+            explanation: 'count(column) only counts values that are not NULL. count(*) would return 12.',
           },
           {
-            frage: 'Where does the condition “groups with more than 5 rows” go?',
-            antworten: ['In WHERE', 'In HAVING', 'In GROUP BY', 'In ORDER BY'],
-            richtig: 1,
-            erklaerung: 'WHERE runs before grouping and does not know count(*) yet. HAVING filters the finished groups.',
+            question: 'Where does the condition “groups with more than 5 rows” go?',
+            answers: ['In WHERE', 'In HAVING', 'In GROUP BY', 'In ORDER BY'],
+            correct: 1,
+            explanation: 'WHERE runs before grouping and does not know count(*) yet. HAVING filters the finished groups.',
           },
           {
-            frage: 'Why does WHERE gross > 100 fail if gross is an alias from the SELECT?',
-            antworten: [
+            question: 'Why does WHERE gross > 100 fail if gross is an alias from the SELECT?',
+            answers: [
               'Aliases must not contain numbers',
               'WHERE is evaluated before SELECT - the alias does not exist yet',
               'Aliases only apply in GROUP BY',
               'The alias has to be put in quotes',
             ],
-            richtig: 1,
-            erklaerung: 'Evaluation: FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY. The alias only exists from SELECT on.',
+            correct: 1,
+            explanation: 'Evaluation: FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY. The alias only exists from SELECT on.',
           },
         ]}
       />

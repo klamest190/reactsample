@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Formulare.code'
+import { examples } from './Formulare.code'
 import { Kontaktformular } from '../demos/Kontaktformular'
 
 /**
@@ -15,8 +15,8 @@ export function Formulare() {
         <P>A controlled input: the value lives in state, submitting goes through <Code>onSubmit</Code>.</P>
         <TryIt
           id="praxis-formulare-einstieg"
-          {...beispiele['praxis-formulare-einstieg']}
-          modus="react"
+          {...examples['praxis-formulare-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -36,8 +36,8 @@ export function Formulare() {
         </Liste>
         <TryIt
           id="praxis-formulare-arten"
-          {...beispiele['praxis-formulare-arten']}
-          modus="react"
+          {...examples['praxis-formulare-arten']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           A field should be either controlled <em>or</em> uncontrolled for its whole life. If <Code>value</Code>{' '}
@@ -73,9 +73,9 @@ export function Formulare() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-formulare-uebung"
-          {...beispiele['praxis-formulare-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-formulare-uebung']}
+          mode="react"
+          task={
             <>
               <p>Build a sign-up form (controlled, one state object, one handler):</p>
               <ul className="mt-1 list-disc pl-5">
@@ -101,27 +101,27 @@ export function Formulare() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What makes a field “controlled”?',
-            antworten: ['A name attribute', 'value from state plus onChange', 'A <form> around it'],
-            richtig: 1,
-            erklaerung: 'React then decides the displayed value.',
+            question: 'What makes a field “controlled”?',
+            answers: ['A name attribute', 'value from state plus onChange', 'A <form> around it'],
+            correct: 1,
+            explanation: 'React then decides the displayed value.',
           },
           {
-            frage: 'Where should validation errors come from?',
-            antworten: [
+            question: 'Where should validation errors come from?',
+            answers: [
               'From a separate useState that is set in onChange',
               'Calculated from the current values while rendering',
             ],
-            richtig: 1,
-            erklaerung: 'Derived instead of stored - a single source of truth.',
+            correct: 1,
+            explanation: 'Derived instead of stored - a single source of truth.',
           },
           {
-            frage: 'What is useId meant for?',
-            antworten: ['For keys in lists', 'For unique id attributes, e.g. label ↔ input', 'For database IDs'],
-            richtig: 1,
-            erklaerung: 'For list keys you use the IDs of the data, not useId.',
+            question: 'What is useId meant for?',
+            answers: ['For keys in lists', 'For unique id attributes, e.g. label ↔ input', 'For database IDs'],
+            correct: 1,
+            explanation: 'For list keys you use the IDs of the data, not useId.',
           },
         ]}
       />

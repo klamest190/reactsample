@@ -11,17 +11,17 @@
  */
 
 import type { Extension } from '../java/extension'
-import { NULL, neuerString, wahrheit, zahl, type NativWert, type Wert } from '../java/values'
+import { NULL, newString, bool, number, type NativeValue, type Value } from '../java/values'
 
 export interface LibraryHost {
   /** `SpringApplication.run(App.class, args)` - starts the context and returns it. */
-  run(mainClass: string | undefined, line: number): Wert
-  getBean(query: Wert, line: number): Wert
+  run(mainClass: string | undefined, line: number): Value
+  getBean(query: Value, line: number): Value
   beanNames(): string[]
   property(key: string): string | undefined
   activeProfiles(): string[]
   /** A Spring Data repository method - `undefined` if `target` is no repository. */
-  repositoryCall(target: NativWert, name: string, args: Wert[], line: number): Wert | undefined
+  repositoryCall(target: NativeValue, name: string, args: Value[], line: number): Value | undefined
 }
 
 // ---------------------------------------------------------------------------
@@ -63,21 +63,21 @@ const REASON_PHRASES: Record<number, string> = {
 export const reasonPhrase = (code: number) => REASON_PHRASES[code] ?? ''
 
 // `HttpStatus.NOT_FOUND == HttpStatus.NOT_FOUND` must be true - one object per constant, like an enum.
-const statusObjects = new Map<number, NativWert>()
-export function httpStatus(code: number): NativWert {
+const statusObjects = new Map<number, NativeValue>()
+export function httpStatus(code: number): NativeValue {
   let status = statusObjects.get(code)
   if (!status) {
-    status = { art: 'nativ', typ: 'HttpStatus', daten: { zahl: code, text: STATUS_NAMES[code] ?? String(code) } }
+    status = { kind: 'native', type: 'HttpStatus', data: { number: code, text: STATUS_NAMES[code] ?? String(code) } }
     statusObjects.set(code, status)
   }
   return status
 }
 
 /** A status from Java: `HttpStatus.CREATED`, `201` or a `HttpStatusCode`. */
-export function statusCode(value: Wert | undefined): number | null {
+export function statusCode(value: Value | undefined): number | null {
   if (!value) return null
-  if (value.art === 'int' || value.art === 'long') return value.wert
-  if (value.art === 'nativ' && value.typ === 'HttpStatus') return value.daten.zahl ?? null
+  if (value.kind === 'int' || value.kind === 'long') return value.value
+  if (value.kind === 'native' && value.type === 'HttpStatus') return value.data.number ?? null
   return null
 }
 
@@ -92,58 +92,58 @@ export function statusFromName(name: string | undefined): number | null {
 // Building values
 // ---------------------------------------------------------------------------
 
-type Headers = Map<string, { schluessel: Wert; wert: Wert }>
+type Headers = Map<string, { key: Value; value: Value }>
 
-export function responseEntity(status: number, body: Wert | null, headers: Headers = new Map()): NativWert {
-  return { art: 'nativ', typ: 'ResponseEntity', daten: { zahl: status, liste: body ? [body] : [], map: headers } }
+export function responseEntity(status: number, body: Value | null, headers: Headers = new Map()): NativeValue {
+  return { kind: 'native', type: 'ResponseEntity', data: { number: status, list: body ? [body] : [], map: headers } }
 }
 
-function builder(status: number, withBody = true, headers: Headers = new Map()): NativWert {
-  return { art: 'nativ', typ: withBody ? 'ResponseEntity.BodyBuilder' : 'ResponseEntity.HeadersBuilder', daten: { zahl: status, map: headers } }
+function builder(status: number, withBody = true, headers: Headers = new Map()): NativeValue {
+  return { kind: 'native', type: withBody ? 'ResponseEntity.BodyBuilder' : 'ResponseEntity.HeadersBuilder', data: { number: status, map: headers } }
 }
 
 function header(headers: Headers, name: string, value: string): Headers {
   const copy = new Map(headers)
-  const key = neuerString(name)
-  copy.set('s:' + name, { schluessel: key, wert: neuerString(value) })
+  const key = newString(name)
+  copy.set('s:' + name, { key, value: newString(value) })
   return copy
 }
 
-export function responseStatusException(status: number, reason?: string): NativWert {
+export function responseStatusException(status: number, reason?: string): NativeValue {
   const name = STATUS_NAMES[status] ?? String(status)
   return {
-    art: 'nativ',
-    typ: 'ResponseStatusException',
-    daten: { zahl: status, text: reason, meldung: `${status} ${name}${reason ? ` "${reason}"` : ''}` },
+    kind: 'native',
+    type: 'ResponseStatusException',
+    data: { number: status, text: reason, message: `${status} ${name}${reason ? ` "${reason}"` : ''}` },
   }
 }
 
 /** Exceptions raised by Spring itself while binding a request - catchable with @ExceptionHandler. */
-export function frameworkException(type: string, message: string, fieldErrors?: FieldErrorInfo[]): NativWert {
+export function frameworkException(type: string, message: string, fieldErrors?: FieldErrorInfo[]): NativeValue {
   return {
-    art: 'nativ',
-    typ: type,
-    daten: {
-      meldung: message,
-      liste: fieldErrors?.map((e) => ({
-        art: 'nativ' as const,
-        typ: 'FieldError',
-        daten: { text: e.field, meldung: e.message, liste: [e.rejected] },
+    kind: 'native',
+    type,
+    data: {
+      message,
+      list: fieldErrors?.map((e) => ({
+        kind: 'native' as const,
+        type: 'FieldError',
+        data: { text: e.field, message: e.message, list: [e.rejected] },
       })),
     },
   }
 }
 
-export type FieldErrorInfo = { objectName: string; field: string; rejected: Wert; message: string }
+export type FieldErrorInfo = { objectName: string; field: string; rejected: Value; message: string }
 
-function problemDetail(status: number, detail: Wert | null): NativWert {
+function problemDetail(status: number, detail: Value | null): NativeValue {
   const map: Headers = new Map()
-  const put = (key: string, value: Wert) => map.set('s:' + key, { schluessel: neuerString(key), wert: value })
-  put('type', neuerString('about:blank'))
-  put('title', neuerString(reasonPhrase(status)))
-  put('status', zahl(status))
-  if (detail && detail.art !== 'null') put('detail', detail)
-  return { art: 'nativ', typ: 'ProblemDetail', daten: { zahl: status, map } }
+  const put = (key: string, value: Value) => map.set('s:' + key, { key: newString(key), value })
+  put('type', newString('about:blank'))
+  put('title', newString(reasonPhrase(status)))
+  put('status', number(status))
+  if (detail && detail.kind !== 'null') put('detail', detail)
+  return { kind: 'native', type: 'ProblemDetail', data: { number: status, map } }
 }
 
 // ---------------------------------------------------------------------------
@@ -209,7 +209,7 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
       const [a, b] = args
       switch (className) {
         case 'SpringApplication':
-          if (name === 'run') return host.run(a?.art === 'nativ' ? a.daten.text : undefined, line)
+          if (name === 'run') return host.run(a?.kind === 'native' ? a.data.text : undefined, line)
           return undefined
         case 'HttpStatus':
         case 'HttpStatusCode':
@@ -217,11 +217,11 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
             const code = statusCode(a)
             if (code && STATUS_NAMES[code]) return httpStatus(code)
             if (name === 'resolve') return NULL
-            return i.werfen('IllegalArgumentException', `No matching constant for [${code}]`, line)
+            return i.raise('IllegalArgumentException', `No matching constant for [${code}]`, line)
           }
           return undefined
         case 'URI':
-          if (name === 'create') return { art: 'nativ', typ: 'URI', daten: { text: i.alsText(a) } }
+          if (name === 'create') return { kind: 'native', type: 'URI', data: { text: i.toText(a) } }
           return undefined
         case 'ProblemDetail':
           if (name === 'forStatus') return problemDetail(statusCode(a) ?? 500, null)
@@ -234,7 +234,7 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
             case 'status':
               return builder(statusCode(a) ?? 200)
             case 'created':
-              return builder(201, true, a ? header(new Map(), 'Location', i.alsText(a)) : new Map())
+              return builder(201, true, a ? header(new Map(), 'Location', i.toText(a)) : new Map())
             case 'accepted':
               return builder(202)
             case 'noContent':
@@ -250,7 +250,7 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
               return builder(500)
             case 'of':
             case 'ofNullable': {
-              const inner = name === 'of' && a?.art === 'nativ' && a.typ === 'Optional' ? (a.daten.liste?.[0] ?? null) : a && a.art !== 'null' ? a : null
+              const inner = name === 'of' && a?.kind === 'native' && a.type === 'Optional' ? (a.data.list?.[0] ?? null) : a && a.kind !== 'null' ? a : null
               return inner ? responseEntity(200, inner) : responseEntity(404, null)
             }
           }
@@ -263,83 +263,83 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
       const [a, b] = args
       switch (className) {
         case 'ResponseStatusException':
-          return responseStatusException(statusCode(a) ?? 500, b && b.art !== 'null' ? i.alsText(b) : undefined)
+          return responseStatusException(statusCode(a) ?? 500, b && b.kind !== 'null' ? i.toText(b) : undefined)
         case 'ResponseEntity': {
           // new ResponseEntity<>(body, HttpStatus.OK) or new ResponseEntity<>(HttpStatus.NO_CONTENT)
           if (args.length === 1) return responseEntity(statusCode(a) ?? 200, null)
-          return responseEntity(statusCode(b) ?? 200, a && a.art !== 'null' ? a : null)
+          return responseEntity(statusCode(b) ?? 200, a && a.kind !== 'null' ? a : null)
         }
         case 'AtomicLong':
         case 'AtomicInteger':
-          return { art: 'nativ', typ: className, daten: { zahl: a && (a.art === 'int' || a.art === 'long') ? a.wert : 0 } }
+          return { kind: 'native', type: className, data: { number: a && (a.kind === 'int' || a.kind === 'long') ? a.value : 0 } }
       }
       return undefined
     },
 
     method(target, name, args, i, line) {
-      const data = target.daten
+      const data = target.data
       const [a, b] = args
       const repository = host.repositoryCall(target, name, args, line)
       if (repository) return repository
 
-      switch (target.typ) {
+      switch (target.type) {
         case 'HttpStatus': {
-          const code = data.zahl ?? 0
+          const code = data.number ?? 0
           switch (name) {
             case 'value':
-              return zahl(code)
+              return number(code)
             case 'getReasonPhrase':
-              return neuerString(reasonPhrase(code))
+              return newString(reasonPhrase(code))
             case 'name':
-              return neuerString(data.text ?? '')
+              return newString(data.text ?? '')
             case 'is2xxSuccessful':
-              return wahrheit(code >= 200 && code < 300)
+              return bool(code >= 200 && code < 300)
             case 'is4xxClientError':
-              return wahrheit(code >= 400 && code < 500)
+              return bool(code >= 400 && code < 500)
             case 'is5xxServerError':
-              return wahrheit(code >= 500)
+              return bool(code >= 500)
             case 'isError':
-              return wahrheit(code >= 400)
+              return bool(code >= 400)
             case 'equals':
-              return wahrheit(a === target)
+              return bool(a === target)
           }
           return undefined
         }
         case 'ResponseEntity.BodyBuilder':
         case 'ResponseEntity.HeadersBuilder':
-          if (name === 'body' && target.typ === 'ResponseEntity.BodyBuilder') return responseEntity(data.zahl ?? 200, a && a.art !== 'null' ? a : null, data.map)
-          if (name === 'build') return responseEntity(data.zahl ?? 200, null, data.map)
-          if (name === 'header') return { ...target, daten: { ...data, map: header(data.map ?? new Map(), i.alsText(a), i.alsText(b)) } }
-          if (name === 'location') return { ...target, daten: { ...data, map: header(data.map ?? new Map(), 'Location', i.alsText(a)) } }
+          if (name === 'body' && target.type === 'ResponseEntity.BodyBuilder') return responseEntity(data.number ?? 200, a && a.kind !== 'null' ? a : null, data.map)
+          if (name === 'build') return responseEntity(data.number ?? 200, null, data.map)
+          if (name === 'header') return { ...target, data: { ...data, map: header(data.map ?? new Map(), i.toText(a), i.toText(b)) } }
+          if (name === 'location') return { ...target, data: { ...data, map: header(data.map ?? new Map(), 'Location', i.toText(a)) } }
           return undefined
         case 'ResponseEntity':
           switch (name) {
             case 'getStatusCode':
-              return httpStatus(data.zahl ?? 200)
+              return httpStatus(data.number ?? 200)
             case 'getStatusCodeValue':
-              return zahl(data.zahl ?? 200)
+              return number(data.number ?? 200)
             case 'getBody':
-              return data.liste?.[0] ?? NULL
+              return data.list?.[0] ?? NULL
             case 'hasBody':
-              return wahrheit(Boolean(data.liste?.length))
+              return bool(Boolean(data.list?.length))
             case 'getHeaders':
-              return { art: 'nativ', typ: 'LinkedHashMap', daten: { map: new Map(data.map) } }
+              return { kind: 'native', type: 'LinkedHashMap', data: { map: new Map(data.map) } }
           }
           return undefined
         case 'ResponseStatusException':
-          if (name === 'getStatusCode') return httpStatus(data.zahl ?? 500)
-          if (name === 'getReason') return data.text !== undefined ? neuerString(data.text) : NULL
+          if (name === 'getStatusCode') return httpStatus(data.number ?? 500)
+          if (name === 'getReason') return data.text !== undefined ? newString(data.text) : NULL
           return undefined
         case 'ProblemDetail': {
           const map = data.map!
-          const read = (key: string) => map.get('s:' + key)?.wert ?? NULL
-          const write = (key: string, value: Wert) => {
-            map.set('s:' + key, { schluessel: neuerString(key), wert: value })
+          const read = (key: string) => map.get('s:' + key)?.value ?? NULL
+          const write = (key: string, value: Value) => {
+            map.set('s:' + key, { key: newString(key), value })
             return NULL
           }
           switch (name) {
             case 'getStatus':
-              return zahl(data.zahl ?? 500)
+              return number(data.number ?? 500)
             case 'getTitle':
             case 'getDetail':
             case 'getType':
@@ -349,31 +349,31 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
             case 'setDetail':
             case 'setType':
             case 'setInstance':
-              return write(name.slice(3).toLowerCase(), a.art === 'nativ' ? neuerString(i.alsText(a)) : a)
+              return write(name.slice(3).toLowerCase(), a.kind === 'native' ? newString(i.toText(a)) : a)
             case 'setProperty':
-              return write(i.alsText(a), b)
+              return write(i.toText(a), b)
           }
           return undefined
         }
         case 'MethodArgumentNotValidException':
         case 'BindingResult':
-          if (name === 'getBindingResult') return { art: 'nativ', typ: 'BindingResult', daten: { liste: data.liste ?? [] } }
-          if (name === 'getFieldErrors' || name === 'getAllErrors') return { art: 'nativ', typ: 'ArrayList', daten: { liste: [...(data.liste ?? [])] } }
-          if (name === 'getErrorCount') return zahl(data.liste?.length ?? 0)
-          if (name === 'hasErrors') return wahrheit(Boolean(data.liste?.length))
-          if (name === 'getFieldError') return data.liste?.[0] ?? NULL
+          if (name === 'getBindingResult') return { kind: 'native', type: 'BindingResult', data: { list: data.list ?? [] } }
+          if (name === 'getFieldErrors' || name === 'getAllErrors') return { kind: 'native', type: 'ArrayList', data: { list: [...(data.list ?? [])] } }
+          if (name === 'getErrorCount') return number(data.list?.length ?? 0)
+          if (name === 'hasErrors') return bool(Boolean(data.list?.length))
+          if (name === 'getFieldError') return data.list?.[0] ?? NULL
           return undefined
         case 'FieldError':
-          if (name === 'getField') return neuerString(data.text ?? '')
-          if (name === 'getDefaultMessage') return neuerString(data.meldung ?? '')
-          if (name === 'getRejectedValue') return data.liste?.[0] ?? NULL
+          if (name === 'getField') return newString(data.text ?? '')
+          if (name === 'getDefaultMessage') return newString(data.message ?? '')
+          if (name === 'getRejectedValue') return data.list?.[0] ?? NULL
           return undefined
         case 'AtomicLong':
         case 'AtomicInteger': {
-          const make = (n: number): Wert => (target.typ === 'AtomicLong' ? { art: 'long', wert: n } : zahl(n))
-          const now = data.zahl ?? 0
+          const make = (n: number): Value => (target.type === 'AtomicLong' ? { kind: 'long', value: n } : number(n))
+          const now = data.number ?? 0
           const set = (n: number) => {
-            data.zahl = n
+            data.number = n
             return n
           }
           switch (name) {
@@ -385,13 +385,13 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
             case 'decrementAndGet':
               return make(set(now - 1))
             case 'addAndGet':
-              return make(set(now + (a && 'wert' in a ? Number(a.wert) : 0)))
+              return make(set(now + (a && 'value' in a ? Number(a.value) : 0)))
             case 'get':
             case 'longValue':
             case 'intValue':
               return make(now)
             case 'set':
-              set(a && 'wert' in a ? Number(a.wert) : 0)
+              set(a && 'value' in a ? Number(a.value) : 0)
               return NULL
           }
           return undefined
@@ -401,44 +401,44 @@ export function springLibrary(host: LibraryHost): Extension & { superClasses: Re
             case 'getBean':
               return host.getBean(a, line)
             case 'getBeanDefinitionNames':
-              return { art: 'array', typ: 'String', werte: host.beanNames().map((n) => neuerString(n)) }
+              return { kind: 'array', type: 'String', values: host.beanNames().map((n) => newString(n)) }
             case 'getBeanDefinitionCount':
-              return zahl(host.beanNames().length)
+              return number(host.beanNames().length)
             case 'containsBean':
-              return wahrheit(host.beanNames().includes(i.alsText(a)))
+              return bool(host.beanNames().includes(i.toText(a)))
             case 'getEnvironment':
-              return { art: 'nativ', typ: 'Environment', daten: {} }
+              return { kind: 'native', type: 'Environment', data: {} }
           }
           return undefined
         case 'Environment':
           if (name === 'getProperty') {
-            const value = host.property(i.alsText(a))
-            return value !== undefined ? neuerString(value) : (b ?? NULL)
+            const value = host.property(i.toText(a))
+            return value !== undefined ? newString(value) : (b ?? NULL)
           }
-          if (name === 'getActiveProfiles') return { art: 'array', typ: 'String', werte: host.activeProfiles().map((p) => neuerString(p)) }
+          if (name === 'getActiveProfiles') return { kind: 'array', type: 'String', values: host.activeProfiles().map((p) => newString(p)) }
           return undefined
       }
       return undefined
     },
 
     text(value, i) {
-      const data = value.daten
-      switch (value.typ) {
+      const data = value.data
+      switch (value.type) {
         case 'HttpStatus':
-          return `${data.zahl} ${data.text}`
+          return `${data.number} ${data.text}`
         case 'URI':
           return data.text ?? ''
         case 'ResponseEntity':
-          return `<${data.zahl} ${STATUS_NAMES[data.zahl ?? 200] ?? ''} ${reasonPhrase(data.zahl ?? 200)},${data.liste?.length ? i.alsText(data.liste[0]) + ',' : ''}[]>`
+          return `<${data.number} ${STATUS_NAMES[data.number ?? 200] ?? ''} ${reasonPhrase(data.number ?? 200)},${data.list?.length ? i.toText(data.list[0]) + ',' : ''}[]>`
         case 'ResponseStatusException':
-          return `org.springframework.web.server.ResponseStatusException: ${data.meldung}`
+          return `org.springframework.web.server.ResponseStatusException: ${data.message}`
         case 'AtomicLong':
         case 'AtomicInteger':
-          return String(data.zahl ?? 0)
+          return String(data.number ?? 0)
         case 'ApplicationContext':
           return 'org.springframework.context.ApplicationContext'
         case 'FieldError':
-          return `Field error on field '${data.text}': ${data.meldung}`
+          return `Field error on field '${data.text}': ${data.message}`
       }
       return undefined
     },

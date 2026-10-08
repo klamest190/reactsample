@@ -5,7 +5,7 @@ import type { UebungsSammlung } from './types'
 
 const t = (de: string, en: string) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'hooks-usestate': [
     {
       id: 'hooks-usestate-updater',
@@ -31,8 +31,8 @@ export const uebungen: UebungsSammlung = {
       stufe: 'fehler',
       wiederholung: 'js-referenzen',
       titel: t('„Add“ tut nichts', '“Add” does nothing'),
-      aufgabe: t('Ein Klick auf „Add“ soll einen Eintrag hinzufügen. Die Liste bleibt aber gleich. Warum?', 'Clicking “Add” should add an item. But the list stays the same. Why?'),
-      modus: 'react',
+      task: t('Ein Klick auf „Add“ soll einen Eintrag hinzufügen. Die Liste bleibt aber gleich. Warum?', 'Clicking “Add” should add an item. But the list stays the same. Why?'),
+      mode: 'react',
       code: js`
         function App() {
           const [items, setItems] = useState(['Learn hooks'])
@@ -54,7 +54,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [items, setItems] = useState(['Learn hooks'])
 
@@ -74,14 +74,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['React vergleicht mit `Object.is`: Ist es noch **dasselbe** Array, wird nicht neu gerendert.', 'Erzeuge ein neues Array: `setItems([...items, neu])`.'],
         en: ['React compares with `Object.is`: if it is still the **same** array, nothing re-renders.', 'Create a new array: `setItems([...items, newItem])`.'],
       },
       tests: [
         {
           name: t('Zwei Klicks ergeben drei Einträge', 'Two clicks give three items'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Add'))
             await click(button('Add'))
@@ -90,7 +90,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Kein push auf dem State', 'No push on the state'),
-          pruefung: js`
+          script: js`
             expect(code).not.toMatch(/items\.push/)
           `,
         },
@@ -100,11 +100,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usestate-objekt',
       stufe: 'ergaenzen',
       titel: t('Ein Handler für mehrere Felder', 'One handler for several fields'),
-      aufgabe: t(
+      task: t(
         'Ergänze `handleChange`: Es aktualisiert das passende Feld im Objekt `person` anhand von `e.target.name`. Darunter steht „Hello Ada Lovelace“.',
         'Complete `handleChange`: it updates the matching field of the `person` object based on `e.target.name`. Below, it shows “Hello Ada Lovelace”.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           const [person, setPerson] = useState({ firstName: '', lastName: '' })
@@ -124,7 +124,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [person, setPerson] = useState({ firstName: '', lastName: '' })
 
@@ -143,14 +143,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ein berechneter Schlüssel: `{ [e.target.name]: e.target.value }`.', 'Die anderen Felder mit Spread übernehmen: `{ ...person, … }`.'],
         en: ['A computed key: `{ [e.target.name]: e.target.value }`.', 'Keep the other fields with spread: `{ ...person, … }`.'],
       },
       tests: [
         {
           name: t('Beide Felder werden übernommen', 'Both fields are applied'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('firstName'), 'Ada')
             await type(field('lastName'), 'Lovelace')
@@ -188,11 +188,11 @@ export const uebungen: UebungsSammlung = {
       stufe: 'fehler',
       wiederholung: 'js-funktionen',
       titel: t('Die Uhr bleibt bei 1 stehen', 'The clock gets stuck at 1'),
-      aufgabe: t(
+      task: t(
         'Die Anzeige soll alle 100 ms um eins steigen, bleibt aber bei 1 stehen. Außerdem fehlt das Aufräumen. Behebe beides.',
         'The display should go up by one every 100 ms but gets stuck at 1. Cleanup is missing too. Fix both.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function App() {
           const [ticks, setTicks] = useState(0)
@@ -206,7 +206,7 @@ export const uebungen: UebungsSammlung = {
           return <p>Ticks: {ticks}</p>
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [ticks, setTicks] = useState(0)
 
@@ -220,14 +220,14 @@ export const uebungen: UebungsSammlung = {
           return <p>Ticks: {ticks}</p>
         }
       `,
-      tipps: {
+      hints: {
         de: ['Der Timer-Callback stammt aus dem ersten Render - dort ist `ticks` für immer 0 (Stale Closure).', 'Updater-Funktion: `setTicks((t) => t + 1)`.', 'Cleanup: `const id = setInterval(…)` und `return () => clearInterval(id)`.'],
         en: ['The timer callback comes from the first render - where `ticks` is 0 forever (stale closure).', 'Updater function: `setTicks((t) => t + 1)`.', 'Cleanup: `const id = setInterval(…)` and `return () => clearInterval(id)`.'],
       },
       tests: [
         {
           name: t('Zählt weiter', 'Keeps counting'),
-          pruefung: js`
+          script: js`
             await render()
             await wait(550)
             const ticks = Number(text().match(/\d+/)[0])
@@ -236,7 +236,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Intervall wird aufgeräumt', 'Interval is cleaned up'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/clearInterval\(/)
             expect(code).toMatch(/return\s*\(\)\s*=>/)
           `,
@@ -247,8 +247,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-useeffect-titel',
       stufe: 'ergaenzen',
       titel: t('Tab-Titel synchronisieren', 'Sync the tab title'),
-      aufgabe: t('Halte `document.title` mit dem Zähler synchron: „Clicked 0 times“, „Clicked 1 times“ …', 'Keep `document.title` in sync with the counter: “Clicked 0 times”, “Clicked 1 times” …'),
-      modus: 'react',
+      task: t('Halte `document.title` mit dem Zähler synchron: „Clicked 0 times“, „Clicked 1 times“ …', 'Keep `document.title` in sync with the counter: “Clicked 0 times”, “Clicked 1 times” …'),
+      mode: 'react',
       code: js`
         function App() {
           const [count, setCount] = useState(0)
@@ -258,7 +258,7 @@ export const uebungen: UebungsSammlung = {
           return <button onClick={() => setCount(count + 1)}>Click me</button>
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [count, setCount] = useState(0)
 
@@ -269,14 +269,14 @@ export const uebungen: UebungsSammlung = {
           return <button onClick={() => setCount(count + 1)}>Click me</button>
         }
       `,
-      tipps: {
+      hints: {
         de: ['Der Titel gehört zur Außenwelt - also `useEffect`.', 'Abhängigkeit: `[count]`.'],
         en: ['The title belongs to the outside world - so `useEffect`.', 'Dependency: `[count]`.'],
       },
       tests: [
         {
           name: t('Titel folgt dem Zähler', 'Title follows the counter'),
-          pruefung: js`
+          script: js`
             await render()
             await waitFor(() => expect(title()).toBe('Clicked 0 times'))
             await click(button('Click me'))
@@ -285,7 +285,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Mit useEffect', 'With useEffect'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/useEffect\(/)
           `,
         },
@@ -316,8 +316,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-useref-timer',
       stufe: 'fehler',
       titel: t('Stopp stoppt nicht', 'Stop does not stop'),
-      aufgabe: t('Nach „Start“ läuft die Stoppuhr, aber „Stop“ hält sie nicht an. Finde heraus, wo die Timer-ID verloren geht.', 'After “Start” the stopwatch runs, but “Stop” does not halt it. Find out where the timer ID gets lost.'),
-      modus: 'react',
+      task: t('Nach „Start“ läuft die Stoppuhr, aber „Stop“ hält sie nicht an. Finde heraus, wo die Timer-ID verloren geht.', 'After “Start” the stopwatch runs, but “Stop” does not halt it. Find out where the timer ID gets lost.'),
+      mode: 'react',
       code: js`
         function App() {
           const [time, setTime] = useState(0)
@@ -340,7 +340,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const [time, setTime] = useState(0)
           const intervalRef = useRef(null)
@@ -363,14 +363,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Nach jedem Render ist `intervalId` wieder `null` - die Funktion `App` läuft ja komplett neu.', 'Eine Ref überlebt Renders: `const intervalRef = useRef(null)`.'],
         en: ['After every render, `intervalId` is `null` again - the `App` function runs from scratch.', 'A ref survives renders: `const intervalRef = useRef(null)`.'],
       },
       tests: [
         {
           name: t('Stop hält die Uhr an', 'Stop halts the clock'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Start'))
             await wait(200)
@@ -387,8 +387,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-useref-fokus',
       stufe: 'ergaenzen',
       titel: t('Feld fokussieren', 'Focus an input'),
-      aufgabe: t('Ein Klick auf „Focus“ soll den Cursor ins Eingabefeld setzen.', 'Clicking “Focus” should put the cursor into the input.'),
-      modus: 'react',
+      task: t('Ein Klick auf „Focus“ soll den Cursor ins Eingabefeld setzen.', 'Clicking “Focus” should put the cursor into the input.'),
+      mode: 'react',
       code: js`
         function App() {
           // TODO: create a ref and connect it to the input
@@ -401,7 +401,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function App() {
           const inputRef = useRef(null)
 
@@ -413,14 +413,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`const inputRef = useRef(null)` und `<input ref={inputRef} />`.', 'Im Klick-Handler: `inputRef.current.focus()`.'],
         en: ['`const inputRef = useRef(null)` and `<input ref={inputRef} />`.', 'In the click handler: `inputRef.current.focus()`.'],
       },
       tests: [
         {
           name: t('Klick fokussiert das Feld', 'Click focuses the input'),
-          pruefung: js`
+          script: js`
             await render()
             button('Focus').focus()
             await click(button('Focus'))
@@ -466,8 +466,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usememo-deps',
       stufe: 'fehler',
       titel: t('Die Suche filtert nicht', 'The search does not filter'),
-      aufgabe: t('Beim Tippen soll die Liste gefiltert werden. Sie bleibt aber unverändert.', 'Typing should filter the list. But it stays unchanged.'),
-      modus: 'react',
+      task: t('Beim Tippen soll die Liste gefiltert werden. Sie bleibt aber unverändert.', 'Typing should filter the list. But it stays unchanged.'),
+      mode: 'react',
       code: js`
         const FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry']
 
@@ -490,7 +490,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry']
 
         function App() {
@@ -512,14 +512,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`useMemo` rechnet nur neu, wenn sich eine Abhängigkeit ändert.', 'Welcher Wert wird in der Funktion benutzt, fehlt aber im Array?'],
         en: ['`useMemo` only recomputes when a dependency changes.', 'Which value is used inside the function but missing from the array?'],
       },
       tests: [
         {
           name: t('„ap“ findet zwei Früchte', '“ap” finds two fruits'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Search'), 'ap')
             expect(findAll('li')).toHaveLength(2)
@@ -531,11 +531,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usememo-callback',
       stufe: 'ergaenzen',
       titel: t('Unnötige Renders vermeiden', 'Avoid unnecessary renders'),
-      aufgabe: t(
+      task: t(
         '`ResetButton` ist mit `memo` umhüllt und loggt jeden Render. Trotzdem rendert er bei jeder Eingabe ins Textfeld neu. Sorge dafür, dass er beim Tippen nicht mehr rendert.',
         '`ResetButton` is wrapped in `memo` and logs every render. Still, it re-renders on every keystroke in the text field. Make sure it no longer renders while typing.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const ResetButton = memo(function ResetButton({ onReset }) {
           console.log('ResetButton render')
@@ -555,7 +555,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const ResetButton = memo(function ResetButton({ onReset }) {
           console.log('ResetButton render')
           return <button onClick={onReset}>Reset</button>
@@ -574,14 +574,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`handleReset` ist bei jedem Render eine neue Funktion - für `memo` eine geänderte Prop.', '`useCallback(() => setText(\'\'), [])` - `setText` ist stabil und muss nicht in die Abhängigkeiten.'],
         en: ['`handleReset` is a new function on every render - a changed prop for `memo`.', '`useCallback(() => setText(\'\'), [])` - `setText` is stable and does not need to be a dependency.'],
       },
       tests: [
         {
           name: t('Tippen rendert ResetButton nicht neu', 'Typing does not re-render ResetButton'),
-          pruefung: js`
+          script: js`
             await render()
             clearLogs()
             await type(field('Type'), 'Hello')
@@ -590,7 +590,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Reset funktioniert weiter', 'Reset still works'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Type'), 'Hello')
             await click(button('Reset'))
@@ -631,8 +631,8 @@ export const uebungen: UebungsSammlung = {
       stufe: 'fehler',
       wiederholung: 'js-kontrollfluss',
       titel: t('Minus und Reset kaputt', 'Minus and reset are broken'),
-      aufgabe: t('„+“ funktioniert, „−“ und „Reset“ nicht. Finde die zwei Fehler.', '“+” works, “−” and “Reset” don’t. Find the two bugs.'),
-      modus: 'react',
+      task: t('„+“ funktioniert, „−“ und „Reset“ nicht. Finde die zwei Fehler.', '“+” works, “−” and “Reset” don’t. Find the two bugs.'),
+      mode: 'react',
       code: js`
         function reducer(state, action) {
           switch (action.type) {
@@ -659,7 +659,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function reducer(state, action) {
           switch (action.type) {
             case 'incremented':
@@ -685,14 +685,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Vergleiche den `type` im Knopf mit den `case`-Namen.', 'Im `reset`-Fall fehlt etwas - ohne `return` läuft `switch` in den nächsten Fall weiter.', 'Ein `throw` im `default` hätte den Tippfehler sofort gezeigt.'],
         en: ['Compare the `type` in the button with the `case` names.', 'Something is missing in the `reset` case - without `return`, `switch` falls through to the next case.', 'A `throw` in `default` would have revealed the typo right away.'],
       },
       tests: [
         {
           name: t('+ + − ergibt 1', '+ + − gives 1'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('+'))
             await click(button('+'))
@@ -702,7 +702,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Reset setzt auf 0', 'Reset sets to 0'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('+'))
             await click(button('Reset'))
@@ -715,11 +715,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usereducer-wizard',
       stufe: 'frei',
       titel: t('Schritt-für-Schritt-Assistent', 'Step-by-step wizard'),
-      aufgabe: t(
+      task: t(
         'Baue mit `useReducer` einen Assistenten mit 3 Schritten: Anzeige „Step 1 of 3“, Knöpfe „Back“ und „Next“. „Back“ ist bei Schritt 1 deaktiviert, „Next“ bei Schritt 3. Ein Knopf „Start over“ springt zurück zu Schritt 1.',
         'Build a wizard with 3 steps using `useReducer`: display “Step 1 of 3”, buttons “Back” and “Next”. “Back” is disabled on step 1, “Next” on step 3. A “Start over” button jumps back to step 1.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function wizardReducer(step, action) {
 
@@ -729,7 +729,7 @@ export const uebungen: UebungsSammlung = {
           return <p>Step 1 of 3</p>
         }
       `,
-      loesung: js`
+      solution: js`
         const LAST_STEP = 3
 
         function wizardReducer(step, action) {
@@ -763,14 +763,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Der State kann einfach eine Zahl sein: `useReducer(wizardReducer, 1)`.', '`Math.min` und `Math.max` halten den Schritt in den Grenzen.'],
         en: ['The state can simply be a number: `useReducer(wizardReducer, 1)`.', '`Math.min` and `Math.max` keep the step within bounds.'],
       },
       tests: [
         {
           name: t('Vor und zurück', 'Forward and back'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Next'))
             await click(button('Next'))
@@ -781,7 +781,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Knöpfe an den Grenzen deaktiviert', 'Buttons disabled at the bounds'),
-          pruefung: js`
+          script: js`
             await render()
             expect(button('Back')).toBeDisabled()
             await click(button('Next'))
@@ -791,7 +791,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Start over und useReducer', 'Start over and useReducer'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Next'))
             await click(button('Start over'))
@@ -838,8 +838,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usecontext-provider',
       stufe: 'fehler',
       titel: t('Das Theme wechselt nicht', 'The theme does not switch'),
-      aufgabe: t('Nach „Toggle“ soll „Theme: dark“ dastehen. Es bleibt aber „light“.', 'After “Toggle”, it should say “Theme: dark”. But it stays “light”.'),
-      modus: 'react',
+      task: t('Nach „Toggle“ soll „Theme: dark“ dastehen. Es bleibt aber „light“.', 'After “Toggle”, it should say “Theme: dark”. But it stays “light”.'),
+      mode: 'react',
       code: js`
         const ThemeContext = createContext('light')
 
@@ -860,7 +860,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const ThemeContext = createContext('light')
 
         function ThemeLabel() {
@@ -878,14 +878,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ein Provider versorgt nur die Komponenten **innerhalb** seiner Tags.'],
         en: ['A provider only supplies the components **inside** its tags.'],
       },
       tests: [
         {
           name: t('Toggle wechselt auf dark', 'Toggle switches to dark'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Toggle'))
             expect(text()).toContain('Theme: dark')
@@ -897,11 +897,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-usecontext-user',
       stufe: 'ergaenzen',
       titel: t('Provider mit eigenem Hook', 'Provider with a custom hook'),
-      aufgabe: t(
+      task: t(
         'Ergänze `UserProvider` und `useUser`: Der Provider hält den Nutzer (anfangs `null`) sowie `logIn` und `logOut`. `useUser` wirft außerhalb des Providers einen Fehler. `Greeting` zeigt „Guest“ oder „Hello, Ada“.',
         'Complete `UserProvider` and `useUser`: the provider holds the user (initially `null`) plus `logIn` and `logOut`. `useUser` throws outside the provider. `Greeting` shows “Guest” or “Hello, Ada”.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const UserContext = createContext(null)
 
@@ -935,7 +935,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const UserContext = createContext(null)
 
         function UserProvider({ children }) {
@@ -978,14 +978,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Im Provider: `const [user, setUser] = useState(null)` und `<UserContext value={…}>{children}</UserContext>`.', '`useUser`: `useContext(UserContext)` lesen, bei `null` einen Fehler werfen.'],
         en: ['In the provider: `const [user, setUser] = useState(null)` and `<UserContext value={…}>{children}</UserContext>`.', '`useUser`: read `useContext(UserContext)`, throw an error on `null`.'],
       },
       tests: [
         {
           name: t('Anmelden und abmelden', 'Log in and log out'),
-          pruefung: js`
+          script: js`
             await render()
             expect(text()).toContain('Guest')
             await click(button('Log in'))
@@ -996,7 +996,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('useUser wirft außerhalb des Providers', 'useUser throws outside the provider'),
-          pruefung: js`
+          script: js`
             expect(code).toMatch(/throw new Error/)
           `,
         },
@@ -1034,8 +1034,8 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-eigene-regeln',
       stufe: 'fehler',
       titel: t('Absturz beim Aufklappen', 'Crash when expanding'),
-      aufgabe: t('Ein Klick auf „Show details“ lässt die Komponente abstürzen. Welche Hook-Regel wird verletzt?', 'Clicking “Show details” crashes the component. Which rule of hooks is broken?'),
-      modus: 'react',
+      task: t('Ein Klick auf „Show details“ lässt die Komponente abstürzen. Welche Hook-Regel wird verletzt?', 'Clicking “Show details” crashes the component. Which rule of hooks is broken?'),
+      mode: 'react',
       code: js`
         function useToggle(initial = false) {
           const [on, setOn] = useState(initial)
@@ -1063,7 +1063,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function useToggle(initial = false) {
           const [on, setOn] = useState(initial)
           return [on, () => setOn((o) => !o)]
@@ -1085,14 +1085,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['React erkennt Hooks an ihrer **Reihenfolge**. Ein Hook im `if` verschiebt sie.', 'Rufe `useToggle` immer auf - benutze das Ergebnis nur bei Bedarf.'],
         en: ['React identifies hooks by their **order**. A hook inside `if` shifts it.', 'Always call `useToggle` - only use the result when needed.'],
       },
       tests: [
         {
           name: t('Details aufklappen und liken', 'Expand details and like'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Show details'))
             expect(text()).toContain('Details')
@@ -1106,11 +1106,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-eigene-debounce',
       stufe: 'frei',
       titel: t('useDebouncedValue', 'useDebouncedValue'),
-      aufgabe: t(
+      task: t(
         'Schreibe `useDebouncedValue(value, delay)`: Es gibt `value` erst zurück, wenn er sich `delay` ms lang nicht geändert hat. `App` zeigt damit „Searching for: …“ 300 ms nach der letzten Eingabe.',
         'Write `useDebouncedValue(value, delay)`: it only returns `value` once it has not changed for `delay` ms. `App` uses it to show “Searching for: …” 300 ms after the last keystroke.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function useDebouncedValue(value, delay) {
           return value
@@ -1128,7 +1128,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function useDebouncedValue(value, delay) {
           const [debounced, setDebounced] = useState(value)
 
@@ -1152,14 +1152,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ein eigener State für den verzögerten Wert.', 'Ein Effekt startet bei jeder Änderung einen Timer - und das Cleanup bricht den vorherigen ab.'],
         en: ['A separate state for the delayed value.', 'An effect starts a timer on every change - and the cleanup cancels the previous one.'],
       },
       tests: [
         {
           name: t('Nicht sofort, aber nach 300 ms', 'Not immediately, but after 300 ms'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Search'), 'react')
             expect(text()).not.toContain('Searching for: react')
@@ -1168,7 +1168,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Schnelles Tippen startet den Timer neu', 'Fast typing restarts the timer'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Search'), 'r')
             await wait(200)
@@ -1208,11 +1208,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-nebenlaeufig-suspense',
       stufe: 'ergaenzen',
       titel: t('Nachladen mit Platzhalter', 'Lazy loading with a placeholder'),
-      aufgabe: t(
+      task: t(
         '`Details` wird mit `lazy` nachgeladen. Ergänze eine `Suspense`-Grenze, damit nach dem Klick „Loading details …“ erscheint, bis „Details loaded“ da ist.',
         '`Details` is loaded with `lazy`. Add a `Suspense` boundary so that “Loading details …” appears after the click until “Details loaded” is there.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         // Simulates a slow network: the module arrives after 300 ms.
         const Details = lazy(
@@ -1229,7 +1229,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         // Simulates a slow network: the module arrives after 300 ms.
         const Details = lazy(
           () => new Promise((resolve) => setTimeout(() => resolve({ default: () => <p>Details loaded</p> }), 300)),
@@ -1245,14 +1245,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['`<Suspense fallback={…}>` um die Stelle, die nachlädt.'],
         en: ['`<Suspense fallback={…}>` around the part that loads.'],
       },
       tests: [
         {
           name: t('Platzhalter, dann Inhalt', 'Placeholder, then content'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Show details'))
             expect(text()).toContain('Loading details')
@@ -1295,11 +1295,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-react19-use',
       stufe: 'fehler',
       titel: t('Lädt für immer', 'Loading forever'),
-      aufgabe: t(
+      task: t(
         'Der Name soll nach kurzer Zeit erscheinen, aber „Loading …“ bleibt stehen. Das Promise wird bei jedem Render neu erzeugt. Behebe das.',
         'The name should appear after a moment, but “Loading …” stays. The promise is created anew on every render. Fix it.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         function fetchUser() {
           return new Promise((resolve) => setTimeout(() => resolve({ name: 'Ada' }), 100))
@@ -1318,7 +1318,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         function fetchUser() {
           return new Promise((resolve) => setTimeout(() => resolve({ name: 'Ada' }), 100))
         }
@@ -1338,14 +1338,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Nach dem Laden rendert React neu - und `fetchUser()` erzeugt ein **neues** Promise, das wieder wartet.', 'Erzeuge das Promise außerhalb der suspendierenden Komponente, z. B. mit `useState(() => fetchUser())` in `App`, und gib es als Prop weiter.'],
         en: ['After loading, React renders again - and `fetchUser()` creates a **new** promise that waits again.', 'Create the promise outside the suspending component, e.g. with `useState(() => fetchUser())` in `App`, and pass it down as a prop.'],
       },
       tests: [
         {
           name: t('Name erscheint', 'Name appears'),
-          pruefung: js`
+          script: js`
             await render()
             await waitFor(() => expect(text()).toContain('Ada'), 2000)
           `,
@@ -1356,11 +1356,11 @@ export const uebungen: UebungsSammlung = {
       id: 'hooks-react19-action',
       stufe: 'ergaenzen',
       titel: t('Formular mit useActionState', 'A form with useActionState'),
-      aufgabe: t(
+      task: t(
         'Ergänze `saveName`: Ohne Namen gibt es „Name is required“ zurück, sonst nach dem Speichern „Saved Ada“. Während des Speicherns ist der Knopf „Save“ deaktiviert.',
         'Complete `saveName`: without a name it returns “Name is required”, otherwise “Saved Ada” after saving. While saving, the “Save” button is disabled.',
       ),
-      modus: 'react',
+      mode: 'react',
       code: js`
         const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -1381,7 +1381,7 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      loesung: js`
+      solution: js`
         const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
         async function saveName(previousMessage, formData) {
@@ -1403,14 +1403,14 @@ export const uebungen: UebungsSammlung = {
           )
         }
       `,
-      tipps: {
+      hints: {
         de: ['Der Rückgabewert der Action wird zum neuen `message`.', '`isPending` ist `true`, solange die Action läuft: `<button disabled={isPending}>`.'],
         en: ['The action’s return value becomes the new `message`.', '`isPending` is `true` while the action runs: `<button disabled={isPending}>`.'],
       },
       tests: [
         {
           name: t('Leerer Name wird abgelehnt', 'Empty name is rejected'),
-          pruefung: js`
+          script: js`
             await render()
             await click(button('Save'))
             await waitFor(() => expect(text()).toContain('Name is required'))
@@ -1418,7 +1418,7 @@ export const uebungen: UebungsSammlung = {
         },
         {
           name: t('Speichern mit Wartezustand', 'Saving with pending state'),
-          pruefung: js`
+          script: js`
             await render()
             await type(field('Name'), 'Ada')
             await click(button('Save'))

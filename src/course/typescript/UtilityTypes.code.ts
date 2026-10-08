@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.6 - Typ-Operatoren & Utility Types. */
 
-export const beispiele = {
+export const examples = {
   'ts-utility-einstieg': {
     code: js`
       type Todo = { id: number; title: string; done: boolean }
@@ -131,7 +131,7 @@ export const beispiele = {
     `,
   },
   'ts-utility-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`Omit<Product, \'id\'>` - alles außer `id`. `Pick<Product, \'id\' | \'name\'>` - nur diese beiden.',
         'Utility Types lassen sich verschachteln: `Partial<Pick<Product, \'name\' | \'price\' | \'stock\'>>`.',
@@ -178,7 +178,7 @@ export const beispiele = {
       const mug = createProduct({ name: 'Mug', price: 9.5, stock: 12, tags: ['kitchen'] }, 1)
       console.log(applyPatch(mug, { price: 8 }), summarize(mug), isCategory('office'))
     `,
-    loesung: js`
+    solution: js`
       type Product = { id: number; name: string; price: number; stock: number; tags: string[] }
 
       // 1. Like Product, but without id (the server assigns it)
@@ -214,11 +214,11 @@ export const beispiele = {
       console.log(applyPatch(mug, { price: 8 }), summarize(mug), isCategory('office'))
     `,
     tests: [
-      { name: 'applyPatch(mug, { price: 8 }).price', ausdruck: 'applyPatch(mug, { price: 8 }).price', erwartet: 8 },
-      { name: 'summarize(mug)', ausdruck: 'summarize(mug)', erwartet: { id: 1, name: 'Mug' } },
-      { name: "isCategory('garden') / isCategory('pool')", ausdruck: "[isCategory('garden'), isCategory('pool')]", erwartet: [true, false] },
+      { name: 'applyPatch(mug, { price: 8 }).price', expression: 'applyPatch(mug, { price: 8 }).price', expected: 8 },
+      { name: 'summarize(mug)', expression: 'summarize(mug)', expected: { id: 1, name: 'Mug' } },
+      { name: "isCategory('garden') / isCategory('pool')", expression: "[isCategory('garden'), isCategory('pool')]", expected: [true, false] },
     ],
-    typTests: [
+    typeTests: [
       {
         name: { de: 'ProductDraft hat alles außer id', en: 'ProductDraft has everything except id' },
         code: "const okDraft: ProductDraft = { name: 'A', price: 1, stock: 1, tags: [] }\n// @ts-expect-error - no id in a draft\nconst draftWithId: ProductDraft = { id: 1, name: 'A', price: 1, stock: 1, tags: [] }",
@@ -237,7 +237,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   uebersicht: js`

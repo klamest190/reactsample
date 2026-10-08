@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-tailwind-einstieg': {
     code: js`
       function App() {
@@ -51,7 +51,7 @@ export const beispiele = {
     `,
   },
   'praxis-tailwind-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Lege ein Objekt an: `const STYLES = { open: \'bg-amber-100 text-amber-800\', … }` - mit vollständigen Klassennamen.',
         'Genauso für Text und Symbol pro Status.',
@@ -78,7 +78,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const STATUS = {
         open: { classes: 'bg-amber-100 text-amber-800', symbol: '○', text: 'open' },
         inProgress: { classes: 'bg-sky-100 text-sky-800', symbol: '◐', text: 'in progress' },
@@ -107,13 +107,13 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Keine zusammengesetzten Klassennamen', en: 'No assembled class names' },
-        pruefung: js`
+        script: js`
           expect(code).not.toMatch(/bg-[$][{]/)
         `,
       },
       {
         name: { de: 'Jeder Status hat seine Farben', en: 'Every status has its colors' },
-        pruefung: js`
+        script: js`
           await render()
           const badge = (wort) => findAll('span').find((s) => s.textContent.includes(wort))
           expect(badge('done')?.className).toContain('bg-emerald-100')
@@ -123,7 +123,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Badges sind rund und klein', en: 'Badges are round and small' },
-        pruefung: js`
+        script: js`
           await render()
           const badges = findAll('span').filter((s) => /done|progress|open/.test(s.textContent))
           expect(badges.length).toBeGreaterThan(2)
@@ -132,7 +132,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

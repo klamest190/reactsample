@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Variablen.code'
+import { examples, codeBloecke } from './Variablen.code'
 
 /**
  * KAPITEL 1.1 - Variablen & Datentypen
@@ -16,7 +16,7 @@ export function Variablen() {
         <P>Ein Wert, ein Name: <Code>const</Code> für feste Werte, <Code>let</Code> für Werte, die sich ändern.</P>
         <TryIt
           id="js-variablen-einstieg"
-          {...beispiele['js-variablen-einstieg']}
+          {...examples['js-variablen-einstieg']}
         />
       </Abschnitt>
 
@@ -58,7 +58,7 @@ export function Variablen() {
         />
         <TryIt
           id="js-variablen-1"
-          {...beispiele['js-variablen-1']}
+          {...examples['js-variablen-1']}
         />
         <Hinweis variante="info">
           Faustregel: Immer <Code>const</Code> - und erst dann zu <Code>let</Code> wechseln, wenn du
@@ -88,7 +88,7 @@ export function Variablen() {
         </P>
         <TryIt
           id="js-variablen-2"
-          {...beispiele['js-variablen-2']}
+          {...examples['js-variablen-2']}
         />
       </Abschnitt>
 
@@ -101,7 +101,7 @@ export function Variablen() {
         </P>
         <TryIt
           id="js-variablen-3"
-          {...beispiele['js-variablen-3']}
+          {...examples['js-variablen-3']}
         />
       </Abschnitt>
 
@@ -111,14 +111,14 @@ export function Variablen() {
           Fehlerquelle. Besonders wichtig ist, welche Werte in einer Bedingung als{' '}
           <strong>falsch</strong> gelten. Es sind genau diese:
         </P>
-        <CodeBlock code={codeBloecke.beispiel2} titel="Die falsy-Werte" />
+        <CodeBlock code={codeBloecke.beispiel2} title="Die falsy-Werte" />
         <P>
           <strong>Alles andere</strong> ist truthy - auch <Code>'0'</Code>, <Code>'false'</Code>,{' '}
           <Code>[]</Code> und <Code>{'{}'}</Code>.
         </P>
         <TryIt
           id="js-variablen-4"
-          {...beispiele['js-variablen-4']}
+          {...examples['js-variablen-4']}
         />
         <Hinweis variante="warnung">
           Genau das führt in React zu einem Klassiker: <Code>{'{count && <List />}'}</Code> zeigt
@@ -130,8 +130,8 @@ export function Variablen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="js-variablen-uebung"
-          {...beispiele['js-variablen-uebung']}
-          aufgabe={
+          {...examples['js-variablen-uebung']}
+          task={
             <>
               <p>
                 Lege die Variablen <Code>firstName</Code> mit dem Wert <Code>'Ada'</Code> und{' '}
@@ -148,24 +148,24 @@ export function Variablen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welches Schlüsselwort nimmst du standardmäßig für neue Variablen?',
-            antworten: ['var', 'let', 'const'],
-            richtig: 2,
-            erklaerung: 'const ist der Standard. let nur, wenn du wirklich neu zuweisen musst.',
+            question: 'Welches Schlüsselwort nimmst du standardmäßig für neue Variablen?',
+            answers: ['var', 'let', 'const'],
+            correct: 2,
+            explanation: 'const ist der Standard. let nur, wenn du wirklich neu zuweisen musst.',
           },
           {
-            frage: "Was ergibt '5' + 1 ?",
-            antworten: ['6', "'51'", 'NaN', 'einen Fehler'],
-            richtig: 1,
-            erklaerung: 'Bei + mit einem String wird die Zahl in einen String umgewandelt und angehängt.',
+            question: "Was ergibt '5' + 1 ?",
+            answers: ['6', "'51'", 'NaN', 'einen Fehler'],
+            correct: 1,
+            explanation: 'Bei + mit einem String wird die Zahl in einen String umgewandelt und angehängt.',
           },
           {
-            frage: 'Welcher dieser Werte ist truthy?',
-            antworten: ['0', "''", "'0'", 'null'],
-            richtig: 2,
-            erklaerung: "'0' ist ein nicht-leerer String - und damit truthy.",
+            question: 'Welcher dieser Werte ist truthy?',
+            answers: ['0', "''", "'0'", 'null'],
+            correct: 2,
+            explanation: "'0' ist ein nicht-leerer String - und damit truthy.",
           },
         ]}
       />

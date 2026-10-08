@@ -11,30 +11,30 @@
  * A custom text replaces the default: `@NotBlank(message = "title is required")`.
  */
 
-import type { Annotation, TypRef } from '../java/ast'
+import type { Annotation, TypeRef } from '../java/ast'
 import type { Interpreter } from '../java/interpreter'
-import { alsZahl, istZahl, type JavaObjekt, type Klasse, type Wert } from '../java/values'
+import { toNumber, isNumber, type JavaObject, type ClassInfo, type Value } from '../java/values'
 import { number, text } from './annotations'
 import type { FieldErrorInfo } from './library'
 
 const MAX_INT = 2147483647
 
-type Check = (value: Wert, annotation: Annotation, interpreter: Interpreter) => string | null
+type Check = (value: Value, annotation: Annotation, interpreter: Interpreter) => string | null
 
-const length = (value: Wert): number | null => {
-  if (value.art === 'string') return value.wert.length
-  if (value.art === 'array') return value.werte.length
-  if (value.art === 'nativ' && value.daten.liste) return value.daten.liste.length
-  if (value.art === 'nativ' && value.daten.map) return value.daten.map.size
+const length = (value: Value): number | null => {
+  if (value.kind === 'string') return value.value.length
+  if (value.kind === 'array') return value.values.length
+  if (value.kind === 'native' && value.data.list) return value.data.list.length
+  if (value.kind === 'native' && value.data.map) return value.data.map.size
   return null
 }
 
-const numeric = (value: Wert) => (istZahl(value) ? alsZahl(value) : null)
+const numeric = (value: Value) => (isNumber(value) ? toNumber(value) : null)
 
 const CHECKS: Record<string, Check> = {
-  NotNull: (v) => (v.art === 'null' ? 'must not be null' : null),
-  NotBlank: (v) => (v.art === 'null' || (v.art === 'string' && v.wert.trim() === '') ? 'must not be blank' : null),
-  NotEmpty: (v) => (v.art === 'null' || length(v) === 0 ? 'must not be empty' : null),
+  NotNull: (v) => (v.kind === 'null' ? 'must not be null' : null),
+  NotBlank: (v) => (v.kind === 'null' || (v.kind === 'string' && v.value.trim() === '') ? 'must not be blank' : null),
+  NotEmpty: (v) => (v.kind === 'null' || length(v) === 0 ? 'must not be empty' : null),
   Size: (v, a) => {
     const n = length(v)
     const min = number(a, 'min') ?? 0
@@ -55,13 +55,13 @@ const CHECKS: Record<string, Check> = {
   PositiveOrZero: (v) => (numeric(v) !== null && numeric(v)! < 0 ? 'must be greater than or equal to 0' : null),
   Negative: (v) => (numeric(v) !== null && numeric(v)! >= 0 ? 'must be less than 0' : null),
   Email: (v) =>
-    v.art === 'string' && v.wert !== '' && !/^[^@\s]+@[^@\s]+$/.test(v.wert) ? 'must be a well-formed email address' : null,
+    v.kind === 'string' && v.value !== '' && !/^[^@\s]+@[^@\s]+$/.test(v.value) ? 'must be a well-formed email address' : null,
   Pattern: (v, a) => {
     const regexp = text(a, 'regexp') ?? ''
-    return v.art === 'string' && !new RegExp(`^(?:${regexp})$`).test(v.wert) ? `must match "${regexp}"` : null
+    return v.kind === 'string' && !new RegExp(`^(?:${regexp})$`).test(v.value) ? `must match "${regexp}"` : null
   },
-  AssertTrue: (v) => (v.art === 'boolean' && !v.wert ? 'must be true' : null),
-  AssertFalse: (v) => (v.art === 'boolean' && v.wert ? 'must be false' : null),
+  AssertTrue: (v) => (v.kind === 'boolean' && !v.value ? 'must be true' : null),
+  AssertFalse: (v) => (v.kind === 'boolean' && v.value ? 'must be false' : null),
 }
 
 export const CONSTRAINTS = new Set(Object.keys(CHECKS))
@@ -77,13 +77,13 @@ function message(annotation: Annotation, fallback: string): string {
 }
 
 /** All violations of one object; `objectName` is the parameter's class name with a lower-case first letter. */
-export function validate(object: Wert, interpreter: Interpreter): FieldErrorInfo[] {
-  if (object.art !== 'objekt') return []
-  const klasse = object.klasse
-  const objectName = klasse.name.charAt(0).toLowerCase() + klasse.name.slice(1)
+export function validate(object: Value, interpreter: Interpreter): FieldErrorInfo[] {
+  if (object.kind !== 'object') return []
+  const classInfo = object.classInfo
+  const objectName = classInfo.name.charAt(0).toLowerCase() + classInfo.name.slice(1)
   const errors: FieldErrorInfo[] = []
-  for (const { name, annotations } of constrainedProperties(klasse)) {
-    const value = (object as JavaObjekt).felder.get(name)
+  for (const { name, annotations } of constrainedProperties(classInfo)) {
+    const value = (object as JavaObject).fields.get(name)
     if (!value) continue
     for (const annotation of annotations) {
       const check = CHECKS[annotation.name]
@@ -94,14 +94,14 @@ export function validate(object: Wert, interpreter: Interpreter): FieldErrorInfo
   return errors
 }
 
-function constrainedProperties(klasse: Klasse): { name: string; typ: TypRef; annotations: Annotation[] }[] {
-  if (klasse.dekl.komponenten) {
-    return klasse.dekl.komponenten.map((c) => ({ name: c.name, typ: c.typ, annotations: c.annotations ?? [] }))
+function constrainedProperties(classInfo: ClassInfo): { name: string; type: TypeRef; annotations: Annotation[] }[] {
+  if (classInfo.decl.components) {
+    return classInfo.decl.components.map((c) => ({ name: c.name, type: c.type, annotations: c.annotations ?? [] }))
   }
-  const result: { name: string; typ: TypRef; annotations: Annotation[] }[] = []
-  for (let k: Klasse | undefined = klasse; k; k = k.oberklasse) {
-    for (const field of k.dekl.felder) {
-      if (!field.statisch) result.push({ name: field.name, typ: field.typ, annotations: field.annotations ?? [] })
+  const result: { name: string; type: TypeRef; annotations: Annotation[] }[] = []
+  for (let k: ClassInfo | undefined = classInfo; k; k = k.superclass) {
+    for (const field of k.decl.fields) {
+      if (!field.isStatic) result.push({ name: field.name, type: field.type, annotations: field.annotations ?? [] })
     }
   }
   return result
@@ -111,7 +111,7 @@ function constrainedProperties(klasse: Klasse): { name: string; typ: TypRef; ann
 export function validationMessage(errors: FieldErrorInfo[], interpreter: Interpreter): string {
   const parts = errors.map(
     (e) =>
-      `[Field error in object '${e.objectName}' on field '${e.field}': rejected value [${e.rejected.art === 'null' ? 'null' : interpreter.alsText(e.rejected)}]; default message [${e.message}]]`,
+      `[Field error in object '${e.objectName}' on field '${e.field}': rejected value [${e.rejected.kind === 'null' ? 'null' : interpreter.toText(e.rejected)}]; default message [${e.message}]]`,
   )
   return `Validation failed for argument [0] with ${errors.length} error${errors.length === 1 ? '' : 's'}: ${parts.join(' ')}`
 }

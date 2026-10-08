@@ -9,7 +9,7 @@
  * No DOM, no React - used by the browser self-test and by `npm test -- backend`.
  */
 
-import type { CodeBeispiel, SpringTestSpec } from '../learning/jsSandbox'
+import type { CodeExample, SpringTestSpec } from '../learning/jsSandbox'
 import { parseHttp, requestText } from './http'
 import { springRun } from './index'
 import { localized } from '../i18n/localized'
@@ -25,13 +25,13 @@ export const SPRING_EXPECTED_FAILURES: Record<string, string> = {
 
 const asTests = (tests: SpringTestSpec[]) => tests.map((t) => ({ ...t, name: localized(t.name, 'de') }))
 
-export function springExampleCheck(id: string, example: CodeBeispiel): ContentResult {
+export function springExampleCheck(id: string, example: CodeExample): ContentResult {
   const result = contentResult(id)
   const tests = example.tests as SpringTestSpec[] | undefined
   const options = { language: 'de' as const, properties: example.properties, requests: example.requests }
 
   if (tests?.length) {
-    const solution = springRun(example.loesung ?? example.code, { ...options, tests: asTests(tests) })
+    const solution = springRun(example.solution ?? example.code, { ...options, tests: asTests(tests) })
     const failed = (solution.results ?? []).filter((r) => !r.ok)
     if (failed.length) return result('solution fails: ' + failed.map((r) => `“${r.name}” ${r.message}`).join(' · '))
     const start = springRun(example.code, { ...options, tests: asTests(tests) })
@@ -40,10 +40,10 @@ export function springExampleCheck(id: string, example: CodeBeispiel): ContentRe
   }
 
   const expected = SPRING_EXPECTED_FAILURES[id]
-  for (const [what, code] of [['example', example.code], ...(example.loesung ? [['solution', example.loesung]] : [])] as const) {
+  for (const [what, code] of [['example', example.code], ...(example.solution ? [['solution', example.solution]] : [])] as const) {
     const run = springRun(code, options)
     if (run.failed && !expected) {
-      const errors = run.lines.filter((l) => l.typ === 'fehler' || l.typ === 'error').map((l) => l.text)
+      const errors = run.lines.filter((l) => l.type === 'exception' || l.type === 'error').map((l) => l.text)
       return result(`${what} does not start: ${errors.join(' | ')}`)
     }
     if (!run.failed && expected && what === 'example') return result(`should fail (${expected}), but starts`)

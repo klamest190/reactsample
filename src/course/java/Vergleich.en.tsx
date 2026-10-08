@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Vergleich.code'
+import { examples, codeBloecke } from './Vergleich.code'
 
 /**
  * CHAPTER 6.10 (English) - Java, JavaScript & React compared
@@ -16,8 +16,8 @@ export function Vergleich() {
           The same task, two languages: sum and average of a series of numbers. Both editors run on
           this very page - watch the badge in the top right corner.
         </P>
-        <TryIt modus="java" titel="Java" id="java-vergleich-java" {...beispiele['java-vergleich-java']} />
-        <TryIt titel="JavaScript" id="java-vergleich-js" {...beispiele['java-vergleich-js']} />
+        <TryIt mode="java" title="Java" id="java-vergleich-java" {...examples['java-vergleich-java']} />
+        <TryIt title="JavaScript" id="java-vergleich-js" {...examples['java-vergleich-js']} />
         <P>
           Two things stand out: Java needs noticeably more scaffolding - and the cast{' '}
           <Code>(double)</Code> is mandatory, because <Code>int / int</Code> would cut off otherwise
@@ -56,9 +56,9 @@ export function Vergleich() {
           A task list, filtered by “open”. First Java, then JavaScript, then React - and in the third
           case it becomes a user interface you can click.
         </P>
-        <TryIt modus="java" titel="Java" id="java-vergleich-liste-java" {...beispiele['java-vergleich-liste-java']} />
-        <TryIt titel="JavaScript" id="java-vergleich-liste-js" {...beispiele['java-vergleich-liste-js']} />
-        <TryIt modus="react" titel="React" id="java-vergleich-liste-react" {...beispiele['java-vergleich-liste-react']} />
+        <TryIt mode="java" title="Java" id="java-vergleich-liste-java" {...examples['java-vergleich-liste-java']} />
+        <TryIt title="JavaScript" id="java-vergleich-liste-js" {...examples['java-vergleich-liste-js']} />
+        <TryIt mode="react" title="React" id="java-vergleich-liste-react" {...examples['java-vergleich-liste-react']} />
         <P>
           The chain <Code>stream().filter(…).toList()</Code> and{' '}
           <Code>{'tasks.filter(t => !t.done)'}</Code> say the same thing. React only adds one thing:
@@ -77,7 +77,7 @@ export function Vergleich() {
           The app itself is 100 % React and TypeScript. Java only appears in two places here - and
           both are cleanly separated from the rest:
         </P>
-        <CodeBlock code={codeBloecke.struktur} titel="Project structure" />
+        <CodeBlock code={codeBloecke.struktur} title="Project structure" />
         <Liste>
           <li>
             <strong>
@@ -132,7 +132,7 @@ export function Vergleich() {
             <Code>double</Code>, lets <Code>int</Code> overflow and throws real exceptions.
           </li>
         </Liste>
-        <TryIt modus="java" id="java-vergleich-laufzeit" {...beispiele['java-vergleich-laufzeit']} />
+        <TryIt mode="java" id="java-vergleich-laufzeit" {...examples['java-vergleich-laufzeit']} />
         <Hinweis variante="warnung">
           The runtime covers the fundamentals, not all of Java. Missing are threads, file access,{' '}
           <Code>Scanner</Code> (there is no keyboard input), packages across several files and
@@ -173,10 +173,10 @@ export function Vergleich() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-vergleich-uebung"
-          {...beispiele['java-vergleich-uebung']}
-          aufgabe={
+          {...examples['java-vergleich-uebung']}
+          task={
             <>
               <p>
                 Translate two JavaScript one-liners into Java. The originals are in the comment
@@ -198,34 +198,34 @@ export function Vergleich() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is true about Java and JavaScript?',
-            antworten: [
+            question: 'What is true about Java and JavaScript?',
+            answers: [
               'JavaScript is a simplified version of Java.',
               'They are independent languages - the similar name was marketing.',
               'Java runs in the browser, JavaScript on the server.',
               'Both are executed by the same runtime.',
             ],
-            richtig: 1,
-            erklaerung: 'JavaScript got its name in 1995 for marketing reasons, because Java was popular then. The languages are not related.',
+            correct: 1,
+            explanation: 'JavaScript got its name in 1995 for marketing reasons, because Java was popular then. The languages are not related.',
           },
           {
-            frage: 'Which folder in this project contains Java logic exclusively?',
-            antworten: ['src/learning/', 'src/java/', 'src/course/', 'src/components/'],
-            richtig: 1,
-            erklaerung: 'src/java/ is the Java runtime: lexer, parser, checker, interpreter - pure TypeScript without React.',
+            question: 'Which folder in this project contains Java logic exclusively?',
+            answers: ['src/learning/', 'src/java/', 'src/course/', 'src/components/'],
+            correct: 1,
+            explanation: 'src/java/ is the Java runtime: lexer, parser, checker, interpreter - pure TypeScript without React.',
           },
           {
-            frage: 'Where would you build a user interface with click state?',
-            antworten: [
+            question: 'Where would you build a user interface with click state?',
+            answers: [
               'in Java, because it is type-safe',
               'in React, because the display follows from the state automatically',
               'both are equivalent',
               'in plain JavaScript without a library',
             ],
-            richtig: 1,
-            erklaerung: 'That is exactly what React is for: you describe the result, React takes care of the DOM changes.',
+            correct: 1,
+            explanation: 'That is exactly what React is for: you describe the result, React takes care of the DOM changes.',
           },
         ]}
       />

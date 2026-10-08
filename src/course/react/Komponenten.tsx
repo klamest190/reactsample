@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Komponenten.code'
+import { examples, codeBloecke } from './Komponenten.code'
 
 /**
  * KAPITEL 3.1 - Komponenten & JSX
@@ -15,8 +15,8 @@ export function Komponenten() {
         <P>Eine Komponente ist eine Funktion, die JSX zurückgibt.</P>
         <TryIt
           id="react-komponenten-einstieg"
-          {...beispiele['react-komponenten-einstieg']}
-          modus="react"
+          {...examples['react-komponenten-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -45,8 +45,8 @@ export function Komponenten() {
         </Liste>
         <TryIt
           id="react-komponenten-1"
-          {...beispiele['react-komponenten-1']}
-          modus="react"
+          {...examples['react-komponenten-1']}
+          mode="react"
         />
         <Hinweis variante="info">
           In einem echten Projekt steht ganz am Anfang einmal{' '}
@@ -93,17 +93,17 @@ export function Komponenten() {
         </Liste>
         <TryIt
           id="react-komponenten-2"
-          {...beispiele['react-komponenten-2']}
-          modus="react"
+          {...examples['react-komponenten-2']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="react-komponenten-uebung"
-          {...beispiele['react-komponenten-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-komponenten-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Dieser Code ist in HTML-Denkweise geschrieben und lässt sich nicht übersetzen. Finde
@@ -119,29 +119,29 @@ export function Komponenten() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Warum muss ein Komponentenname mit einem Großbuchstaben beginnen?',
-            antworten: [
+            question: 'Warum muss ein Komponentenname mit einem Großbuchstaben beginnen?',
+            answers: [
               'Das ist nur eine Stilkonvention.',
               'Sonst hält React ihn für ein HTML-Element.',
               'Weil JavaScript-Funktionen immer groß geschrieben werden.',
             ],
-            richtig: 1,
-            erklaerung: '<profile> wäre ein (unbekanntes) HTML-Tag, <Profile> ruft deine Funktion auf.',
+            correct: 1,
+            explanation: '<profile> wäre ein (unbekanntes) HTML-Tag, <Profile> ruft deine Funktion auf.',
           },
           {
-            frage: 'Was darf in JSX zwischen { } stehen?',
-            antworten: ['Nur Variablen', 'Jeder JavaScript-Ausdruck', 'Auch if- und for-Anweisungen'],
-            richtig: 1,
-            erklaerung:
+            question: 'Was darf in JSX zwischen { } stehen?',
+            answers: ['Nur Variablen', 'Jeder JavaScript-Ausdruck', 'Auch if- und for-Anweisungen'],
+            correct: 1,
+            explanation:
               'Ausdrücke wie a + b, condition ? x : y oder list.map(…) - keine Anweisungen wie if oder for.',
           },
           {
-            frage: 'Wie gibst du zwei Geschwister-Elemente ohne zusätzliches <div> zurück?',
-            antworten: ['Als Array ohne Klammern', 'Mit einem Fragment <>…</>', 'Gar nicht'],
-            richtig: 1,
-            erklaerung: 'Das Fragment gruppiert Elemente, ohne selbst im DOM aufzutauchen.',
+            question: 'Wie gibst du zwei Geschwister-Elemente ohne zusätzliches <div> zurück?',
+            answers: ['Als Array ohne Klammern', 'Mit einem Fragment <>…</>', 'Gar nicht'],
+            correct: 1,
+            explanation: 'Das Fragment gruppiert Elemente, ohne selbst im DOM aufzutauchen.',
           },
         ]}
       />

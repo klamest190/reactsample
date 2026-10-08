@@ -6,7 +6,7 @@ import { kurs } from '../course/course'
 import { playgrounds } from '../course/playground'
 import { bausteinSchritte } from '../course/playground/locations'
 import type { Baustein, PlaygroundDaten } from '../course/playground/types'
-import type { EditorSteuerung } from '../learning/CodeEditor'
+import type { EditorControl } from '../learning/CodeEditor'
 import { TryIt, type TryItProps } from '../learning/TryIt'
 
 /**
@@ -65,22 +65,22 @@ export function Playground({ teil }: { teil?: string }) {
 function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
   const t = useTexte()
   const { sprache } = useSprache()
-  const editorRef = useRef<EditorSteuerung>(null)
+  const editorRef = useRef<EditorControl>(null)
   const [filter, setFilter] = useState('')
   const kursTeil = kurs.find((k) => k.id === daten.teil)!
 
   function bausteinEinfuegen(baustein: Baustein) {
     const editor = editorRef.current
     if (!editor) return
-    editor.einfuegen(bausteinSchritte(baustein, editor.stand()))
-    editor.ausfuehren()
+    editor.insert(bausteinSchritte(baustein, editor.stand()))
+    editor.run()
   }
 
   function vorlageLaden(code: string) {
     const editor = editorRef.current
     if (!editor) return
-    editor.ersetzen(code)
-    editor.ausfuehren()
+    editor.replace(code)
+    editor.run()
   }
 
   // Filter über Titel, Erklärung und Code - "map" findet also auch Bausteine, die map benutzen.
@@ -212,7 +212,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
         {/* Editor mit Ausgabe */}
         <div className="min-w-0">
           {/* Ein Editor für jeden Modus; JavaScript zeigt dazu die Vorschau, damit DOM-Code sichtbar wird. */}
-          <TryIt {...({ ...gemeinsam, modus: daten.modus, vorschau: daten.modus === 'js' || undefined } as TryItProps)} />
+          <TryIt {...({ ...gemeinsam, mode: daten.mode, preview: daten.mode === 'js' || undefined } as TryItProps)} />
         </div>
       </div>
     </div>

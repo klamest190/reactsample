@@ -1,5 +1,5 @@
-import type { CodeBeispiel, ReactTest, Test } from '../learning/jsSandbox'
-import { dateien as businessDateien } from '../course/practice/BusinessApp.code'
+import type { CodeExample, ReactTest, Test } from '../learning/jsSandbox'
+import { files as businessDateien } from '../course/practice/BusinessApp.code'
 import { uebungDateien, uebungVarianten } from '../course/practice/Testen.code'
 import { schrittInhalte } from '../course/project/steps'
 import { projektSchritte } from '../course/project/meta'
@@ -7,137 +7,137 @@ import type { UebungsSammlung } from '../course/exercises/types'
 import { playgrounds } from '../course/playground'
 import { bausteinSchritte } from '../course/playground/locations'
 import type { Baustein } from '../course/playground/types'
-import { einfuegungenPlanen } from '../learning/insertion'
-import { ERWARTETE_FEHLER, beispielPruefen, projektRendern, uebungPruefen, type Ergebnis, type Modus } from './checks'
+import { planInsertions } from '../learning/insertion'
+import { EXPECTED_FAILURES, checkExample, renderProject, uebungPruefen, type Result, type Mode } from './checks'
 import { tryItUsages } from './tryItUsages'
 
 /**
  * Einstieg der Testseite selftest.html (nur im Dev-Server, nicht im Build).
- * Gestartet wird sie von scripts/e2e-content.mjs; ?nur=praxis- beschränkt auf IDs mit diesem Anfang.
- * Das Ergebnis steht danach in window.__selbsttest.
+ * Gestartet wird sie von scripts/e2e-content.mjs; ?only=praxis- limits it to ids with this prefix.
+ * Das Ergebnis steht danach in window.__selftest.
  */
 
-type Auftrag = { id: string; ort: string; pruefen: () => Promise<string | null> }
+type Job = { id: string; location: string; check: () => Promise<string | null> }
 
-const codeModule = import.meta.glob<{ beispiele?: Record<string, CodeBeispiel> }>('../course/**/*.code.ts', { eager: true })
-const kapitelQuellen = import.meta.glob<string>(['../course/**/*.tsx', '!../course/**/*.en.tsx'], {
+const codeModules = import.meta.glob<{ examples?: Record<string, CodeExample> }>('../course/**/*.code.ts', { eager: true })
+const chapterSources = import.meta.glob<string>(['../course/**/*.tsx', '!../course/**/*.en.tsx'], {
   query: '?raw',
   import: 'default',
   eager: true,
 })
-const uebungsModule = import.meta.glob<{ uebungen: UebungsSammlung }>('../course/exercises/{js,ts,react,hooks,practice,java,backend,sql}.ts', { eager: true })
+const exerciseModules = import.meta.glob<{ exercises: UebungsSammlung }>('../course/exercises/{js,ts,react,hooks,practice,java,backend,sql}.ts', { eager: true })
 
-function auftraegeSammeln(): Auftrag[] {
-  const modi: Map<string, Modus> = tryItUsages(Object.values(kapitelQuellen))
-  const auftraege: Auftrag[] = []
+function collectJobs(): Job[] {
+  const modi: Map<string, Mode> = tryItUsages(Object.values(chapterSources))
+  const jobs: Job[] = []
 
   // 1. Beispiele und Übungen in den Kapiteln
-  for (const [pfad, modul] of Object.entries(codeModule)) {
-    const ort = pfad.replace('../course/', '')
-    for (const [id, beispiel] of Object.entries(modul.beispiele ?? {})) {
+  for (const [pfad, mod] of Object.entries(codeModules)) {
+    const location = pfad.replace('../course/', '')
+    for (const [id, example] of Object.entries(mod.examples ?? {})) {
       const m = modi.get(id)
       if (!m) {
-        auftraege.push({ id, ort, pruefen: async () => 'wird in keinem Kapitel verwendet' })
+        jobs.push({ id, location, check: async () => 'wird in keinem Kapitel verwendet' })
         continue
       }
-      const extra = id === 'praxis-testen-uebung' ? { dateien: uebungDateien, varianten: uebungVarianten } : {}
-      auftraege.push({ id, ort, pruefen: () => beispielPruefen(beispiel, m, { ...extra, id }) })
+      const extra = id === 'praxis-testen-uebung' ? { files: uebungDateien, variants: uebungVarianten } : {}
+      jobs.push({ id, location, check: () => checkExample(example, m, { ...extra, id }) })
     }
   }
 
   // 2. Zusatzübungen
-  for (const [pfad, modul] of Object.entries(uebungsModule)) {
-    const ort = pfad.replace('../course/', '')
-    for (const liste of Object.values(modul.uebungen)) {
-      for (const u of liste) {
+  for (const [pfad, mod] of Object.entries(exerciseModules)) {
+    const location = pfad.replace('../course/', '')
+    for (const list of Object.values(mod.exercises)) {
+      for (const u of list) {
         if (u.stufe === 'vorhersage') continue // Multiple Choice, nichts auszuführen
-        auftraege.push({
+        jobs.push({
           id: u.id,
-          ort,
-          pruefen: () =>
-            u.modus === 'ts' || u.modus === 'spring' || u.modus === 'dockerfile' || u.modus === 'compose' || u.modus === 'sql'
-              ? beispielPruefen(u, { modus: u.modus, typen: false, vorschau: false }, { id: u.id })
+          location,
+          check: () =>
+            u.mode === 'ts' || u.mode === 'spring' || u.mode === 'dockerfile' || u.mode === 'compose' || u.mode === 'sql'
+              ? checkExample(u, { mode: u.mode, typed: false, preview: false }, { id: u.id })
               : u.tests?.length
-              ? uebungPruefen(u.modus, u.code, u.loesung, u.tests as Test[] | ReactTest[], u.vorbereitung)
-              : beispielPruefen({ code: u.code, loesung: u.loesung, vorbereitung: u.vorbereitung }, { modus: u.modus, typen: false, vorschau: Boolean(u.vorschau) }),
+              ? uebungPruefen(u.mode, u.code, u.solution, u.tests as Test[] | ReactTest[], u.setup)
+              : checkExample({ code: u.code, solution: u.solution, setup: u.setup }, { mode: u.mode, typed: false, preview: Boolean(u.preview) }),
         })
       }
     }
   }
 
   // 3. Projektschritte: jeder startet mit der Lösung des vorherigen
-  let vorherige = ''
+  let previous = ''
   for (const meta of projektSchritte) {
     const s = schrittInhalte[meta.id]
     if (!s) continue
-    const start = s.start ?? vorherige
-    vorherige = s.loesung
-    const beispiel = { code: start, loesung: s.loesung, tests: s.modus === 'test' ? undefined : s.tests }
-    const modus = { modus: s.modus, typen: s.modus === 'react' && Boolean(s.typen), vorschau: s.modus === 'js' && Boolean(s.vorschau) }
-    const extra = s.modus === 'test' ? { dateien: s.dateien, varianten: s.varianten } : {}
-    auftraege.push({ id: meta.id, ort: 'project/steps.ts', pruefen: () => beispielPruefen(beispiel, modus, extra) })
+    const start = s.start ?? previous
+    previous = s.solution
+    const example = { code: start, solution: s.solution, tests: s.mode === 'test' ? undefined : s.tests }
+    const mode = { mode: s.mode, typed: s.mode === 'react' && Boolean(s.typed), preview: s.mode === 'js' && Boolean(s.preview) }
+    const extra = s.mode === 'test' ? { files: s.files, variants: s.variants } : {}
+    jobs.push({ id: meta.id, location: 'project/steps.ts', check: () => checkExample(example, mode, extra) })
   }
 
   // 4. Die Business-App der Werkstatt
-  auftraege.push({
+  jobs.push({
     id: 'praxis-business',
-    ort: 'praxis/businessApp/',
-    pruefen: async () => (await projektRendern(businessDateien, 'App.tsx'))[0] ?? null,
+    location: 'praxis/businessApp/',
+    check: async () => (await renderProject(businessDateien, 'App.tsx'))[0] ?? null,
   })
 
   // 5. Playgrounds: Vorlagen laufen, jeder Baustein läuft an seiner automatischen Stelle -
   //    und alle Bausteine eines Teils zusammen (findet doppelte Namen und falsche Stellen).
   for (const p of playgrounds) {
-    const modus: Modus = { modus: p.modus, typen: false, vorschau: p.modus === 'js' }
-    const ort = `playground/${p.teil}.ts`
+    const mode: Mode = { mode: p.mode, typed: false, preview: p.mode === 'js' }
+    const location = `playground/${p.teil}.ts`
     const start = p.vorlagen[0].code
-    const einfuegen = (code: string, b: Baustein) =>
-      einfuegungenPlanen(code, bausteinSchritte(b, { code, start: 0, ende: 0, vonHand: false })).code
-    const pruefen = (code: string) => beispielPruefen({ code }, modus)
+    const insert = (code: string, b: Baustein) =>
+      planInsertions(code, bausteinSchritte(b, { code, start: 0, end: 0, manual: false })).code
+    const check = (code: string) => checkExample({ code }, mode)
 
-    p.vorlagen.forEach((v, i) => auftraege.push({ id: `playground-${p.teil}-vorlage-${i + 1}`, ort, pruefen: () => pruefen(v.code) }))
+    p.vorlagen.forEach((v, i) => jobs.push({ id: `playground-${p.teil}-vorlage-${i + 1}`, location, check: () => check(v.code) }))
     const alle = p.gruppen.flatMap((g) => g.bausteine)
     for (const b of alle) {
-      auftraege.push({ id: `playground-${p.teil}-${b.titel.en}`, ort, pruefen: () => pruefen(einfuegen(start, b)) })
+      jobs.push({ id: `playground-${p.teil}-${b.titel.en}`, location, check: () => check(insert(start, b)) })
     }
-    auftraege.push({
+    jobs.push({
       id: `playground-${p.teil}-alle-bausteine`,
-      ort,
-      pruefen: async () => {
-        const code = alle.reduce(einfuegen, start)
-        const meldung = await pruefen(code)
-        return meldung && `${meldung}\n--- Code ---\n${code}`
+      location,
+      check: async () => {
+        const code = alle.reduce(insert, start)
+        const message = await check(code)
+        return message && `${message}\n--- Code ---\n${code}`
       },
     })
   }
 
-  return auftraege
+  return jobs
 }
 
 async function start() {
-  const nur = new URLSearchParams(location.search).get('nur') ?? ''
-  const auftraege = auftraegeSammeln().filter((a) => a.id.startsWith(nur))
-  const ergebnisse: Ergebnis[] = []
-  const ausgabe = document.getElementById('ausgabe')!
-  const status = window as unknown as { __selbsttest: { fertig: boolean; ergebnisse: Ergebnis[]; gesamt: number } }
-  status.__selbsttest = { fertig: false, ergebnisse, gesamt: auftraege.length }
+  const only = new URLSearchParams(location.search).get('only') ?? ''
+  const jobs = collectJobs().filter((a) => a.id.startsWith(only))
+  const results: Result[] = []
+  const output = document.getElementById('output')!
+  const status = window as unknown as { __selftest: { done: boolean; results: Result[]; total: number } }
+  status.__selftest = { done: false, results, total: jobs.length }
 
-  for (const a of auftraege) {
-    const beginn = performance.now()
-    let meldung: string | null
+  for (const a of jobs) {
+    const begin = performance.now()
+    let message: string | null
     try {
-      meldung = await a.pruefen()
+      message = await a.check()
     } catch (f) {
-      meldung = 'Absturz im Selbsttest: ' + String(f)
+      message = 'Absturz im Selbsttest: ' + String(f)
     }
-    if (meldung && ERWARTETE_FEHLER[a.id]) meldung = null
-    const e = { id: a.id, ort: a.ort, ok: !meldung, meldung: meldung ?? '', dauer: Math.round(performance.now() - beginn) }
-    ergebnisse.push(e)
-    ausgabe.textContent += `${e.ok ? '✓' : '✗'} ${e.id} (${e.dauer} ms)${e.ok ? '' : '\n    → ' + e.meldung}\n`
+    if (message && EXPECTED_FAILURES[a.id]) message = null
+    const e = { id: a.id, location: a.location, ok: !message, message: message ?? '', duration: Math.round(performance.now() - begin) }
+    results.push(e)
+    output.textContent += `${e.ok ? '✓' : '✗'} ${e.id} (${e.duration} ms)${e.ok ? '' : '\n    → ' + e.message}\n`
   }
-  status.__selbsttest.fertig = true
-  const fehlgeschlagen = ergebnisse.filter((e) => !e.ok).length
-  ausgabe.textContent += `\n${ergebnisse.length - fehlgeschlagen} ok, ${fehlgeschlagen} fehlgeschlagen\n`
+  status.__selftest.done = true
+  const failed = results.filter((e) => !e.ok).length
+  output.textContent += `\n${results.length - failed} ok, ${failed} fehlgeschlagen\n`
 }
 
 void start()

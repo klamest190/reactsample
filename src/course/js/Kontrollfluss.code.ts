@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-kontrollfluss-einstieg': {
     code: js`
       const temperature = 23
@@ -112,7 +112,7 @@ export const beispiele = {
     `,
   },
   'js-kontrollfluss-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Prüfe zuerst den Sonderfall „keine Punkte“: `points === null || points === undefined`.',
         'Dann von oben nach unten: `>= 90`, `>= 70`, `>= 50` - mit frühem `return` brauchst du kein `else`.',
@@ -129,7 +129,7 @@ export const beispiele = {
 
       console.log(grade(95))
     `,
-    loesung: js`
+    solution: js`
       function grade(points) {
         if (points === null || points === undefined) return 'not specified'
         if (points >= 90) return 'excellent'
@@ -141,16 +141,16 @@ export const beispiele = {
       console.log(grade(95))
     `,
     tests: [
-      { name: { de: 'grade(95) ist \'excellent\'', en: 'grade(95) is \'excellent\'' }, ausdruck: 'grade(95)', erwartet: 'excellent' },
-      { name: { de: 'grade(90) ist \'excellent\' (Grenze)', en: 'grade(90) is \'excellent\' (boundary)' }, ausdruck: 'grade(90)', erwartet: 'excellent' },
-      { name: { de: 'grade(75) ist \'good\'', en: 'grade(75) is \'good\'' }, ausdruck: 'grade(75)', erwartet: 'good' },
-      { name: { de: 'grade(50) ist \'passed\'', en: 'grade(50) is \'passed\'' }, ausdruck: 'grade(50)', erwartet: 'passed' },
-      { name: { de: 'grade(0) ist \'failed\'', en: 'grade(0) is \'failed\'' }, ausdruck: 'grade(0)', erwartet: 'failed' },
-      { name: { de: 'grade(null) ist \'not specified\'', en: 'grade(null) is \'not specified\'' }, ausdruck: 'grade(null)', erwartet: 'not specified' },
-      { name: { de: 'grade() ist \'not specified\'', en: 'grade() is \'not specified\'' }, ausdruck: 'grade()', erwartet: 'not specified' },
+      { name: { de: 'grade(95) ist \'excellent\'', en: 'grade(95) is \'excellent\'' }, expression: 'grade(95)', expected: 'excellent' },
+      { name: { de: 'grade(90) ist \'excellent\' (Grenze)', en: 'grade(90) is \'excellent\' (boundary)' }, expression: 'grade(90)', expected: 'excellent' },
+      { name: { de: 'grade(75) ist \'good\'', en: 'grade(75) is \'good\'' }, expression: 'grade(75)', expected: 'good' },
+      { name: { de: 'grade(50) ist \'passed\'', en: 'grade(50) is \'passed\'' }, expression: 'grade(50)', expected: 'passed' },
+      { name: { de: 'grade(0) ist \'failed\'', en: 'grade(0) is \'failed\'' }, expression: 'grade(0)', expected: 'failed' },
+      { name: { de: 'grade(null) ist \'not specified\'', en: 'grade(null) is \'not specified\'' }, expression: 'grade(null)', expected: 'not specified' },
+      { name: { de: 'grade() ist \'not specified\'', en: 'grade() is \'not specified\'' }, expression: 'grade()', expected: 'not specified' },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

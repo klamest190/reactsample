@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Funktionen.code'
+import { examples, codeBloecke } from './Funktionen.code'
 
 /**
  * KAPITEL 2.3 - Funktionen typisieren
@@ -17,7 +17,7 @@ export function Funktionen() {
           Bei Funktionen schreibst du hinter jeden Parameter seinen Typ. Den Rückgabetyp kann TypeScript
           meist selbst ableiten - du darfst ihn aber hinter die Klammer schreiben.
         </P>
-        <TryIt id="ts-funktionen-einstieg" modus="ts" {...beispiele['ts-funktionen-einstieg']} />
+        <TryIt id="ts-funktionen-einstieg" mode="ts" {...examples['ts-funktionen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Optionale, Default- und Rest-Parameter">
@@ -26,7 +26,7 @@ export function Funktionen() {
           einen Parameter optional, ein Default-Wert bringt seinen Typ gleich mit, und Rest-Parameter sind
           ein Array.
         </P>
-        <TryIt id="ts-funktionen-parameter" modus="ts" {...beispiele['ts-funktionen-parameter']} />
+        <TryIt id="ts-funktionen-parameter" mode="ts" {...examples['ts-funktionen-parameter']} />
         <Hinweis variante="info">
           Optionale Parameter müssen hinten stehen: <Code>(name: string, title?: string)</Code> geht,{' '}
           <Code>(title?: string, name: string)</Code> nicht.
@@ -40,7 +40,7 @@ export function Funktionen() {
           lohnt sich besonders bei exportierten Funktionen. <Code>void</Code> bedeutet „gibt nichts
           Brauchbares zurück“.
         </P>
-        <TryIt id="ts-funktionen-rueckgabe" modus="ts" {...beispiele['ts-funktionen-rueckgabe']} />
+        <TryIt id="ts-funktionen-rueckgabe" mode="ts" {...examples['ts-funktionen-rueckgabe']} />
       </Abschnitt>
 
       <Abschnitt titel="Funktionstypen und Callbacks">
@@ -50,8 +50,8 @@ export function Funktionen() {
           mit Funktionstyp zu, bekommen ihre Parameter die Typen automatisch. Dasselbe passiert bei
           Callbacks.
         </P>
-        <TryIt id="ts-funktionen-typen" modus="ts" {...beispiele['ts-funktionen-typen']} />
-        <CodeBlock titel="Funktionstypen in React-Props" code={codeBloecke.eventHandler} />
+        <TryIt id="ts-funktionen-typen" mode="ts" {...examples['ts-funktionen-typen']} />
+        <CodeBlock title="Funktionstypen in React-Props" code={codeBloecke.eventHandler} />
       </Abschnitt>
 
       <Abschnitt titel="void und never">
@@ -61,7 +61,7 @@ export function Funktionen() {
           Eine Funktion mit Rückgabetyp <Code>never</Code> kehrt nie normal zurück, weil sie immer einen
           Fehler wirft.
         </P>
-        <TryIt id="ts-funktionen-void-never" modus="ts" {...beispiele['ts-funktionen-void-never']} />
+        <TryIt id="ts-funktionen-void-never" mode="ts" {...examples['ts-funktionen-void-never']} />
         <Hinweis variante="warnung">
           Im <Code>catch</Code>-Block ist der Fehler vom Typ <Code>unknown</Code> - in JavaScript kann
           man schließlich alles werfen, auch Strings. Prüfe mit <Code>instanceof Error</Code>, bevor du{' '}
@@ -74,7 +74,7 @@ export function Funktionen() {
           Mit Überladungen gibst du einer Funktion mehrere Signaturen. Aufrufer sehen nur diese
           Signaturen, die Implementierung darunter muss alle abdecken.
         </P>
-        <TryIt id="ts-funktionen-ueberladung" modus="ts" {...beispiele['ts-funktionen-ueberladung']} />
+        <TryIt id="ts-funktionen-ueberladung" mode="ts" {...examples['ts-funktionen-ueberladung']} />
         <Liste>
           <li>
             Oft reicht ein Union-Parameter (<Code>value: number | Date</Code>) - Überladungen lohnen sich
@@ -87,9 +87,9 @@ export function Funktionen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="ts-funktionen-uebung"
-          modus="ts"
-          {...beispiele['ts-funktionen-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-funktionen-uebung']}
+          task={
             <>
               <p>
                 Ein kleines Validierungssystem, wie man es für Formulare braucht. Die Logik steht schon -
@@ -114,24 +114,24 @@ export function Funktionen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wo steht bei function f(x: number): string der Rückgabetyp?',
-            antworten: ['Vor dem Funktionsnamen', 'Hinter der Parameterliste: ": string"', 'In der ersten Zeile des Körpers'],
-            richtig: 1,
-            erklaerung: 'Der Rückgabetyp folgt nach einem Doppelpunkt hinter der schließenden Klammer der Parameter.',
+            question: 'Wo steht bei function f(x: number): string der Rückgabetyp?',
+            answers: ['Vor dem Funktionsnamen', 'Hinter der Parameterliste: ": string"', 'In der ersten Zeile des Körpers'],
+            correct: 1,
+            explanation: 'Der Rückgabetyp folgt nach einem Doppelpunkt hinter der schließenden Klammer der Parameter.',
           },
           {
-            frage: 'type Fn = (n: number) => void. Darf man (n) => n * 2 zuweisen?',
-            antworten: ['Nein, die Funktion gibt eine Zahl zurück', 'Ja - bei void wird der Rückgabewert einfach ignoriert', 'Nur mit as'],
-            richtig: 1,
-            erklaerung: 'Ein void-Rückgabetyp in einem Funktionstyp heißt „der Wert wird nicht benutzt“. Deshalb funktioniert z. B. forEach((n) => list.push(n)).',
+            question: 'type Fn = (n: number) => void. Darf man (n) => n * 2 zuweisen?',
+            answers: ['Nein, die Funktion gibt eine Zahl zurück', 'Ja - bei void wird der Rückgabewert einfach ignoriert', 'Nur mit as'],
+            correct: 1,
+            explanation: 'Ein void-Rückgabetyp in einem Funktionstyp heißt „der Wert wird nicht benutzt“. Deshalb funktioniert z. B. forEach((n) => list.push(n)).',
           },
           {
-            frage: 'Welchen Typ hat error in catch (error) { … }?',
-            antworten: ['Error', 'any', 'unknown'],
-            richtig: 2,
-            erklaerung: 'Mit strict ist error unknown - geworfen werden kann alles. Erst instanceof Error grenzt ihn ein.',
+            question: 'Welchen Typ hat error in catch (error) { … }?',
+            answers: ['Error', 'any', 'unknown'],
+            correct: 2,
+            explanation: 'Mit strict ist error unknown - geworfen werden kann alles. Erst instanceof Error grenzt ihn ein.',
           },
         ]}
       />

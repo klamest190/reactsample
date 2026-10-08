@@ -1,5 +1,5 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
@@ -22,7 +22,7 @@ const fakeApi = js`
   }
 `
 
-export const beispiele = {
+export const examples = {
   'js-async-einstieg': {
     code: js`
       console.log('1: start')
@@ -90,7 +90,7 @@ export const beispiele = {
       const all = await Promise.all([loadUser(1), loadUser(2), loadUser(3)])
       console.log(all.map((u) => u.name))
     `,
-    vorbereitung: fakeApi,
+    setup: fakeApi,
   },
   'js-async-4': {
     code: js`
@@ -109,7 +109,7 @@ export const beispiele = {
     `,
   },
   'js-async-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Erzeuge mit `ids.map(…)` ein Array von Promises.',
         'Jedes Promise fängt seinen eigenen Fehler: `.then((user) => user.name).catch(() => \'unknown\')`.',
@@ -128,7 +128,7 @@ export const beispiele = {
 
       console.log(await loadNames([1, 2]))
     `,
-    loesung: js`
+    solution: js`
       async function loadNames(ids) {
         const promises = ids.map((id) =>
           loadUser(id)
@@ -140,12 +140,12 @@ export const beispiele = {
 
       console.log(await loadNames([1, 2]))
     `,
-    vorbereitung: fakeApi,
+    setup: fakeApi,
     tests: [
-      { name: { de: 'loadNames gibt ein Promise zurück', en: 'loadNames returns a promise' }, ausdruck: 'loadNames([1]) instanceof Promise' },
-      { name: { de: 'Namen in der richtigen Reihenfolge', en: 'Names in the right order' }, ausdruck: 'loadNames([3, 1])', erwartet: ['Grace', 'Ada'] },
-      { name: { de: 'Unbekannte IDs werden zu "unknown"', en: 'Unknown IDs become "unknown"' }, ausdruck: 'loadNames([2, 42])', erwartet: ['Alan', 'unknown'] },
-      { name: { de: 'Lädt parallel (3 Nutzer in unter 600 ms)', en: 'Loads in parallel (3 users in under 600 ms)' }, ausdruck: '(async () => { const t = performance.now(); await loadNames([1, 2, 3]); return performance.now() - t < 600 })()' },
+      { name: { de: 'loadNames gibt ein Promise zurück', en: 'loadNames returns a promise' }, expression: 'loadNames([1]) instanceof Promise' },
+      { name: { de: 'Namen in der richtigen Reihenfolge', en: 'Names in the right order' }, expression: 'loadNames([3, 1])', expected: ['Grace', 'Ada'] },
+      { name: { de: 'Unbekannte IDs werden zu "unknown"', en: 'Unknown IDs become "unknown"' }, expression: 'loadNames([2, 42])', expected: ['Alan', 'unknown'] },
+      { name: { de: 'Lädt parallel (3 Nutzer in unter 600 ms)', en: 'Loads in parallel (3 users in under 600 ms)' }, expression: '(async () => { const t = performance.now(); await loadNames([1, 2, 3]); return performance.now() - t < 600 })()' },
     ],
   },
   'js-async-eventloop': {
@@ -171,7 +171,7 @@ export const beispiele = {
       // The browser can only repaint between tasks.
     `,
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

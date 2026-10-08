@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Datenfluss.code'
+import { examples, codeBloecke } from './Datenfluss.code'
 
 /**
  * KAPITEL 3.4 - State teilen & Datenfluss
@@ -15,8 +15,8 @@ export function Datenfluss() {
         <P>Der State liegt im Eltern-Element: Daten gehen per Prop nach unten, der Klick per Callback nach oben.</P>
         <TryIt
           id="react-datenfluss-einstieg"
-          {...beispiele['react-datenfluss-einstieg']}
-          modus="react"
+          {...examples['react-datenfluss-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -36,8 +36,8 @@ export function Datenfluss() {
         </Liste>
         <TryIt
           id="react-datenfluss-1"
-          {...beispiele['react-datenfluss-1']}
-          modus="react"
+          {...examples['react-datenfluss-1']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -50,8 +50,8 @@ export function Datenfluss() {
         </P>
         <TryIt
           id="react-datenfluss-2"
-          {...beispiele['react-datenfluss-2']}
-          modus="react"
+          {...examples['react-datenfluss-2']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -94,9 +94,9 @@ export function Datenfluss() {
       <Abschnitt titel="Übung">
         <TryIt
           id="react-datenfluss-uebung"
-          {...beispiele['react-datenfluss-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-datenfluss-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Die Komponenten sind schon statisch gebaut (Schritt 2). Mach die Liste filterbar:
@@ -120,35 +120,35 @@ export function Datenfluss() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Zwei Geschwister-Komponenten brauchen denselben Wert. Wo gehört der State hin?',
-            antworten: [
+            question: 'Zwei Geschwister-Komponenten brauchen denselben Wert. Wo gehört der State hin?',
+            answers: [
               'In beide Komponenten',
               'In den nächsten gemeinsamen Elternteil',
               'In eine globale Variable',
             ],
-            richtig: 1,
-            erklaerung: 'Von dort kann er per Props an beide Kinder weitergegeben werden.',
+            correct: 1,
+            explanation: 'Von dort kann er per Props an beide Kinder weitergegeben werden.',
           },
           {
-            frage: 'Wie teilt ein Kind dem Elternteil mit, dass etwas passiert ist?',
-            antworten: [
+            question: 'Wie teilt ein Kind dem Elternteil mit, dass etwas passiert ist?',
+            answers: [
               'Es ändert die Props',
               'Es ruft eine Funktion auf, die es als Prop bekommen hat',
               'Es liest den State des Elternteils',
             ],
-            richtig: 1,
-            erklaerung: 'Callbacks als Props sind der Weg nach oben.',
+            correct: 1,
+            explanation: 'Callbacks als Props sind der Weg nach oben.',
           },
           {
-            frage: 'Du hast den State „list“. Wie bekommst du „count“?',
-            antworten: [
+            question: 'Du hast den State „list“. Wie bekommst du „count“?',
+            answers: [
               'const [count, setCount] = useState(list.length)',
               'const count = list.length',
             ],
-            richtig: 1,
-            erklaerung: 'Abgeleitete Werte berechnet man beim Rendern - so können sie nie veralten.',
+            correct: 1,
+            explanation: 'Abgeleitete Werte berechnet man beim Rendern - so können sie nie veralten.',
           },
         ]}
       />

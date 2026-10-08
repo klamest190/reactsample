@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Where.code'
+import { examples, codeBloecke } from './Where.code'
 
 /**
  * KAPITEL 9.2 - Filtern mit WHERE
@@ -18,17 +18,17 @@ export function Where() {
           Bedingung <strong>wahr</strong> ist - wie <Code>filter</Code> bei Arrays (<Verweis id="js-arrays" />),
           nur dass die Datenbank die Arbeit macht.
         </P>
-        <TryIt modus="sql" id="sql-where-einstieg" {...beispiele['sql-where-einstieg']} />
+        <TryIt mode="sql" id="sql-where-einstieg" {...examples['sql-where-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Vergleichen und verknüpfen">
-        <CodeBlock code={codeBloecke.operatoren} titel="SQL" />
+        <CodeBlock code={codeBloecke.operatoren} title="SQL" />
         <P>
           Wichtig: Ein einfaches <Code>=</Code> vergleicht (kein <Code>===</Code> wie in JavaScript).
           Ungleich ist <Code>&lt;&gt;</Code>. Mehrere Bedingungen verbindest du mit <Code>AND</Code> und{' '}
           <Code>OR</Code>; für häufige Muster gibt es Kurzformen:
         </P>
-        <TryIt modus="sql" id="sql-where-vergleiche" {...beispiele['sql-where-vergleiche']} />
+        <TryIt mode="sql" id="sql-where-vergleiche" {...examples['sql-where-vergleiche']} />
         <Liste>
           <li>
             <Code>IN ('books', 'accessories')</Code> ist kürzer und lesbarer als eine Kette von{' '}
@@ -46,7 +46,7 @@ export function Where() {
           Wie Punkt vor Strich bindet <Code>AND</Code> stärker als <Code>OR</Code>. Das ist die
           häufigste Ursache für Abfragen, die „zu viel“ liefern:
         </P>
-        <TryIt modus="sql" id="sql-where-klammern" {...beispiele['sql-where-klammern']} />
+        <TryIt mode="sql" id="sql-where-klammern" {...examples['sql-where-klammern']} />
         <Hinweis variante="tipp">
           Sobald <Code>AND</Code> und <Code>OR</Code> in einer Bedingung vorkommen: Klammern setzen.
           Auch wenn sie nicht nötig wären - der nächste Leser dankt es dir.
@@ -59,7 +59,7 @@ export function Where() {
           Zeichen (auch keins), <Code>_</Code> für genau eins. <Code>'Code%'</Code> heißt also „beginnt
           mit Code“, <Code>'%book%'</Code> „enthält book“.
         </P>
-        <TryIt modus="sql" id="sql-where-like" {...beispiele['sql-where-like']} />
+        <TryIt mode="sql" id="sql-where-like" {...examples['sql-where-like']} />
         <P>
           <Code>LIKE</Code> achtet auf Groß- und Kleinschreibung. PostgreSQL hat dafür{' '}
           <Code>ILIKE</Code>, das sie ignoriert - in anderen Datenbanken schreibt man{' '}
@@ -73,13 +73,13 @@ export function Where() {
           E-Mail, Software hat keinen Lagerbestand. NULL ist <strong>nicht</strong> dasselbe wie 0
           oder ein leerer Text, und es verhält sich anders als jeder andere Wert:
         </P>
-        <CodeBlock code={codeBloecke.null} titel="SQL" />
+        <CodeBlock code={codeBloecke.null} title="SQL" />
         <P>
           Jeder Vergleich mit NULL ergibt wieder NULL - „unbekannt“. Und <Code>WHERE</Code> behält nur
           Zeilen, deren Bedingung <strong>wahr</strong> ist. Deshalb findet <Code>= NULL</Code> nie
           etwas:
         </P>
-        <TryIt modus="sql" id="sql-where-null" {...beispiele['sql-where-null']} />
+        <TryIt mode="sql" id="sql-where-null" {...examples['sql-where-null']} />
         <Liste>
           <li>
             Nach „kein Wert“ fragt man mit <Code>IS NULL</Code>, nach „irgendein Wert“ mit{' '}
@@ -103,15 +103,15 @@ export function Where() {
           <strong>Ausdruck</strong>, der einen Wert liefert, wie der Ternär-Operator. Die erste
           zutreffende Zeile gewinnt:
         </P>
-        <TryIt modus="sql" id="sql-where-case" {...beispiele['sql-where-case']} />
+        <TryIt mode="sql" id="sql-where-case" {...examples['sql-where-case']} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-where-uebung"
-          {...beispiele['sql-where-uebung']}
-          aufgabe={
+          {...examples['sql-where-uebung']}
+          task={
             <p>
               Das Lager will nachbestellen: Zeige alle Produkte mit <strong>weniger als 10 Stück</strong>{' '}
               auf Lager - <Code>name</Code> und <Code>stock</Code>, der kleinste Bestand zuerst, bei
@@ -122,29 +122,29 @@ export function Where() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: "Was liefert WHERE category = 'books' OR category = 'hardware' AND price > 100?",
-            antworten: [
+            question: "Was liefert WHERE category = 'books' OR category = 'hardware' AND price > 100?",
+            answers: [
               'Bücher und Hardware, jeweils über 100',
               'Alle Bücher und die Hardware über 100',
               'Nur Hardware über 100',
               'Einen Fehler',
             ],
-            richtig: 1,
-            erklaerung: 'AND bindet stärker: books OR (hardware AND price > 100). Für die erste Antwort braucht es Klammern um das OR.',
+            correct: 1,
+            explanation: 'AND bindet stärker: books OR (hardware AND price > 100). Für die erste Antwort braucht es Klammern um das OR.',
           },
           {
-            frage: 'Wie findest du Kunden ohne E-Mail?',
-            antworten: ['WHERE email = NULL', "WHERE email = ''", 'WHERE email IS NULL', 'WHERE NOT email'],
-            richtig: 2,
-            erklaerung: '= NULL ist nie wahr, weil jeder Vergleich mit NULL wieder NULL ergibt. Dafür gibt es IS NULL.',
+            question: 'Wie findest du Kunden ohne E-Mail?',
+            answers: ['WHERE email = NULL', "WHERE email = ''", 'WHERE email IS NULL', 'WHERE NOT email'],
+            correct: 2,
+            explanation: '= NULL ist nie wahr, weil jeder Vergleich mit NULL wieder NULL ergibt. Dafür gibt es IS NULL.',
           },
           {
-            frage: "Welche Namen passen auf LIKE 'A_a%'?",
-            antworten: ['Ada Lovelace', 'Alan Turing', 'Anna', 'Ada Lovelace und Anna'],
-            richtig: 0,
-            erklaerung: "A, genau ein beliebiges Zeichen (d), a, dann beliebig viel. 'Anna' hat an dritter Stelle ein n.",
+            question: "Welche Namen passen auf LIKE 'A_a%'?",
+            answers: ['Ada Lovelace', 'Alan Turing', 'Anna', 'Ada Lovelace und Anna'],
+            correct: 0,
+            explanation: "A, genau ein beliebiges Zeichen (d), a, dann beliebig viel. 'Anna' hat an dritter Stelle ein n.",
           },
         ]}
       />

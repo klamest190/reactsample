@@ -5,7 +5,7 @@ import type { Uebung, UebungsSammlung } from './types'
  * Die Promises werden zwischengespeichert - `use(promise)` braucht bei jedem Render
  * dasselbe Promise-Objekt (siehe Kapitel 4.9).
  */
-const LADER: Record<string, () => Promise<{ uebungen: UebungsSammlung }>> = {
+const LADER: Record<string, () => Promise<{ exercises: UebungsSammlung }>> = {
   js: () => import('./js'),
   ts: () => import('./ts'),
   java: () => import('./java'),
@@ -25,7 +25,7 @@ export function uebungenFuer(kapitelId: string): Promise<Uebung[]> {
   if (!promise) {
     const teil = kapitelId.split('-')[0]
     const lader = LADER[teil]
-    promise = lader ? lader().then((modul) => modul.uebungen[kapitelId] ?? []) : Promise.resolve([])
+    promise = lader ? lader().then((modul) => modul.exercises[kapitelId] ?? []) : Promise.resolve([])
     cache.set(kapitelId, promise)
   }
   return promise

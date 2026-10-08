@@ -1,5 +1,5 @@
 import { http, java, js, properties } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.4 - Validation & error handling. */
 
@@ -13,7 +13,7 @@ const APP = java`
 `
 const withApp = (code: string) => `${APP}\n\n${code}`
 
-export const beispiele = {
+export const examples = {
   'spring-fehler-valid': {
     code: withApp(java`
       // The rules sit directly on the fields of the request.
@@ -159,7 +159,7 @@ export const beispiele = {
     `,
   },
   'spring-fehler-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Die Regeln gehören an die Komponenten des Records: `@NotBlank String title`, `@NotBlank String author`, `@Min(1) int pages` - und `@Valid` vor `@RequestBody`.',
         'In `one` wirfst du `new BookNotFoundException(id)`, wenn `books.get(id)` null ist.',
@@ -203,7 +203,7 @@ export const beispiele = {
 
       // TODO: a @RestControllerAdvice that turns BookNotFoundException into a 404 ProblemDetail
     `),
-    loesung: withApp(java`
+    solution: withApp(java`
       record Book(long id, String title, String author, int pages) {}
       record BookRequest(@NotBlank String title, @NotBlank String author, @Min(1) int pages) {}
 
@@ -266,7 +266,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   abhaengigkeit: js`

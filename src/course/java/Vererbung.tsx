@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Vererbung.code'
+import { examples, codeBloecke } from './Vererbung.code'
 
 /**
  * KAPITEL 7.7 - Vererbung & Interfaces
@@ -17,7 +17,7 @@ export function Vererbung() {
           Mit <Code>extends</Code> übernimmt eine Klasse alles von einer anderen - und darf einzelne
           Methoden anders machen.
         </P>
-        <TryIt modus="java" id="java-vererbung-einstieg" {...beispiele['java-vererbung-einstieg']} />
+        <TryIt mode="java" id="java-vererbung-einstieg" {...examples['java-vererbung-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="„ist ein“">
@@ -35,7 +35,7 @@ export function Vererbung() {
           Objekt entscheidet, <em>was passiert</em>. Man kann also eine Liste von{' '}
           <Code>Animal</Code> durchlaufen, ohne zu wissen, welche Tierart gerade dran ist.
         </P>
-        <TryIt modus="java" id="java-vererbung-polymorphie" {...beispiele['java-vererbung-polymorphie']} />
+        <TryIt mode="java" id="java-vererbung-polymorphie" {...examples['java-vererbung-polymorphie']} />
         <Hinweis variante="info">
           <Code>@Override</Code> ersetzt die geerbte Methode. Mit <Code>super.methode()</Code> kannst
           du die alte Fassung trotzdem noch aufrufen und nur etwas ergänzen - so macht es{' '}
@@ -53,7 +53,7 @@ export function Vererbung() {
           gemeinsame Grundlage. Eine <Code>abstract</Code>-Methode hat keinen Rumpf: Jede
           Unterklasse <em>muss</em> sie liefern, sonst kompiliert es nicht.
         </P>
-        <TryIt modus="java" id="java-vererbung-abstract" {...beispiele['java-vererbung-abstract']} />
+        <TryIt mode="java" id="java-vererbung-abstract" {...examples['java-vererbung-abstract']} />
       </Abschnitt>
 
       <Abschnitt titel="Interfaces: Fähigkeiten statt Herkunft">
@@ -62,7 +62,7 @@ export function Vererbung() {
           hat genau eine Oberklasse, darf aber beliebig viele Interfaces implementieren.
         </P>
         <CodeBlock code={codeBloecke.wahl} />
-        <TryIt modus="java" id="java-vererbung-interface" {...beispiele['java-vererbung-interface']} />
+        <TryIt mode="java" id="java-vererbung-interface" {...examples['java-vererbung-interface']} />
         <Hinweis variante="tipp">
           Faustregel: <strong>abstract class</strong>, wenn es gemeinsame Daten und Code gibt („ist
           ein“). <strong>interface</strong>, wenn es nur um eine Fähigkeit geht („kann“) - besonders,
@@ -76,13 +76,13 @@ export function Vererbung() {
           einer festen, abzählbaren Menge von Objekten - Javas Antwort auf den Union-Type aus
           TypeScript (<Verweis nr="5.8" />).
         </P>
-        <TryIt modus="java" id="java-vererbung-enum" {...beispiele['java-vererbung-enum']} />
+        <TryIt mode="java" id="java-vererbung-enum" {...examples['java-vererbung-enum']} />
         <P>
           Ein <Code>record</Code> (seit Java 16) ist eine Klasse für reine Daten. Felder,
           Konstruktor, Getter, <Code>toString</Code> und <Code>equals</Code> erzeugt der Compiler -
           du schreibst eine Zeile.
         </P>
-        <TryIt modus="java" id="java-vererbung-record" {...beispiele['java-vererbung-record']} />
+        <TryIt mode="java" id="java-vererbung-record" {...examples['java-vererbung-record']} />
       </Abschnitt>
 
       <Abschnitt titel="Und warum macht React das anders?">
@@ -102,10 +102,10 @@ export function Vererbung() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-vererbung-uebung"
-          {...beispiele['java-vererbung-uebung']}
-          aufgabe={
+          {...examples['java-vererbung-uebung']}
+          task={
             <>
               <p>Baue eine kleine Gehaltsabrechnung:</p>
               <Liste>
@@ -132,34 +132,34 @@ export function Vererbung() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was bewirkt Polymorphie bei Animal a = new Dog("Rex"); a.sound(); ?',
-            antworten: [
+            question: 'Was bewirkt Polymorphie bei Animal a = new Dog("Rex"); a.sound(); ?',
+            answers: [
               'Es läuft die Methode von Animal.',
               'Es läuft die Methode von Dog.',
               'Es gibt einen Kompilierfehler.',
               'Das hängt von der Reihenfolge der Klassen ab.',
             ],
-            richtig: 1,
-            erklaerung: 'Der Typ der Variablen bestimmt, was du aufrufen DARFST. Welche Fassung läuft, entscheidet das Objekt.',
+            correct: 1,
+            explanation: 'Der Typ der Variablen bestimmt, was du aufrufen DARFST. Welche Fassung läuft, entscheidet das Objekt.',
           },
           {
-            frage: 'Wie viele Interfaces darf eine Klasse implementieren?',
-            antworten: ['keins', 'genau eins', 'beliebig viele', 'höchstens zwei'],
-            richtig: 2,
-            erklaerung: 'Beliebig viele Interfaces - aber nur eine Oberklasse. Genau dafür gibt es Interfaces.',
+            question: 'Wie viele Interfaces darf eine Klasse implementieren?',
+            answers: ['keins', 'genau eins', 'beliebig viele', 'höchstens zwei'],
+            correct: 2,
+            explanation: 'Beliebig viele Interfaces - aber nur eine Oberklasse. Genau dafür gibt es Interfaces.',
           },
           {
-            frage: 'Was gilt für eine abstrakte Methode?',
-            antworten: [
+            question: 'Was gilt für eine abstrakte Methode?',
+            answers: [
               'Sie hat einen Rumpf, der überschrieben werden kann.',
               'Sie hat keinen Rumpf, und jede konkrete Unterklasse muss sie liefern.',
               'Sie ist automatisch static.',
               'Sie darf nur in Interfaces stehen.',
             ],
-            richtig: 1,
-            erklaerung: 'Sie ist ein Versprechen ohne Umsetzung - deshalb kann man die Klasse auch nicht instanziieren.',
+            correct: 1,
+            explanation: 'Sie ist ein Versprechen ohne Umsetzung - deshalb kann man die Klasse auch nicht instanziieren.',
           },
         ]}
       />

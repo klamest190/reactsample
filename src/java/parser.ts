@@ -12,78 +12,78 @@
  * Echtes javac macht dasselbe.
  */
 
-import { JavaSyntaxFehler, tokenisieren, type Token } from './lexer'
+import { JavaSyntaxError, tokenize, type Token } from './lexer'
 import type {
   Annotation,
   AnnotationValue,
-  Anweisung,
-  Ausdruck,
+  Statement,
+  Expression,
   Block,
-  Faenger,
+  CatchClause,
   Literal,
-  ParamDekl,
-  Programm,
-  Sichtbarkeit,
-  SwitchFall,
-  TypDeklaration,
-  TypRef,
-  VarDekl,
+  ParamDecl,
+  Program,
+  Visibility,
+  SwitchCase,
+  TypeDecl,
+  TypeRef,
+  VarDecl,
 } from './ast'
 
-const PRIMITIVE = new Set(['int', 'long', 'short', 'byte', 'double', 'float', 'boolean', 'char', 'void', 'var'])
+const PRIMITIVES = new Set(['int', 'long', 'short', 'byte', 'double', 'float', 'boolean', 'char', 'void', 'var'])
 
 /** Modifikatoren, die vor Klassen, Feldern und Methoden stehen dürfen. */
-const MODIFIKATOREN = new Set([
+const MODIFIERS = new Set([
   'public', 'private', 'protected', 'static', 'final', 'abstract', 'default',
   'synchronized', 'native', 'transient', 'volatile', 'strictfp',
 ])
 
-type Modifikatoren = {
-  statisch: boolean
+type Modifiers = {
+  isStatic: boolean
   final: boolean
-  abstrakt: boolean
-  sichtbarkeit: Sichtbarkeit
+  isAbstract: boolean
+  visibility: Visibility
   annotations: Annotation[]
 }
 
-export function parsen(quelle: string): Programm {
-  const tokens = tokenisieren(quelle)
+export function parse(source: string): Program {
+  const tokens = tokenize(source)
   let pos = 0
 
   // --- Werkzeuge ------------------------------------------------------------
-  const jetzt = () => tokens[pos]
-  const naechstes = (n = 1) => tokens[Math.min(pos + n, tokens.length - 1)]
-  const istEnde = () => jetzt().art === 'ende'
-  const ist = (text: string, n = 0) => naechstes(n).text === text && naechstes(n).art !== 'text'
-  const istName = (n = 0) => naechstes(n).art === 'name'
+  const current = () => tokens[pos]
+  const peek = (n = 1) => tokens[Math.min(pos + n, tokens.length - 1)]
+  const atEnd = () => current().kind === 'end'
+  const is = (text: string, n = 0) => peek(n).text === text && peek(n).kind !== 'text'
+  const isName = (n = 0) => peek(n).kind === 'name'
 
-  function fehler(meldung: string, token: Token = jetzt()): never {
-    throw new JavaSyntaxFehler(meldung, token.zeile)
+  function fail(message: string, token: Token = current()): never {
+    throw new JavaSyntaxError(message, token.line)
   }
   /** Nimmt das Token, wenn es passt - sonst false. */
-  function nimm(text: string) {
-    if (ist(text)) {
+  function accept(text: string) {
+    if (is(text)) {
       pos++
       return true
     }
     return false
   }
-  function erwarte(text: string): Token {
-    if (!ist(text)) fehler(`'${text}' expected, found '${jetzt().text}'`)
+  function expect(text: string): Token {
+    if (!is(text)) fail(`'${text}' expected, found '${current().text}'`)
     return tokens[pos++]
   }
-  function erwarteName(): string {
-    if (jetzt().art !== 'name') fehler(`<identifier> expected, found '${jetzt().text}'`)
+  function expectName(): string {
+    if (current().kind !== 'name') fail(`<identifier> expected, found '${current().text}'`)
     return tokens[pos++].text
   }
-  const sichern = () => pos
-  const zurueck = (p: number) => {
+  const mark = () => pos
+  const back = (p: number) => {
     pos = p
   }
 
   /** `>>` und `>>>` schließen mehrere Generics auf einmal - hier aufspalten. */
-  function schliesseSpitz() {
-    const t = jetzt()
+  function closeAngle() {
+    const t = current()
     if (t.text === '>') {
       pos++
       return true
@@ -97,82 +97,82 @@ export function parsen(quelle: string): Programm {
 
   // --- Typen ----------------------------------------------------------------
 
-  function istTypAnfang(n = 0) {
-    const t = naechstes(n)
-    return t.art === 'name' || (t.art === 'schluessel' && PRIMITIVE.has(t.text))
+  function isTypeStart(n = 0) {
+    const t = peek(n)
+    return t.kind === 'name' || (t.kind === 'keyword' && PRIMITIVES.has(t.text))
   }
 
   /** Liest einen Typ. Gibt null zurück, wenn hier keiner steht (für Rateversuche). */
-  function typLesen(): TypRef | null {
-    if (!istTypAnfang()) return null
+  function readType(): TypeRef | null {
+    if (!isTypeStart()) return null
     let name = tokens[pos++].text
     // Punktnamen wie java.util.List: für uns zählt nur der letzte Teil.
-    while (ist('.') && istName(1)) {
+    while (is('.') && isName(1)) {
       pos++
       name = tokens[pos++].text
     }
-    const argumente: TypRef[] = []
-    if (ist('<')) {
-      const p = sichern()
+    const args: TypeRef[] = []
+    if (is('<')) {
+      const p = mark()
       pos++
-      if (schliesseSpitz()) {
+      if (closeAngle()) {
         // Diamond <> - kein Argument
       } else {
         let ok = true
         while (true) {
-          if (nimm('?')) {
-            if (nimm('extends') || nimm('super')) typLesen()
-            argumente.push({ name: 'Object', dimensionen: 0, argumente: [] })
+          if (accept('?')) {
+            if (accept('extends') || accept('super')) readType()
+            args.push({ name: 'Object', dimensions: 0, args: [] })
           } else {
-            const arg = typLesen()
+            const arg = readType()
             if (!arg) {
               ok = false
               break
             }
-            argumente.push(arg)
+            args.push(arg)
           }
-          if (nimm(',')) continue
-          if (schliesseSpitz()) break
+          if (accept(',')) continue
+          if (closeAngle()) break
           ok = false
           break
         }
         if (!ok) {
-          zurueck(p) // war doch ein Vergleich, kein Generic
-          return { name, dimensionen: 0, argumente: [] }
+          back(p) // war doch ein Vergleich, kein Generic
+          return { name, dimensions: 0, args: [] }
         }
       }
     }
-    let dimensionen = 0
-    while (ist('[') && ist(']', 1)) {
+    let dimensions = 0
+    while (is('[') && is(']', 1)) {
       pos += 2
-      dimensionen++
+      dimensions++
     }
-    return { name, dimensionen, argumente }
+    return { name, dimensions, args }
   }
 
-  function typErwarten(): TypRef {
-    const typ = typLesen()
-    if (!typ) fehler(`<type> expected, found '${jetzt().text}'`)
-    return typ
+  function expectType(): TypeRef {
+    const type = readType()
+    if (!type) fail(`<type> expected, found '${current().text}'`)
+    return type
   }
 
   // --- Modifikatoren & Annotationen ----------------------------------------
 
-  function modifikatorenLesen(): Modifikatoren {
-    const m: Modifikatoren = { statisch: false, final: false, abstrakt: false, sichtbarkeit: 'paket', annotations: [] }
+  function readModifiers(): Modifiers {
+    const m: Modifiers = { isStatic: false, final: false, isAbstract: false, visibility: 'package', annotations: [] }
     while (true) {
       // `@interface` would declare an annotation type - not supported here.
-      if (ist('@') && !ist('interface', 1)) {
+      if (is('@') && !is('interface', 1)) {
         m.annotations.push(readAnnotation())
         continue
       }
-      const t = jetzt().text
-      if (jetzt().art === 'schluessel' && MODIFIKATOREN.has(t)) {
+      const t = current().text
+      if (current().kind === 'keyword' && MODIFIERS.has(t)) {
         pos++
-        if (t === 'static') m.statisch = true
+        if (t === 'static') m.isStatic = true
         else if (t === 'final') m.final = true
-        else if (t === 'abstract') m.abstrakt = true
-        else if (t === 'public' || t === 'private' || t === 'protected') m.sichtbarkeit = t
+        else if (t === 'abstract') m.isAbstract = true
+        else if (t === 'public' || t === 'private' || t === 'protected') m.visibility = t
         continue
       }
       return m
@@ -184,323 +184,323 @@ export function parsen(quelle: string): Programm {
    * The runtime ignores annotations; they are only kept for libraries like Spring.
    */
   function readAnnotation(): Annotation {
-    const line = erwarte('@').zeile
-    let name = erwarteName()
+    const line = expect('@').line
+    let name = expectName()
     // Fully qualified: @jakarta.validation.constraints.NotBlank → NotBlank
-    while (ist('.') && istName(1)) {
+    while (is('.') && isName(1)) {
       pos++
-      name = erwarteName()
+      name = expectName()
     }
     const values: Record<string, AnnotationValue> = {}
-    if (nimm('(')) {
-      if (!ist(')')) {
-        if (istName() && ist('=', 1)) {
+    if (accept('(')) {
+      if (!is(')')) {
+        if (isName() && is('=', 1)) {
           do {
-            const key = erwarteName()
-            erwarte('=')
+            const key = expectName()
+            expect('=')
             values[key] = readAnnotationValue()
-          } while (nimm(','))
+          } while (accept(','))
         } else {
           values.value = readAnnotationValue()
         }
       }
-      erwarte(')')
+      expect(')')
     }
     return { name, values, line }
   }
 
   function readAnnotationValue(): AnnotationValue {
-    if (nimm('{')) {
+    if (accept('{')) {
       const list: AnnotationValue[] = []
-      while (!ist('}') && !istEnde()) {
+      while (!is('}') && !atEnd()) {
         list.push(readAnnotationValue())
-        if (!nimm(',')) break
+        if (!accept(',')) break
       }
-      erwarte('}')
+      expect('}')
       return list
     }
-    const t = jetzt()
-    if (t.art === 'text') {
+    const t = current()
+    if (t.kind === 'text') {
       pos++
       // "a" + "b" - happens with long paths or messages
       let text = t.text
-      while (ist('+') && naechstes(1).art === 'text') {
+      while (is('+') && peek(1).kind === 'text') {
         pos++
         text += tokens[pos++].text
       }
       return text
     }
-    if (t.art === 'zahl') {
+    if (t.kind === 'number') {
       pos++
-      return t.wert ?? Number(t.text)
+      return t.value ?? Number(t.text)
     }
-    if (ist('-') && naechstes(1).art === 'zahl') {
+    if (is('-') && peek(1).kind === 'number') {
       pos++
-      return -(tokens[pos++].wert ?? 0)
+      return -(tokens[pos++].value ?? 0)
     }
-    if (ist('true') || ist('false')) return tokens[pos++].text === 'true'
-    if (t.art === 'name') {
+    if (is('true') || is('false')) return tokens[pos++].text === 'true'
+    if (t.kind === 'name') {
       // HttpStatus.CREATED, RequestMethod.GET, Todo.class
-      const parts = [erwarteName()]
-      while (ist('.') && (istName(1) || ist('class', 1))) {
+      const parts = [expectName()]
+      while (is('.') && (isName(1) || is('class', 1))) {
         pos++
-        if (nimm('class')) return parts.join('.')
-        parts.push(erwarteName())
+        if (accept('class')) return parts.join('.')
+        parts.push(expectName())
       }
       return parts.join('.')
     }
-    fehler(`illegal annotation value: '${t.text}'`)
+    fail(`illegal annotation value: '${t.text}'`)
   }
 
   // --- Typdeklarationen -----------------------------------------------------
 
-  function typDeklaration(mods: Modifikatoren): TypDeklaration {
-    const zeile = jetzt().zeile
-    const art = nimm('class') ? 'klasse' : nimm('interface') ? 'interface' : nimm('enum') ? 'enum' : 'record'
-    if (art === 'record') erwarte('record')
-    const name = erwarteName()
+  function typeDeclaration(mods: Modifiers): TypeDecl {
+    const line = current().line
+    const kind = accept('class') ? 'class' : accept('interface') ? 'interface' : accept('enum') ? 'enum' : 'record'
+    if (kind === 'record') expect('record')
+    const name = expectName()
 
     // Generische Klassen: <T> lesen und vergessen (Java macht zur Laufzeit dasselbe).
-    if (ist('<')) {
+    if (is('<')) {
       pos++
-      while (!schliesseSpitz() && !istEnde()) pos++
+      while (!closeAngle() && !atEnd()) pos++
     }
 
-    const deklaration: TypDeklaration = {
-      art: art === 'record' ? 'klasse' : art,
+    const declaration: TypeDecl = {
+      kind: kind === 'record' ? 'class' : kind,
       name,
-      abstrakt: mods.abstrakt || art === 'interface',
+      isAbstract: mods.isAbstract || kind === 'interface',
       interfaces: [],
-      felder: [],
-      methoden: [],
-      konstanten: [],
+      fields: [],
+      methods: [],
+      constants: [],
       superTypes: [],
       annotations: mods.annotations,
-      zeile,
+      line,
     }
 
-    if (art === 'record') {
-      deklaration.komponenten = parameterListe()
+    if (kind === 'record') {
+      declaration.components = parameterList()
     }
-    if (nimm('extends')) {
-      const erster = typErwarten()
-      deklaration.superTypes!.push(erster)
-      if (art === 'interface') {
-        deklaration.interfaces.push(erster.name)
-        while (nimm(',')) {
-          const next = typErwarten()
-          deklaration.superTypes!.push(next)
-          deklaration.interfaces.push(next.name)
+    if (accept('extends')) {
+      const first = expectType()
+      declaration.superTypes!.push(first)
+      if (kind === 'interface') {
+        declaration.interfaces.push(first.name)
+        while (accept(',')) {
+          const next = expectType()
+          declaration.superTypes!.push(next)
+          declaration.interfaces.push(next.name)
         }
       } else {
-        deklaration.oberklasse = erster.name
+        declaration.superclass = first.name
       }
     }
-    if (nimm('implements')) {
+    if (accept('implements')) {
       do {
-        const typ = typErwarten()
-        deklaration.superTypes!.push(typ)
-        deklaration.interfaces.push(typ.name)
-      } while (nimm(','))
+        const type = expectType()
+        declaration.superTypes!.push(type)
+        declaration.interfaces.push(type.name)
+      } while (accept(','))
     }
 
-    erwarte('{')
+    expect('{')
 
-    if (art === 'enum') {
-      while (istName() && !istEnde()) {
-        const kName = erwarteName()
-        const argumente = ist('(') ? argumentListe() : []
-        deklaration.konstanten.push({ name: kName, argumente })
-        if (!nimm(',')) break
+    if (kind === 'enum') {
+      while (isName() && !atEnd()) {
+        const cName = expectName()
+        const args = is('(') ? argumentList() : []
+        declaration.constants.push({ name: cName, args })
+        if (!accept(',')) break
       }
-      nimm(';')
+      accept(';')
     }
 
-    while (!ist('}') && !istEnde()) {
-      if (nimm(';')) continue
-      mitgliedLesen(deklaration)
+    while (!is('}') && !atEnd()) {
+      if (accept(';')) continue
+      readMember(declaration)
     }
-    erwarte('}')
-    return deklaration
+    expect('}')
+    return declaration
   }
 
   /** Ein Mitglied: Feld, Methode, Konstruktor oder eine verschachtelte Klasse. */
-  function mitgliedLesen(klasse: TypDeklaration) {
-    const mods = modifikatorenLesen()
+  function readMember(classInfo: TypeDecl) {
+    const mods = readModifiers()
 
-    if (ist('class') || ist('interface') || ist('enum') || (ist('record') && istName(1))) {
+    if (is('class') || is('interface') || is('enum') || (is('record') && isName(1))) {
       // Verschachtelte Typen behandeln wir wie eigene Klassen der Datei - sie
       // merken sich aber, wo sie standen, damit sie deren static-Felder sehen.
-      const innen = typDeklaration(mods)
-      innen.aeussere = klasse.name
-      verschachtelte.push(innen)
+      const inner = typeDeclaration(mods)
+      inner.outer = classInfo.name
+      nested.push(inner)
       return
     }
-    if (ist('{')) fehler('initializer blocks are not supported in this course runtime')
+    if (is('{')) fail('initializer blocks are not supported in this course runtime')
 
-    const zeile = jetzt().zeile
+    const line = current().line
 
     // Konstruktor: heißt wie die Klasse und hat sofort eine Klammer.
-    if (jetzt().art === 'name' && jetzt().text === klasse.name && ist('(', 1)) {
+    if (current().kind === 'name' && current().text === classInfo.name && is('(', 1)) {
       pos++
-      const parameter = parameterListe()
-      wurfListe()
-      const rumpf = block()
-      klasse.methoden.push({
+      const params = parameterList()
+      throwsList()
+      const body = block()
+      classInfo.methods.push({
         name: '<init>',
-        rueckgabe: { name: 'void', dimensionen: 0, argumente: [] },
-        parameter,
-        rumpf,
-        statisch: false,
-        abstrakt: false,
-        sichtbarkeit: mods.sichtbarkeit,
-        konstruktor: true,
+        returnType: { name: 'void', dimensions: 0, args: [] },
+        params,
+        body,
+        isStatic: false,
+        isAbstract: false,
+        visibility: mods.visibility,
+        isConstructor: true,
         annotations: mods.annotations,
-        zeile,
+        line,
       })
       return
     }
 
     // Generische Methode: <T> vor dem Rückgabetyp.
-    if (ist('<')) {
+    if (is('<')) {
       pos++
-      while (!schliesseSpitz() && !istEnde()) pos++
+      while (!closeAngle() && !atEnd()) pos++
     }
 
-    const typ = typErwarten()
+    const type = expectType()
 
     // Methode: Name direkt gefolgt von (
-    if (istName() && ist('(', 1)) {
-      const name = erwarteName()
-      const parameter = parameterListe()
-      while (ist('[') && ist(']', 1)) pos += 2
-      wurfListe()
-      const abstrakt = mods.abstrakt || (klasse.art === 'interface' && ist(';'))
-      const rumpf = ist(';') ? (pos++, undefined) : block()
-      klasse.methoden.push({
+    if (isName() && is('(', 1)) {
+      const name = expectName()
+      const params = parameterList()
+      while (is('[') && is(']', 1)) pos += 2
+      throwsList()
+      const isAbstract = mods.isAbstract || (classInfo.kind === 'interface' && is(';'))
+      const body = is(';') ? (pos++, undefined) : block()
+      classInfo.methods.push({
         name,
-        rueckgabe: typ,
-        parameter,
-        rumpf,
-        statisch: mods.statisch,
-        abstrakt: abstrakt && !rumpf,
-        sichtbarkeit: klasse.art === 'interface' ? 'public' : mods.sichtbarkeit,
-        konstruktor: false,
+        returnType: type,
+        params,
+        body,
+        isStatic: mods.isStatic,
+        isAbstract: isAbstract && !body,
+        visibility: classInfo.kind === 'interface' ? 'public' : mods.visibility,
+        isConstructor: false,
         annotations: mods.annotations,
-        zeile,
+        line,
       })
       return
     }
 
     // Sonst: ein oder mehrere Felder.
     do {
-      const name = erwarteName()
-      let dimensionen = 0
-      while (ist('[') && ist(']', 1)) {
+      const name = expectName()
+      let dimensions = 0
+      while (is('[') && is(']', 1)) {
         pos += 2
-        dimensionen++
+        dimensions++
       }
-      const init = nimm('=') ? (ist('{') ? arrayWerte() : ausdruck()) : undefined
-      klasse.felder.push({
+      const init = accept('=') ? (is('{') ? arrayLiteral() : expression()) : undefined
+      classInfo.fields.push({
         name,
-        typ: { ...typ, dimensionen: typ.dimensionen + dimensionen },
-        statisch: mods.statisch || klasse.art === 'interface',
-        final: mods.final || klasse.art === 'interface',
-        sichtbarkeit: mods.sichtbarkeit,
+        type: { ...type, dimensions: type.dimensions + dimensions },
+        isStatic: mods.isStatic || classInfo.kind === 'interface',
+        final: mods.final || classInfo.kind === 'interface',
+        visibility: mods.visibility,
         init,
         annotations: mods.annotations,
-        zeile,
+        line,
       })
-    } while (nimm(','))
-    erwarte(';')
+    } while (accept(','))
+    expect(';')
   }
 
-  function wurfListe() {
-    if (nimm('throws')) {
+  function throwsList() {
+    if (accept('throws')) {
       do {
-        typErwarten()
-      } while (nimm(','))
+        expectType()
+      } while (accept(','))
     }
   }
 
-  function parameterListe(): ParamDekl[] {
-    erwarte('(')
-    const parameter: ParamDekl[] = []
-    if (!ist(')')) {
+  function parameterList(): ParamDecl[] {
+    expect('(')
+    const params: ParamDecl[] = []
+    if (!is(')')) {
       do {
-        const { annotations } = modifikatorenLesen() // final / @PathVariable … before parameters
-        const typ = typErwarten()
-        const varargs = nimm('...')
-        const name = erwarteName()
-        let dimensionen = 0
-        while (ist('[') && ist(']', 1)) {
+        const { annotations } = readModifiers() // final / @PathVariable … before parameters
+        const type = expectType()
+        const varargs = accept('...')
+        const name = expectName()
+        let dimensions = 0
+        while (is('[') && is(']', 1)) {
           pos += 2
-          dimensionen++
+          dimensions++
         }
-        parameter.push({
+        params.push({
           name,
-          typ: { ...typ, dimensionen: typ.dimensionen + dimensionen + (varargs ? 1 : 0) },
+          type: { ...type, dimensions: type.dimensions + dimensions + (varargs ? 1 : 0) },
           varargs,
           annotations,
         })
-      } while (nimm(','))
+      } while (accept(','))
     }
-    erwarte(')')
-    return parameter
+    expect(')')
+    return params
   }
 
   // --- Anweisungen ----------------------------------------------------------
 
   function block(): Block {
-    const zeile = erwarte('{').zeile
-    const anweisungen: Anweisung[] = []
-    while (!ist('}') && !istEnde()) anweisungen.push(anweisung())
-    erwarte('}')
-    return { art: 'block', anweisungen, zeile }
+    const line = expect('{').line
+    const statements: Statement[] = []
+    while (!is('}') && !atEnd()) statements.push(statement())
+    expect('}')
+    return { kind: 'block', statements, line }
   }
 
-  function anweisung(): Anweisung {
-    const zeile = jetzt().zeile
+  function statement(): Statement {
+    const line = current().line
 
-    if (ist('{')) return block()
-    if (nimm(';')) return { art: 'leer', zeile }
-    if (ist('if')) return ifAnweisung()
-    if (ist('while')) return whileAnweisung()
-    if (ist('do')) return doWhileAnweisung()
-    if (ist('for')) return forAnweisung()
-    if (ist('switch')) return switchAnweisung()
-    if (ist('try')) return tryAnweisung()
-    if (nimm('return')) {
-      const wert = ist(';') ? undefined : ausdruck()
-      erwarte(';')
-      return { art: 'return', wert, zeile }
+    if (is('{')) return block()
+    if (accept(';')) return { kind: 'empty', line }
+    if (is('if')) return ifStatement()
+    if (is('while')) return whileStatement()
+    if (is('do')) return doWhileStatement()
+    if (is('for')) return forStatement()
+    if (is('switch')) return switchStatement()
+    if (is('try')) return tryStatement()
+    if (accept('return')) {
+      const expr = is(';') ? undefined : expression()
+      expect(';')
+      return { kind: 'return', value: expr, line }
     }
-    if (nimm('break')) {
-      if (istName()) pos++ // Labels werden gelesen und ignoriert
-      erwarte(';')
-      return { art: 'break', zeile }
+    if (accept('break')) {
+      if (isName()) pos++ // Labels werden gelesen und ignoriert
+      expect(';')
+      return { kind: 'break', line }
     }
-    if (nimm('continue')) {
-      if (istName()) pos++
-      erwarte(';')
-      return { art: 'continue', zeile }
+    if (accept('continue')) {
+      if (isName()) pos++
+      expect(';')
+      return { kind: 'continue', line }
     }
-    if (nimm('throw')) {
-      const wert = ausdruck()
-      erwarte(';')
-      return { art: 'throw', wert, zeile }
+    if (accept('throw')) {
+      const expr = expression()
+      expect(';')
+      return { kind: 'throw', value: expr, line }
     }
-    if (ist('class') || ist('interface') || ist('enum')) {
-      verschachtelte.push(typDeklaration(modifikatorenLesen()))
-      return { art: 'leer', zeile }
+    if (is('class') || is('interface') || is('enum')) {
+      nested.push(typeDeclaration(readModifiers()))
+      return { kind: 'empty', line }
     }
 
-    const lokale = lokaleDeklaration()
-    if (lokale) return lokale
+    const local = localDeclaration()
+    if (local) return local
 
-    const wert = ausdruck()
-    erwarte(';')
-    return { art: 'ausdruck', ausdruck: wert, zeile }
+    const expr = expression()
+    expect(';')
+    return { kind: 'expression', expression: expr, line }
   }
 
   /**
@@ -508,229 +508,229 @@ export function parsen(quelle: string): Programm {
    * `var n = 2;`, `Map<String, Integer> m = …`. Passt es nicht, wird
    * zurückgesprungen und als Ausdruck gelesen.
    */
-  function lokaleDeklaration(): Anweisung | null {
-    const start = sichern()
-    const zeile = jetzt().zeile
+  function localDeclaration(): Statement | null {
+    const start = mark()
+    const line = current().line
     let final = false
-    while (ist('final') || ist('@')) {
-      if (nimm('final')) final = true
+    while (is('final') || is('@')) {
+      if (accept('final')) final = true
       else readAnnotation() // e.g. @SuppressWarnings - meaningless for local variables
     }
-    const typ = typLesen()
-    if (!typ || !istName()) {
-      zurueck(start)
+    const type = readType()
+    if (!type || !isName()) {
+      back(start)
       return null
     }
     // Nach dem Namen muss = ; , oder [ kommen - sonst war es ein Ausdruck.
-    const danach = naechstes(1).text
-    if (!['=', ';', ',', '['].includes(danach)) {
-      zurueck(start)
+    const after = peek(1).text
+    if (!['=', ';', ',', '['].includes(after)) {
+      back(start)
       return null
     }
-    if (danach === '[' && naechstes(2).text !== ']') {
-      zurueck(start)
+    if (after === '[' && peek(2).text !== ']') {
+      back(start)
       return null
     }
 
-    const variablen: VarDekl[] = []
+    const variables: VarDecl[] = []
     do {
-      const name = erwarteName()
-      let dimensionen = 0
-      while (ist('[') && ist(']', 1)) {
+      const name = expectName()
+      let dimensions = 0
+      while (is('[') && is(']', 1)) {
         pos += 2
-        dimensionen++
+        dimensions++
       }
-      const init = nimm('=') ? (ist('{') ? arrayWerte() : ausdruck()) : undefined
-      variablen.push({ name, dimensionen, init })
-    } while (nimm(','))
-    erwarte(';')
-    return { art: 'lokal', typ, final, variablen, zeile }
+      const init = accept('=') ? (is('{') ? arrayLiteral() : expression()) : undefined
+      variables.push({ name, dimensions, init })
+    } while (accept(','))
+    expect(';')
+    return { kind: 'local', type, final, variables, line }
   }
 
-  function ifAnweisung(): Anweisung {
-    const zeile = erwarte('if').zeile
-    erwarte('(')
-    const bedingung = ausdruck()
-    erwarte(')')
-    const dann = anweisung()
-    const sonst = nimm('else') ? anweisung() : undefined
-    return { art: 'if', bedingung, dann, sonst, zeile }
+  function ifStatement(): Statement {
+    const line = expect('if').line
+    expect('(')
+    const condition = expression()
+    expect(')')
+    const thenBranch = statement()
+    const elseBranch = accept('else') ? statement() : undefined
+    return { kind: 'if', condition, thenBranch, elseBranch, line }
   }
 
-  function whileAnweisung(): Anweisung {
-    const zeile = erwarte('while').zeile
-    erwarte('(')
-    const bedingung = ausdruck()
-    erwarte(')')
-    return { art: 'while', bedingung, rumpf: anweisung(), zeile }
+  function whileStatement(): Statement {
+    const line = expect('while').line
+    expect('(')
+    const condition = expression()
+    expect(')')
+    return { kind: 'while', condition, body: statement(), line }
   }
 
-  function doWhileAnweisung(): Anweisung {
-    const zeile = erwarte('do').zeile
-    const rumpf = anweisung()
-    erwarte('while')
-    erwarte('(')
-    const bedingung = ausdruck()
-    erwarte(')')
-    erwarte(';')
-    return { art: 'doWhile', bedingung, rumpf, zeile }
+  function doWhileStatement(): Statement {
+    const line = expect('do').line
+    const body = statement()
+    expect('while')
+    expect('(')
+    const condition = expression()
+    expect(')')
+    expect(';')
+    return { kind: 'doWhile', condition, body, line }
   }
 
-  function forAnweisung(): Anweisung {
-    const zeile = erwarte('for').zeile
-    erwarte('(')
+  function forStatement(): Statement {
+    const line = expect('for').line
+    expect('(')
 
     // for-each: for (Typ name : quelle)
-    const start = sichern()
-    modifikatorenLesen()
-    const typ = typLesen()
-    if (typ && istName() && ist(':', 1)) {
-      const name = erwarteName()
-      erwarte(':')
-      const quelle = ausdruck()
-      erwarte(')')
-      return { art: 'forEach', typ, name, quelle, rumpf: anweisung(), zeile }
+    const start = mark()
+    readModifiers()
+    const type = readType()
+    if (type && isName() && is(':', 1)) {
+      const name = expectName()
+      expect(':')
+      const source = expression()
+      expect(')')
+      return { kind: 'forEach', type, name, source, body: statement(), line }
     }
-    zurueck(start)
+    back(start)
 
-    const init: Anweisung[] = []
-    if (!nimm(';')) {
-      const lokale = lokaleDeklaration()
-      if (lokale) init.push(lokale)
+    const init: Statement[] = []
+    if (!accept(';')) {
+      const local = localDeclaration()
+      if (local) init.push(local)
       else {
         do {
-          init.push({ art: 'ausdruck', ausdruck: ausdruck(), zeile })
-        } while (nimm(','))
-        erwarte(';')
+          init.push({ kind: 'expression', expression: expression(), line })
+        } while (accept(','))
+        expect(';')
       }
     }
-    const bedingung = ist(';') ? undefined : ausdruck()
-    erwarte(';')
-    const schritt: Ausdruck[] = []
-    if (!ist(')')) {
+    const condition = is(';') ? undefined : expression()
+    expect(';')
+    const update: Expression[] = []
+    if (!is(')')) {
       do {
-        schritt.push(ausdruck())
-      } while (nimm(','))
+        update.push(expression())
+      } while (accept(','))
     }
-    erwarte(')')
-    return { art: 'for', init, bedingung, schritt, rumpf: anweisung(), zeile }
+    expect(')')
+    return { kind: 'for', init, condition, update, body: statement(), line }
   }
 
-  function switchAnweisung(): Anweisung {
-    const zeile = erwarte('switch').zeile
-    erwarte('(')
-    const wert = ausdruck()
-    erwarte(')')
-    erwarte('{')
-    const faelle: SwitchFall[] = []
-    let pfeil = false
+  function switchStatement(): Statement {
+    const line = expect('switch').line
+    expect('(')
+    const expr = expression()
+    expect(')')
+    expect('{')
+    const cases: SwitchCase[] = []
+    let arrow = false
 
-    while (!ist('}') && !istEnde()) {
-      const werte: Ausdruck[] = []
-      if (nimm('default')) {
+    while (!is('}') && !atEnd()) {
+      const values: Expression[] = []
+      if (accept('default')) {
         // default ohne Werte
       } else {
-        erwarte('case')
+        expect('case')
         do {
-          werte.push(fallWert())
-        } while (nimm(','))
+          values.push(caseValue())
+        } while (accept(','))
       }
 
-      if (nimm('->')) {
-        pfeil = true
-        if (ist('{')) {
-          faelle.push({ werte, anweisungen: [block()] })
-        } else if (ist('throw')) {
-          faelle.push({ werte, anweisungen: [anweisung()] })
+      if (accept('->')) {
+        arrow = true
+        if (is('{')) {
+          cases.push({ values, statements: [block()] })
+        } else if (is('throw')) {
+          cases.push({ values, statements: [statement()] })
         } else {
-          const ergebnis = ausdruck()
-          erwarte(';')
-          faelle.push({ werte, anweisungen: [], ergebnis })
+          const result = expression()
+          expect(';')
+          cases.push({ values, statements: [], result })
         }
         continue
       }
 
-      erwarte(':')
+      expect(':')
       // Gestapelte Labels: case 1: case 2: …
-      while (ist('case') || (ist('default') && ist(':', 1))) {
-        if (nimm('default')) {
-          erwarte(':')
-          faelle.push({ werte: [...werte], anweisungen: [] })
-          werte.length = 0
+      while (is('case') || (is('default') && is(':', 1))) {
+        if (accept('default')) {
+          expect(':')
+          cases.push({ values: [...values], statements: [] })
+          values.length = 0
         } else {
-          erwarte('case')
+          expect('case')
           do {
-            werte.push(fallWert())
-          } while (nimm(','))
-          erwarte(':')
+            values.push(caseValue())
+          } while (accept(','))
+          expect(':')
         }
       }
-      const anweisungen: Anweisung[] = []
-      while (!ist('case') && !ist('default') && !ist('}') && !istEnde()) anweisungen.push(anweisung())
-      faelle.push({ werte, anweisungen })
+      const statements: Statement[] = []
+      while (!is('case') && !is('default') && !is('}') && !atEnd()) statements.push(statement())
+      cases.push({ values, statements })
     }
-    erwarte('}')
-    return { art: 'switch', wert, faelle, pfeil, zeile }
+    expect('}')
+    return { kind: 'switch', value: expr, cases, arrow, line }
   }
 
   /**
    * Ein case-Label. Sonderfall: `case ROT ->` ist ein enum-Name mit Pfeil und
    * KEIN Lambda - deshalb hier nicht der normale Ausdrucks-Parser.
    */
-  function fallWert(): Ausdruck {
-    if (istName() && ['->', ',', ':'].includes(naechstes(1).text)) {
+  function caseValue(): Expression {
+    if (isName() && ['->', ',', ':'].includes(peek(1).text)) {
       const t = tokens[pos++]
-      return { art: 'name', name: t.text, zeile: t.zeile }
+      return { kind: 'name', name: t.text, line: t.line }
     }
-    return ternaer()
+    return ternary()
   }
 
-  function tryAnweisung(): Anweisung {
-    const zeile = erwarte('try').zeile
-    if (ist('(')) fehler('try-with-resources is not supported in this course runtime')
-    const rumpf = block()
-    const faenger: Faenger[] = []
-    while (nimm('catch')) {
-      erwarte('(')
-      modifikatorenLesen()
-      const typen = [typErwarten().name]
-      while (nimm('|')) typen.push(typErwarten().name)
-      const name = erwarteName()
-      erwarte(')')
-      faenger.push({ typen, name, rumpf: block() })
+  function tryStatement(): Statement {
+    const line = expect('try').line
+    if (is('(')) fail('try-with-resources is not supported in this course runtime')
+    const body = block()
+    const catches: CatchClause[] = []
+    while (accept('catch')) {
+      expect('(')
+      readModifiers()
+      const types = [expectType().name]
+      while (accept('|')) types.push(expectType().name)
+      const name = expectName()
+      expect(')')
+      catches.push({ types, name, body: block() })
     }
-    const schliesslich = nimm('finally') ? block() : undefined
-    if (!faenger.length && !schliesslich) fehler("'catch' or 'finally' expected")
-    return { art: 'try', rumpf, faenger, schliesslich, zeile }
+    const finallyBlock = accept('finally') ? block() : undefined
+    if (!catches.length && !finallyBlock) fail("'catch' or 'finally' expected")
+    return { kind: 'try', body, catches, finallyBlock, line }
   }
 
   // --- Ausdrücke ------------------------------------------------------------
 
-  function ausdruck(): Ausdruck {
-    const links = ternaer()
-    const op = jetzt().text
-    if (jetzt().art === 'symbol' && ['=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=', '>>>='].includes(op)) {
-      const zeile = tokens[pos++].zeile
-      const wert = ausdruck() // rechtsassoziativ: a = b = c
-      return { art: 'zuweisung', ziel: links, operator: op, wert, zeile }
+  function expression(): Expression {
+    const left = ternary()
+    const op = current().text
+    if (current().kind === 'symbol' && ['=', '+=', '-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=', '>>>='].includes(op)) {
+      const line = tokens[pos++].line
+      const expr = expression() // rechtsassoziativ: a = b = c
+      return { kind: 'assign', target: left, operator: op, value: expr, line }
     }
-    return links
+    return left
   }
 
-  function ternaer(): Ausdruck {
-    const bedingung = binaer(0)
-    if (ist('?')) {
-      const zeile = tokens[pos++].zeile
-      const dann = ausdruck()
-      erwarte(':')
-      const sonst = ternaer()
-      return { art: 'ternaer', bedingung, dann, sonst, zeile }
+  function ternary(): Expression {
+    const condition = binary(0)
+    if (is('?')) {
+      const line = tokens[pos++].line
+      const thenBranch = expression()
+      expect(':')
+      const elseBranch = ternary()
+      return { kind: 'ternary', condition, thenBranch, elseBranch, line }
     }
-    return bedingung
+    return condition
   }
 
   /** Alle zweistelligen Operatoren mit einer Tabelle statt einer Funktion je Stufe. */
-  const STUFEN: string[][] = [
+  const STEPS: string[][] = [
     ['||'],
     ['&&'],
     ['|'],
@@ -743,306 +743,306 @@ export function parsen(quelle: string): Programm {
     ['*', '/', '%'],
   ]
 
-  function binaer(stufe: number): Ausdruck {
-    if (stufe >= STUFEN.length) return unaer()
-    let links = binaer(stufe + 1)
+  function binary(stufe: number): Expression {
+    if (stufe >= STEPS.length) return unary()
+    let left = binary(stufe + 1)
     while (true) {
-      const t = jetzt()
-      if (!STUFEN[stufe].includes(t.text) || (t.art !== 'symbol' && t.text !== 'instanceof')) break
+      const t = current()
+      if (!STEPS[stufe].includes(t.text) || (t.kind !== 'symbol' && t.text !== 'instanceof')) break
       // `>` `>` nebeneinander sind hier nie Generics - die hat typLesen() schon geschluckt.
       pos++
       if (t.text === 'instanceof') {
-        nimm('final')
-        const typ = typErwarten()
-        const bindung = istName() ? erwarteName() : undefined
-        links = { art: 'instanceof', ausdruck: links, typ: typ.name + '[]'.repeat(typ.dimensionen), bindung, zeile: t.zeile }
+        accept('final')
+        const type = expectType()
+        const binding = isName() ? expectName() : undefined
+        left = { kind: 'instanceof', expression: left, type: type.name + '[]'.repeat(type.dimensions), binding, line: t.line }
         continue
       }
-      const rechts = binaer(stufe + 1)
-      links = { art: 'binaer', operator: t.text, links, rechts, zeile: t.zeile }
+      const right = binary(stufe + 1)
+      left = { kind: 'binary', operator: t.text, left, right, line: t.line }
     }
-    return links
+    return left
   }
 
-  function unaer(): Ausdruck {
-    const t = jetzt()
-    if (t.art === 'symbol' && ['!', '~', '-', '+'].includes(t.text)) {
+  function unary(): Expression {
+    const t = current()
+    if (t.kind === 'symbol' && ['!', '~', '-', '+'].includes(t.text)) {
       pos++
-      return { art: 'unaer', operator: t.text, ausdruck: unaer(), zeile: t.zeile }
+      return { kind: 'unary', operator: t.text, expression: unary(), line: t.line }
     }
     if (t.text === '++' || t.text === '--') {
       pos++
-      return { art: 'stufe', operator: t.text as '++' | '--', ziel: unaer(), vorher: true, zeile: t.zeile }
+      return { kind: 'increment', operator: t.text as '++' | '--', target: unary(), prefix: true, line: t.line }
     }
     // Cast? (int) x   (String) o   (List<String>) o
-    if (ist('(')) {
-      const start = sichern()
+    if (is('(')) {
+      const start = mark()
       pos++
-      const typ = typLesen()
-      if (typ && ist(')')) {
+      const type = readType()
+      if (type && is(')')) {
         pos++
-        const folgt = jetzt()
-        const kannFolgen =
-          folgt.art === 'name' ||
-          folgt.art === 'zahl' ||
-          folgt.art === 'text' ||
-          folgt.art === 'zeichen' ||
-          ['new', 'this', 'super', 'true', 'false', 'null'].includes(folgt.text) ||
-          folgt.text === '(' ||
-          folgt.text === '!'
-        const primitiv = PRIMITIVE.has(typ.name) && typ.dimensionen === 0
-        if (kannFolgen && (primitiv || typ.dimensionen > 0 || /^[A-Z]/.test(typ.name))) {
-          return { art: 'cast', typ, ausdruck: unaer(), zeile: t.zeile }
+        const next = current()
+        const canFollow =
+          next.kind === 'name' ||
+          next.kind === 'number' ||
+          next.kind === 'text' ||
+          next.kind === 'char' ||
+          ['new', 'this', 'super', 'true', 'false', 'null'].includes(next.text) ||
+          next.text === '(' ||
+          next.text === '!'
+        const primitive = PRIMITIVES.has(type.name) && type.dimensions === 0
+        if (canFollow && (primitive || type.dimensions > 0 || /^[A-Z]/.test(type.name))) {
+          return { kind: 'cast', type, expression: unary(), line: t.line }
         }
       }
-      zurueck(start)
+      back(start)
     }
-    return nachgestellt(primaer())
+    return postfix(primary())
   }
 
   /** Alles, was hinter einem Wert stehen kann: .feld, .methode(), [i], ++, -- */
-  function nachgestellt(wert: Ausdruck): Ausdruck {
+  function postfix(value: Expression): Expression {
     while (true) {
-      const t = jetzt()
-      if (ist('.')) {
+      const t = current()
+      if (is('.')) {
         pos++
-        if (ist('<')) {
+        if (is('<')) {
           // explizite Typargumente beim Aufruf: list.<String>toArray()
           pos++
-          while (!schliesseSpitz() && !istEnde()) pos++
+          while (!closeAngle() && !atEnd()) pos++
         }
         // Todo.class - a class literal (needed e.g. by SpringApplication.run)
-        if (ist('class') && wert.art === 'name') {
+        if (is('class') && value.kind === 'name') {
           pos++
-          wert = { art: 'classLiteral', className: wert.name, zeile: t.zeile }
+          value = { kind: 'classLiteral', className: value.name, line: t.line }
           continue
         }
-        const name = ist('new') ? fehler('inner class creation is not supported') : erwarteName()
-        if (ist('(')) {
-          wert = { art: 'aufruf', ziel: wert, name, argumente: argumentListe(), ueberSuper: wert.art === 'super', zeile: t.zeile }
+        const name = is('new') ? fail('inner class creation is not supported') : expectName()
+        if (is('(')) {
+          value = { kind: 'call', target: value, name, args: argumentList(), viaSuper: value.kind === 'super', line: t.line }
         } else {
-          wert = { art: 'feld', ziel: wert, name, zeile: t.zeile }
+          value = { kind: 'field', target: value, name, line: t.line }
         }
         continue
       }
-      if (ist('::')) {
+      if (is('::')) {
         pos++
-        const name = ist('new') ? (pos++, '<init>') : erwarteName()
-        const ziel = wert.art === 'name' ? wert.name : wert.art === 'feld' ? wert.name : ''
-        wert = { art: 'methodenRef', ziel, name, zeile: t.zeile }
+        const name = is('new') ? (pos++, '<init>') : expectName()
+        const target = value.kind === 'name' ? value.name : value.kind === 'field' ? value.name : ''
+        value = { kind: 'methodRef', target, name, line: t.line }
         continue
       }
-      if (ist('[')) {
+      if (is('[')) {
         pos++
-        const index = ausdruck()
-        erwarte(']')
-        wert = { art: 'index', ziel: wert, index, zeile: t.zeile }
+        const index = expression()
+        expect(']')
+        value = { kind: 'index', target: value, index, line: t.line }
         continue
       }
-      if (ist('++') || ist('--')) {
+      if (is('++') || is('--')) {
         pos++
-        wert = { art: 'stufe', operator: t.text as '++' | '--', ziel: wert, vorher: false, zeile: t.zeile }
+        value = { kind: 'increment', operator: t.text as '++' | '--', target: value, prefix: false, line: t.line }
         continue
       }
-      return wert
+      return value
     }
   }
 
-  function argumentListe(): Ausdruck[] {
-    erwarte('(')
-    const argumente: Ausdruck[] = []
-    if (!ist(')')) {
+  function argumentList(): Expression[] {
+    expect('(')
+    const args: Expression[] = []
+    if (!is(')')) {
       do {
-        argumente.push(ausdruck())
-      } while (nimm(','))
+        args.push(expression())
+      } while (accept(','))
     }
-    erwarte(')')
-    return argumente
+    expect(')')
+    return args
   }
 
-  function arrayWerte(): Ausdruck {
-    const zeile = erwarte('{').zeile
-    const werte: Ausdruck[] = []
-    if (!ist('}')) {
+  function arrayLiteral(): Expression {
+    const line = expect('{').line
+    const values: Expression[] = []
+    if (!is('}')) {
       do {
-        if (ist('}')) break // erlaubtes Komma am Ende
-        werte.push(ist('{') ? arrayWerte() : ausdruck())
-      } while (nimm(','))
+        if (is('}')) break // erlaubtes Komma am Ende
+        values.push(is('{') ? arrayLiteral() : expression())
+      } while (accept(','))
     }
-    erwarte('}')
-    return { art: 'arrayWerte', werte, zeile }
+    expect('}')
+    return { kind: 'arrayLiteral', values, line }
   }
 
-  function literalLesen(): Literal | null {
-    const t = jetzt()
-    if (t.art === 'zahl') {
+  function readLiteral(): Literal | null {
+    const t = current()
+    if (t.kind === 'number') {
       pos++
-      return t.kommazahl ? { typ: 'double', wert: t.wert! } : { typ: 'int', wert: t.wert! }
+      return t.isFloat ? { type: 'double', value: t.value! } : { type: 'int', value: t.value! }
     }
-    if (t.art === 'text') {
+    if (t.kind === 'text') {
       pos++
-      return { typ: 'String', wert: t.text }
+      return { type: 'String', value: t.text }
     }
-    if (t.art === 'zeichen') {
+    if (t.kind === 'char') {
       pos++
-      return { typ: 'char', wert: t.wert! }
+      return { type: 'char', value: t.value! }
     }
     if (t.text === 'true' || t.text === 'false') {
       pos++
-      return { typ: 'boolean', wert: t.text === 'true' }
+      return { type: 'boolean', value: t.text === 'true' }
     }
     if (t.text === 'null') {
       pos++
-      return { typ: 'null' }
+      return { type: 'null' }
     }
     return null
   }
 
-  function primaer(): Ausdruck {
-    const t = jetzt()
-    const zeile = t.zeile
+  function primary(): Expression {
+    const t = current()
+    const line = t.line
 
-    const wert = literalLesen()
-    if (wert) return { art: 'literal', wert, zeile }
+    const expr = readLiteral()
+    if (expr) return { kind: 'literal', value: expr, line }
 
-    if (nimm('this')) {
-      if (ist('(')) return { art: 'aufruf', name: '<init>', argumente: argumentListe(), ueberSuper: false, zeile }
-      return { art: 'this', zeile }
+    if (accept('this')) {
+      if (is('(')) return { kind: 'call', name: '<init>', args: argumentList(), viaSuper: false, line }
+      return { kind: 'this', line }
     }
-    if (nimm('super')) {
-      if (ist('(')) return { art: 'aufruf', name: '<superinit>', argumente: argumentListe(), ueberSuper: true, zeile }
-      return { art: 'super', zeile }
+    if (accept('super')) {
+      if (is('(')) return { kind: 'call', name: '<superinit>', args: argumentList(), viaSuper: true, line }
+      return { kind: 'super', line }
     }
-    if (nimm('new')) return neuLesen(zeile)
+    if (accept('new')) return readNew(line)
     // switch als Ausdruck: int x = switch (tag) { case 1 -> 10; default -> 0; };
-    if (ist('switch')) return { art: 'switchAusdruck', anweisung: switchAnweisung(), zeile }
+    if (is('switch')) return { kind: 'switchExpression', statement: switchStatement(), line }
 
     // Lambda mit einem Parameter ohne Klammern: x -> x * 2
-    if (istName() && ist('->', 1)) {
-      const p = erwarteName()
-      erwarte('->')
-      return { art: 'lambda', parameter: [p], rumpf: ist('{') ? block() : ausdruck(), zeile }
+    if (isName() && is('->', 1)) {
+      const p = expectName()
+      expect('->')
+      return { kind: 'lambda', params: [p], body: is('{') ? block() : expression(), line }
     }
 
-    if (ist('(')) {
+    if (is('(')) {
       // Lambda mit Klammern: () -> …, (a, b) -> …, (int a) -> …
-      const start = sichern()
+      const start = mark()
       pos++
-      const parameter: string[] = []
-      let istLambda = true
-      if (!ist(')')) {
+      const params: string[] = []
+      let isLambda = true
+      if (!is(')')) {
         do {
-          modifikatorenLesen()
-          const p = sichern()
-          const typ = typLesen()
-          if (typ && istName()) {
-            parameter.push(erwarteName())
+          readModifiers()
+          const p = mark()
+          const type = readType()
+          if (type && isName()) {
+            params.push(expectName())
           } else {
-            zurueck(p)
-            if (istName()) parameter.push(erwarteName())
+            back(p)
+            if (isName()) params.push(expectName())
             else {
-              istLambda = false
+              isLambda = false
               break
             }
           }
-        } while (nimm(','))
+        } while (accept(','))
       }
-      if (istLambda && ist(')') && ist('->', 1)) {
+      if (isLambda && is(')') && is('->', 1)) {
         pos += 2
-        return { art: 'lambda', parameter, rumpf: ist('{') ? block() : ausdruck(), zeile }
+        return { kind: 'lambda', params, body: is('{') ? block() : expression(), line }
       }
-      zurueck(start)
+      back(start)
       pos++
-      const innen = ausdruck()
-      erwarte(')')
-      return innen
+      const inner = expression()
+      expect(')')
+      return inner
     }
 
-    if (istName()) {
-      let name = erwarteName()
+    if (isName()) {
+      let name = expectName()
       // Voll qualifizierter Name: java.util.Arrays.sort(…) → Arrays.sort(…)
-      if ((name === 'java' || name === 'javax') && ist('.')) {
-        while (ist('.') && istName(1) && /^[a-z]/.test(naechstes(1).text)) {
+      if ((name === 'java' || name === 'javax') && is('.')) {
+        while (is('.') && isName(1) && /^[a-z]/.test(peek(1).text)) {
           pos += 2
         }
-        if (ist('.') && istName(1)) {
+        if (is('.') && isName(1)) {
           pos++
-          name = erwarteName()
+          name = expectName()
         }
       }
-      if (ist('(')) {
-        return { art: 'aufruf', name, argumente: argumentListe(), ueberSuper: false, zeile }
+      if (is('(')) {
+        return { kind: 'call', name, args: argumentList(), viaSuper: false, line }
       }
-      return { art: 'name', name, zeile }
+      return { kind: 'name', name, line }
     }
 
     // `int.class` o. Ä. kommt im Kurs nicht vor - alles andere ist ein Fehler.
-    fehler(`illegal start of expression: '${t.text}'`)
+    fail(`illegal start of expression: '${t.text}'`)
   }
 
-  function neuLesen(zeile: number): Ausdruck {
-    const typ = typErwarten()
+  function readNew(line: number): Expression {
+    const type = expectType()
     // `new int[]{1, 2, 3}`: die leeren Klammern hat typLesen() schon geschluckt.
-    if (typ.dimensionen > 0 && ist('{')) {
-      const werte = arrayWerte() as { werte: Ausdruck[] }
-      return { art: 'neuArray', typ, groessen: [], werte: werte.werte, zeile }
+    if (type.dimensions > 0 && is('{')) {
+      const values = arrayLiteral() as { values: Expression[] }
+      return { kind: 'newArray', type, sizes: [], values: values.values, line }
     }
-    if (ist('[')) {
-      const groessen: Ausdruck[] = []
-      let dimensionen = 0
-      while (ist('[')) {
+    if (is('[')) {
+      const sizes: Expression[] = []
+      let dimensions = 0
+      while (is('[')) {
         pos++
-        if (ist(']')) {
+        if (is(']')) {
           pos++
-          dimensionen++
+          dimensions++
           continue
         }
-        groessen.push(ausdruck())
-        erwarte(']')
-        dimensionen++
+        sizes.push(expression())
+        expect(']')
+        dimensions++
       }
-      const basis: TypRef = { ...typ, dimensionen }
-      if (ist('{')) {
-        const werte = arrayWerte() as { werte: Ausdruck[] }
-        return { art: 'neuArray', typ: basis, groessen: [], werte: werte.werte, zeile }
+      const base: TypeRef = { ...type, dimensions }
+      if (is('{')) {
+        const values = arrayLiteral() as { values: Expression[] }
+        return { kind: 'newArray', type: base, sizes: [], values: values.values, line }
       }
-      return { art: 'neuArray', typ: basis, groessen, zeile }
+      return { kind: 'newArray', type: base, sizes, line }
     }
-    const argumente = argumentListe()
-    if (ist('{')) fehler('anonymous classes are not supported in this course runtime')
-    return { art: 'neu', klasse: typ.name, argumente, zeile }
+    const args = argumentList()
+    if (is('{')) fail('anonymous classes are not supported in this course runtime')
+    return { kind: 'new', classInfo: type.name, args, line }
   }
 
   // --- Los geht's -----------------------------------------------------------
 
-  const verschachtelte: TypDeklaration[] = []
-  const typen: TypDeklaration[] = []
-  const importe: string[] = []
+  const nested: TypeDecl[] = []
+  const types: TypeDecl[] = []
+  const imports: string[] = []
 
-  while (!istEnde()) {
-    if (nimm('package')) {
-      while (!ist(';') && !istEnde()) pos++
-      erwarte(';')
+  while (!atEnd()) {
+    if (accept('package')) {
+      while (!is(';') && !atEnd()) pos++
+      expect(';')
       continue
     }
-    if (nimm('import')) {
-      nimm('static')
-      let pfad = ''
-      while (!ist(';') && !istEnde()) pfad += tokens[pos++].text
-      erwarte(';')
-      importe.push(pfad)
+    if (accept('import')) {
+      accept('static')
+      let path = ''
+      while (!is(';') && !atEnd()) path += tokens[pos++].text
+      expect(';')
+      imports.push(path)
       continue
     }
-    if (nimm(';')) continue
-    const mods = modifikatorenLesen()
-    if (ist('class') || ist('interface') || ist('enum') || ist('record')) {
-      typen.push(typDeklaration(mods))
+    if (accept(';')) continue
+    const mods = readModifiers()
+    if (is('class') || is('interface') || is('enum') || is('record')) {
+      types.push(typeDeclaration(mods))
       continue
     }
-    fehler(`class, interface or enum expected, found '${jetzt().text}'`)
+    fail(`class, interface or enum expected, found '${current().text}'`)
   }
 
-  if (!typen.length) throw new JavaSyntaxFehler('no class found - Java code always lives inside a class', 1)
+  if (!types.length) throw new JavaSyntaxError('no class found - Java code always lives inside a class', 1)
 
-  return { typen: [...typen, ...verschachtelte], importe }
+  return { types: [...types, ...nested], imports }
 }

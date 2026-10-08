@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { javaAusfuehren, javaPruefen } from './index'
+import { runJava, checkJava } from './index'
 
 /** Runs `body` inside `main` and returns the printed lines. */
 function run(body: string, extra = '') {
-  const result = javaAusfuehren(`public class Main {\n${extra}\npublic static void main(String[] args) {\n${body}\n}\n}`, { sprache: 'en' })
-  return { output: result.zeilen.filter((z) => z.typ === 'log').map((z) => z.text), errors: result.zeilen.filter((z) => z.typ === 'fehler').map((z) => z.text), failed: result.fehler }
+  const result = runJava(`public class Main {\n${extra}\npublic static void main(String[] args) {\n${body}\n}\n}`, { language: 'en' })
+  return { output: result.lines.filter((z) => z.type === 'log').map((z) => z.text), errors: result.lines.filter((z) => z.type === 'exception').map((z) => z.text), failed: result.failed }
 }
 
 describe('javaAusfuehren', () => {
@@ -44,34 +44,34 @@ describe('javaAusfuehren', () => {
   })
 
   it('reports a syntax error with its line', () => {
-    const result = javaAusfuehren('public class Main {\n  public static void main(String[] args) {\n    int x = 1\n  }\n}')
-    expect(result.fehler).toBe(true)
-    expect(result.zeilen[0].text).toMatch(/^Main\.java:[34]: error: /)
+    const result = runJava('public class Main {\n  public static void main(String[] args) {\n    int x = 1\n  }\n}')
+    expect(result.failed).toBe(true)
+    expect(result.lines[0].text).toMatch(/^Main\.java:[34]: error: /)
   })
 
   it('runs exercise tests against the program', () => {
     const source = 'public class Main {\n  static int add(int a, int b) { return a + b; }\n  public static void main(String[] args) {}\n}'
-    const result = javaAusfuehren(source, {
-      sprache: 'en',
+    const result = runJava(source, {
+      language: 'en',
       tests: [
-        { name: 'adds', ausdruck: 'add(2, 3)', erwartet: 5 },
-        { name: 'wrong on purpose', ausdruck: 'add(1, 1)', erwartet: 3 },
+        { name: 'adds', expression: 'add(2, 3)', expected: 5 },
+        { name: 'wrong on purpose', expression: 'add(1, 1)', expected: 3 },
       ],
     })
-    expect(result.ergebnisse?.map((e) => e.ok)).toEqual([true, false])
-    expect(result.ergebnisse?.[1].meldung).toBe('expected: 3, got: 2')
+    expect(result.results?.map((e) => e.ok)).toEqual([true, false])
+    expect(result.results?.[1].message).toBe('expected: 3, got: 2')
   })
 })
 
 describe('javaPruefen', () => {
   it('returns no findings for a valid program', () => {
-    expect(javaPruefen('public class Main { public static void main(String[] args) { int x = 1; } }')).toEqual([])
+    expect(checkJava('public class Main { public static void main(String[] args) { int x = 1; } }')).toEqual([])
   })
 
   it('returns type errors with their line, in the chosen language', () => {
-    const findings = javaPruefen('public class Main {\n  public static void main(String[] args) {\n    boolean b = 1;\n  }\n}', 'en')
+    const findings = checkJava('public class Main {\n  public static void main(String[] args) {\n    boolean b = 1;\n  }\n}', 'en')
     expect(findings).toHaveLength(1)
-    expect(findings[0].zeile).toBe(3)
+    expect(findings[0].line).toBe(3)
     expect(findings[0].text).toMatch(/incompatible types/)
   })
 })

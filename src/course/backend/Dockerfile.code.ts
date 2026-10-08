@@ -1,5 +1,5 @@
 import { docker, js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 import type { TerminalTask } from '../demos/DockerTerminal'
 
 /**
@@ -33,7 +33,7 @@ const MULTI_STAGE = docker`
   ENTRYPOINT ["java", "-jar", "app.jar"]
 `
 
-export const beispiele = {
+export const examples = {
   'docker-dockerfile-einstieg': {
     code: docker`
       FROM maven:3.9-eclipse-temurin-21
@@ -93,7 +93,7 @@ export const beispiele = {
     `,
   },
   'docker-dockerfile-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Zuerst nur `COPY pom.xml .` und `RUN mvn -q dependency:go-offline`, danach erst `COPY src ./src` und `RUN mvn -q package -DskipTests` - dann bleibt der Download im Cache.',
         'Zwei Stages: `FROM maven:3.9-eclipse-temurin-21 AS build` zum Bauen, `FROM eclipse-temurin:21-jre` für das fertige Image. Die JAR holst du mit `COPY --from=build /app/target/*.jar app.jar`.',
@@ -112,7 +112,7 @@ export const beispiele = {
       RUN mvn package
       CMD java -jar target/todo-api-0.0.1-SNAPSHOT.jar
     `,
-    loesung: MULTI_STAGE,
+    solution: MULTI_STAGE,
     project: 'spring',
     ignore: JAVA_IGNORE,
     tests: [
@@ -126,7 +126,7 @@ export const beispiele = {
       { name: { de: 'Der Container läuft nicht als root', en: 'The container does not run as root' }, dockerfile: (r) => Boolean(r.image && r.image.user !== 'root') },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Tasks for the terminal at the end of the chapter: build the image and run it. */
 export const terminalTasks: TerminalTask[] = [

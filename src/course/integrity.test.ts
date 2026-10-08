@@ -14,13 +14,13 @@ const chapterSourcesDe = import.meta.glob<string>(['./**/*.tsx', '!./**/*.en.tsx
   eager: true,
 })
 const chapterSourcesEn = import.meta.glob<string>('./**/*.en.tsx', { query: '?raw', import: 'default', eager: true })
-const exerciseModules = import.meta.glob<{ uebungen: UebungsSammlung }>('./exercises/{js,ts,react,hooks,practice,java,backend,sql}.ts', { eager: true })
+const exerciseModules = import.meta.glob<{ exercises: UebungsSammlung }>('./exercises/{js,ts,react,hooks,practice,java,backend,sql}.ts', { eager: true })
 
 const chapterIds = new Set(alleKapitel.map((k) => k.id))
 const duplicates = (values: string[]) => values.filter((v, i) => values.indexOf(v) !== i)
 const matches = (text: string, pattern: RegExp) => [...text.matchAll(pattern)].map((m) => m[1])
 
-const exercises = Object.values(exerciseModules).flatMap((m) => Object.values(m.uebungen).flat())
+const exercises = Object.values(exerciseModules).flatMap((m) => Object.values(m.exercises).flat())
 const tryItIdsDe = Object.values(chapterSourcesDe).flatMap((source) => matches(source, /<TryIt[^>]*?\bid="([^"]+)"/g))
 
 describe('chapters', () => {

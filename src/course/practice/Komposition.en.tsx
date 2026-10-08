@@ -1,7 +1,7 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Komposition.code'
+import { examples } from './Komposition.code'
 import { KompositionsDemo } from '../demos/KompositionsDemo'
 
 /**
@@ -14,8 +14,8 @@ export function Komposition() {
         <P>With <Code>children</Code> you can put any content inside a component.</P>
         <TryIt
           id="praxis-komposition-einstieg"
-          {...beispiele['praxis-komposition-einstieg']}
-          modus="react"
+          {...examples['praxis-komposition-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -47,8 +47,8 @@ export function Komposition() {
       <Abschnitt titel="Slots instead of a prop desert">
         <TryIt
           id="praxis-komposition-slots"
-          {...beispiele['praxis-komposition-slots']}
-          modus="react"
+          {...examples['praxis-komposition-slots']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -60,8 +60,8 @@ export function Komposition() {
         </P>
         <TryIt
           id="praxis-komposition-children-perf"
-          {...beispiele['praxis-komposition-children-perf']}
-          modus="react"
+          {...examples['praxis-komposition-children-perf']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -74,17 +74,17 @@ export function Komposition() {
         </P>
         <TryIt
           id="praxis-komposition-portal"
-          {...beispiele['praxis-komposition-portal']}
-          modus="react"
+          {...examples['praxis-komposition-portal']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-komposition-uebung"
-          {...beispiele['praxis-komposition-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-komposition-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Build a reusable <Code>Tabs</Code> component. It receives a prop{' '}
@@ -109,28 +109,28 @@ export function Komposition() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'A component already has 8 boolean props for small variants. What usually helps?',
-            antworten: ['Even more props', 'Passing content in via children or slot props', 'Inheriting from a class'],
-            richtig: 1,
-            erklaerung: 'Composition keeps the component small and the caller flexible.',
+            question: 'A component already has 8 boolean props for small variants. What usually helps?',
+            answers: ['Even more props', 'Passing content in via children or slot props', 'Inheriting from a class'],
+            correct: 1,
+            explanation: 'Composition keeps the component small and the caller flexible.',
           },
           {
-            frage: 'Where does a click event inside a portal bubble to?',
-            antworten: ['Through the DOM tree (to body)', 'Through the React tree (to the component that renders the portal)'],
-            richtig: 1,
-            erklaerung: 'For React the portal remains a child of its parent component.',
+            question: 'Where does a click event inside a portal bubble to?',
+            answers: ['Through the DOM tree (to body)', 'Through the React tree (to the component that renders the portal)'],
+            correct: 1,
+            explanation: 'For React the portal remains a child of its parent component.',
           },
           {
-            frage: 'Why doesn’t <Expensive /> as children re-render when the wrapper changes its state?',
-            antworten: [
+            question: 'Why doesn’t <Expensive /> as children re-render when the wrapper changes its state?',
+            answers: [
               'Because children are always memoized',
               'Because the JSX was created by the parent and nothing changed there',
               'That’s not true, it always re-renders',
             ],
-            richtig: 1,
-            erklaerung: 'The children prop is the same object as before - React can skip the subtree.',
+            correct: 1,
+            explanation: 'The children prop is the same object as before - React can skip the subtree.',
           },
         ]}
       />

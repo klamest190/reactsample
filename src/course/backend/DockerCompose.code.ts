@@ -1,5 +1,5 @@
 import { js, yaml } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Code for chapter 8.10 - Docker Compose. `docker compose up` is simulated (src/docker/compose.ts):
@@ -44,7 +44,7 @@ const FULL_STACK = yaml`
     db-data:
 `
 
-export const beispiele = {
+export const examples = {
   'docker-compose-einstieg': {
     code: FULL_STACK,
   },
@@ -53,7 +53,7 @@ export const beispiele = {
     code: FULL_STACK.replace('jdbc:postgresql://db:5432/todo', 'jdbc:postgresql://localhost:5432/todo'),
   },
   'docker-compose-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Lies zuerst die rote Meldung: Ein Volume, das ein Service benutzt, muss ganz unten unter `volumes:` stehen.',
         'Die Datenbank startet nicht ohne `POSTGRES_PASSWORD` - und es muss dasselbe sein wie `SPRING_DATASOURCE_PASSWORD`.',
@@ -98,7 +98,7 @@ export const beispiele = {
           depends_on:
             - api
     `,
-    loesung: FULL_STACK,
+    solution: FULL_STACK,
     tests: [
       { name: { de: 'Alle drei Container laufen', en: 'All three containers are running' }, compose: (r) => r.ok && r.containers.length === 3 },
       { name: { de: 'Die API antwortet auf http://localhost:8080', en: 'The API answers on http://localhost:8080' }, compose: (r) => r.urls.some((u) => u.url.startsWith('http://localhost:8080') && u.ok) },
@@ -109,7 +109,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   ordner: js`

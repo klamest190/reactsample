@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import type { Typfehler } from './typeCheck'
+import type { TypeDiagnostic } from './typeCheck'
 
 /**
  * Echte Typprüfung für den Editor - mit dem TypeScript-Compiler selbst.
@@ -16,7 +16,7 @@ const LIB = import.meta.glob(
 ) as Record<string, string>
 
 // Die Typen von React - unter denselben Pfaden wie im echten Projekt.
-const TYPEN = import.meta.glob(
+const TYPES = import.meta.glob(
   [
     '/node_modules/@types/react/{index,global,jsx-runtime,jsx-dev-runtime}.d.ts',
     '/node_modules/@types/react-dom/{index,client}.d.ts',
@@ -29,13 +29,13 @@ const TYPEN = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 ) as Record<string, string>
 
-const LIB_ORDNER = '/lib/'
-const DATEI = '/app.tsx'
+const LIB_FOLDER = '/lib/'
+const FILE = '/app.tsx'
 // Reines TypeScript (Teil 2): ohne JSX, damit z. B. <T>(x: T) => x eine generische Funktion ist.
-const DATEI_TS = '/app.ts'
+const FILE_TS = '/app.ts'
 
 // Im Editor gibt es Hooks & Co. ohne Import (siehe GLOBALE in reactKompilieren.ts) - das muss der Compiler wissen.
-const GLOBALE = `
+const GLOBALS = `
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 declare global {
@@ -69,18 +69,18 @@ declare global {
 export {}
 `
 
-const dateien = new Map<string, string>([...Object.entries(TYPEN), ['/globale.d.ts', GLOBALE]])
-for (const [pfad, inhalt] of Object.entries(LIB)) {
-  dateien.set(LIB_ORDNER + pfad.split('/').pop(), inhalt)
+const files = new Map<string, string>([...Object.entries(TYPES), ['/globale.d.ts', GLOBALS]])
+for (const [pfad, content] of Object.entries(LIB)) {
+  files.set(LIB_FOLDER + pfad.split('/').pop(), content)
 }
 
 /** Inhalt einer Datei: Editor, Projekt oder mitgeliefertes Typ-Paket. */
-function lesen(pfad: string): string | undefined {
-  if (pfad === aktiveDatei) return editorCode
-  return projekt.get(pfad)?.code ?? dateien.get(pfad)
+function read(pfad: string): string | undefined {
+  if (pfad === activeFile) return editorCode
+  return projekt.get(pfad)?.code ?? files.get(pfad)
 }
 
-const OPTIONEN: ts.CompilerOptions = {
+const OPTIONS: ts.CompilerOptions = {
   strict: true,
   noEmit: true,
   target: ts.ScriptTarget.ES2023,
@@ -96,67 +96,67 @@ const OPTIONEN: ts.CompilerOptions = {
 }
 
 let editorCode = ''
-let aktiveDatei = DATEI
+let activeFile = FILE
 let version = 0
 
 // Mehrere Dateien (Werkstatt): Pfad -> Inhalt + Version. Die Version sagt dem
 // Language Service, welche Datei sich geändert hat - alles andere bleibt geparst.
-const PROJEKT_ORDNER = '/projekt/'
+const PROJECT_FOLDER = '/projekt/'
 const projekt = new Map<string, { code: string; version: number }>()
 
-function projektSetzen(dateien: { pfad: string; code: string }[]) {
-  const aktuelle = new Set<string>()
-  for (const datei of dateien) {
-    const pfad = PROJEKT_ORDNER + datei.pfad
-    aktuelle.add(pfad)
-    const vorhanden = projekt.get(pfad)
-    if (!vorhanden) projekt.set(pfad, { code: datei.code, version: 1 })
-    else if (vorhanden.code !== datei.code) projekt.set(pfad, { code: datei.code, version: vorhanden.version + 1 })
+function setProject(files: { pfad: string; code: string }[]) {
+  const current = new Set<string>()
+  for (const file of files) {
+    const pfad = PROJECT_FOLDER + file.pfad
+    current.add(pfad)
+    const existing = projekt.get(pfad)
+    if (!existing) projekt.set(pfad, { code: file.code, version: 1 })
+    else if (existing.code !== file.code) projekt.set(pfad, { code: file.code, version: existing.version + 1 })
   }
-  for (const pfad of projekt.keys()) if (!aktuelle.has(pfad)) projekt.delete(pfad)
+  for (const pfad of projekt.keys()) if (!current.has(pfad)) projekt.delete(pfad)
 }
 
 const host: ts.LanguageServiceHost = {
-  getScriptFileNames: () => [aktiveDatei, '/globale.d.ts', ...projekt.keys()],
+  getScriptFileNames: () => [activeFile, '/globale.d.ts', ...projekt.keys()],
   getScriptVersion: (pfad) => {
-    if (pfad === aktiveDatei) return String(version)
+    if (pfad === activeFile) return String(version)
     return String(projekt.get(pfad)?.version ?? 1)
   },
   getScriptSnapshot: (pfad) => {
-    const inhalt = lesen(pfad)
-    return inhalt === undefined ? undefined : ts.ScriptSnapshot.fromString(inhalt)
+    const content = read(pfad)
+    return content === undefined ? undefined : ts.ScriptSnapshot.fromString(content)
   },
   getCurrentDirectory: () => '/',
-  getCompilationSettings: () => OPTIONEN,
-  getDefaultLibFileName: () => LIB_ORDNER + 'lib.es2023.d.ts',
-  fileExists: (pfad) => lesen(pfad) !== undefined,
-  readFile: lesen,
-  directoryExists: (ordner) => {
-    const praefix = ordner.endsWith('/') ? ordner : ordner + '/'
-    return [...dateien.keys(), ...projekt.keys()].some((pfad) => pfad.startsWith(praefix))
+  getCompilationSettings: () => OPTIONS,
+  getDefaultLibFileName: () => LIB_FOLDER + 'lib.es2023.d.ts',
+  fileExists: (pfad) => read(pfad) !== undefined,
+  readFile: read,
+  directoryExists: (folder) => {
+    const prefix = folder.endsWith('/') ? folder : folder + '/'
+    return [...files.keys(), ...projekt.keys()].some((pfad) => pfad.startsWith(prefix))
   },
   getDirectories: () => [],
 }
 
 // Der Language Service merkt sich die geparsten Bibliotheken - nur der erste Lauf ist langsam.
-const dienst = ts.createLanguageService(host, ts.createDocumentRegistry())
+const service = ts.createLanguageService(host, ts.createDocumentRegistry())
 
 /** Eine einzelne Datei prüfen - der Editor-Code oder eine Datei des Projekts. */
-function pruefen(datei: string): Typfehler[] {
-  const code = lesen(datei) ?? ''
-  const diagnosen = [...dienst.getSyntacticDiagnostics(datei), ...dienst.getSemanticDiagnostics(datei)]
-  const quelle = dienst.getProgram()?.getSourceFile(datei)
+function check(file: string): TypeDiagnostic[] {
+  const code = read(file) ?? ''
+  const diagnostics = [...service.getSyntacticDiagnostics(file), ...service.getSemanticDiagnostics(file)]
+  const source = service.getProgram()?.getSourceFile(file)
 
-  return diagnosen.map((d) => {
+  return diagnostics.map((d) => {
     const start = d.start ?? 0
-    const { line, character } = quelle ? quelle.getLineAndCharacterOfPosition(start) : { line: 0, character: 0 }
+    const { line, character } = source ? source.getLineAndCharacterOfPosition(start) : { line: 0, character: 0 }
     // Markierung höchstens bis zum Zeilenende - der Editor zeichnet pro Zeile.
-    const zeilenende = code.indexOf('\n', start)
-    const laenge = Math.max(1, Math.min(d.length ?? 1, (zeilenende === -1 ? code.length : zeilenende) - start))
+    const lineEnd = code.indexOf('\n', start)
+    const length = Math.max(1, Math.min(d.length ?? 1, (lineEnd === -1 ? code.length : lineEnd) - start))
     return {
-      zeile: line + 1,
-      spalte: character,
-      laenge,
+      line: line + 1,
+      column: character,
+      length,
       text: ts.flattenDiagnosticMessageText(d.messageText, '\n'),
       code: d.code,
     }
@@ -165,23 +165,23 @@ function pruefen(datei: string): Typfehler[] {
 
 // Im Worker ist self der Worker-Scope. Die Projekt-Typen kennen nur das DOM, deshalb diese schmale Beschreibung.
 const scope = self as unknown as {
-  onmessage: (e: MessageEvent<{ id: number; code?: string; ts?: boolean; dateien?: { pfad: string; code: string }[]; aktiv?: string }>) => void
-  postMessage: (nachricht: unknown) => void
+  onmessage: (e: MessageEvent<{ id: number; code?: string; ts?: boolean; files?: { pfad: string; code: string }[]; active?: string }>) => void
+  postMessage: (message: unknown) => void
 }
 
 scope.onmessage = (e) => {
-  const { id, code, ts: nurTs, dateien: projektDateien, aktiv } = e.data
+  const { id, code, ts: nurTs, files: projectFiles, active } = e.data
   try {
-    if (projektDateien) {
-      projektSetzen(projektDateien)
-      scope.postMessage({ id, fehler: pruefen(PROJEKT_ORDNER + aktiv) })
+    if (projectFiles) {
+      setProject(projectFiles)
+      scope.postMessage({ id, error: check(PROJECT_FOLDER + active) })
     } else {
       editorCode = code ?? ''
-      aktiveDatei = nurTs ? DATEI_TS : DATEI
+      activeFile = nurTs ? FILE_TS : FILE
       version++
-      scope.postMessage({ id, fehler: pruefen(aktiveDatei) })
+      scope.postMessage({ id, error: check(activeFile) })
     }
-  } catch (fehler) {
-    scope.postMessage({ id, fehler: [], absturz: String(fehler) })
+  } catch (error) {
+    scope.postMessage({ id, error: [], absturz: String(error) })
   }
 }

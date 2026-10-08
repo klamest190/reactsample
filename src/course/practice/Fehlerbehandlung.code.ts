@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-fehler-einstieg': {
     code: js`
       class ErrorBoundary extends React.Component {
@@ -117,7 +117,7 @@ export const beispiele = {
     `,
   },
   'praxis-fehler-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Jedes Widget bekommt seine eigene `ErrorBoundary` - dann bleibt der Rest stehen.',
         '`getDerivedStateFromError` speichert den Fehler, `render` zeigt dann `fallback`.',
@@ -151,7 +151,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       class ErrorBoundary extends React.Component {
         state = { error: null }
         static getDerivedStateFromError(error) {
@@ -196,14 +196,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Eine eigene ErrorBoundary-Klasse', en: 'A custom ErrorBoundary class' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/extends (React\.)?Component/)
           expect(code).toMatch(/getDerivedStateFromError/)
         `,
       },
       {
         name: { de: 'Kaputte Daten treffen nur das Umsatz-Widget', en: 'Broken data only affects the revenue widget' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Break the data'))
           expect(text()).toContain('Widget unavailable')
@@ -212,7 +212,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Reparierte Daten stellen das Widget wieder her', en: 'Fixed data restores the widget' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Break the data'))
           await click(button('Fix the data'))
@@ -222,7 +222,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Referenzen.code'
+import { examples, codeBloecke } from './Referenzen.code'
 
 /**
  * KAPITEL 1.6 (English) - References & Immutability
@@ -14,7 +14,7 @@ export function Referenzen() {
         <P>Two variables, but only one array: assigning does not copy.</P>
         <TryIt
           id="js-referenzen-einstieg"
-          {...beispiele['js-referenzen-einstieg']}
+          {...examples['js-referenzen-einstieg']}
         />
       </Abschnitt>
 
@@ -27,10 +27,10 @@ export function Referenzen() {
         </P>
         <TryIt
           id="js-referenzen-1"
-          {...beispiele['js-referenzen-1']}
+          {...examples['js-referenzen-1']}
         />
         <CodeBlock
-          titel="Picture it in memory"
+          title="Picture it in memory"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -47,7 +47,7 @@ export function Referenzen() {
         />
         <TryIt
           id="js-referenzen-2"
-          {...beispiele['js-referenzen-2']}
+          {...examples['js-referenzen-2']}
         />
         <Hinweis variante="info">
           <strong>Immutability</strong> has more benefits: old states are preserved (undo!), and
@@ -60,7 +60,7 @@ export function Referenzen() {
         <P>You will write these patterns over and over again in React:</P>
         <TryIt
           id="js-referenzen-3"
-          {...beispiele['js-referenzen-3']}
+          {...examples['js-referenzen-3']}
         />
       </Abschnitt>
 
@@ -71,7 +71,7 @@ export function Referenzen() {
         </P>
         <TryIt
           id="js-referenzen-4"
-          {...beispiele['js-referenzen-4']}
+          {...examples['js-referenzen-4']}
         />
         <Liste>
           <li>Avoid deeply nested state where possible - flat structures are easier to update.</li>
@@ -85,8 +85,8 @@ export function Referenzen() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-referenzen-uebung"
-          {...beispiele['js-referenzen-uebung']}
-          aufgabe={
+          {...examples['js-referenzen-uebung']}
+          task={
             <>
               <p>
                 Write three functions that <strong>don’t change</strong> an array of todos but return a new
@@ -111,28 +111,28 @@ export function Referenzen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'What is [1] === [1] ?',
-            antworten: ['true', 'false'],
-            richtig: 1,
-            erklaerung: 'Two array literals are two different objects with different references.',
+            question: 'What is [1] === [1] ?',
+            answers: ['true', 'false'],
+            correct: 1,
+            explanation: 'Two array literals are two different objects with different references.',
           },
           {
-            frage: 'Why doesn’t React re-render after list.push(x); setList(list)?',
-            antworten: [
+            question: 'Why doesn’t React re-render after list.push(x); setList(list)?',
+            answers: [
               'push is forbidden in React',
               'The reference is the same - React sees no change',
               'setList needs a function',
             ],
-            richtig: 1,
-            erklaerung: 'React compares old and new with Object.is. Same reference = no change.',
+            correct: 1,
+            explanation: 'React compares old and new with Object.is. Same reference = no change.',
           },
           {
-            frage: 'What does { ...user } copy?',
-            antworten: ['All levels', 'Only the top level', 'Nothing, it is a reference'],
-            richtig: 1,
-            erklaerung: 'Spread is a shallow copy - nested objects are still shared.',
+            question: 'What does { ...user } copy?',
+            answers: ['All levels', 'Only the top level', 'Nothing, it is a reference'],
+            correct: 1,
+            explanation: 'Spread is a shallow copy - nested objects are still shared.',
           },
         ]}
       />

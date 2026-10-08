@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Abschlussprojekt.code'
+import { examples } from './Abschlussprojekt.code'
 
 const steps: [string, string, string][] = [
   ['1', 'Data model & reducer', 'Habits as an array, actions: added, toggled, deleted. Dates as "YYYY-MM-DD" strings.'],
@@ -39,10 +39,10 @@ export function Abschlussprojekt() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-projekt"
-          {...beispiele['praxis-projekt']}
-          modus="react"
-          titel="Habit tracker"
-          aufgabe={
+          {...examples['praxis-projekt']}
+          mode="react"
+          title="Habit tracker"
+          task={
             <>
               <p>
                 <strong>Requirements</strong> - the helper functions for dates already exist:
@@ -112,38 +112,38 @@ export function Abschlussprojekt() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Where do you sensibly start with an app like the tracker?',
-            antworten: [
+            question: 'Where do you sensibly start with an app like the tracker?',
+            answers: [
               'With the layout and the colors',
               'With the data model and the transitions - that is, the reducer',
               'With the components, the UI follows from them',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Once it is clear what the data looks like and how it changes, the UI is only a rendering of it.',
           },
           {
-            frage: 'The streak (“🔥 4”) of a habit - where does it belong?',
-            antworten: [
+            question: 'The streak (“🔥 4”) of a habit - where does it belong?',
+            answers: [
               'In its own state that is updated whenever a day is ticked',
               'In the reducer as an extra field on every habit',
               'Not in state at all - it is computed from the ticked days',
             ],
-            richtig: 2,
-            erklaerung:
+            correct: 2,
+            explanation:
               'Whatever can be derived from existing state does not belong in state. Otherwise the two values can drift apart.',
           },
           {
-            frage: 'What is a custom hook like useLocalStorage good for?',
-            antworten: [
+            question: 'What is a custom hook like useLocalStorage good for?',
+            answers: [
               'It makes the app faster',
               'It encapsulates recurring mechanics so components do not repeat them every time',
               'It replaces the reducer',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Custom hooks gather logic with state and effects in one place - the component stays readable.',
           },
         ]}

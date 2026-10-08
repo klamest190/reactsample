@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für das Kapitel Barrierefreiheit - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen und Tipps gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-a11y-einstieg': {
     code: js`
       function App() {
@@ -211,7 +211,7 @@ export const beispiele = {
     `,
   },
   'praxis-a11y-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Aus `<b>` wird `<h2>`, aus den beiden klickbaren `<div>`/`<span>` echte `<button>`. Der ✕-Knopf braucht `aria-label="Close"`.',
         'Das Bild ist nur Dekoration: `alt=""` sagt dem Screenreader, dass er es überspringen soll.',
@@ -267,7 +267,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const ENVELOPE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E✉️%3C/text%3E%3C/svg%3E"
 
       function App() {
@@ -323,7 +323,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: '„Newsletter“ ist eine Überschrift', en: '“Newsletter” is a heading' },
-        pruefung: js`
+        script: js`
           await render()
           const heading = findAll('h1, h2, h3, h4').find((h) => h.textContent.includes('Newsletter'))
           expect(Boolean(heading)).toBe(true)
@@ -331,7 +331,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Schließen ist ein <button> mit Namen „Close“', en: 'Close is a <button> named “Close”' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Close'))
           expect(text()).toContain('Closed.')
@@ -339,14 +339,14 @@ export const beispiele = {
       },
       {
         name: { de: 'Das Bild hat ein alt-Attribut', en: 'The image has an alt attribute' },
-        pruefung: js`
+        script: js`
           await render()
           expect(find('img').hasAttribute('alt')).toBe(true)
         `,
       },
       {
         name: { de: 'Das E-Mail-Feld hat ein echtes Label', en: 'The e-mail field has a real label' },
-        pruefung: js`
+        script: js`
           await render()
           const input = find('input')
           const labels = [...(input.labels ?? [])].map((l) => l.textContent)
@@ -355,14 +355,14 @@ export const beispiele = {
       },
       {
         name: { de: '„Subscribe“ ist ein <button>', en: '“Subscribe” is a <button>' },
-        pruefung: js`
+        script: js`
           await render()
           expect(button('Subscribe').tagName).toBe('BUTTON')
         `,
       },
       {
         name: { de: 'Der Fehler ist mit dem Feld verknüpft', en: 'The error is linked to the field' },
-        pruefung: js`
+        script: js`
           await render()
           await type(find('input'), 'nope')
           await click(button('Subscribe'))
@@ -375,7 +375,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Mit gültiger Adresse kommt der Dank', en: 'A valid address shows the thank-you' },
-        pruefung: js`
+        script: js`
           await render()
           await type(find('input'), 'ada@example.com')
           await click(button('Subscribe'))
@@ -384,4 +384,4 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

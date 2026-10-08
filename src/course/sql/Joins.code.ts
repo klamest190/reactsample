@@ -3,7 +3,7 @@ import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.4 - Joining tables: JOIN. */
 
-export const beispiele: Record<string, SqlBeispiel> = {
+export const examples: Record<string, SqlBeispiel> = {
   'sql-joins-einstieg': {
     code: sql`
       -- orders only knows the customer_id - the JOIN fetches the name
@@ -83,7 +83,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
       FROM products p
       ORDER BY p.name;
     `,
-    loesung: sql`
+    solution: sql`
       SELECT p.name, p.category
       FROM products p
       LEFT JOIN order_items i ON i.product_id = p.id
@@ -92,9 +92,9 @@ export const beispiele: Record<string, SqlBeispiel> = {
     `,
     tests: [
       { name: { de: 'Genau die Produkte, die nie bestellt wurden', en: 'Exactly the products that were never ordered' } },
-      { name: { de: 'Nach Name sortiert', en: 'Sorted by name' }, reihenfolge: true },
+      { name: { de: 'Nach Name sortiert', en: 'Sorted by name' }, order: true },
     ],
-    tipps: {
+    hints: {
       de: [
         'Bestellt heißt: Es gibt eine Zeile in `order_items` mit dieser `product_id`.',
         '`LEFT JOIN order_items i ON i.product_id = p.id` behält auch Produkte ohne Position.',

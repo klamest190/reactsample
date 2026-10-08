@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './FehlerUndKlassen.code'
+import { examples } from './FehlerUndKlassen.code'
 
 /**
  * KAPITEL 1.8 (English) - Errors & Classes
@@ -14,7 +14,7 @@ export function FehlerUndKlassen() {
         <P>
           <Code>try</Code> attempts something, <Code>catch</Code> catches the error - and the program keeps running.
         </P>
-        <TryIt id="js-fehler-einstieg" {...beispiele['js-fehler-einstieg']} />
+        <TryIt id="js-fehler-einstieg" {...examples['js-fehler-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Throwing and catching errors">
@@ -24,7 +24,7 @@ export function FehlerUndKlassen() {
           for example when a function is called with invalid values. <Code>finally</Code> runs in every case, with or
           without an error.
         </P>
-        <TryIt id="js-fehler-werfen" {...beispiele['js-fehler-werfen']} />
+        <TryIt id="js-fehler-werfen" {...examples['js-fehler-werfen']} />
         <Liste>
           <li>
             Built-in error types: <Code>TypeError</Code> (wrong type, e.g. <Code>undefined.x</Code>),{' '}
@@ -52,7 +52,7 @@ export function FehlerUndKlassen() {
           creates a new object (an <strong>instance</strong>), the <Code>constructor</Code> sets it up. Inside methods,{' '}
           <Code>this</Code> points to the instance.
         </P>
-        <TryIt id="js-fehler-klassen" {...beispiele['js-fehler-klassen']} />
+        <TryIt id="js-fehler-klassen" {...examples['js-fehler-klassen']} />
         <Liste>
           <li>
             <Code>#field</Code> is private: nobody outside can reach it, not even to read it.
@@ -73,7 +73,7 @@ export function FehlerUndKlassen() {
           was defined in. If you pass a method on (as a callback, to <Code>setTimeout</Code>, as an event handler), the
           dot is missing and <Code>this</Code> is <Code>undefined</Code>.
         </P>
-        <TryIt id="js-fehler-this" {...beispiele['js-fehler-this']} />
+        <TryIt id="js-fehler-this" {...examples['js-fehler-this']} />
         <P>
           Arrow functions have no <Code>this</Code> of their own, they use the one from outside (
           <Verweis id="js-funktionen" />). That is one reason why React relies on function components today: there is
@@ -88,7 +88,7 @@ export function FehlerUndKlassen() {
           <Code>super(…)</Code> calls the parent’s constructor. This is most useful for <strong>custom error
           types</strong>: with <Code>instanceof</Code> you can tell expected errors (invalid input) from real bugs.
         </P>
-        <TryIt id="js-fehler-vererbung" {...beispiele['js-fehler-vererbung']} />
+        <TryIt id="js-fehler-vererbung" {...examples['js-fehler-vererbung']} />
         <P>
           One place where you still write a class in React today is the error boundary - it catches errors during
           rendering (<Verweis id="praxis-fehler" />).
@@ -98,8 +98,8 @@ export function FehlerUndKlassen() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="js-fehler-uebung"
-          {...beispiele['js-fehler-uebung']}
-          aufgabe={
+          {...examples['js-fehler-uebung']}
+          task={
             <>
               <p>Build a small bank account:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -129,28 +129,28 @@ export function FehlerUndKlassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'When does the finally block run?',
-            antworten: ['Only without an error', 'Only after an error', 'Always - with and without an error'],
-            richtig: 2,
-            erklaerung: 'Ideal for cleaning up, e.g. to end a loading state.',
+            question: 'When does the finally block run?',
+            answers: ['Only without an error', 'Only after an error', 'Always - with and without an error'],
+            correct: 2,
+            explanation: 'Ideal for cleaning up, e.g. to end a loading state.',
           },
           {
-            frage: 'What is this in obj.method()?',
-            antworten: ['The class', 'obj - the object in front of the dot', 'Always window'],
-            richtig: 1,
-            erklaerung: 'Without a dot at call time (e.g. as a callback), this gets lost.',
+            question: 'What is this in obj.method()?',
+            answers: ['The class', 'obj - the object in front of the dot', 'Always window'],
+            correct: 1,
+            explanation: 'Without a dot at call time (e.g. as a callback), this gets lost.',
           },
           {
-            frage: 'Why write custom error classes like ValidationError?',
-            antworten: [
+            question: 'Why write custom error classes like ValidationError?',
+            answers: [
               'So instanceof can tell expected errors from real bugs',
               'Because Error must not be thrown',
               'To make the error faster',
             ],
-            richtig: 0,
-            erklaerung: 'You handle expected errors and throw unknown ones on.',
+            correct: 0,
+            explanation: 'You handle expected errors and throw unknown ones on.',
           },
         ]}
       />

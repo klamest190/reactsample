@@ -9,17 +9,17 @@
  */
 
 /** Ein Typ im Quelltext: `int`, `String`, `List<String>`, `int[][]`. */
-export type TypRef = {
+export type TypeRef = {
   name: string
   /** Anzahl der [] - `int[][]` hat 2. */
-  dimensionen: number
+  dimensions: number
   /** Generics werden gelesen, aber (wie in echtem Java zur Laufzeit) vergessen. */
-  argumente: TypRef[]
+  args: TypeRef[]
 }
 
-export const TYP_UNBEKANNT: TypRef = { name: 'var', dimensionen: 0, argumente: [] }
+export const UNKNOWN_TYPE: TypeRef = { name: 'var', dimensions: 0, args: [] }
 
-export type Sichtbarkeit = 'public' | 'protected' | 'private' | 'paket'
+export type Visibility = 'public' | 'protected' | 'private' | 'package'
 
 /**
  * An annotation such as `@GetMapping("/todos/{id}")` or `@Size(min = 1, max = 80)`.
@@ -38,128 +38,128 @@ export type Annotation = {
 /** Strings, numbers and booleans as such; constants and classes as text (`HttpStatus.CREATED`, `Todo.class` → `Todo`). */
 export type AnnotationValue = string | number | boolean | AnnotationValue[]
 
-export type ParamDekl = { name: string; typ: TypRef; varargs: boolean; annotations?: Annotation[] }
+export type ParamDecl = { name: string; type: TypeRef; varargs: boolean; annotations?: Annotation[] }
 
-export type FeldDekl = {
+export type FieldDecl = {
   name: string
-  typ: TypRef
-  statisch: boolean
+  type: TypeRef
+  isStatic: boolean
   final: boolean
-  sichtbarkeit: Sichtbarkeit
-  init?: Ausdruck
+  visibility: Visibility
+  init?: Expression
   annotations?: Annotation[]
-  zeile: number
+  line: number
 }
 
-export type MethodenDekl = {
+export type MethodDecl = {
   name: string
-  rueckgabe: TypRef
-  parameter: ParamDekl[]
+  returnType: TypeRef
+  params: ParamDecl[]
   /** Fehlt bei abstrakten Methoden und Interface-Methoden ohne default. */
-  rumpf?: Block
-  statisch: boolean
-  abstrakt: boolean
-  sichtbarkeit: Sichtbarkeit
+  body?: Block
+  isStatic: boolean
+  isAbstract: boolean
+  visibility: Visibility
   /** Konstruktoren sind Methoden ohne Rückgabetyp, die so heißen wie die Klasse. */
-  konstruktor: boolean
+  isConstructor: boolean
   annotations?: Annotation[]
-  zeile: number
+  line: number
 }
 
-export type TypDeklaration = {
-  art: 'klasse' | 'interface' | 'enum'
+export type TypeDecl = {
+  kind: 'class' | 'interface' | 'enum'
   name: string
-  abstrakt: boolean
-  oberklasse?: string
+  isAbstract: boolean
+  superclass?: string
   interfaces: string[]
   /** extends/implements including type arguments: `JpaRepository<Todo, Long>` - for libraries like Spring Data. */
-  superTypes?: TypRef[]
-  felder: FeldDekl[]
-  methoden: MethodenDekl[]
+  superTypes?: TypeRef[]
+  fields: FieldDecl[]
+  methods: MethodDecl[]
   /** Nur bei enum: die Konstanten in Reihenfolge. */
-  konstanten: { name: string; argumente: Ausdruck[] }[]
+  constants: { name: string; args: Expression[] }[]
   /** Nur bei record: die Komponenten (werden zu final-Feldern + Gettern). */
-  komponenten?: ParamDekl[]
+  components?: ParamDecl[]
   /** Bei verschachtelten Klassen: die umgebende Klasse - deren static-Felder sind sichtbar. */
-  aeussere?: string
+  outer?: string
   annotations?: Annotation[]
-  zeile: number
+  line: number
 }
 
-export type Programm = {
-  typen: TypDeklaration[]
+export type Program = {
+  types: TypeDecl[]
   /** package/import werden gelesen und ignoriert - hier gibt es nur eine Datei. */
-  importe: string[]
+  imports: string[]
 }
 
 // ---------------------------------------------------------------------------
 // Anweisungen
 // ---------------------------------------------------------------------------
 
-export type Block = { art: 'block'; anweisungen: Anweisung[]; zeile: number }
+export type Block = { kind: 'block'; statements: Statement[]; line: number }
 
-export type VarDekl = { name: string; dimensionen: number; init?: Ausdruck }
+export type VarDecl = { name: string; dimensions: number; init?: Expression }
 
-export type Anweisung =
+export type Statement =
   | Block
-  | { art: 'lokal'; typ: TypRef; final: boolean; variablen: VarDekl[]; zeile: number }
-  | { art: 'ausdruck'; ausdruck: Ausdruck; zeile: number }
-  | { art: 'if'; bedingung: Ausdruck; dann: Anweisung; sonst?: Anweisung; zeile: number }
-  | { art: 'while'; bedingung: Ausdruck; rumpf: Anweisung; zeile: number }
-  | { art: 'doWhile'; bedingung: Ausdruck; rumpf: Anweisung; zeile: number }
-  | { art: 'for'; init: Anweisung[]; bedingung?: Ausdruck; schritt: Ausdruck[]; rumpf: Anweisung; zeile: number }
-  | { art: 'forEach'; typ: TypRef; name: string; quelle: Ausdruck; rumpf: Anweisung; zeile: number }
-  | { art: 'switch'; wert: Ausdruck; faelle: SwitchFall[]; pfeil: boolean; zeile: number }
-  | { art: 'return'; wert?: Ausdruck; zeile: number }
-  | { art: 'break'; zeile: number }
-  | { art: 'continue'; zeile: number }
-  | { art: 'throw'; wert: Ausdruck; zeile: number }
-  | { art: 'try'; rumpf: Block; faenger: Faenger[]; schliesslich?: Block; zeile: number }
-  | { art: 'leer'; zeile: number }
+  | { kind: 'local'; type: TypeRef; final: boolean; variables: VarDecl[]; line: number }
+  | { kind: 'expression'; expression: Expression; line: number }
+  | { kind: 'if'; condition: Expression; thenBranch: Statement; elseBranch?: Statement; line: number }
+  | { kind: 'while'; condition: Expression; body: Statement; line: number }
+  | { kind: 'doWhile'; condition: Expression; body: Statement; line: number }
+  | { kind: 'for'; init: Statement[]; condition?: Expression; update: Expression[]; body: Statement; line: number }
+  | { kind: 'forEach'; type: TypeRef; name: string; source: Expression; body: Statement; line: number }
+  | { kind: 'switch'; value: Expression; cases: SwitchCase[]; arrow: boolean; line: number }
+  | { kind: 'return'; value?: Expression; line: number }
+  | { kind: 'break'; line: number }
+  | { kind: 'continue'; line: number }
+  | { kind: 'throw'; value: Expression; line: number }
+  | { kind: 'try'; body: Block; catches: CatchClause[]; finallyBlock?: Block; line: number }
+  | { kind: 'empty'; line: number }
 
-export type SwitchFall = {
+export type SwitchCase = {
   /** Leer = `default`. Mehrere Werte für `case 1, 2 ->` bzw. gestapelte `case`. */
-  werte: Ausdruck[]
-  anweisungen: Anweisung[]
+  values: Expression[]
+  statements: Statement[]
   /** Bei `case x -> ausdruck;` der Wert, den das switch liefert. */
-  ergebnis?: Ausdruck
+  result?: Expression
 }
 
-export type Faenger = { typen: string[]; name: string; rumpf: Block }
+export type CatchClause = { types: string[]; name: string; body: Block }
 
 // ---------------------------------------------------------------------------
 // Ausdrücke
 // ---------------------------------------------------------------------------
 
 export type Literal =
-  | { typ: 'int'; wert: number }
-  | { typ: 'double'; wert: number }
-  | { typ: 'boolean'; wert: boolean }
-  | { typ: 'char'; wert: number }
-  | { typ: 'String'; wert: string }
-  | { typ: 'null' }
+  | { type: 'int'; value: number }
+  | { type: 'double'; value: number }
+  | { type: 'boolean'; value: boolean }
+  | { type: 'char'; value: number }
+  | { type: 'String'; value: string }
+  | { type: 'null' }
 
-export type Ausdruck =
-  | { art: 'literal'; wert: Literal; zeile: number }
-  | { art: 'name'; name: string; zeile: number }
-  | { art: 'this'; zeile: number }
-  | { art: 'feld'; ziel: Ausdruck; name: string; zeile: number }
-  | { art: 'aufruf'; ziel?: Ausdruck; name: string; argumente: Ausdruck[]; ueberSuper: boolean; zeile: number }
-  | { art: 'neu'; klasse: string; argumente: Ausdruck[]; zeile: number }
-  | { art: 'neuArray'; typ: TypRef; groessen: Ausdruck[]; werte?: Ausdruck[]; zeile: number }
-  | { art: 'arrayWerte'; werte: Ausdruck[]; zeile: number }
-  | { art: 'index'; ziel: Ausdruck; index: Ausdruck; zeile: number }
-  | { art: 'zuweisung'; ziel: Ausdruck; operator: string; wert: Ausdruck; zeile: number }
-  | { art: 'binaer'; operator: string; links: Ausdruck; rechts: Ausdruck; zeile: number }
-  | { art: 'unaer'; operator: string; ausdruck: Ausdruck; zeile: number }
-  | { art: 'stufe'; operator: '++' | '--'; ziel: Ausdruck; vorher: boolean; zeile: number }
-  | { art: 'ternaer'; bedingung: Ausdruck; dann: Ausdruck; sonst: Ausdruck; zeile: number }
-  | { art: 'instanceof'; ausdruck: Ausdruck; typ: string; bindung?: string; zeile: number }
-  | { art: 'cast'; typ: TypRef; ausdruck: Ausdruck; zeile: number }
-  | { art: 'lambda'; parameter: string[]; rumpf: Ausdruck | Block; zeile: number }
-  | { art: 'methodenRef'; ziel: string; name: string; zeile: number }
-  | { art: 'super'; zeile: number }
+export type Expression =
+  | { kind: 'literal'; value: Literal; line: number }
+  | { kind: 'name'; name: string; line: number }
+  | { kind: 'this'; line: number }
+  | { kind: 'field'; target: Expression; name: string; line: number }
+  | { kind: 'call'; target?: Expression; name: string; args: Expression[]; viaSuper: boolean; line: number }
+  | { kind: 'new'; classInfo: string; args: Expression[]; line: number }
+  | { kind: 'newArray'; type: TypeRef; sizes: Expression[]; values?: Expression[]; line: number }
+  | { kind: 'arrayLiteral'; values: Expression[]; line: number }
+  | { kind: 'index'; target: Expression; index: Expression; line: number }
+  | { kind: 'assign'; target: Expression; operator: string; value: Expression; line: number }
+  | { kind: 'binary'; operator: string; left: Expression; right: Expression; line: number }
+  | { kind: 'unary'; operator: string; expression: Expression; line: number }
+  | { kind: 'increment'; operator: '++' | '--'; target: Expression; prefix: boolean; line: number }
+  | { kind: 'ternary'; condition: Expression; thenBranch: Expression; elseBranch: Expression; line: number }
+  | { kind: 'instanceof'; expression: Expression; type: string; binding?: string; line: number }
+  | { kind: 'cast'; type: TypeRef; expression: Expression; line: number }
+  | { kind: 'lambda'; params: string[]; body: Expression | Block; line: number }
+  | { kind: 'methodRef'; target: string; name: string; line: number }
+  | { kind: 'super'; line: number }
   /** `Todo.class` - a Class object, as needed by e.g. `SpringApplication.run(App.class, args)`. */
-  | { art: 'classLiteral'; className: string; zeile: number }
+  | { kind: 'classLiteral'; className: string; line: number }
   /** switch als Ausdruck (Java 14+): `int t = switch (tag) { case 1 -> 10; … };` */
-  | { art: 'switchAusdruck'; anweisung: Anweisung; zeile: number }
+  | { kind: 'switchExpression'; statement: Statement; line: number }

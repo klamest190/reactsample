@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.7 - Vererbung & Interfaces. */
 
-export const beispiele = {
+export const examples = {
   'java-vererbung-einstieg': {
     code: java`
       public class Main {
@@ -245,7 +245,7 @@ export const beispiele = {
     `,
   },
   'java-vererbung-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`abstract class Employee` bekommt das Feld `name`, den Konstruktor und `abstract double monthlySalary();`.',
         'Die Unterklassen rufen im Konstruktor zuerst `super(name);` auf.',
@@ -284,7 +284,7 @@ export const beispiele = {
 
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           Employee[] team = { new Developer("Ada", 100, 50), new Manager("Alan", 6000) };
@@ -345,27 +345,27 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Developer verdient hours * hourlyRate', en: 'Developer earns hours * hourlyRate' },
-        ausdruck: 'new Developer("X", 10, 20).monthlySalary()',
-        erwartet: 200,
+        expression: 'new Developer("X", 10, 20).monthlySalary()',
+        expected: 200,
       },
       {
         name: { de: 'Manager verdient das Fixgehalt', en: 'Manager earns the fixed salary' },
-        ausdruck: 'new Manager("Y", 5000).monthlySalary()',
-        erwartet: 5000,
+        expression: 'new Manager("Y", 5000).monthlySalary()',
+        expected: 5000,
       },
       {
         name: { de: 'Beide sind Employee', en: 'Both are Employee' },
-        ausdruck: 'new Manager("Y", 1) instanceof Employee && new Developer("X", 1, 1) instanceof Employee',
-        erwartet: true,
+        expression: 'new Manager("Y", 1) instanceof Employee && new Developer("X", 1, 1) instanceof Employee',
+        expected: true,
       },
       {
         name: { de: 'describe() steht nur in Employee', en: 'describe() lives only in Employee' },
-        ausdruck: 'new Developer("Ada", 2, 3).describe()',
-        erwartet: 'Ada: 6.0',
+        expression: 'new Developer("Ada", 2, 3).describe()',
+        expected: 'Ada: 6.0',
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   istEin: java`

@@ -17,10 +17,10 @@
  */
 
 import { alsJs, tiefGleich, zeigen } from '../java'
-import { JavaAbbruch, JavaAusnahme, Umgebung } from '../java/interpreter'
-import { JavaSyntaxFehler } from '../java/lexer'
-import { parsen } from '../java/parser'
-import { pruefen } from '../java/typeChecker'
+import { JavaAbort, JavaException, Scope } from '../java/interpreter'
+import { JavaSyntaxError } from '../java/lexer'
+import { parse } from '../java/parser'
+import { checkProgram } from '../java/typeChecker'
 import { find } from './annotations'
 import { SpringApp, StartupFailure, type BeanInfo, type Language, type OutputLine } from './context'
 import { check, parseHttp, requestText, type HttpRequest, type HttpResponse, type Mismatch } from './http'
@@ -36,8 +36,8 @@ export type SpringTest = {
   /** Requests in `.http` notation, each optionally followed by `→ status body`. */
   http?: string
   /** A Java expression checked afterwards; `context` (the ApplicationContext) and `output` are available. */
-  ausdruck?: string
-  erwartet?: unknown
+  expression?: string
+  expected?: unknown
 }
 
 export type Exchange = { request: HttpRequest; response: HttpResponse; mismatch: Mismatch | null }
@@ -92,7 +92,7 @@ export class SpringServer {
       response = this.web.handle(request)
     } catch (error) {
       // A bug in this runtime must never take the page down - report it like a server error.
-      this.app.print(String(error instanceof Error ? error.message : error), 'fehler')
+      this.app.print(String(error instanceof Error ? error.message : error), 'exception')
       response = { status: 500, headers: {}, body: { kind: 'text', text: 'Internal Server Error' }, millis: 1 }
     }
     return { response, lines: this.app.lines.slice(before) }
@@ -108,12 +108,12 @@ export class SpringServer {
 }
 
 /** Only check, don't run - for the red squiggles, like an IDE does while typing. */
-export function springCheck(source: string, language: Language = 'de'): { zeile: number; text: string }[] {
+export function springCheck(source: string, language: Language = 'de'): { line: number; text: string }[] {
   try {
     const classes = springLibrary(dummyHost).classes
-    return pruefen(parsen(source), classes).map((m) => ({ zeile: m.zeile, text: language === 'de' ? m.deutsch : m.englisch }))
+    return checkProgram(parse(source), classes).map((m) => ({ line: m.line, text: language === 'de' ? m.de : m.en }))
   } catch (error) {
-    if (error instanceof JavaSyntaxFehler) return [{ zeile: error.zeile, text: error.meldung }]
+    if (error instanceof JavaSyntaxError) return [{ line: error.line, text: error.message }]
     return []
   }
 }
@@ -127,20 +127,20 @@ export function springStart(source: string, options: Options = {}): { lines: Out
   // --- 1. Read -----------------------------------------------------------------------
   let program
   try {
-    program = parsen(source)
+    program = parse(source)
   } catch (error) {
-    if (error instanceof JavaSyntaxFehler) return { lines: [{ typ: 'fehler', text: `Main.java:${error.zeile}: error: ${error.meldung}` }], failed: true, server: null }
+    if (error instanceof JavaSyntaxError) return { lines: [{ type: 'exception', text: `Main.java:${error.line}: error: ${error.message}` }], failed: true, server: null }
     throw error
   }
 
   // --- 2. Compile ----------------------------------------------------------------------
-  const messages = pruefen(program, springLibrary(dummyHost).classes)
+  const messages = checkProgram(program, springLibrary(dummyHost).classes)
   if (messages.length) {
     for (const m of messages) {
-      lines.push({ typ: 'fehler', text: `Main.java:${m.zeile}: error: ${m.englisch}` })
-      if (language === 'de') lines.push({ typ: 'info', text: '   ' + m.deutsch })
+      lines.push({ type: 'exception', text: `Main.java:${m.line}: error: ${m.en}` })
+      if (language === 'de') lines.push({ type: 'info', text: '   ' + m.de })
     }
-    lines.push({ typ: 'warn', text: t.compileErrors(messages.length) })
+    lines.push({ type: 'warn', text: t.compileErrors(messages.length) })
     return { lines, failed: true, server: null }
   }
 
@@ -149,7 +149,7 @@ export function springStart(source: string, options: Options = {}): { lines: Out
   try {
     app = new SpringApp(program, options.properties ?? '', language)
   } catch (error) {
-    return { lines: [{ typ: 'fehler', text: errorText(error, language) }], failed: true, server: null }
+    return { lines: [{ type: 'exception', text: errorText(error, language) }], failed: true, server: null }
   }
   const web = new Web(app)
   app.onStarted = () => {
@@ -169,26 +169,26 @@ export function springStart(source: string, options: Options = {}): { lines: Out
     }
   }
 
-  const mainClass = [...app.interpreter.klassen.values()].find((k) => (k.methoden.get('main') ?? []).some((m) => m.statisch))
+  const mainClass = [...app.interpreter.classes.values()].find((k) => (k.methods.get('main') ?? []).some((m) => m.isStatic))
   let failed = false
   try {
     if (mainClass) {
-      app.interpreter.starten()
+      app.interpreter.start()
     } else {
       // Short examples may leave out main - then we start the application ourselves.
-      const application = [...app.interpreter.klassen.values()].find((k) => find(k.dekl.annotations, 'SpringBootApplication'))
+      const application = [...app.interpreter.classes.values()].find((k) => find(k.decl.annotations, 'SpringBootApplication'))
       app.run(application?.name, 1)
     }
   } catch (error) {
     failed = true
-    app.interpreter.abschliessen()
+    app.interpreter.finish()
     if (error instanceof StartupFailure) reportFailure(app, error, language)
-    else if (error instanceof JavaAusnahme) {
-      app.print(`Exception in thread "main" ${app.interpreter.ausnahmeText(error.wert)}`, 'fehler')
-      if (error.zeile) app.print(`   at Main.java:${error.zeile}`, 'info')
-    } else app.print(errorText(error, language), 'fehler')
+    else if (error instanceof JavaException) {
+      app.print(`Exception in thread "main" ${app.interpreter.exceptionText(error.value)}`, 'exception')
+      if (error.line) app.print(`   at Main.java:${error.line}`, 'info')
+    } else app.print(errorText(error, language), 'exception')
   }
-  app.interpreter.abschliessen()
+  app.interpreter.finish()
   app.flushOutput()
 
   if (!failed && !app.started) {
@@ -239,19 +239,19 @@ function runTest(source: string, test: SpringTest, options: Options, language: L
     if (mismatch) return result(`${requestText(step.request)} → ${mismatch[language]}`)
   }
 
-  if (test.ausdruck) {
+  if (test.expression) {
     const i = server.app.interpreter
     try {
-      i.hauptUmgebung ??= new Umgebung()
-      i.hauptUmgebung.deklarieren('context', server.app.contextValue, { name: 'ApplicationContext', dimensionen: 0, argumente: [] })
-      const output = server.app.lines.filter((l) => l.typ === 'log').map((l) => l.text).join('\n')
-      i.hauptUmgebung.deklarieren('output', { art: 'string', wert: output }, { name: 'String', dimensionen: 0, argumente: [] })
+      i.globalScope ??= new Scope()
+      i.globalScope.declare('context', server.app.contextValue, { name: 'ApplicationContext', dimensions: 0, args: [] })
+      const output = server.app.lines.filter((l) => l.type === 'log').map((l) => l.text).join('\n')
+      i.globalScope.declare('output', { kind: 'string', value: output }, { name: 'String', dimensions: 0, args: [] })
       i.resetStepLimit()
-      const value = alsJs(i.ausdruckAuswerten(test.ausdruck), i)
-      const expected = test.erwartet === undefined ? true : test.erwartet
+      const value = alsJs(i.evaluateExpression(test.expression), i)
+      const expected = test.expected === undefined ? true : test.expected
       if (!tiefGleich(value, expected)) return result(t.testFailed(zeigen(expected), zeigen(value)))
     } catch (error) {
-      const text = error instanceof JavaAusnahme ? i.ausnahmeText(error.wert) : errorText(error, language)
+      const text = error instanceof JavaException ? i.exceptionText(error.value) : errorText(error, language)
       return result(t.testCrashed(text))
     }
   }
@@ -280,18 +280,18 @@ function reportFailure(app: SpringApp, failure: StartupFailure, language: Langua
     app.print(failure.action, 'error')
   } else {
     app.log('ERROR', 'SpringApplication', 'Application run failed')
-    for (const line of failure.description.split('\n')) app.print(line, 'fehler')
+    for (const line of failure.description.split('\n')) app.print(line, 'exception')
   }
   app.print('', 'info')
   app.print(`💡 ${failure.hint[language]}${failure.line ? ` (Main.java:${failure.line})` : ''}`, 'info')
 }
 
 function errorText(error: unknown, language: Language): string {
-  if (error instanceof JavaAbbruch) {
-    const text = language === 'de' ? error.deutsch : error.englisch
-    return error.zeile ? `Main.java:${error.zeile}: error: ${text}` : text
+  if (error instanceof JavaAbort) {
+    const text = language === 'de' ? error.de : error.en
+    return error.line ? `Main.java:${error.line}: error: ${text}` : text
   }
-  if (error instanceof JavaSyntaxFehler) return `Main.java:${error.zeile}: error: ${error.meldung}`
+  if (error instanceof JavaSyntaxError) return `Main.java:${error.line}: error: ${error.message}`
   if (error instanceof RangeError) {
     return language === 'de' ? 'StackOverflowError: Eine Methode ruft sich endlos selbst auf.' : 'StackOverflowError: a method calls itself endlessly.'
   }
@@ -300,8 +300,8 @@ function errorText(error: unknown, language: Language): string {
 
 /** Only for the list of class names - these calls never happen. */
 const dummyHost = {
-  run: () => ({ art: 'null' as const }),
-  getBean: () => ({ art: 'null' as const }),
+  run: () => ({ kind: 'null' as const }),
+  getBean: () => ({ kind: 'null' as const }),
   beanNames: () => [],
   property: () => undefined,
   activeProfiles: () => [],

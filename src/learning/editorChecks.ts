@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
-import type { Typfehler } from './typeCheck'
+import type { TypeDiagnostic } from './typeCheck'
 
 /**
  * Red squiggles under whole lines - for checks that know the line of a problem but not
  * its column (Java, Spring, Dockerfile, Compose). The squiggle starts at the first
  * character of the line, so indentation stays unmarked.
  */
-export function lineMarkers(code: string, messages: { zeile: number; text: string }[]): Typfehler[] {
+export function lineMarkers(code: string, messages: { line: number; text: string }[]): TypeDiagnostic[] {
   const lines = code.split('\n')
-  return messages.map(({ zeile, text }) => {
-    const line = lines[zeile - 1] ?? ''
-    return { zeile, spalte: line.length - line.trimStart().length, laenge: line.trim().length || 1, text, code: 0 }
+  return messages.map(({ line, text }) => {
+    const lineText = lines[line - 1] ?? ''
+    return { line, column: lineText.length - lineText.trimStart().length, length: lineText.trim().length || 1, text, code: 0 }
   })
 }
 

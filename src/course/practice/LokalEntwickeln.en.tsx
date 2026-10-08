@@ -4,7 +4,7 @@ import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
 import { LokalCheckliste } from '../demos/LokalCheckliste'
-import { beispiele, codeBloecke } from './LokalEntwickeln.code'
+import { examples, codeBloecke } from './LokalEntwickeln.code'
 
 /**
  * KAPITEL 5.10 (English) - Developing locally: the bridge from the browser editor to your own project
@@ -31,7 +31,7 @@ export function LokalEntwickeln() {
             <strong>React DevTools</strong> as a browser extension for Chrome, Edge or Firefox
           </li>
         </Liste>
-        <CodeBlock titel="Terminal" code={codeBloecke.pruefen} />
+        <CodeBlock title="Terminal" code={codeBloecke.pruefen} />
       </Abschnitt>
 
       <Abschnitt titel="Create a project with Vite">
@@ -39,7 +39,7 @@ export function LokalEntwickeln() {
           <strong>Vite</strong> sets up a ready-to-go React project and starts a development server. Changes to files
           show up in the browser immediately, without losing state (hot module replacement).
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
+        <CodeBlock title="Terminal" code={codeBloecke.anlegen} />
         <P>
           The app then runs at <Code>http://localhost:5173</Code>. The structure is easy to follow:
         </P>
@@ -71,7 +71,7 @@ export function LokalEntwickeln() {
             out (<Verweis id="hooks-useeffect" />).
           </li>
         </Liste>
-        <CodeBlock titel="src/App.tsx" code={codeBloecke.importe} />
+        <CodeBlock title="src/App.tsx" code={codeBloecke.importe} />
         <CodeBlock code={codeBloecke.aufteilen} />
       </Abschnitt>
 
@@ -103,7 +103,7 @@ export function LokalEntwickeln() {
         </P>
         <LokalCheckliste />
         <P>To publish, build an optimized version:</P>
-        <CodeBlock titel="Terminal" code={codeBloecke.bauen} />
+        <CodeBlock title="Terminal" code={codeBloecke.bauen} />
         <P>
           The <Code>dist/</Code> folder then only contains static files. You can upload them to services such as
           Netlify, Vercel or GitHub Pages.
@@ -114,9 +114,9 @@ export function LokalEntwickeln() {
         <P>Debugging works the same everywhere - here in the browser editor just as in your own project later.</P>
         <TryIt
           id="praxis-lokal-debugging"
-          titel="🐞 Bug hunt"
-          {...beispiele['praxis-lokal-debugging']}
-          aufgabe={
+          title="🐞 Bug hunt"
+          {...examples['praxis-lokal-debugging']}
+          task={
             <p>
               <Code>averageLength</Code> returns wrong values. Use <Code>console.log</Code> to find out why and fix the
               function - for an empty list too.
@@ -126,24 +126,24 @@ export function LokalEntwickeln() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Which command starts the development server of a Vite project?',
-            antworten: [<Code key="a">npm run build</Code>, <Code key="b">npm run dev</Code>, <Code key="c">npm install</Code>],
-            richtig: 1,
-            erklaerung: 'npm run dev starts the server with hot reload; build creates the final version in dist/.',
+            question: 'Which command starts the development server of a Vite project?',
+            answers: [<Code key="a">npm run build</Code>, <Code key="b">npm run dev</Code>, <Code key="c">npm install</Code>],
+            correct: 1,
+            explanation: 'npm run dev starts the server with hot reload; build creates the final version in dist/.',
           },
           {
-            frage: 'Your effect runs twice in development. Why?',
-            antworten: ['A bug in Vite', 'StrictMode intentionally checks that the cleanup is correct', 'The dependencies are missing'],
-            richtig: 1,
-            erklaerung: 'StrictMode mounts components twice in development. This does not happen in the build.',
+            question: 'Your effect runs twice in development. Why?',
+            answers: ['A bug in Vite', 'StrictMode intentionally checks that the cleanup is correct', 'The dependencies are missing'],
+            correct: 1,
+            explanation: 'StrictMode mounts components twice in development. This does not happen in the build.',
           },
           {
-            frage: 'Where is the most convenient place to see the current state of a specific component?',
-            antworten: ['In the network tab', 'In the React DevTools under Components', 'In package.json'],
-            richtig: 1,
-            erklaerung: 'The Components tab shows the props, state and hooks of every component - and you can even edit values.',
+            question: 'Where is the most convenient place to see the current state of a specific component?',
+            answers: ['In the network tab', 'In the React DevTools under Components', 'In package.json'],
+            correct: 1,
+            explanation: 'The Components tab shows the props, state and hooks of every component - and you can even edit values.',
           },
         ]}
       />

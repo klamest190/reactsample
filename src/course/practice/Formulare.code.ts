@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-formulare-einstieg': {
     code: js`
       function App() {
@@ -70,7 +70,7 @@ export const beispiele = {
     `,
   },
   'praxis-formulare-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Ein State-Objekt für alle Werte und ein `handleChange`, das `name` und bei Checkboxen `checked` nutzt.',
         '`validate(values)` gibt ein Fehlerobjekt zurück - abgeleitet bei jedem Render.',
@@ -95,7 +95,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const INITIAL = { username: '', password: '', repeat: '', terms: false }
 
       function validate(v) {
@@ -162,14 +162,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Sign up ist anfangs deaktiviert', en: 'Sign up is disabled initially' },
-        pruefung: js`
+        script: js`
           await render()
           expect(button('Sign up')).toBeDisabled()
         `,
       },
       {
         name: { de: 'Gültige Eingaben aktivieren Sign up', en: 'Valid input enables Sign up' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('username'), 'ada')
           await type(field('password'), 'secret123')
@@ -180,7 +180,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Das Passwort braucht eine Ziffer', en: 'The password needs a digit' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('username'), 'ada')
           await type(field('password'), 'secretpassword')
@@ -191,7 +191,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Die Passwörter müssen übereinstimmen', en: 'The passwords must match' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('username'), 'ada')
           await type(field('password'), 'secret123')
@@ -202,7 +202,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Fehler erscheinen erst nach Verlassen des Feldes', en: 'Errors only appear after leaving the field' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('username'), 'ab')
           const vorher = text()
@@ -212,7 +212,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Absenden zeigt „Welcome, ada!“', en: 'Submitting shows “Welcome, ada!”' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('username'), 'ada')
           await type(field('password'), 'secret123')
@@ -224,7 +224,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Labels sind per useId verknüpft', en: 'Labels are linked via useId' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/useId\(/)
           await render()
           const id = field('username').id
@@ -234,4 +234,4 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

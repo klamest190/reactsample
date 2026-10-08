@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.5 - Generics. */
 
-export const beispiele = {
+export const examples = {
   'ts-generics-einstieg': {
     code: js`
       // T is a placeholder - filled in anew on every call
@@ -143,7 +143,7 @@ export const beispiele = {
     `,
   },
   'ts-generics-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Schreib den Typparameter hinter den Funktionsnamen: `function last<T>(items: T[]): T | undefined`.',
         'Bei `groupBy` ersetzt `T` jedes `any`: `items: T[]`, `getKey: (item: T) => string`, Ergebnis `Record<string, T[]>`.',
@@ -186,7 +186,7 @@ export const beispiele = {
       ]
       console.log(last(people), groupBy(people, (person) => person.team), pluck(people, 'name'))
     `,
-    loesung: js`
+    solution: js`
       // Replace every any with type parameters - the functions should work for ALL types
       // and still keep the exact types.
 
@@ -218,16 +218,16 @@ export const beispiele = {
       console.log(last(people), groupBy(people, (person) => person.team), pluck(people, 'name'))
     `,
     tests: [
-      { name: 'last([1, 2, 3])', ausdruck: 'last([1, 2, 3])', erwartet: 3 },
-      { name: { de: 'last([]) ist undefined', en: 'last([]) is undefined' }, ausdruck: 'last([]) === undefined' },
+      { name: 'last([1, 2, 3])', expression: 'last([1, 2, 3])', expected: 3 },
+      { name: { de: 'last([]) ist undefined', en: 'last([]) is undefined' }, expression: 'last([]) === undefined' },
       {
         name: { de: 'groupBy nach Team', en: 'groupBy by team' },
-        ausdruck: 'groupBy(people, (p) => p.team)',
-        erwartet: { red: [{ name: 'Ada', team: 'red' }, { name: 'Linus', team: 'red' }], blue: [{ name: 'Grace', team: 'blue' }] },
+        expression: 'groupBy(people, (p) => p.team)',
+        expected: { red: [{ name: 'Ada', team: 'red' }, { name: 'Linus', team: 'red' }], blue: [{ name: 'Grace', team: 'blue' }] },
       },
-      { name: "pluck(people, 'name')", ausdruck: "pluck(people, 'name')", erwartet: ['Ada', 'Grace', 'Linus'] },
+      { name: "pluck(people, 'name')", expression: "pluck(people, 'name')", expected: ['Ada', 'Grace', 'Linus'] },
     ],
-    typTests: [
+    typeTests: [
       {
         name: { de: 'last liefert T | undefined', en: 'last returns T | undefined' },
         code: 'const lastNumber = last([1, 2, 3])\n// @ts-expect-error - it could be undefined\nconst sureNumber: number = lastNumber',
@@ -246,7 +246,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   react: js`

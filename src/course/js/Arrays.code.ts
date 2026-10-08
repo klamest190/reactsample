@@ -1,5 +1,5 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
@@ -16,7 +16,7 @@ const products = js`
   ]
 `
 
-export const beispiele = {
+export const examples = {
   'js-arrays-einstieg': {
     code: js`
       const numbers = [1, 2, 3]
@@ -102,7 +102,7 @@ export const beispiele = {
     `,
   },
   'js-arrays-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`namesInStock`: erst `filter` (Bestand > 0), dann `map` auf den Namen.',
         '`totalPrice`: `reduce((sum, p) => sum + p.price, 0)` - der Startwert 0 ist wichtig.',
@@ -129,7 +129,7 @@ export const beispiele = {
 
       console.log(namesInStock(products))
     `,
-    loesung: js`
+    solution: js`
       function namesInStock(list) {
         return list.filter((p) => p.stock > 0).map((p) => p.name)
       }
@@ -144,16 +144,16 @@ export const beispiele = {
 
       console.log(namesInStock(products))
     `,
-    vorbereitung: products,
+    setup: products,
     tests: [
-      { name: { de: 'namesInStock liefert die richtigen Namen', en: 'namesInStock returns the right names' }, ausdruck: 'namesInStock(products)', erwartet: ['Keyboard', 'Monitor', 'Teapot'] },
-      { name: { de: 'totalPrice ergibt 314', en: 'totalPrice is 314' }, ausdruck: 'totalPrice(products)', erwartet: 314 },
-      { name: { de: 'totalPrice([]) ergibt 0', en: 'totalPrice([]) is 0' }, ausdruck: 'totalPrice([])', erwartet: 0 },
-      { name: { de: 'mostExpensive ist der Monitor', en: 'mostExpensive is the monitor' }, ausdruck: 'mostExpensive(products)?.name', erwartet: 'Monitor' },
-      { name: { de: 'Das Original-Array bleibt unverändert', en: 'The original array stays unchanged' }, ausdruck: '(namesInStock(products), totalPrice(products), mostExpensive(products), products.length === 5 && products[0].name === \'Keyboard\')' },
+      { name: { de: 'namesInStock liefert die richtigen Namen', en: 'namesInStock returns the right names' }, expression: 'namesInStock(products)', expected: ['Keyboard', 'Monitor', 'Teapot'] },
+      { name: { de: 'totalPrice ergibt 314', en: 'totalPrice is 314' }, expression: 'totalPrice(products)', expected: 314 },
+      { name: { de: 'totalPrice([]) ergibt 0', en: 'totalPrice([]) is 0' }, expression: 'totalPrice([])', expected: 0 },
+      { name: { de: 'mostExpensive ist der Monitor', en: 'mostExpensive is the monitor' }, expression: 'mostExpensive(products)?.name', expected: 'Monitor' },
+      { name: { de: 'Das Original-Array bleibt unverändert', en: 'The original array stays unchanged' }, expression: '(namesInStock(products), totalPrice(products), mostExpensive(products), products.length === 5 && products[0].name === \'Keyboard\')' },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

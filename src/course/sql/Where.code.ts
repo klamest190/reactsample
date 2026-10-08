@@ -3,7 +3,7 @@ import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.2 - Filtering with WHERE. */
 
-export const beispiele: Record<string, SqlBeispiel> = {
+export const examples: Record<string, SqlBeispiel> = {
   'sql-where-einstieg': {
     code: sql`
       -- Only customers from the USA. Try 'UK' - or country <> 'USA'.
@@ -91,7 +91,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
       SELECT name, stock
       FROM products;
     `,
-    loesung: sql`
+    solution: sql`
       SELECT name, stock
       FROM products
       WHERE stock < 10
@@ -99,9 +99,9 @@ export const beispiele: Record<string, SqlBeispiel> = {
     `,
     tests: [
       { name: { de: 'Genau die Produkte mit weniger als 10 Stück', en: 'Exactly the products with fewer than 10 in stock' } },
-      { name: { de: 'Kleinster Bestand zuerst, bei Gleichstand nach Name', en: 'Smallest stock first, ties by name' }, reihenfolge: true },
+      { name: { de: 'Kleinster Bestand zuerst, bei Gleichstand nach Name', en: 'Smallest stock first, ties by name' }, order: true },
     ],
-    tipps: {
+    hints: {
       de: ['Die Bedingung heißt `stock < 10`.', 'Und NULL? `NULL < 10` ist nicht wahr - diese Zeilen fallen von selbst heraus.', 'Sortieren: `ORDER BY stock, name`.'],
       en: ['The condition is `stock < 10`.', 'And NULL? `NULL < 10` is not true - these rows drop out by themselves.', 'Sort: `ORDER BY stock, name`.'],
     },

@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'react-datenfluss-einstieg': {
     code: js`
       function Display({ count }) {
@@ -58,7 +58,7 @@ export const beispiele = {
     `,
   },
   'react-datenfluss-2': {
-    tipps: {
+    hints: {
       de: [
         'Der State `openIndex` wandert von `Section` nach `App`.',
         '`Section` bekommt `isOpen` und `onToggle` als Props und hat keinen eigenen State mehr.',
@@ -95,7 +95,7 @@ export const beispiele = {
       // Task: change the code so that only ONE section is open at a time.
       // Tip: "isOpen" becomes a prop, the state (which index is open) moves to App.
     `,
-    loesung: js`
+    solution: js`
       // AFTER: the state lives in the parent, the sections are "controlled"
       function Section({ title, isOpen, onToggle, children }) {
         return (
@@ -130,7 +130,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Ein Klick öffnet einen Abschnitt', en: 'A click opens a section' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button(/What is state\?/))
           expect(text()).toContain('Data that can change.')
@@ -138,7 +138,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Es ist immer nur ein Abschnitt offen', en: 'Only one section is open at a time' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button(/What is state\?/))
           await click(button(/What are props\?/))
@@ -150,7 +150,7 @@ export const beispiele = {
     ],
   },
   'react-datenfluss-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Suchtext und Checkbox gehören als State in `App` - beide Eingaben beeinflussen dieselbe Liste.',
         'Die Eingabe-Komponenten bekommen `value`/`checked` und `onChange` als Props.',
@@ -203,7 +203,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const PRODUCTS = [
         { id: 1, name: 'Apple', available: true },
         { id: 2, name: 'Apricot', available: false },
@@ -258,14 +258,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Ohne Filter sind alle 5 Produkte sichtbar', en: 'Without a filter all 5 products are visible' },
-        pruefung: js`
+        script: js`
           await render()
           expect(findAll('li')).toHaveLength(5)
         `,
       },
       {
         name: { de: 'Die Suche filtert ohne Groß-/Kleinschreibung', en: 'The search filters case-insensitively' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('Search'), 'AP')
           expect(findAll('li').map((li) => li.textContent)).toEqual(['Apple', 'Apricot'])
@@ -273,7 +273,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Die Checkbox blendet nicht verfügbare aus', en: 'The checkbox hides unavailable products' },
-        pruefung: js`
+        script: js`
           await render()
           await check(field('checkbox'))
           expect(findAll('li').map((li) => li.textContent)).toEqual(['Apple', 'Banana', 'Kiwi'])
@@ -281,7 +281,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Suche und Checkbox wirken zusammen', en: 'Search and checkbox work together' },
-        pruefung: js`
+        script: js`
           await render()
           await type(field('Search'), 'a')
           await check(field('checkbox'))
@@ -290,7 +290,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Der State lebt in App, nicht in den Kindern', en: 'The state lives in App, not in the children' },
-        pruefung: js`
+        script: js`
           const body = (name) => (code.match(new RegExp('function ' + name + '\\b[\\s\\S]*?\\n}')) ?? [''])[0]
           expect(body('SearchField')).not.toMatch(/useState/)
           expect(body('OnlyAvailable')).not.toMatch(/useState/)
@@ -299,7 +299,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

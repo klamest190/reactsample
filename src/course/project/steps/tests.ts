@@ -6,7 +6,7 @@ import type { ReactTest } from '../../../learning/jsSandbox'
 
 export const TEST_HINZUFUEGEN: ReactTest = {
   name: t('Neues Todo über das Formular hinzufügen', 'Add a new todo via the form'),
-  pruefung: js`
+  script: js`
     await render()
     const before = findAll('li').length
     await type(field('What needs to be done?'), '  Walk the dog  ')
@@ -19,7 +19,7 @@ export const TEST_HINZUFUEGEN: ReactTest = {
 
 export const TEST_LEER: ReactTest = {
   name: t('Leere Eingaben werden ignoriert', 'Empty input is ignored'),
-  pruefung: js`
+  script: js`
     await render()
     const before = findAll('li').length
     await type(field('What needs to be done?'), '   ')
@@ -30,7 +30,7 @@ export const TEST_LEER: ReactTest = {
 
 export const TEST_UMSCHALTEN: ReactTest = {
   name: t('Checkbox schaltet „done“ um und aktualisiert die Anzahl', 'Checkbox toggles “done” and updates the count'),
-  pruefung: js`
+  script: js`
     await render()
     await click(findAll('li input[type="checkbox"]')[1])
     expect(findAll('li.done')).toHaveLength(2)
@@ -40,7 +40,7 @@ export const TEST_UMSCHALTEN: ReactTest = {
 
 export const TEST_LOESCHEN: ReactTest = {
   name: t('✕ löscht das Todo', '✕ deletes the todo'),
-  pruefung: js`
+  script: js`
     await render()
     await click(within(findAll('li')[0]).button(/✕|delete|remove/i))
     expect(findAll('li')).toHaveLength(2)
@@ -50,7 +50,7 @@ export const TEST_LOESCHEN: ReactTest = {
 
 export const TEST_FILTER: ReactTest = {
   name: t('Filter All / Open / Done zeigen die passenden Todos', 'Filters All / Open / Done show the matching todos'),
-  pruefung: js`
+  script: js`
     await render()
     await click(button('Open'))
     expect(findAll('li')).toHaveLength(2)
@@ -63,7 +63,7 @@ export const TEST_FILTER: ReactTest = {
 
 export const TEST_ARIA_PRESSED: ReactTest = {
   name: t('Der aktive Filter hat aria-pressed="true"', 'The active filter has aria-pressed="true"'),
-  pruefung: js`
+  script: js`
     await render()
     expect(button('All').getAttribute('aria-pressed')).toBe('true')
     await click(button('Done'))
@@ -74,7 +74,7 @@ export const TEST_ARIA_PRESSED: ReactTest = {
 
 export const TEST_CLEAR_DONE: ReactTest = {
   name: t('„Clear done“ entfernt erledigte Todos', '“Clear done” removes completed todos'),
-  pruefung: js`
+  script: js`
     await render()
     await click(button('Clear done'))
     expect(findAll('li')).toHaveLength(2)
@@ -84,7 +84,7 @@ export const TEST_CLEAR_DONE: ReactTest = {
 
 export const TEST_SPEICHERN: ReactTest = {
   name: t('Todos überleben ein Neuladen (localStorage "todos")', 'Todos survive a reload (localStorage "todos")'),
-  pruefung: js`
+  script: js`
     await render()
     await type(field('What needs to be done?'), 'Still here')
     await click(button('Add'))
@@ -97,7 +97,7 @@ export const TEST_SPEICHERN: ReactTest = {
 /** Grundfunktionen einmal komplett durchspielen - für Schritte, die umbauen statt erweitern. */
 export const TEST_ALLES_GEHT_NOCH: ReactTest = {
   name: t('Hinzufügen, Umschalten, Löschen und Filtern funktionieren weiter', 'Adding, toggling, deleting and filtering still work'),
-  pruefung: js`
+  script: js`
     await render()
     await type(field('What needs to be done?'), 'Refactor')
     await click(button('Add'))

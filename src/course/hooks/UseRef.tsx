@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseRef.code'
+import { examples, codeBloecke } from './UseRef.code'
 import { RefDemo } from '../demos/RefDemo'
 
 /**
@@ -16,8 +16,8 @@ export function UseRef() {
         <P><Code>useRef</Code> gibt dir Zugriff auf ein echtes DOM-Element.</P>
         <TryIt
           id="hooks-useref-einstieg"
-          {...beispiele['hooks-useref-einstieg']}
-          modus="react"
+          {...examples['hooks-useref-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -46,8 +46,8 @@ export function UseRef() {
         />
         <TryIt
           id="hooks-useref-vergleich"
-          {...beispiele['hooks-useref-vergleich']}
-          modus="react"
+          {...examples['hooks-useref-vergleich']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -59,8 +59,8 @@ export function UseRef() {
         </P>
         <TryIt
           id="hooks-useref-dom"
-          {...beispiele['hooks-useref-dom']}
-          modus="react"
+          {...examples['hooks-useref-dom']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -95,7 +95,7 @@ export function UseRef() {
           Mit <Code>useImperativeHandle</Code> bestimmt die Kindkomponente selbst, was sie nach außen anbietet: hier nur{' '}
           <Code>focus()</Code> und <Code>clear()</Code>.
         </P>
-        <TryIt id="hooks-useref-imperativ" {...beispiele['hooks-useref-imperativ']} modus="react" />
+        <TryIt id="hooks-useref-imperativ" {...examples['hooks-useref-imperativ']} mode="react" />
         <Hinweis variante="tipp">
           Das ist die Ausnahme, nicht die Regel. Was sich mit Props ausdrücken lässt (<Code>{'value'}</Code>,{' '}
           <Code>{'open'}</Code>), gehört in Props. Imperative Methoden sind für Dinge wie Fokus, Scrollen oder Abspielen
@@ -109,7 +109,7 @@ export function UseRef() {
           Misst du dort ein Element und stellst danach etwas um, sieht man kurz den falschen Zustand - es flackert.{' '}
           <Code>useLayoutEffect</Code> läuft direkt nach der DOM-Änderung, aber <strong>vor</strong> dem Zeichnen.
         </P>
-        <TryIt id="hooks-useref-layout" {...beispiele['hooks-useref-layout']} modus="react" />
+        <TryIt id="hooks-useref-layout" {...examples['hooks-useref-layout']} mode="react" />
         <Hinweis variante="warnung">
           <Code>useLayoutEffect</Code> blockiert das Zeichnen, bis er fertig ist. Nimm ihn nur zum Messen und Positionieren
           (Tooltips, Popups, Scroll-Position) - für alles andere bleibt <Code>useEffect</Code> richtig.
@@ -119,9 +119,9 @@ export function UseRef() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-useref-uebung"
-          {...beispiele['hooks-useref-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-useref-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue eine Stoppuhr mit Rundenzeiten:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -142,28 +142,28 @@ export function UseRef() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was passiert, wenn du ref.current = 5 setzt?',
-            antworten: [
+            question: 'Was passiert, wenn du ref.current = 5 setzt?',
+            answers: [
               'Die Komponente rendert neu',
               'Der Wert ist sofort gespeichert, es gibt keinen Render',
               'Ein Fehler, refs sind read-only',
             ],
-            richtig: 1,
-            erklaerung: 'Refs sind veränderbar und für React „unsichtbar“.',
+            correct: 1,
+            explanation: 'Refs sind veränderbar und für React „unsichtbar“.',
           },
           {
-            frage: 'Wann ist eine DOM-Ref (ref={myRef}) gesetzt?',
-            antworten: ['Schon beim ersten Rendern', 'Nachdem React das DOM aktualisiert hat'],
-            richtig: 1,
-            erklaerung: 'Deshalb nutzt man sie in Effekten oder Event-Handlern, nicht beim Rendern.',
+            question: 'Wann ist eine DOM-Ref (ref={myRef}) gesetzt?',
+            answers: ['Schon beim ersten Rendern', 'Nachdem React das DOM aktualisiert hat'],
+            correct: 1,
+            explanation: 'Deshalb nutzt man sie in Effekten oder Event-Handlern, nicht beim Rendern.',
           },
           {
-            frage: 'Wo speicherst du die ID von setInterval?',
-            antworten: ['In einer lokalen Variable', 'In useState', 'In useRef'],
-            richtig: 2,
-            erklaerung: 'Sie muss Renders überleben, soll aber keinen Render auslösen.',
+            question: 'Wo speicherst du die ID von setInterval?',
+            answers: ['In einer lokalen Variable', 'In useState', 'In useRef'],
+            correct: 2,
+            explanation: 'Sie muss Renders überleben, soll aber keinen Render auslösen.',
           },
         ]}
       />

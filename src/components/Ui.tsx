@@ -53,7 +53,7 @@ export function Abschnitt({
   children: ReactNode
 }) {
   return (
-    <section data-anker={anker} className="scroll-mt-24 space-y-4">
+    <section data-anchor={anker} className="scroll-mt-24 space-y-4">
       {/* tabIndex -1: die Überschrift ist kein Tabstopp, kann aber Sprungziel sein. */}
       <h2
         tabIndex={-1}

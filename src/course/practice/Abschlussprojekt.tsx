@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Abschlussprojekt.code'
+import { examples } from './Abschlussprojekt.code'
 
 const schritte: [string, string, string][] = [
   ['1', 'Datenmodell & Reducer', 'Gewohnheiten als Array, Actions: hinzugefuegt, abgehakt, geloescht. Datum als "YYYY-MM-DD"-String.'],
@@ -40,10 +40,10 @@ export function Abschlussprojekt() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-projekt"
-          {...beispiele['praxis-projekt']}
-          modus="react"
-          titel="Gewohnheiten-Tracker"
-          aufgabe={
+          {...examples['praxis-projekt']}
+          mode="react"
+          title="Gewohnheiten-Tracker"
+          task={
             <>
               <p>
                 <strong>Anforderungen</strong> - die Hilfsfunktionen für Datumswerte sind schon da:
@@ -113,38 +113,38 @@ export function Abschlussprojekt() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Womit fängst du bei einer App wie dem Tracker sinnvollerweise an?',
-            antworten: [
+            question: 'Womit fängst du bei einer App wie dem Tracker sinnvollerweise an?',
+            answers: [
               'Mit dem Layout und den Farben',
               'Mit dem Datenmodell und den Übergängen - also dem Reducer',
               'Mit den Komponenten, die Oberfläche ergibt sich daraus',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Steht fest, wie die Daten aussehen und wie sie sich ändern, ist die Oberfläche nur noch eine Darstellung davon.',
           },
           {
-            frage: 'Die Serie („🔥 4“) einer Gewohnheit - wo gehört sie hin?',
-            antworten: [
+            question: 'Die Serie („🔥 4“) einer Gewohnheit - wo gehört sie hin?',
+            answers: [
               'Als eigener State, der beim Abhaken mitgepflegt wird',
               'In den Reducer als zusätzliches Feld jeder Gewohnheit',
               'Gar nicht in den State - sie wird aus den abgehakten Tagen berechnet',
             ],
-            richtig: 2,
-            erklaerung:
+            correct: 2,
+            explanation:
               'Was sich aus vorhandenem State ableiten lässt, gehört nicht in den State. Sonst können beide Werte auseinanderlaufen.',
           },
           {
-            frage: 'Wofür ist ein eigener Hook wie useLocalStorage gut?',
-            antworten: [
+            question: 'Wofür ist ein eigener Hook wie useLocalStorage gut?',
+            answers: [
               'Er macht die App schneller',
               'Er kapselt wiederkehrende Mechanik, damit Komponenten sie nicht jedes Mal wiederholen',
               'Er ersetzt den Reducer',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Eigene Hooks bündeln Logik mit State und Effekten an einer Stelle - die Komponente bleibt lesbar.',
           },
         ]}

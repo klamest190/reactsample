@@ -1,5 +1,5 @@
 import { http, java, js, properties } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Code for chapter 8.7 - React meets Spring Boot. */
 
@@ -132,9 +132,9 @@ export const frontend = js`
   }
 `
 
-export const beispiele = {
+export const examples = {
   'spring-react-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Die Methode braucht `@PatchMapping("/{id}")`, die id per `@PathVariable long id` und den Body per `@RequestBody TodoPatch patch`.',
         'Records sind unveränderlich: Du baust ein neues `Todo` mit dem alten Titel und `patch.done()` und legst es mit `todos.put(id, …)` ab.',
@@ -170,7 +170,7 @@ export const beispiele = {
         // TODO: PATCH /api/todos/{id} with the body {"done": true}
       }
     `,
-    loesung: java`
+    solution: java`
       @SpringBootApplication
       public class TodoApplication {
         public static void main(String[] args) {
@@ -216,7 +216,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   cors: http`

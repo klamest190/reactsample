@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseMemo.code'
+import { examples, codeBloecke } from './UseMemo.code'
 import { PerformanceDemo } from '../demos/PerformanceDemo'
 
 /**
@@ -16,8 +16,8 @@ export function UseMemo() {
         <P><Code>useMemo</Code> rechnet nur neu, wenn sich eine Abhängigkeit ändert. Achte auf die Konsole.</P>
         <TryIt
           id="hooks-usememo-einstieg"
-          {...beispiele['hooks-usememo-einstieg']}
-          modus="react"
+          {...examples['hooks-usememo-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -29,8 +29,8 @@ export function UseMemo() {
         </P>
         <TryIt
           id="hooks-usememo-render"
-          {...beispiele['hooks-usememo-render']}
-          modus="react"
+          {...examples['hooks-usememo-render']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -42,8 +42,8 @@ export function UseMemo() {
         </P>
         <TryIt
           id="hooks-usememo-memo"
-          {...beispiele['hooks-usememo-memo']}
-          modus="react"
+          {...examples['hooks-usememo-memo']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -69,8 +69,8 @@ export function UseMemo() {
         <PerformanceDemo />
         <TryIt
           id="hooks-usememo-teuer"
-          {...beispiele['hooks-usememo-teuer']}
-          modus="react"
+          {...examples['hooks-usememo-teuer']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -125,9 +125,9 @@ export function UseMemo() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-usememo-uebung"
-          {...beispiele['hooks-usememo-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-usememo-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Das Suchfeld ruckelt, weil bei jedem Tastendruck 20.000 Einträge sortiert werden und
@@ -148,35 +148,35 @@ export function UseMemo() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Ein memo-Kind bekommt style={{ color: "red" }}. Rendert es bei jedem Eltern-Render neu?',
-            antworten: [
+            question: 'Ein memo-Kind bekommt style={{ color: "red" }}. Rendert es bei jedem Eltern-Render neu?',
+            answers: [
               'Nein, der Inhalt ist gleich',
               'Ja, das Objekt-Literal ist bei jedem Render eine neue Referenz',
             ],
-            richtig: 1,
-            erklaerung: 'memo vergleicht Referenzen. Abhilfe: useMemo oder das Objekt außerhalb der Komponente definieren.',
+            correct: 1,
+            explanation: 'memo vergleicht Referenzen. Abhilfe: useMemo oder das Objekt außerhalb der Komponente definieren.',
           },
           {
-            frage: 'Was ist der Unterschied zwischen useMemo und useCallback?',
-            antworten: [
+            question: 'Was ist der Unterschied zwischen useMemo und useCallback?',
+            answers: [
               'useMemo merkt sich ein Ergebnis, useCallback eine Funktion',
               'useCallback ist schneller',
               'useMemo ist nur für Arrays',
             ],
-            richtig: 0,
-            erklaerung: 'useCallback(fn, deps) entspricht useMemo(() => fn, deps).',
+            correct: 0,
+            explanation: 'useCallback(fn, deps) entspricht useMemo(() => fn, deps).',
           },
           {
-            frage: 'Wann solltest du useMemo einsetzen?',
-            antworten: [
+            question: 'Wann solltest du useMemo einsetzen?',
+            answers: [
               'Bei jeder Berechnung',
               'Wenn eine Berechnung messbar teuer ist oder eine stabile Referenz gebraucht wird',
               'Nie, der Compiler macht das',
             ],
-            richtig: 1,
-            erklaerung: 'Optimierung hat Kosten. Erst messen, dann gezielt einsetzen.',
+            correct: 1,
+            explanation: 'Optimierung hat Kosten. Erst messen, dann gezielt einsetzen.',
           },
         ]}
       />

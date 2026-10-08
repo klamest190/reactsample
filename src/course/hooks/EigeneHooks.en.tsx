@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './EigeneHooks.code'
+import { examples, codeBloecke } from './EigeneHooks.code'
 import { HookDemo } from '../demos/HookDemo'
 
 /**
@@ -16,8 +16,8 @@ export function EigeneHooks() {
         <P>A custom hook is a function that starts with <Code>use</Code> and uses other hooks.</P>
         <TryIt
           id="hooks-eigene-einstieg"
-          {...beispiele['hooks-eigene-einstieg']}
-          modus="react"
+          {...examples['hooks-eigene-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -40,8 +40,8 @@ export function EigeneHooks() {
         </Liste>
         <TryIt
           id="hooks-eigene-extrahieren"
-          {...beispiele['hooks-eigene-extrahieren']}
-          modus="react"
+          {...examples['hooks-eigene-extrahieren']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -52,7 +52,7 @@ export function EigeneHooks() {
           or an object with names. (The source code of this project is written with German names.)
         </P>
         <CodeBlock
-          titel="src/hooks/useDebounce.ts (translated)"
+          title="src/hooks/useDebounce.ts (translated)"
           code={codeBloecke.beispiel1}
         />
         <HookDemo />
@@ -66,8 +66,8 @@ export function EigeneHooks() {
       <Abschnitt titel="Build your own: useLocalStorage">
         <TryIt
           id="hooks-eigene-localstorage"
-          {...beispiele['hooks-eigene-localstorage']}
-          modus="react"
+          {...examples['hooks-eigene-localstorage']}
+          mode="react"
         />
         <Hinweis variante="tipp">
           Rule of thumb: when the same combination of <Code>useState</Code> and <Code>useEffect</Code> shows up
@@ -79,9 +79,9 @@ export function EigeneHooks() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="hooks-eigene-uebung"
-          {...beispiele['hooks-eigene-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['hooks-eigene-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Write the hook <Code>{'useCounter(initial, { min, max })'}</Code>. It returns an object:
@@ -104,28 +104,28 @@ export function EigeneHooks() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Two components call the same custom hook containing useState. Do they share the state?',
-            antworten: ['Yes', 'No, each gets its own state'],
-            richtig: 1,
-            erklaerung: 'Hooks share logic. For shared state: lift state up or use context.',
+            question: 'Two components call the same custom hook containing useState. Do they share the state?',
+            answers: ['Yes', 'No, each gets its own state'],
+            correct: 1,
+            explanation: 'Hooks share logic. For shared state: lift state up or use context.',
           },
           {
-            frage: 'Why must a custom hook start with “use”?',
-            antworten: [
+            question: 'Why must a custom hook start with “use”?',
+            answers: [
               'Otherwise JavaScript doesn’t allow the call',
               'So React tooling knows the rules of hooks apply',
               'It is just a matter of taste',
             ],
-            richtig: 1,
-            erklaerung: 'The linter and the React Compiler check functions with the use prefix against the rules of hooks.',
+            correct: 1,
+            explanation: 'The linter and the React Compiler check functions with the use prefix against the rules of hooks.',
           },
           {
-            frage: 'A helper function only formats a date and calls no hooks. Should it be called “useDate”?',
-            antworten: ['Yes', 'No, then it is a normal function'],
-            richtig: 1,
-            erklaerung: 'Without hooks inside, the prefix is misleading - and the function couldn’t be used inside an if.',
+            question: 'A helper function only formats a date and calls no hooks. Should it be called “useDate”?',
+            answers: ['Yes', 'No, then it is a normal function'],
+            correct: 1,
+            explanation: 'Without hooks inside, the prefix is misleading - and the function couldn’t be used inside an if.',
           },
         ]}
       />

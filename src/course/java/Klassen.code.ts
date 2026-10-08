@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.6 - Klassen & Objekte. */
 
-export const beispiele = {
+export const examples = {
   'java-klassen-einstieg': {
     code: java`
       public class Main {
@@ -202,7 +202,7 @@ export const beispiele = {
     `,
   },
   'java-klassen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Die Felder gehören ins Innere der Klasse und sind `private`.',
         'Der Konstruktor heißt wie die Klasse und hat keinen Rückgabetyp - auch kein `void`.',
@@ -230,7 +230,7 @@ export const beispiele = {
 
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           Task task = new Task("Learn Java");
@@ -269,32 +269,32 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Ein neuer Task ist nicht erledigt', en: 'A new task is not done' },
-        ausdruck: 'new Task("A").isDone()',
-        erwartet: false,
+        expression: 'new Task("A").isDone()',
+        expected: false,
       },
       {
         name: { de: 'getTitle() gibt den Titel zurück', en: 'getTitle() returns the title' },
-        ausdruck: 'new Task("A").getTitle()',
-        erwartet: 'A',
+        expression: 'new Task("A").getTitle()',
+        expected: 'A',
       },
       {
         name: { de: 'toggle() schaltet um', en: 'toggle() flips the state' },
-        ausdruck: 'task.isDone()',
-        erwartet: true,
+        expression: 'task.isDone()',
+        expected: true,
       },
       {
         name: { de: 'toString() ist "[x] Learn Java"', en: 'toString() is "[x] Learn Java"' },
-        ausdruck: 'task.toString()',
-        erwartet: '[x] Learn Java',
+        expression: 'task.toString()',
+        expected: '[x] Learn Java',
       },
       {
         name: { de: 'Unerledigt beginnt mit "[ ]"', en: 'Not done starts with "[ ]"' },
-        ausdruck: 'new Task("B").toString()',
-        erwartet: '[ ] B',
+        expression: 'new Task("B").toString()',
+        expected: '[ ] B',
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   bauplan: java`

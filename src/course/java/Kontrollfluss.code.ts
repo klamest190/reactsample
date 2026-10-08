@@ -1,9 +1,9 @@
 import { java } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 7.3 - Bedingungen & Schleifen. */
 
-export const beispiele = {
+export const examples = {
   'java-kontrollfluss-einstieg': {
     code: java`
       public class Main {
@@ -141,7 +141,7 @@ export const beispiele = {
     `,
   },
   'java-kontrollfluss-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Zähle mit `for (int i = 1; i <= 20; i++)`.',
         'Teilbar durch 3 heißt: `i % 3 == 0`.',
@@ -166,7 +166,7 @@ export const beispiele = {
         }
       }
     `,
-    loesung: java`
+    solution: java`
       public class Main {
         public static void main(String[] args) {
           int fizzCount = 0;
@@ -189,14 +189,14 @@ export const beispiele = {
       }
     `,
     tests: [
-      { name: { de: '1 und 2 werden als Zahl ausgegeben', en: '1 and 2 are printed as numbers' }, ausdruck: 'output.startsWith("1\\n2\\n")', erwartet: true },
-      { name: { de: 'Bei 3 steht Fizz', en: 'At 3 it says Fizz' }, ausdruck: 'output.contains("2\\nFizz\\n4")', erwartet: true },
-      { name: { de: 'Bei 5 steht Buzz', en: 'At 5 it says Buzz' }, ausdruck: 'output.contains("4\\nBuzz\\n")', erwartet: true },
-      { name: { de: 'Bei 15 steht FizzBuzz', en: 'At 15 it says FizzBuzz' }, ausdruck: 'output.contains("14\\nFizzBuzz\\n16")', erwartet: true },
-      { name: { de: 'fizzCount ist 5 (3, 6, 9, 12, 18)', en: 'fizzCount is 5 (3, 6, 9, 12, 18)' }, ausdruck: 'fizzCount', erwartet: 5 },
+      { name: { de: '1 und 2 werden als Zahl ausgegeben', en: '1 and 2 are printed as numbers' }, expression: 'output.startsWith("1\\n2\\n")', expected: true },
+      { name: { de: 'Bei 3 steht Fizz', en: 'At 3 it says Fizz' }, expression: 'output.contains("2\\nFizz\\n4")', expected: true },
+      { name: { de: 'Bei 5 steht Buzz', en: 'At 5 it says Buzz' }, expression: 'output.contains("4\\nBuzz\\n")', expected: true },
+      { name: { de: 'Bei 15 steht FizzBuzz', en: 'At 15 it says FizzBuzz' }, expression: 'output.contains("14\\nFizzBuzz\\n16")', expected: true },
+      { name: { de: 'fizzCount ist 5 (3, 6, 9, 12, 18)', en: 'fizzCount is 5 (3, 6, 9, 12, 18)' }, expression: 'fizzCount', expected: 5 },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   keinTruthy: java`

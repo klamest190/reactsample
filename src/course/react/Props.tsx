@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Props.code'
+import { examples, codeBloecke } from './Props.code'
 import { BenutzerKarten } from '../demos/BenutzerKarten'
 
 /**
@@ -17,8 +17,8 @@ export function Props() {
         <P>Props sind die Parameter einer Komponente - dieselbe Komponente, andere Daten.</P>
         <TryIt
           id="react-props-einstieg"
-          {...beispiele['react-props-einstieg']}
-          modus="react"
+          {...examples['react-props-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -44,8 +44,8 @@ export function Props() {
         </Liste>
         <TryIt
           id="react-props-1"
-          {...beispiele['react-props-1']}
-          modus="react"
+          {...examples['react-props-1']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           Props sind <strong>schreibgeschützt</strong>. Eine Komponente darf ihre Props nie
@@ -60,8 +60,8 @@ export function Props() {
         </P>
         <TryIt
           id="react-props-2"
-          {...beispiele['react-props-2']}
-          modus="react"
+          {...examples['react-props-2']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -79,8 +79,8 @@ export function Props() {
         </P>
         <TryIt
           id="react-props-3"
-          {...beispiele['react-props-3']}
-          modus="react"
+          {...examples['react-props-3']}
+          mode="react"
         />
         <Hinweis variante="warnung">
           Den Array-Index als <Code>key</Code> nur nehmen, wenn sich die Liste nie umsortiert oder
@@ -96,17 +96,17 @@ export function Props() {
         </P>
         <TryIt
           id="react-props-4"
-          {...beispiele['react-props-4']}
-          modus="react"
+          {...examples['react-props-4']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="react-props-uebung"
-          {...beispiele['react-props-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['react-props-uebung']}
+          mode="react"
+          task={
             <>
               <p>Baue eine Kontaktliste:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -132,24 +132,24 @@ export function Props() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Wie übergibst du die Zahl 5 als Prop?',
-            antworten: ['count="5"', 'count={5}', 'count=5'],
-            richtig: 1,
-            erklaerung: 'count="5" wäre der String "5". Alles außer Strings kommt in { }.',
+            question: 'Wie übergibst du die Zahl 5 als Prop?',
+            answers: ['count="5"', 'count={5}', 'count=5'],
+            correct: 1,
+            explanation: 'count="5" wäre der String "5". Alles außer Strings kommt in { }.',
           },
           {
-            frage: 'Was ist ein guter key für Listeneinträge aus einer Datenbank?',
-            antworten: ['Der Array-Index', 'Math.random()', 'Die ID des Datensatzes'],
-            richtig: 2,
-            erklaerung: 'Die ID ist eindeutig und bleibt über Renders hinweg stabil.',
+            question: 'Was ist ein guter key für Listeneinträge aus einer Datenbank?',
+            answers: ['Der Array-Index', 'Math.random()', 'Die ID des Datensatzes'],
+            correct: 2,
+            explanation: 'Die ID ist eindeutig und bleibt über Renders hinweg stabil.',
           },
           {
-            frage: 'Wie kommt <Karte>Hallo</Karte> an den Text „Hallo“?',
-            antworten: ['props.text', 'props.children', 'props.content'],
-            richtig: 1,
-            erklaerung: 'Inhalt zwischen den Tags landet immer in children.',
+            question: 'Wie kommt <Karte>Hallo</Karte> an den Text „Hallo“?',
+            answers: ['props.text', 'props.children', 'props.content'],
+            correct: 1,
+            explanation: 'Inhalt zwischen den Tags landet immer in children.',
           },
         ]}
       />

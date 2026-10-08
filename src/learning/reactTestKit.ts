@@ -2,8 +2,8 @@ import { createElement, type ComponentType } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
 import type { Sprache } from '../i18n/LanguageContext'
-import type { ReactTest, TestErgebnis } from './jsSandbox'
-import { formatieren, kompilieren } from './reactCompile'
+import type { ReactTest, TestResult } from './jsSandbox'
+import { formatieren, compile } from './reactCompile'
 import { localized } from '../i18n/localized'
 
 /**
@@ -26,104 +26,104 @@ import { localized } from '../i18n/localized'
  * document.title, fetch, confirm und alert werden danach wiederhergestellt.
  */
 
-const MELDUNGEN = {
+const MESSAGES = {
   de: {
-    erwartet: (e: string, a: string) => `Erwartet ${e}, erhalten ${a}`,
-    erwartetNicht: (e: string) => `Erwartet nicht ${e}`,
-    enthaelt: (a: string, e: string) => `${a} enthält nicht ${e}`,
-    enthaeltNicht: (a: string, e: string) => `${a} enthält ${e}, sollte es aber nicht`,
-    passt: (a: string, e: string) => `${a} passt nicht zu ${e}`,
-    passtNicht: (a: string, e: string) => `${a} passt zu ${e}, sollte es aber nicht`,
-    wahr: (a: string) => `Erwartet einen wahren Wert, erhalten ${a}`,
-    falsch: (a: string) => `Erwartet einen falschen Wert, erhalten ${a}`,
-    groesser: (a: string, e: string) => `Erwartet ${a} > ${e}`,
-    kleiner: (a: string, e: string) => `Erwartet ${a} < ${e}`,
-    laenge: (e: number, a: number) => `Erwartet Länge ${e}, erhalten ${a}`,
-    deaktiviert: (e: string) => `${e} sollte deaktiviert sein`,
-    aktiviert: (e: string) => `${e} sollte aktiviert sein`,
-    knopf: (l: string) => `Knopf „${l}“ nicht gefunden`,
-    knopfAus: (l: string) => `Knopf „${l}“ ist deaktiviert`,
-    feld: (h: string) => `Eingabefeld „${h}“ nicht gefunden`,
-    textFehlt: (t: string) => `Text „${t}“ nicht gefunden`,
+    expected: (e: string, a: string) => `Erwartet ${e}, erhalten ${a}`,
+    notExpected: (e: string) => `Erwartet nicht ${e}`,
+    contains: (a: string, e: string) => `${a} enthält nicht ${e}`,
+    notContains: (a: string, e: string) => `${a} enthält ${e}, sollte es aber nicht`,
+    matches: (a: string, e: string) => `${a} passt nicht zu ${e}`,
+    notMatches: (a: string, e: string) => `${a} passt zu ${e}, sollte es aber nicht`,
+    truthy: (a: string) => `Erwartet einen wahren Wert, erhalten ${a}`,
+    falsy: (a: string) => `Erwartet einen falschen Wert, erhalten ${a}`,
+    greater: (a: string, e: string) => `Erwartet ${a} > ${e}`,
+    less: (a: string, e: string) => `Erwartet ${a} < ${e}`,
+    length: (e: number, a: number) => `Erwartet Länge ${e}, erhalten ${a}`,
+    disabled: (e: string) => `${e} sollte deaktiviert sein`,
+    enabled: (e: string) => `${e} sollte aktiviert sein`,
+    button: (l: string) => `Knopf „${l}“ nicht gefunden`,
+    buttonOff: (l: string) => `Knopf „${l}“ ist deaktiviert`,
+    field: (h: string) => `Eingabefeld „${h}“ nicht gefunden`,
+    textMissing: (t: string) => `Text „${t}“ nicht gefunden`,
     element: (s: string) => `Element „${s}“ nicht gefunden`,
-    nichtGerendert: 'Zuerst render() aufrufen',
-    zeitueberschreitung: 'Zeitüberschreitung - der Test hat zu lange gedauert',
-    renderFehler: 'Fehler beim Rendern: ',
-    keineApp: 'Keine Komponente App gefunden',
+    notRendered: 'Zuerst render() aufrufen',
+    timeout: 'Zeitüberschreitung - der Test hat zu lange gedauert',
+    renderError: 'Fehler beim Rendern: ',
+    noApp: 'Keine Komponente App gefunden',
   },
   en: {
-    erwartet: (e: string, a: string) => `Expected ${e}, received ${a}`,
-    erwartetNicht: (e: string) => `Expected not ${e}`,
-    enthaelt: (a: string, e: string) => `${a} does not contain ${e}`,
-    enthaeltNicht: (a: string, e: string) => `${a} contains ${e}, but should not`,
-    passt: (a: string, e: string) => `${a} does not match ${e}`,
-    passtNicht: (a: string, e: string) => `${a} matches ${e}, but should not`,
-    wahr: (a: string) => `Expected a truthy value, received ${a}`,
-    falsch: (a: string) => `Expected a falsy value, received ${a}`,
-    groesser: (a: string, e: string) => `Expected ${a} > ${e}`,
-    kleiner: (a: string, e: string) => `Expected ${a} < ${e}`,
-    laenge: (e: number, a: number) => `Expected length ${e}, received ${a}`,
-    deaktiviert: (e: string) => `${e} should be disabled`,
-    aktiviert: (e: string) => `${e} should be enabled`,
-    knopf: (l: string) => `Button “${l}” not found`,
-    knopfAus: (l: string) => `Button “${l}” is disabled`,
-    feld: (h: string) => `Input “${h}” not found`,
-    textFehlt: (t: string) => `Text “${t}” not found`,
+    expected: (e: string, a: string) => `Expected ${e}, received ${a}`,
+    notExpected: (e: string) => `Expected not ${e}`,
+    contains: (a: string, e: string) => `${a} does not contain ${e}`,
+    notContains: (a: string, e: string) => `${a} contains ${e}, but should not`,
+    matches: (a: string, e: string) => `${a} does not match ${e}`,
+    notMatches: (a: string, e: string) => `${a} matches ${e}, but should not`,
+    truthy: (a: string) => `Expected a truthy value, received ${a}`,
+    falsy: (a: string) => `Expected a falsy value, received ${a}`,
+    greater: (a: string, e: string) => `Expected ${a} > ${e}`,
+    less: (a: string, e: string) => `Expected ${a} < ${e}`,
+    length: (e: number, a: number) => `Expected length ${e}, received ${a}`,
+    disabled: (e: string) => `${e} should be disabled`,
+    enabled: (e: string) => `${e} should be enabled`,
+    button: (l: string) => `Button “${l}” not found`,
+    buttonOff: (l: string) => `Button “${l}” is disabled`,
+    field: (h: string) => `Input “${h}” not found`,
+    textMissing: (t: string) => `Text “${t}” not found`,
     element: (s: string) => `Element “${s}” not found`,
-    nichtGerendert: 'Call render() first',
-    zeitueberschreitung: 'Timeout - the test took too long',
-    renderFehler: 'Error while rendering: ',
-    keineApp: 'No App component found',
+    notRendered: 'Call render() first',
+    timeout: 'Timeout - the test took too long',
+    renderError: 'Error while rendering: ',
+    noApp: 'No App component found',
   },
 }
 
 /** Schlüssel, die der Lernpfad selbst benutzt - sie überleben die Test-Isolation. */
-const APP_SCHLUESSEL = [/^tryit:/, /^lernpfad-/, /^sprache$/, /^theme$/, /^demo-notiz$/]
+const APP_KEYS = [/^tryit:/, /^lernpfad-/, /^sprache$/, /^theme$/, /^demo-notiz$/]
 
 const TEST_TIMEOUT = 15_000
 
-class TestFehler extends Error {}
+class TestFailure extends Error {}
 
-const kurz = (wert: unknown) => {
-  const text = formatieren(wert, 1)
+const short = (value: unknown) => {
+  const text = formatieren(value, 1)
   return text.length > 90 ? text.slice(0, 87) + '…' : text
 }
-const normal = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim()
+const normalize = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim()
 const tick = (ms = 20) => new Promise((r) => setTimeout(r, ms))
-const passt = (inhalt: string, muster: string | RegExp) =>
-  typeof muster === 'string' ? inhalt.includes(muster) : muster.test(inhalt)
+const matches = (content: string, pattern: string | RegExp) =>
+  typeof pattern === 'string' ? content.includes(pattern) : pattern.test(content)
 
-type Umgebung = {
+type Environment = {
   App: ComponentType
   code: string
   logs: string[]
-  m: (typeof MELDUNGEN)['de']
-  aufraeumen: (() => void)[]
-  fehler: { wert: unknown }
+  m: (typeof MESSAGES)['de']
+  cleanup: (() => void)[]
+  error: { value: unknown }
   /** The `fetch` the code under test sees - mockFetch swaps it (see ausfuehren). */
   fetch: { current: typeof fetch }
 }
 
 /** Alle Helfer, die im Testcode als Variablen verfügbar sind. */
-function helferErstellen(u: Umgebung) {
+function createHelpers(u: Environment) {
   const { m } = u
   let container: HTMLElement | null = null
   let root: Root | null = null
 
-  function fehlerPruefen() {
-    if (u.fehler.wert) {
-      const f = u.fehler.wert
-      u.fehler.wert = null
-      throw new TestFehler(m.renderFehler + formatieren(f))
+  function checkError() {
+    if (u.error.value) {
+      const f = u.error.value
+      u.error.value = null
+      throw new TestFailure(m.renderError + formatieren(f))
     }
   }
 
-  function wurzel(): HTMLElement {
-    if (!container) throw new TestFehler(m.nichtGerendert)
+  function rootElement(): HTMLElement {
+    if (!container) throw new TestFailure(m.notRendered)
     return container
   }
 
-  function abbauen() {
+  function unmount() {
     const r = root
     const c = container
     root = null
@@ -131,103 +131,103 @@ function helferErstellen(u: Umgebung) {
     if (r) flushSync(() => r.unmount())
     c?.remove()
   }
-  u.aufraeumen.push(abbauen)
+  u.cleanup.push(unmount)
 
   async function render() {
-    abbauen()
+    unmount()
     container = document.createElement('div')
-    container.className = 'vorschau'
+    container.className = 'preview'
     container.setAttribute('aria-hidden', 'true')
     Object.assign(container.style, { position: 'fixed', left: '-10000px', top: '0', width: '720px' })
     document.body.appendChild(container)
-    root = createRoot(container, { onUncaughtError: (f) => (u.fehler.wert = f) })
+    root = createRoot(container, { onUncaughtError: (f) => (u.error.value = f) })
     const r = root
     flushSync(() => r.render(createElement(u.App)))
     await tick(30)
-    fehlerPruefen()
+    checkError()
   }
 
   /** Suchfunktionen - global oder innerhalb eines Elements (within). */
-  function sucher(bereich: () => HTMLElement) {
-    const alle = (selektor: string) => Array.from(bereich().querySelectorAll<HTMLElement>(selektor))
+  function finders(scope: () => HTMLElement) {
+    const alle = (selector: string) => Array.from(scope().querySelectorAll<HTMLElement>(selector))
 
     // innerText statt textContent: sichtbarer Text mit Abständen zwischen Elementen ("0 / 50 characters Send").
-    const text = () => normal(bereich().innerText || bereich().textContent)
+    const text = () => normalize(scope().innerText || scope().textContent)
 
-    function queryByText(muster: string | RegExp): HTMLElement | null {
-      const treffer = alle('*')
-        .map((el, index) => ({ el, index, laenge: normal(el.textContent).length }))
-        .filter(({ el }) => passt(normal(el.textContent), muster))
+    function queryByText(pattern: string | RegExp): HTMLElement | null {
+      const hits = alle('*')
+        .map((el, index) => ({ el, index, length: normalize(el.textContent).length }))
+        .filter(({ el }) => matches(normalize(el.textContent), pattern))
       // Kürzester Text gewinnt; bei gleichem Text das tiefere Element (z. B. <li> statt <ul>),
       // das in der Dokumentreihenfolge später kommt.
-      treffer.sort((a, b) => a.laenge - b.laenge || b.index - a.index)
-      return treffer[0]?.el ?? null
+      hits.sort((a, b) => a.length - b.length || b.index - a.index)
+      return hits[0]?.el ?? null
     }
 
-    function getByText(muster: string | RegExp) {
-      const el = queryByText(muster)
-      if (!el) throw new TestFehler(m.textFehlt(String(muster)))
+    function getByText(pattern: string | RegExp) {
+      const el = queryByText(pattern)
+      if (!el) throw new TestFailure(m.textMissing(String(pattern)))
       return el
     }
 
     function button(label: string | RegExp) {
-      const knoepfe = alle('button')
+      const buttons = alle('button')
       const el =
-        knoepfe.find((b) => typeof label === 'string' && normal(b.textContent) === label) ??
-        knoepfe.find((b) => passt(normal(b.textContent), label) || passt(b.getAttribute('aria-label') ?? '', label))
-      if (!el) throw new TestFehler(m.knopf(String(label)))
+        buttons.find((b) => typeof label === 'string' && normalize(b.textContent) === label) ??
+        buttons.find((b) => matches(normalize(b.textContent), label) || matches(b.getAttribute('aria-label') ?? '', label))
+      if (!el) throw new TestFailure(m.button(String(label)))
       return el as HTMLButtonElement
     }
 
-    function field(hinweis?: string | number) {
-      const felder = alle('input, textarea, select') as (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)[]
-      let el: (typeof felder)[number] | undefined
-      if (hinweis === undefined) el = felder[0]
-      else if (typeof hinweis === 'number') el = felder[hinweis]
+    function field(hint?: string | number) {
+      const fields = alle('input, textarea, select') as (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)[]
+      let el: (typeof fields)[number] | undefined
+      if (hint === undefined) el = fields[0]
+      else if (typeof hint === 'number') el = fields[hint]
       else {
-        const h = hinweis.toLowerCase()
-        el = felder.find((f) => {
-          const label = f.id ? bereich().querySelector(`label[for="${CSS.escape(f.id)}"]`) : f.closest('label')
+        const h = hint.toLowerCase()
+        el = fields.find((f) => {
+          const label = f.id ? scope().querySelector(`label[for="${CSS.escape(f.id)}"]`) : f.closest('label')
           return (
-            f.getAttribute('name') === hinweis ||
+            f.getAttribute('name') === hint ||
             (f.getAttribute('placeholder') ?? '').toLowerCase().includes(h) ||
             (f.getAttribute('aria-label') ?? '').toLowerCase().includes(h) ||
-            normal(label?.textContent).toLowerCase().includes(h) ||
-            f.getAttribute('type') === hinweis ||
+            normalize(label?.textContent).toLowerCase().includes(h) ||
+            f.getAttribute('type') === hint ||
             f.tagName.toLowerCase() === h
           )
         })
       }
-      if (!el) throw new TestFehler(m.feld(String(hinweis ?? '')))
+      if (!el) throw new TestFailure(m.field(String(hint ?? '')))
       return el
     }
 
-    function find(selektor: string) {
-      const el = bereich().querySelector<HTMLElement>(selektor)
-      if (!el) throw new TestFehler(m.element(selektor))
+    function find(selector: string) {
+      const el = scope().querySelector<HTMLElement>(selector)
+      if (!el) throw new TestFailure(m.element(selector))
       return el
     }
 
     return { text, queryByText, getByText, button, field, find, findAll: alle }
   }
 
-  const global = sucher(wurzel)
+  const global = finders(rootElement)
 
   async function click(el: HTMLElement) {
-    if ((el as HTMLButtonElement).disabled) throw new TestFehler(m.knopfAus(normal(el.textContent)))
+    if ((el as HTMLButtonElement).disabled) throw new TestFailure(m.buttonOff(normalize(el.textContent)))
     el.click()
     await tick()
-    fehlerPruefen()
+    checkError()
   }
 
-  async function type(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, wert: string | number) {
+  async function type(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, value: string | number) {
     el.focus()
     // Über den nativen Setter, damit React die Änderung als echte Eingabe erkennt.
     const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value')?.set
-    setter?.call(el, String(wert))
+    setter?.call(el, String(value))
     el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }))
     await tick()
-    fehlerPruefen()
+    checkError()
   }
 
   async function press(el: HTMLElement, key: string) {
@@ -235,29 +235,29 @@ function helferErstellen(u: Umgebung) {
     el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
     el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }))
     await tick()
-    fehlerPruefen()
+    checkError()
   }
 
   async function blur(el: HTMLElement) {
     el.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
     el.blur()
     await tick()
-    fehlerPruefen()
+    checkError()
   }
 
   async function submit(el: HTMLElement) {
     const form = el.closest('form')
-    if (!form) throw new TestFehler(m.element('form'))
+    if (!form) throw new TestFailure(m.element('form'))
     form.requestSubmit()
     await tick()
-    fehlerPruefen()
+    checkError()
   }
 
   async function waitFor<T>(fn: () => T | Promise<T>, timeout = 4000): Promise<T> {
     const start = performance.now()
     for (;;) {
       try {
-        fehlerPruefen()
+        checkError()
         return await fn()
       } catch (e) {
         if (performance.now() - start > timeout) throw e
@@ -266,45 +266,45 @@ function helferErstellen(u: Umgebung) {
     }
   }
 
-  function expect(ist: unknown) {
-    const baue = (nicht: boolean) => {
-      const pruefe = (ok: boolean, meldung: string, nichtMeldung: string) => {
-        if (ok === nicht) throw new TestFehler(nicht ? nichtMeldung : meldung)
+  function expect(actual: unknown) {
+    const build = (nicht: boolean) => {
+      const check = (ok: boolean, message: string, nichtMeldung: string) => {
+        if (ok === nicht) throw new TestFailure(nicht ? nichtMeldung : message)
       }
       return {
-        toBe: (soll: unknown) => pruefe(Object.is(ist, soll), m.erwartet(kurz(soll), kurz(ist)), m.erwartetNicht(kurz(soll))),
-        toEqual: (soll: unknown) =>
-          pruefe(JSON.stringify(ist) === JSON.stringify(soll), m.erwartet(kurz(soll), kurz(ist)), m.erwartetNicht(kurz(soll))),
-        toContain: (teil: unknown) =>
-          pruefe(
-            Array.isArray(ist) ? ist.includes(teil) : String(ist).includes(String(teil)),
-            m.enthaelt(kurz(ist), kurz(teil)),
-            m.enthaeltNicht(kurz(ist), kurz(teil)),
+        toBe: (expected: unknown) => check(Object.is(actual, expected), m.expected(short(expected), short(actual)), m.notExpected(short(expected))),
+        toEqual: (expected: unknown) =>
+          check(JSON.stringify(actual) === JSON.stringify(expected), m.expected(short(expected), short(actual)), m.notExpected(short(expected))),
+        toContain: (part: unknown) =>
+          check(
+            Array.isArray(actual) ? actual.includes(part) : String(actual).includes(String(part)),
+            m.contains(short(actual), short(part)),
+            m.notContains(short(actual), short(part)),
           ),
-        toMatch: (muster: RegExp) => pruefe(muster.test(String(ist)), m.passt(kurz(ist), String(muster)), m.passtNicht(kurz(ist), String(muster))),
-        toBeTruthy: () => pruefe(Boolean(ist), m.wahr(kurz(ist)), m.falsch(kurz(ist))),
-        toBeFalsy: () => pruefe(!ist, m.falsch(kurz(ist)), m.wahr(kurz(ist))),
-        toBeGreaterThan: (n: number) => pruefe(Number(ist) > n, m.groesser(kurz(ist), String(n)), m.kleiner(kurz(ist), String(n))),
-        toBeLessThan: (n: number) => pruefe(Number(ist) < n, m.kleiner(kurz(ist), String(n)), m.groesser(kurz(ist), String(n))),
+        toMatch: (pattern: RegExp) => check(pattern.test(String(actual)), m.matches(short(actual), String(pattern)), m.notMatches(short(actual), String(pattern))),
+        toBeTruthy: () => check(Boolean(actual), m.truthy(short(actual)), m.falsy(short(actual))),
+        toBeFalsy: () => check(!actual, m.falsy(short(actual)), m.truthy(short(actual))),
+        toBeGreaterThan: (n: number) => check(Number(actual) > n, m.greater(short(actual), String(n)), m.less(short(actual), String(n))),
+        toBeLessThan: (n: number) => check(Number(actual) < n, m.less(short(actual), String(n)), m.greater(short(actual), String(n))),
         toHaveLength: (n: number) => {
-          const laenge = (ist as { length: number }).length
-          pruefe(laenge === n, m.laenge(n, laenge), m.erwartetNicht(String(n)))
+          const length = (actual as { length: number }).length
+          check(length === n, m.length(n, length), m.notExpected(String(n)))
         },
         toBeDisabled: () => {
-          const el = ist as HTMLButtonElement
-          const name = `<${el.tagName?.toLowerCase()}> „${normal(el.textContent) || el.getAttribute?.('name') || ''}“`
-          pruefe(Boolean(el.disabled), m.deaktiviert(name), m.aktiviert(name))
+          const el = actual as HTMLButtonElement
+          const name = `<${el.tagName?.toLowerCase()}> „${normalize(el.textContent) || el.getAttribute?.('name') || ''}“`
+          check(Boolean(el.disabled), m.disabled(name), m.enabled(name))
         },
       }
     }
-    return { ...baue(false), not: baue(true) }
+    return { ...build(false), not: build(true) }
   }
 
-  function mockFetch(antwort: (url: string, init?: RequestInit) => unknown) {
+  function mockFetch(answer: (url: string, init?: RequestInit) => unknown) {
     const original = u.fetch.current
     const calls: { url: string; signal?: AbortSignal | null }[] = []
-    u.fetch.current = (async (eingabe: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(eingabe instanceof Request ? eingabe.url : eingabe)
+    u.fetch.current = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input instanceof Request ? input.url : input)
       calls.push({ url, signal: init?.signal })
       await new Promise<void>((resolve, reject) => {
         const timer = setTimeout(resolve, 30)
@@ -313,13 +313,13 @@ function helferErstellen(u: Umgebung) {
           reject(new DOMException('Aborted', 'AbortError'))
         })
       })
-      const ergebnis = (await antwort(url, init)) as { status?: number; body?: unknown } | undefined
-      if (ergebnis instanceof Response) return ergebnis
-      const status = ergebnis && typeof ergebnis === 'object' && 'status' in ergebnis ? ergebnis.status! : 200
-      const body = ergebnis && typeof ergebnis === 'object' && 'status' in ergebnis ? ergebnis.body : ergebnis
+      const result = (await answer(url, init)) as { status?: number; body?: unknown } | undefined
+      if (result instanceof Response) return result
+      const status = result && typeof result === 'object' && 'status' in result ? result.status! : 200
+      const body = result && typeof result === 'object' && 'status' in result ? result.body : result
       return new Response(JSON.stringify(body ?? null), { status, headers: { 'content-type': 'application/json' } })
     }) as typeof fetch
-    u.aufraeumen.push(() => (u.fetch.current = original))
+    u.cleanup.push(() => (u.fetch.current = original))
     return { calls }
   }
 
@@ -327,7 +327,7 @@ function helferErstellen(u: Umgebung) {
     ...global,
     render,
     remount: render,
-    within: (el: HTMLElement) => sucher(() => el),
+    within: (el: HTMLElement) => finders(() => el),
     click,
     type,
     check: click,
@@ -347,84 +347,84 @@ function helferErstellen(u: Umgebung) {
 }
 
 // Testläufe nacheinander ausführen - sie verändern globale Dinge wie fetch und localStorage.
-let warteschlange: Promise<unknown> = Promise.resolve()
+let queue: Promise<unknown> = Promise.resolve()
 
-export function reactTestsAusfuehren(code: string, tests: ReactTest[], sprache: Sprache): Promise<TestErgebnis[]> {
-  const lauf = warteschlange.then(() => ausfuehren(code, tests, sprache))
-  warteschlange = lauf.catch(() => {})
-  return lauf
+export function runReactTests(code: string, tests: ReactTest[], language: Sprache): Promise<TestResult[]> {
+  const queued = queue.then(() => run(code, tests, language))
+  queue = queued.catch(() => {})
+  return queued
 }
 
-async function ausfuehren(code: string, tests: ReactTest[], sprache: Sprache): Promise<TestErgebnis[]> {
-  const m = MELDUNGEN[sprache]
+async function run(code: string, tests: ReactTest[], language: Sprache): Promise<TestResult[]> {
+  const m = MESSAGES[language]
   const logs: string[] = []
-  const namen = tests.map((t) => localized(t.name, sprache))
+  const names = tests.map((t) => localized(t.name, language))
 
   // The code under test gets a `fetch` of its own. mockFetch replaces only that one - replacing
   // window.fetch would also count the requests of the preview and every other example on the page.
-  const testFetch: Umgebung['fetch'] = { current: (...args) => window.fetch(...args) }
-  let kompiliert: Awaited<ReturnType<typeof kompilieren>>
+  const testFetch: Environment['fetch'] = { current: (...args) => window.fetch(...args) }
+  let compiled: Awaited<ReturnType<typeof compile>>
   try {
-    kompiliert = await kompilieren(code, (_typ, text) => logs.push(text), sprache, {
+    compiled = await compile(code, (_typ, text) => logs.push(text), language, {
       fetch: (...args: Parameters<typeof fetch>) => testFetch.current(...args),
     })
-  } catch (fehler) {
-    return namen.map((name) => ({ name, ok: false, meldung: formatieren(fehler) }))
+  } catch (error) {
+    return names.map((name) => ({ name, ok: false, message: formatieren(error) }))
   }
 
-  const ergebnisse: TestErgebnis[] = []
+  const results: TestResult[] = []
   for (const [i, test] of tests.entries()) {
     logs.length = 0
-    const u: Umgebung = { App: kompiliert.App, code, logs, m, aufraeumen: [], fehler: { wert: null }, fetch: testFetch }
+    const u: Environment = { App: compiled.App, code, logs, m, cleanup: [], error: { value: null }, fetch: testFetch }
 
     // --- Isolation vorbereiten ---
-    const speicher = Object.entries(localStorage)
-    for (const [k] of speicher) if (!APP_SCHLUESSEL.some((re) => re.test(k))) localStorage.removeItem(k)
-    const titel = document.title
+    const storage = Object.entries(localStorage)
+    for (const [k] of storage) if (!APP_KEYS.some((re) => re.test(k))) localStorage.removeItem(k)
+    const title = document.title
     const { confirm, alert } = window
     window.confirm = () => true
     window.alert = () => {}
-    const beiFehler = (e: ErrorEvent) => (u.fehler.wert ??= e.error ?? e.message)
-    const beiPromise = (e: PromiseRejectionEvent) => (u.fehler.wert ??= e.reason)
-    window.addEventListener('error', beiFehler)
+    const onError = (e: ErrorEvent) => (u.error.value ??= e.error ?? e.message)
+    const beiPromise = (e: PromiseRejectionEvent) => (u.error.value ??= e.reason)
+    window.addEventListener('error', onError)
     window.addEventListener('unhandledrejection', beiPromise)
     // Ein <form> ohne eigenen Handler würde sonst die ganze Seite neu laden.
-    const keinNeuladen = (e: Event) => e.preventDefault()
-    document.addEventListener('submit', keinNeuladen)
+    const noReload = (e: Event) => e.preventDefault()
+    document.addEventListener('submit', noReload)
 
     try {
-      const helfer = helferErstellen(u)
-      const fn = new Function(...Object.keys(helfer), `return (async () => {\n${test.pruefung}\n})()`)
+      const helpers = createHelpers(u)
+      const fn = new Function(...Object.keys(helpers), `return (async () => {\n${test.script}\n})()`)
       let timer = 0
       await Promise.race([
-        fn(...Object.values(helfer)),
-        new Promise((_, nein) => (timer = window.setTimeout(() => nein(new TestFehler(m.zeitueberschreitung)), TEST_TIMEOUT))),
+        fn(...Object.values(helpers)),
+        new Promise((_, reject) => (timer = window.setTimeout(() => reject(new TestFailure(m.timeout)), TEST_TIMEOUT))),
       ]).finally(() => clearTimeout(timer))
-      if (u.fehler.wert) throw new TestFehler(m.renderFehler + formatieren(u.fehler.wert))
-      ergebnisse.push({ name: namen[i], ok: true, meldung: '' })
-    } catch (fehler) {
-      const meldung = fehler instanceof TestFehler ? fehler.message : formatieren(fehler)
-      ergebnisse.push({ name: namen[i], ok: false, meldung })
+      if (u.error.value) throw new TestFailure(m.renderError + formatieren(u.error.value))
+      results.push({ name: names[i], ok: true, message: '' })
+    } catch (error) {
+      const message = error instanceof TestFailure ? error.message : formatieren(error)
+      results.push({ name: names[i], ok: false, message })
     } finally {
-      for (const aufraeumen of u.aufraeumen.reverse()) {
+      for (const cleanup of u.cleanup.reverse()) {
         try {
-          aufraeumen()
+          cleanup()
         } catch {
           /* Aufräumen darf den nächsten Test nicht blockieren */
         }
       }
       // --- Isolation wiederherstellen ---
-      window.removeEventListener('error', beiFehler)
+      window.removeEventListener('error', onError)
       window.removeEventListener('unhandledrejection', beiPromise)
-      document.removeEventListener('submit', keinNeuladen)
+      document.removeEventListener('submit', noReload)
       window.confirm = confirm
       window.alert = alert
-      document.title = titel
-      for (const k of Object.keys(localStorage)) if (!APP_SCHLUESSEL.some((re) => re.test(k))) localStorage.removeItem(k)
-      for (const [k, v] of speicher) if (!APP_SCHLUESSEL.some((re) => re.test(k))) localStorage.setItem(k, v)
+      document.title = title
+      for (const k of Object.keys(localStorage)) if (!APP_KEYS.some((re) => re.test(k))) localStorage.removeItem(k)
+      for (const [k, v] of storage) if (!APP_KEYS.some((re) => re.test(k))) localStorage.setItem(k, v)
     }
   }
 
-  kompiliert.aufraeumen()
-  return ergebnisse
+  compiled.aufraeumen()
+  return results
 }

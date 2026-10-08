@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Tabellen.code'
+import { examples, codeBloecke } from './Tabellen.code'
 
 /**
  * CHAPTER 9.6 - Designing tables: CREATE TABLE (English version)
@@ -16,11 +16,11 @@ export function Tabellen() {
           So far the tables were ready-made. Now you create one yourself: for product reviews, with
           keys to products and customers and a rule that there are only 1 to 5 stars.
         </P>
-        <TryIt modus="sql" id="sql-tabellen-einstieg" {...beispiele['sql-tabellen-einstieg']} />
+        <TryIt mode="sql" id="sql-tabellen-einstieg" {...examples['sql-tabellen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="How CREATE TABLE is built">
-        <CodeBlock code={codeBloecke.aufbau} titel="SQL" />
+        <CodeBlock code={codeBloecke.aufbau} title="SQL" />
         <P>
           Every column has a name, a <strong>type</strong> and optional rules. The type is strict: no
           text fits into an <Code>integer</Code> column, no “February 31st” into a <Code>date</Code>{' '}
@@ -69,7 +69,7 @@ export function Tabellen() {
             <Code>DEFAULT …</Code> - the value if the INSERT brings none.
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-tabellen-check" {...beispiele['sql-tabellen-check']} />
+        <TryIt mode="sql" id="sql-tabellen-check" {...examples['sql-tabellen-check']} />
         <P>
           Rule of thumb: every rule that must <em>always</em> hold belongs (also) in the database. The
           backend checks for nice error messages, the database for safety.
@@ -81,7 +81,7 @@ export function Tabellen() {
           Applications grow, and tables with them. <Code>ALTER TABLE</Code> adds columns, renames,
           adds rules - without losing the existing data:
         </P>
-        <TryIt modus="sql" id="sql-tabellen-alter" {...beispiele['sql-tabellen-alter']} />
+        <TryIt mode="sql" id="sql-tabellen-alter" {...examples['sql-tabellen-alter']} />
         <P>
           <Code>DROP TABLE name</Code> deletes a table with its content, <Code>DROP COLUMN</Code> a
           column. Neither can be undone - except in a transaction, because in PostgreSQL{' '}
@@ -95,7 +95,7 @@ export function Tabellen() {
           <strong>index</strong> is like the index of a book: sorted pointers that let you jump straight
           to the right place. <Code>EXPLAIN</Code> shows which way the database plans to take:
         </P>
-        <TryIt modus="sql" id="sql-tabellen-index" {...beispiele['sql-tabellen-index']} />
+        <TryIt mode="sql" id="sql-tabellen-index" {...examples['sql-tabellen-index']} />
         <Liste>
           <li>
             <Code>Seq Scan</Code> means: read all 200,000 rows. With the index PostgreSQL jumps straight
@@ -118,22 +118,22 @@ export function Tabellen() {
           A JPA entity (<Verweis id="spring-daten" />) is the Java side of a table. The annotations
           correspond to what you write here in SQL:
         </P>
-        <CodeBlock code={codeBloecke.entity} titel="Review.java" />
+        <CodeBlock code={codeBloecke.entity} title="Review.java" />
         <P>
           In the course Hibernate creates the tables itself at startup (<Code>ddl-auto</Code>). In real
           projects you rather write the SQL yourself, as numbered <strong>migrations</strong> that a tool
           like Flyway or Liquibase runs in order at startup - so every change to the schema is
           versioned and the same on every database:
         </P>
-        <CodeBlock code={codeBloecke.migration} titel="V2__add_reviews.sql" />
+        <CodeBlock code={codeBloecke.migration} title="V2__add_reviews.sql" />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-tabellen-uebung"
-          {...beispiele['sql-tabellen-uebung']}
-          aufgabe={
+          {...examples['sql-tabellen-uebung']}
+          task={
             <>
               <p>
                 Customers should be able to remember products. Create the table <Code>wishlist</Code>:
@@ -155,29 +155,29 @@ export function Tabellen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Which type fits the price of a product?',
-            antworten: ['real', 'integer', 'numeric(10, 2)', 'text'],
-            richtig: 2,
-            erklaerung: 'numeric computes exactly. real has rounding errors, integer knows no cents, text cannot be computed with.',
+            question: 'Which type fits the price of a product?',
+            answers: ['real', 'integer', 'numeric(10, 2)', 'text'],
+            correct: 2,
+            explanation: 'numeric computes exactly. real has rounding errors, integer knows no cents, text cannot be computed with.',
           },
           {
-            frage: 'order_items.order_id has ON DELETE CASCADE. What happens when an order is deleted?',
-            antworten: ['The delete is refused', 'The line items are deleted too', 'The line items get order_id NULL', 'Nothing - the line items stay unchanged'],
-            richtig: 1,
-            erklaerung: 'CASCADE deletes dependent rows too. Without it, PostgreSQL would refuse the delete with a foreign key error.',
+            question: 'order_items.order_id has ON DELETE CASCADE. What happens when an order is deleted?',
+            answers: ['The delete is refused', 'The line items are deleted too', 'The line items get order_id NULL', 'Nothing - the line items stay unchanged'],
+            correct: 1,
+            explanation: 'CASCADE deletes dependent rows too. Without it, PostgreSQL would refuse the delete with a foreign key error.',
           },
           {
-            frage: 'EXPLAIN shows “Seq Scan” on a big table. What does that mean?',
-            antworten: [
+            question: 'EXPLAIN shows “Seq Scan” on a big table. What does that mean?',
+            answers: [
               'The query has an error',
               'PostgreSQL reads the whole table - maybe an index is missing',
               'The table is sorted',
               'The query was answered from the cache',
             ],
-            richtig: 1,
-            erklaerung: 'A Seq Scan reads every row. For small tables that is right; for big tables and few matches an index helps.',
+            correct: 1,
+            explanation: 'A Seq Scan reads every row. For small tables that is right; for big tables and few matches an index helps.',
           },
         ]}
       />

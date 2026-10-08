@@ -4,11 +4,11 @@ import { useSprache } from '../i18n/LanguageContext'
 import { checkQueries, evaluate, lastTable } from '../sql/check'
 import { onSqlReady, runSql, SqlTimeout, sqlReady, startSql } from '../sql/client'
 import type { SqlError, SqlRun, SqlTable } from '../sql/engine'
-import type { TestErgebnis } from './jsSandbox'
-import { SqlDatenleiste } from './SqlDataPanel'
-import { Rahmen, Testergebnisse } from './EditorFrame'
+import type { TestResult } from './jsSandbox'
+import { SqlDataPanel } from './SqlDataPanel'
+import { EditorFrame, TestResults } from './EditorFrame'
 import type { SqlProps } from './TryIt'
-import type { Typfehler } from './typeCheck'
+import type { TypeDiagnostic } from './typeCheck'
 import { useEditor, useOnMount } from './useEditor'
 import { focusableWhenScrolling } from '../components/scrollFocus'
 
@@ -69,13 +69,13 @@ const TEXTS = {
   },
 }
 
-type Outcome = { run: SqlRun | null; results: TestErgebnis[] | null; expected: SqlTable | null; failure: string | null }
+type Outcome = { run: SqlRun | null; results: TestResult[] | null; expected: SqlTable | null; failure: string | null }
 
 export function TryItSql(props: SqlProps) {
-  const { id, loesung, tests } = props
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
-  const { code, rahmen } = useEditor(props)
+  const { id, solution, tests } = props
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
+  const { code, frame } = useEditor(props)
   const [outcome, setOutcome] = useState<Outcome | null>(null)
   // Examples start running right away (see useOnMount below), exercises wait for the button.
   const [running, setRunning] = useState(!tests)
@@ -90,15 +90,15 @@ export function TryItSql(props: SqlProps) {
     try {
       const checks = withTests && tests?.length ? checkQueries(tests) : undefined
       const run = await runSql(source, { checks })
-      let results: TestErgebnis[] | null = null
+      let results: TestResult[] | null = null
       let expected: SqlTable | null = null
-      if (checks && tests && loesung) {
-        solutionRun.current ??= runSql(loesung, { checks })
-        const solution = await solutionRun.current
-        results = evaluate(tests, run, solution, sprache)
+      if (checks && tests && solution) {
+        solutionRun.current ??= runSql(solution, { checks })
+        const solutionResult = await solutionRun.current
+        results = evaluate(tests, run, solutionResult, language)
         // The expected table helps when the final result is wrong - not for check queries.
         const lastTest = results.findIndex((r, i) => !r.ok && !tests[i].abfrage)
-        if (lastTest >= 0 && !run.error) expected = lastTable(solution) ?? null
+        if (lastTest >= 0 && !run.error) expected = lastTable(solutionResult) ?? null
       }
       if (number === latest.current) setOutcome({ run, results, expected, failure: null })
     } catch (e) {
@@ -116,24 +116,24 @@ export function TryItSql(props: SqlProps) {
     if (!tests) void start(code, false)
   })
 
-  const markers: Typfehler[] | undefined = useMemo(() => {
+  const markers: TypeDiagnostic[] | undefined = useMemo(() => {
     const error = outcome?.run?.error
-    return error ? [{ zeile: error.line, spalte: error.column, laenge: error.length, text: error.message, code: 0 }] : undefined
+    return error ? [{ line: error.line, column: error.column, length: error.length, text: error.message, code: 0 }] : undefined
   }, [outcome])
 
   return (
-    <Rahmen
-      {...rahmen}
-      art="SQL"
-      markierungen={markers}
-      laeuft={running}
-      oben={<SqlDatenleiste code={code} />}
-      ausfuehren={(c) => {
+    <EditorFrame
+      {...frame}
+      kind="SQL"
+      markers={markers}
+      running={running}
+      above={<SqlDataPanel code={code} />}
+      run={(c) => {
         setRunning(true)
         void start(c ?? code, true)
       }}
     >
-      <Testergebnisse id={id} ergebnisse={outcome?.results ?? null} />
+      <TestResults id={id} results={outcome?.results ?? null} />
       {outcome?.failure ? (
         <p className="flex gap-2 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           <Icon name="warnung" className="mt-0.5 size-4 shrink-0" />
@@ -152,13 +152,13 @@ export function TryItSql(props: SqlProps) {
           </div>
         </details>
       )}
-    </Rahmen>
+    </EditorFrame>
   )
 }
 
 function SqlOutput({ run }: { run: SqlRun }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   if (!run.results.length && !run.error) return <p className="px-4 py-3 text-sm text-slate-500 italic dark:text-slate-400">{t.empty}</p>
 
   return (
@@ -190,8 +190,8 @@ function SqlOutput({ run }: { run: SqlRun }) {
 }
 
 function ErrorBox({ error }: { error: SqlError }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   return (
     <div className="space-y-1 rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-code whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
       <p className="text-2xs text-rose-700 dark:text-rose-400/80">
@@ -209,8 +209,8 @@ function ErrorBox({ error }: { error: SqlError }) {
 
 /** A result like in a database tool: header, NULL in grey, numbers on the right. */
 export function ResultTable({ table }: { table: SqlTable }) {
-  const { sprache } = useSprache()
-  const t = TEXTS[sprache]
+  const { sprache: language } = useSprache()
+  const t = TEXTS[language]
   const numeric = table.columns.map((_, c) =>
     table.rows.some((row) => row[c] !== null) && table.rows.every((row) => row[c] === null || /^-?\d+(\.\d+)?$/.test(row[c]!)),
   )

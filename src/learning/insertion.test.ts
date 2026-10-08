@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { einfuegungAnwenden, einfuegungBerechnen, einfuegungenPlanen } from './insertion'
+import { applyInsertion, computeInsertion, planInsertions } from './insertion'
 
 /** Inserts `snippet` at the `|` in `code` and returns the new code with `|` at the cursor. */
 function insertAt(code: string, snippet: string) {
   const at = code.indexOf('|')
   const plain = code.replace('|', '')
-  const insertion = einfuegungBerechnen(plain, at, at, snippet)
-  const result = einfuegungAnwenden(plain, insertion)
+  const insertion = computeInsertion(plain, at, at, snippet)
+  const result = applyInsertion(plain, insertion)
   return result.slice(0, insertion.cursor) + '|' + result.slice(insertion.cursor)
 }
 
@@ -36,11 +36,11 @@ describe('einfuegungBerechnen', () => {
 describe('einfuegungenPlanen', () => {
   it('applies several parts from the back, so earlier positions stay valid', () => {
     const code = 'top\nbottom'
-    const plan = einfuegungenPlanen(code, [
-      { baustein: 'A', start: 0, ende: 0 },
-      { baustein: 'B', start: code.length, ende: code.length, haupt: true },
+    const plan = planInsertions(code, [
+      { snippet: 'A', start: 0, end: 0 },
+      { snippet: 'B', start: code.length, end: code.length, main: true },
     ])
-    const result = plan.einfuegungen.reduce((c, e) => einfuegungAnwenden(c, e), code)
+    const result = plan.einfuegungen.reduce((c, e) => applyInsertion(c, e), code)
     expect(result).toBe('A\ntop\nbottom\nB')
     expect(plan.code).toBe(result)
     // The main part decides the cursor - shifted by the text inserted in front of it.

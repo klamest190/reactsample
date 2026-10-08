@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Start.code'
+import { examples, codeBloecke } from './Start.code'
 
 /**
  * CHAPTER 6.1 (English) - Hello Java
@@ -16,7 +16,7 @@ export function Start() {
           The shortest complete Java program. Hit ▶ Run - it runs right here in the browser, just
           like the JavaScript examples, but along a different path.
         </P>
-        <TryIt modus="java" id="java-start-einstieg" {...beispiele['java-start-einstieg']} />
+        <TryIt mode="java" id="java-start-einstieg" {...examples['java-start-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Why a Java part in a React course?">
@@ -45,7 +45,7 @@ export function Start() {
       </Abschnitt>
 
       <Abschnitt titel="The skeleton, word by word">
-        <CodeBlock code={codeBloecke.geruest} titel="Main.java" />
+        <CodeBlock code={codeBloecke.geruest} title="Main.java" />
         <P>Every word on the second line has a job:</P>
         <Tabelle
           kopf={['Word', 'Meaning']}
@@ -59,7 +59,7 @@ export function Start() {
           ].map(([word, meaning]) => [<Code key={word}>{word}</Code>, meaning])}
         />
         <P>For comparison - the same program in JavaScript needs exactly one line and no frame at all:</P>
-        <CodeBlock code={codeBloecke.jsVergleich} titel="hello.js" />
+        <CodeBlock code={codeBloecke.jsVergleich} title="hello.js" />
         <Hinweis variante="tipp">
           The class is called <Code>Main</Code> here because our runtime looks there for{' '}
           <Code>main</Code> first. In a real project the file name must match the public class:{' '}
@@ -73,7 +73,7 @@ export function Start() {
           accident: <Code>System</Code> is a class, <Code>out</Code> is a field inside it (the output
           stream) and <Code>println</Code> is a method on that stream.
         </P>
-        <TryIt modus="java" id="java-start-ausgabe" {...beispiele['java-start-ausgabe']} />
+        <TryIt mode="java" id="java-start-ausgabe" {...examples['java-start-ausgabe']} />
         <Hinweis variante="tipp">
           Editor tip: type <Code>sout</Code> and press Enter - the same shortcut as in IntelliJ IDEA.
         </Hinweis>
@@ -98,12 +98,12 @@ export function Start() {
             Linux or Android, all the same. Hence the old slogan “write once, run anywhere”.
           </li>
         </Liste>
-        <CodeBlock code={codeBloecke.werkzeuge} titel="On the command line" />
+        <CodeBlock code={codeBloecke.werkzeuge} title="On the command line" />
         <P>
           The important effect: a typo becomes a <strong>compile error</strong> and the program does
           not start at all. Try it - the semicolon on line 3 is missing:
         </P>
-        <TryIt modus="java" id="java-start-fehler" {...beispiele['java-start-fehler']} />
+        <TryIt mode="java" id="java-start-fehler" {...examples['java-start-fehler']} />
         <Hinweis variante="warnung">
           That is exactly why you see red squiggles in the editor as soon as you pause typing: our
           runtime checks the code in the background - just like a Java IDE does.
@@ -115,7 +115,7 @@ export function Start() {
           A Java program almost always consists of several classes. While learning they may live in
           the same file - only one of them may be <Code>public</Code>.
         </P>
-        <TryIt modus="java" id="java-start-mehrere" {...beispiele['java-start-mehrere']} />
+        <TryIt mode="java" id="java-start-mehrere" {...examples['java-start-mehrere']} />
       </Abschnitt>
 
       <Abschnitt titel="The first differences to JavaScript">
@@ -140,10 +140,10 @@ export function Start() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-start-uebung"
-          {...beispiele['java-start-uebung']}
-          aufgabe={
+          {...examples['java-start-uebung']}
+          task={
             <>
               <p>
                 Create two variables inside <Code>main</Code>: <Code>name</Code> holding the text{' '}
@@ -158,39 +158,39 @@ export function Start() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Where does a Java program start?',
-            antworten: [
+            question: 'Where does a Java program start?',
+            answers: [
               'on the first line of the file',
               'in the main method',
               'in the class with the shortest name',
               'in the constructor',
             ],
-            richtig: 1,
-            erklaerung: 'The JVM looks for public static void main(String[] args) and starts there.',
+            correct: 1,
+            explanation: 'The JVM looks for public static void main(String[] args) and starts there.',
           },
           {
-            frage: 'What does javac do?',
-            antworten: [
+            question: 'What does javac do?',
+            answers: [
               'It runs the program.',
               'It checks the source and produces bytecode.',
               'It downloads libraries from the internet.',
               'It formats the code.',
             ],
-            richtig: 1,
-            erklaerung: 'javac is the compiler: check, then write .class files with bytecode. The JVM runs those.',
+            correct: 1,
+            explanation: 'javac is the compiler: check, then write .class files with bytecode. The JVM runs those.',
           },
           {
-            frage: 'What happens if a semicolon is missing?',
-            antworten: [
+            question: 'What happens if a semicolon is missing?',
+            answers: [
               'Java adds it automatically.',
               'Only that line is skipped.',
               'The program does not start at all.',
               'There is a runtime warning.',
             ],
-            richtig: 2,
-            erklaerung: 'A syntax error stops compilation - and without a .class file there is nothing to run.',
+            correct: 2,
+            explanation: 'A syntax error stops compilation - and without a .class file there is nothing to run.',
           },
         ]}
       />

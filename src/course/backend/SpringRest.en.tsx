@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './SpringRest.code'
+import { examples, codeBloecke } from './SpringRest.code'
 
 /**
  * CHAPTER 8.3 - REST APIs with controllers (English version)
@@ -17,7 +17,7 @@ export function SpringRest() {
           requests run - each with the expected answer. Below you can carry on: create a third todo,
           delete the first one, ask for one that does not exist.
         </P>
-        <TryIt modus="spring" id="spring-rest-crud" {...beispiele['spring-rest-crud']} />
+        <TryIt mode="spring" id="spring-rest-crud" {...examples['spring-rest-crud']} />
       </Abschnitt>
 
       <Abschnitt titel="REST: resources and verbs">
@@ -26,9 +26,9 @@ export function SpringRest() {
           <strong>the path names a thing</strong> (a <em>resource</em>, in the plural),{' '}
           <strong>the method says what happens to it.</strong>
         </P>
-        <CodeBlock code={codeBloecke.rest} titel="todos.http" />
+        <CodeBlock code={codeBloecke.rest} title="todos.http" />
         <P>This is what it looks like when the idea is ignored:</P>
-        <CodeBlock code={codeBloecke.schlecht} titel="please-dont.http" />
+        <CodeBlock code={codeBloecke.schlecht} title="please-dont.http" />
         <Hinweis variante="warnung">
           <Code>GET</Code> must never change anything. Browsers, proxies and search engines call GET
           links just like that, repeat them or cache the answer - a{' '}
@@ -66,7 +66,7 @@ export function SpringRest() {
           If a method simply returns an object, Spring answers with <strong>200</strong>. For
           everything else there is <Code>ResponseEntity</Code> - status, headers and body in one:
         </P>
-        <CodeBlock code={codeBloecke.responseEntity} titel="ResponseEntity.java" />
+        <CodeBlock code={codeBloecke.responseEntity} title="ResponseEntity.java" />
         <P>
           If the status is fixed, an annotation on the method is shorter:{' '}
           <Code>@ResponseStatus(HttpStatus.CREATED)</Code>. The exercise below uses both.
@@ -82,14 +82,14 @@ export function SpringRest() {
           The conversion is done by the library <strong>Jackson</strong>. It reads objects through
           their <strong>getters</strong>, not their fields:
         </P>
-        <CodeBlock code={codeBloecke.getter} titel="getter → JSON" />
+        <CodeBlock code={codeBloecke.getter} title="getter → JSON" />
         <P>
           That is handy - a password field without a getter stays on the server. But a class without
           any getter cannot be written by Jackson at all, which gives a <strong>500</strong>. The
           third and fourth requests show: a <Code>Map</Code> is enough for any JSON, and Spring
           answers broken JSON with <strong>400</strong>.
         </P>
-        <TryIt modus="spring" id="spring-rest-json" {...beispiele['spring-rest-json']} />
+        <TryIt mode="spring" id="spring-rest-json" {...examples['spring-rest-json']} />
         <Hinweis variante="info">
           That is why records are so popular for APIs (<Verweis nr="7.7" />): they automatically have
           “getters” for all components, they are immutable - and you can see at a glance which
@@ -99,10 +99,10 @@ export function SpringRest() {
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-rest-uebung"
-          {...beispiele['spring-rest-uebung']}
-          aufgabe={
+          {...examples['spring-rest-uebung']}
+          task={
             <>
               <p>The book API can list and create. Add:</p>
               <Liste>
@@ -121,24 +121,24 @@ export function SpringRest() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Which endpoint follows the REST conventions for deleting todo 7?',
-            antworten: ['GET /api/todos/7/delete', 'POST /api/deleteTodo?id=7', 'DELETE /api/todos/7', 'DELETE /api/todo?delete=7'],
-            richtig: 2,
-            erklaerung: 'The path names the resource (/api/todos/7), the method the action (DELETE).',
+            question: 'Which endpoint follows the REST conventions for deleting todo 7?',
+            answers: ['GET /api/todos/7/delete', 'POST /api/deleteTodo?id=7', 'DELETE /api/todos/7', 'DELETE /api/todo?delete=7'],
+            correct: 2,
+            explanation: 'The path names the resource (/api/todos/7), the method the action (DELETE).',
           },
           {
-            frage: 'Which status fits a successful POST that created something?',
-            antworten: ['200 OK', '201 Created', '204 No Content', '302 Found'],
-            richtig: 1,
-            erklaerung: '201 Created - plus the Location header with the address of the new entry.',
+            question: 'Which status fits a successful POST that created something?',
+            answers: ['200 OK', '201 Created', '204 No Content', '302 Found'],
+            correct: 1,
+            explanation: '201 Created - plus the Location header with the address of the new entry.',
           },
           {
-            frage: 'A class has a private field “password” without a getter. What happens to it in the JSON?',
-            antworten: ['It appears with its value', 'It appears as null', 'It is missing', 'Spring answers with 500'],
-            richtig: 2,
-            erklaerung: 'Jackson reads through getters. Without a getter the field stays invisible - as long as there are other getters.',
+            question: 'A class has a private field “password” without a getter. What happens to it in the JSON?',
+            answers: ['It appears with its value', 'It appears as null', 'It is missing', 'Spring answers with 500'],
+            correct: 2,
+            explanation: 'Jackson reads through getters. Without a getter the field stays invisible - as long as there are other getters.',
           },
         ]}
       />

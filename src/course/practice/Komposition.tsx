@@ -1,7 +1,7 @@
 import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele } from './Komposition.code'
+import { examples } from './Komposition.code'
 import { KompositionsDemo } from '../demos/KompositionsDemo'
 
 /**
@@ -14,8 +14,8 @@ export function Komposition() {
         <P>Über <Code>children</Code> steckt man beliebigen Inhalt in eine Komponente.</P>
         <TryIt
           id="praxis-komposition-einstieg"
-          {...beispiele['praxis-komposition-einstieg']}
-          modus="react"
+          {...examples['praxis-komposition-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -48,8 +48,8 @@ export function Komposition() {
       <Abschnitt titel="Slots statt Props-Wüste">
         <TryIt
           id="praxis-komposition-slots"
-          {...beispiele['praxis-komposition-slots']}
-          modus="react"
+          {...examples['praxis-komposition-slots']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -61,8 +61,8 @@ export function Komposition() {
         </P>
         <TryIt
           id="praxis-komposition-children-perf"
-          {...beispiele['praxis-komposition-children-perf']}
-          modus="react"
+          {...examples['praxis-komposition-children-perf']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -75,17 +75,17 @@ export function Komposition() {
         </P>
         <TryIt
           id="praxis-komposition-portal"
-          {...beispiele['praxis-komposition-portal']}
-          modus="react"
+          {...examples['praxis-komposition-portal']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-komposition-uebung"
-          {...beispiele['praxis-komposition-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-komposition-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Baue eine wiederverwendbare <Code>Tabs</Code>-Komponente. Sie bekommt eine Prop{' '}
@@ -110,28 +110,28 @@ export function Komposition() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Eine Komponente hat schon 8 Boolean-Props für kleine Varianten. Was hilft meistens?',
-            antworten: ['Noch mehr Props', 'Inhalt per children oder Slot-Props hineinreichen', 'Eine Klasse erben'],
-            richtig: 1,
-            erklaerung: 'Komposition hält die Komponente klein und den Aufrufer flexibel.',
+            question: 'Eine Komponente hat schon 8 Boolean-Props für kleine Varianten. Was hilft meistens?',
+            answers: ['Noch mehr Props', 'Inhalt per children oder Slot-Props hineinreichen', 'Eine Klasse erben'],
+            correct: 1,
+            explanation: 'Komposition hält die Komponente klein und den Aufrufer flexibel.',
           },
           {
-            frage: 'Wohin sprudelt ein Klick-Event in einem Portal?',
-            antworten: ['Durch den DOM-Baum (zu body)', 'Durch den React-Baum (zur Komponente, die das Portal rendert)'],
-            richtig: 1,
-            erklaerung: 'Für React bleibt das Portal ein Kind seiner Eltern-Komponente.',
+            question: 'Wohin sprudelt ein Klick-Event in einem Portal?',
+            answers: ['Durch den DOM-Baum (zu body)', 'Durch den React-Baum (zur Komponente, die das Portal rendert)'],
+            correct: 1,
+            explanation: 'Für React bleibt das Portal ein Kind seiner Eltern-Komponente.',
           },
           {
-            frage: 'Warum rendert <Teuer /> als children nicht neu, wenn der Rahmen seinen State ändert?',
-            antworten: [
+            question: 'Warum rendert <Teuer /> als children nicht neu, wenn der Rahmen seinen State ändert?',
+            answers: [
               'Weil children immer memoisiert sind',
               'Weil das JSX vom Elternteil erzeugt wurde und sich dort nichts geändert hat',
               'Das stimmt nicht, es rendert immer neu',
             ],
-            richtig: 1,
-            erklaerung: 'Die children-Prop ist dasselbe Objekt wie vorher - React kann den Teilbaum überspringen.',
+            correct: 1,
+            explanation: 'Die children-Prop ist dasselbe Objekt wie vorher - React kann den Teilbaum überspringen.',
           },
         ]}
       />

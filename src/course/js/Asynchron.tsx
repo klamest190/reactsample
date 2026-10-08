@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Asynchron.code'
+import { examples, codeBloecke } from './Asynchron.code'
 
 // Simulierte API, damit die Beispiele offline und ohne CORS-Probleme laufen.
 /**
@@ -17,7 +17,7 @@ export function Asynchron() {
         <P>Ein Timer läuft später - der restliche Code wartet nicht auf ihn.</P>
         <TryIt
           id="js-async-einstieg"
-          {...beispiele['js-async-einstieg']}
+          {...examples['js-async-einstieg']}
         />
       </Abschnitt>
 
@@ -30,7 +30,7 @@ export function Asynchron() {
         </P>
         <TryIt
           id="js-async-1"
-          {...beispiele['js-async-1']}
+          {...examples['js-async-1']}
         />
       </Abschnitt>
 
@@ -43,7 +43,7 @@ export function Asynchron() {
         </P>
         <TryIt
           id="js-async-2"
-          {...beispiele['js-async-2']}
+          {...examples['js-async-2']}
         />
       </Abschnitt>
 
@@ -61,7 +61,7 @@ export function Asynchron() {
         </Hinweis>
         <TryIt
           id="js-async-3"
-          {...beispiele['js-async-3']}
+          {...examples['js-async-3']}
         />
         <Hinweis variante="tipp">
           <Code>await</Code> auf oberster Ebene funktioniert hier im Editor und in ES-Modulen. In
@@ -77,7 +77,7 @@ export function Asynchron() {
           <strong>Task</strong> (Timer, Klicks, Netzwerk-Antworten). Dazwischen darf der Browser neu zeichnen.
         </P>
         <CodeBlock code={codeBloecke.eventloop} />
-        <TryIt id="js-async-eventloop" {...beispiele['js-async-eventloop']} />
+        <TryIt id="js-async-eventloop" {...examples['js-async-eventloop']} />
         <Hinweis variante="info">
           Das erklärt, warum eine lange Schleife die ganze Seite einfriert: Solange sie läuft, kommt keine Task und kein
           Neuzeichnen dran. React kann langsame Updates deshalb in kleine Stücke teilen und dazwischen dem Browser Luft
@@ -104,15 +104,15 @@ export function Asynchron() {
         />
         <TryIt
           id="js-async-4"
-          {...beispiele['js-async-4']}
+          {...examples['js-async-4']}
         />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
           id="js-async-uebung"
-          {...beispiele['js-async-uebung']}
-          aufgabe={
+          {...examples['js-async-uebung']}
+          task={
             <>
               <p>
                 Schreibe die <Code>async</Code>-Funktion <Code>loadNames(ids)</Code>. Sie bekommt ein
@@ -130,28 +130,28 @@ export function Asynchron() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: "In welcher Reihenfolge erscheint die Ausgabe? console.log('A'); setTimeout(() => console.log('B'), 0); console.log('C')",
-            antworten: ['A B C', 'A C B', 'B A C'],
-            richtig: 1,
-            erklaerung: 'Der Timer-Callback läuft erst, wenn der aktuelle Code fertig ist - selbst bei 0 ms.',
+            question: "In welcher Reihenfolge erscheint die Ausgabe? console.log('A'); setTimeout(() => console.log('B'), 0); console.log('C')",
+            answers: ['A B C', 'A C B', 'B A C'],
+            correct: 1,
+            explanation: 'Der Timer-Callback läuft erst, wenn der aktuelle Code fertig ist - selbst bei 0 ms.',
           },
           {
-            frage: 'fetch bekommt eine 404-Antwort. Was passiert?',
-            antworten: [
+            question: 'fetch bekommt eine 404-Antwort. Was passiert?',
+            answers: [
               'Das Promise wird rejected',
               'Das Promise wird erfüllt, response.ok ist false',
               'fetch gibt null zurück',
             ],
-            richtig: 1,
-            erklaerung: 'Nur Netzwerkfehler führen zu reject. HTTP-Fehler musst du über response.ok prüfen.',
+            correct: 1,
+            explanation: 'Nur Netzwerkfehler führen zu reject. HTTP-Fehler musst du über response.ok prüfen.',
           },
           {
-            frage: 'Wo darf await stehen?',
-            antworten: ['Überall', 'In async-Funktionen (und auf Modul-Ebene)', 'Nur in .then()'],
-            richtig: 1,
-            erklaerung: 'await ist nur in async-Funktionen erlaubt - und auf oberster Ebene von ES-Modulen.',
+            question: 'Wo darf await stehen?',
+            answers: ['Überall', 'In async-Funktionen (und auf Modul-Ebene)', 'Nur in .then()'],
+            correct: 1,
+            explanation: 'await ist nur in async-Funktionen erlaubt - und auf oberster Ebene von ES-Modulen.',
           },
         ]}
       />

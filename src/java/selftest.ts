@@ -8,15 +8,15 @@
  * im Kurs so, wie es in einer echten JVM wäre.
  */
 
-import { javaAusfuehren, type JavaTest } from './index'
+import { runJava, type JavaTest } from './index'
 import { runCases, type RuntimeResult } from '../selftest/results'
 
-type Fall = { name: string; code: string; erwartet: string[]; tests?: JavaTest[] }
+type Case = { name: string; code: string; expected: string[]; tests?: JavaTest[] }
 
 /** Kurzform: nur der Rumpf von main. */
-const main = (rumpf: string) => `public class Main {\n  public static void main(String[] args) {\n${rumpf}\n  }\n}`
+const main = (body: string) => `public class Main {\n  public static void main(String[] args) {\n${body}\n  }\n}`
 
-const faelle: Fall[] = [
+const cases: Case[] = [
   // --- Optional (used a lot with Spring Data in part 8) -----------------------
   {
     name: 'Optional: orElse, orElseGet and orElseThrow with a supplier',
@@ -34,104 +34,104 @@ public class Main {
     }
   }
 }`,
-    erwartet: ['fallback', 'computed', 'Ada', 'caught: nothing here'],
+    expected: ['fallback', 'computed', 'Ada', 'caught: nothing here'],
   },
   // --- Zahlen und Typen ----------------------------------------------------
   {
     name: 'int-Division schneidet ab',
     code: main('    System.out.println(7 / 2);\n    System.out.println(7 % 2);\n    System.out.println(7 / 2.0);'),
-    erwartet: ['3', '1', '3.5'],
+    expected: ['3', '1', '3.5'],
   },
   {
     name: 'double druckt immer mit Punkt',
     code: main('    double d = 5;\n    System.out.println(d);\n    System.out.println(0.1 + 0.2);\n    System.out.println(1.0 / 0);'),
-    erwartet: ['5.0', '0.30000000000000004', 'Infinity'],
+    expected: ['5.0', '0.30000000000000004', 'Infinity'],
   },
   {
     name: 'int läuft über',
     code: main('    int max = Integer.MAX_VALUE;\n    System.out.println(max + 1);'),
-    erwartet: ['-2147483648'],
+    expected: ['-2147483648'],
   },
   {
     name: 'char rechnet als Zahl',
     code: main("    char c = 'A';\n    System.out.println(c);\n    System.out.println((int) c);\n    System.out.println((char) (c + 1));\n    System.out.println(c + 1);"),
-    erwartet: ['A', '65', 'B', '66'],
+    expected: ['A', '65', 'B', '66'],
   },
   {
     name: 'Casting und Rundung',
     code: main('    double d = 3.99;\n    System.out.println((int) d);\n    System.out.println(Math.round(d));\n    System.out.println(Math.floor(d));'),
-    erwartet: ['3', '4', '3.0'],
+    expected: ['3', '4', '3.0'],
   },
   {
     name: 'Division durch null wirft',
     code: main('    System.out.println(5 / 0);'),
-    erwartet: ['Exception in thread "main" java.lang.ArithmeticException: / by zero', '   at Main.java:3'],
+    expected: ['Exception in thread "main" java.lang.ArithmeticException: / by zero', '   at Main.java:3'],
   },
   {
     name: 'Integer.parseInt und NumberFormatException',
     code: main('    System.out.println(Integer.parseInt("42") + 1);\n    try {\n      Integer.parseInt("x");\n    } catch (NumberFormatException e) {\n      System.out.println("Fehler: " + e.getMessage());\n    }'),
-    erwartet: ['43', 'Fehler: For input string: "x"'],
+    expected: ['43', 'Fehler: For input string: "x"'],
   },
 
   // --- Strings -------------------------------------------------------------
   {
     name: 'String-Methoden',
     code: main('    String s = "  Hallo Java  ";\n    System.out.println(s.trim().toUpperCase());\n    System.out.println(s.contains("Java"));\n    System.out.println("abc".charAt(1));\n    System.out.println("a,b,c".split(",").length);'),
-    erwartet: ['HALLO JAVA', 'true', 'b', '3'],
+    expected: ['HALLO JAVA', 'true', 'b', '3'],
   },
   {
     name: '== vergleicht bei Strings die Identität',
     code: main('    String a = "hi";\n    String b = "hi";\n    String c = new String("hi");\n    System.out.println(a == b);\n    System.out.println(a == c);\n    System.out.println(a.equals(c));'),
-    erwartet: ['true', 'false', 'true'],
+    expected: ['true', 'false', 'true'],
   },
   {
     name: 'String.format und printf',
     code: main('    System.out.printf("%s ist %d Jahre alt%n", "Ada", 36);\n    System.out.println(String.format("%.2f", 3.14159));\n    System.out.printf("[%5d][%-5s]%n", 42, "x");'),
-    erwartet: ['Ada ist 36 Jahre alt', '3.14', '[   42][x    ]'],
+    expected: ['Ada ist 36 Jahre alt', '3.14', '[   42][x    ]'],
   },
   {
     name: 'StringBuilder',
     code: main('    StringBuilder sb = new StringBuilder();\n    sb.append("a").append(1).append(true);\n    System.out.println(sb.toString());\n    System.out.println(sb.length());'),
-    erwartet: ['a1true', '6'],
+    expected: ['a1true', '6'],
   },
 
   // --- Kontrollfluss -------------------------------------------------------
   {
     name: 'if / else / ternär',
     code: main('    int n = 7;\n    if (n % 2 == 0) System.out.println("gerade");\n    else System.out.println("ungerade");\n    System.out.println(n > 5 ? "groß" : "klein");'),
-    erwartet: ['ungerade', 'groß'],
+    expected: ['ungerade', 'groß'],
   },
   {
     name: 'switch klassisch mit Durchfallen',
     code: main('    int tag = 6;\n    switch (tag) {\n      case 6:\n      case 7:\n        System.out.println("Wochenende");\n        break;\n      default:\n        System.out.println("Arbeitstag");\n    }'),
-    erwartet: ['Wochenende'],
+    expected: ['Wochenende'],
   },
   {
     name: 'switch als Ausdruck',
     code: main('    int tag = 3;\n    String name = switch (tag) {\n      case 1, 2, 3, 4, 5 -> "Arbeitstag";\n      default -> "Wochenende";\n    };\n    System.out.println(name);'),
-    erwartet: ['Arbeitstag'],
+    expected: ['Arbeitstag'],
   },
   {
     name: 'Schleifen',
     code: main('    int summe = 0;\n    for (int i = 1; i <= 5; i++) summe += i;\n    System.out.println(summe);\n    int k = 3;\n    while (k > 0) { System.out.print(k + " "); k--; }\n    System.out.println();\n    do { System.out.println("einmal"); } while (false);'),
-    erwartet: ['15', '3 2 1 ', 'einmal'],
+    expected: ['15', '3 2 1 ', 'einmal'],
   },
   {
     name: 'break und continue',
     code: main('    for (int i = 0; i < 10; i++) {\n      if (i % 2 == 0) continue;\n      if (i > 6) break;\n      System.out.print(i);\n    }\n    System.out.println();'),
-    erwartet: ['135'],
+    expected: ['135'],
   },
 
   // --- Arrays --------------------------------------------------------------
   {
     name: 'Arrays: feste Länge, Standardwerte',
     code: main('    int[] zahlen = new int[3];\n    zahlen[0] = 5;\n    System.out.println(zahlen.length);\n    System.out.println(zahlen[1]);\n    System.out.println(Arrays.toString(zahlen));\n    String[] namen = new String[2];\n    System.out.println(namen[0]);'),
-    erwartet: ['3', '0', '[5, 0, 0]', 'null'],
+    expected: ['3', '0', '[5, 0, 0]', 'null'],
   },
   {
     name: 'ArrayIndexOutOfBounds',
     code: main('    int[] a = {1, 2};\n    System.out.println(a[2]);'),
-    erwartet: ['Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2', '   at Main.java:4'],
+    expected: ['Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2', '   at Main.java:4'],
   },
   {
     name: 'Array-Literale in allen Schreibweisen',
@@ -142,17 +142,17 @@ public class Main {
         '    int[] leer = new int[0];\n' +
         '    System.out.println(Arrays.toString(a) + Arrays.toString(b) + Arrays.toString(c) + leer.length);',
     ),
-    erwartet: ['[1, 2][3, 4][0, 0]0'],
+    expected: ['[1, 2][3, 4][0, 0]0'],
   },
   {
     name: 'for-each und zweidimensionale Arrays',
     code: main('    int[][] gitter = {{1, 2}, {3, 4}};\n    int summe = 0;\n    for (int[] reihe : gitter) for (int wert : reihe) summe += wert;\n    System.out.println(summe);\n    System.out.println(Arrays.deepToString(gitter));'),
-    erwartet: ['10', '[[1, 2], [3, 4]]'],
+    expected: ['10', '[[1, 2], [3, 4]]'],
   },
   {
     name: 'Array ohne Arrays.toString',
     code: main('    int[] a = {1};\n    String s = "" + a;\n    System.out.println(s.startsWith("[I@"));'),
-    erwartet: ['true'],
+    expected: ['true'],
   },
 
   // --- Methoden ------------------------------------------------------------
@@ -174,7 +174,7 @@ public class Main {
     System.out.println(summe(1, 2, 3));
   }
 }`,
-    erwartet: ['42', 'abab', '120', '6'],
+    expected: ['42', 'abab', '120', '6'],
   },
   {
     name: 'Parameter sind Kopien',
@@ -190,7 +190,7 @@ public class Main {
     System.out.println(zahl + " " + array[0]);
   }
 }`,
-    erwartet: ['1 99'],
+    expected: ['1 99'],
   },
 
   // --- Klassen -------------------------------------------------------------
@@ -217,7 +217,7 @@ class Person {
   @Override
   public String toString() { return name + " (" + alter + ")"; }
 }`,
-    erwartet: ['Ada', 'Ada (37)', 'false'],
+    expected: ['Ada', 'Ada (37)', 'false'],
   },
   {
     name: 'static zählt für die ganze Klasse',
@@ -232,7 +232,7 @@ class Person {
     System.out.println(anzahl);
   }
 }`,
-    erwartet: ['2'],
+    expected: ['2'],
   },
   {
     name: 'Felder haben Standardwerte',
@@ -247,12 +247,12 @@ class Person {
     System.out.println(l.zahl + " " + l.text + " " + l.flagge);
   }
 }`,
-    erwartet: ['0 null false'],
+    expected: ['0 null false'],
   },
   {
     name: 'NullPointerException',
     code: main('    String s = null;\n    System.out.println(s.length());'),
-    erwartet: [
+    expected: [
       'Exception in thread "main" java.lang.NullPointerException: Cannot invoke "length()" because the value is null',
       '   at Main.java:4',
     ],
@@ -286,7 +286,7 @@ class Katze extends Tier {
   @Override
   String sagHallo() { return super.sagHallo() + "!"; }
 }`,
-    erwartet: ['Rex sagt Wuff', 'Mimi sagt Miau!', 'true'],
+    expected: ['Rex sagt Wuff', 'Mimi sagt Miau!', 'true'],
   },
   {
     name: 'Interface mit default-Methode',
@@ -304,7 +304,7 @@ interface Fahrzeug {
 class Auto implements Fahrzeug {
   public int raeder() { return 4; }
 }`,
-    erwartet: ['Fahrzeug mit 4 Rädern', 'true'],
+    expected: ['Fahrzeug mit 4 Rädern', 'true'],
   },
   {
     name: 'enum mit Feld und switch',
@@ -324,7 +324,7 @@ class Auto implements Fahrzeug {
     }
   }
 }`,
-    erwartet: ['ROT = Halt (0)', 'GRUEN = Fahr (1)', 'stehen'],
+    expected: ['ROT = Halt (0)', 'GRUEN = Fahr (1)', 'stehen'],
   },
   {
     name: 'record',
@@ -337,7 +337,7 @@ class Auto implements Fahrzeug {
     System.out.println(p.equals(new Punkt(1, 2)));
   }
 }`,
-    erwartet: ['Punkt[x=1, y=2]', '3', 'true'],
+    expected: ['Punkt[x=1, y=2]', '3', 'true'],
   },
 
   // --- Collections ---------------------------------------------------------
@@ -354,7 +354,7 @@ class Auto implements Fahrzeug {
         '    for (String n : namen) System.out.print(n + " ");\n' +
         '    System.out.println();',
     ),
-    erwartet: ['[Alan, Ada, Grace]', '3 Ada true', 'Ada Grace '],
+    expected: ['[Alan, Ada, Grace]', '3 Ada true', 'Ada Grace '],
   },
   {
     name: 'HashMap',
@@ -369,7 +369,7 @@ class Auto implements Fahrzeug {
         '    for (String name : punkte.keySet()) System.out.print(name + " ");\n' +
         '    System.out.println();',
     ),
-    erwartet: ['12', '0', '2', 'Ada Alan '],
+    expected: ['12', '0', '2', 'Ada Alan '],
   },
   {
     name: 'Autoboxing und List.of',
@@ -382,7 +382,7 @@ class Auto implements Fahrzeug {
         '    for (int z : kopie) summe += z;\n' +
         '    System.out.println(summe);',
     ),
-    erwartet: ['[1, 2, 3]', '6'],
+    expected: ['[1, 2, 3]', '6'],
   },
   {
     name: 'Lambdas und Streams',
@@ -394,7 +394,7 @@ class Auto implements Fahrzeug {
         '    System.out.println(kurz);\n' +
         '    System.out.println(namen.stream().mapToInt(String::length).sum());',
     ),
-    erwartet: ['AAG', '[ADA]', '12'],
+    expected: ['AAG', '[ADA]', '12'],
   },
 
   // --- Exceptions ----------------------------------------------------------
@@ -410,7 +410,7 @@ class Auto implements Fahrzeug {
         '      System.out.println("finally läuft immer");\n' +
         '    }',
     ),
-    erwartet: ['gefangen: Index 5 out of bounds for length 1', 'finally läuft immer'],
+    expected: ['gefangen: Index 5 out of bounds for length 1', 'finally läuft immer'],
   },
   {
     name: 'Eigene Exception',
@@ -431,14 +431,14 @@ class Auto implements Fahrzeug {
     }
   }
 }`,
-    erwartet: ['Erst ab 18, nicht mit 16', 'true'],
+    expected: ['Erst ab 18, nicht mit 16', 'true'],
   },
 
   // --- Der Prüfer (Kompilierfehler) ----------------------------------------
   {
     name: 'Typfehler wird VOR dem Lauf gemeldet',
     code: main('    int zahl = "drei";\n    System.out.println("läuft nie");'),
-    erwartet: [
+    expected: [
       'Main.java:3: error: incompatible types: String cannot be converted to int',
       '   String passt nicht in eine Variable vom Typ int. In Java muss der Typ genau stimmen - anders als in JavaScript.',
       '1 Fehler - das Programm wurde nicht gestartet.',
@@ -447,7 +447,7 @@ class Auto implements Fahrzeug {
   {
     name: 'Unbekannte Variable',
     code: main('    System.out.println(nichtDa);'),
-    erwartet: [
+    expected: [
       'Main.java:3: error: cannot find symbol: variable nichtDa',
       '   Die Variable `nichtDa` ist hier nicht bekannt. Wurde sie deklariert (z. B. `int nichtDa = …;`) - und steht sie im selben Block?',
       '1 Fehler - das Programm wurde nicht gestartet.',
@@ -456,7 +456,7 @@ class Auto implements Fahrzeug {
   {
     name: 'if braucht boolean',
     code: main('    int n = 1;\n    if (n) System.out.println("nie");'),
-    erwartet: [
+    expected: [
       'Main.java:4: error: incompatible types: int cannot be converted to boolean',
       '   Eine Bedingung muss in Java ein `boolean` sein, nicht int. In JavaScript wäre das „truthy“ - in Java ein Fehler.',
       '1 Fehler - das Programm wurde nicht gestartet.',
@@ -470,7 +470,7 @@ class Auto implements Fahrzeug {
   }
   public static void main(String[] args) { System.out.println(verdoppeln(2)); }
 }`,
-    erwartet: [
+    expected: [
       'Main.java:2: error: missing return statement',
       '   Die Methode `verdoppeln` verspricht ein int zurückzugeben, tut es aber nie. Fehlt ein `return`?',
       '1 Fehler - das Programm wurde nicht gestartet.',
@@ -479,22 +479,22 @@ class Auto implements Fahrzeug {
   {
     name: 'Syntaxfehler: fehlendes Semikolon',
     code: main('    int a = 1\n    int b = 2;'),
-    erwartet: ["Main.java:4: error: ';' expected, found 'int'"],
+    expected: ["Main.java:4: error: ';' expected, found 'int'"],
   },
   {
     name: 'Endlosschleife wird abgebrochen',
     code: main('    while (true) { int x = 1; }'),
-    erwartet: ['Das Programm läuft zu lange - vermutlich eine Endlosschleife.'],
+    expected: ['Das Programm läuft zu lange - vermutlich eine Endlosschleife.'],
   },
 
   // --- Tests der Übungen ---------------------------------------------------
   {
     name: 'Testausdrücke greifen auf main zu',
     code: main('    int summe = 2 + 3;\n    String gruss = "Hi";'),
-    erwartet: [],
+    expected: [],
     tests: [
-      { name: 'summe ist 5', ausdruck: 'summe', erwartet: 5 },
-      { name: 'gruss ist "Hi"', ausdruck: 'gruss', erwartet: 'Hi' },
+      { name: 'summe ist 5', expression: 'summe', expected: 5 },
+      { name: 'gruss ist "Hi"', expression: 'gruss', expected: 'Hi' },
     ],
   },
   {
@@ -503,10 +503,10 @@ class Auto implements Fahrzeug {
   static int addiere(int a, int b) { return a + b; }
   public static void main(String[] args) { System.out.println(addiere(1, 1)); }
 }`,
-    erwartet: ['2'],
+    expected: ['2'],
     tests: [
-      { name: 'addiere(2, 3) ist 5', ausdruck: 'addiere(2, 3)', erwartet: 5 },
-      { name: 'Ausgabe enthält 2', ausdruck: 'output.contains("2")', erwartet: true },
+      { name: 'addiere(2, 3) ist 5', expression: 'addiere(2, 3)', expected: 5 },
+      { name: 'Ausgabe enthält 2', expression: 'output.contains("2")', expected: true },
     ],
   },
 ]
@@ -518,16 +518,16 @@ class Auto implements Fahrzeug {
  * Führt alle Fälle aus. Läuft ohne DOM und ohne React - deshalb sowohl auf der
  * Kommandozeile (src/selftest/java.content.test.ts) als auch in der Selbsttest-Seite.
  */
-export function javaLaufzeitPruefen(): RuntimeResult[] {
-  return runCases(faelle, (fall) => {
-    const lauf = javaAusfuehren(fall.code, { sprache: 'de', tests: fall.tests })
-    const bekommen = lauf.zeilen.map((z) => z.text)
-    const testFehler = (lauf.ergebnisse ?? []).filter((e) => !e.ok)
+export function checkJavaRuntime(): RuntimeResult[] {
+  return runCases(cases, (testCase) => {
+    const run = runJava(testCase.code, { language: 'de', tests: testCase.tests })
+    const actual = run.lines.map((z) => z.text)
+    const testFailure = (run.results ?? []).filter((e) => !e.ok)
 
-    if (bekommen.length !== fall.erwartet.length || bekommen.some((z, i) => z !== fall.erwartet[i])) {
-      return `erwartet ${JSON.stringify(fall.erwartet)}, bekommen ${JSON.stringify(bekommen)}`
+    if (actual.length !== testCase.expected.length || actual.some((z, i) => z !== testCase.expected[i])) {
+      return `erwartet ${JSON.stringify(testCase.expected)}, bekommen ${JSON.stringify(actual)}`
     }
-    if (testFehler.length) return testFehler.map((e) => `„${e.name}“: ${e.meldung}`).join(' · ')
+    if (testFailure.length) return testFailure.map((e) => `„${e.name}“: ${e.message}`).join(' · ')
     return null
   })
 }

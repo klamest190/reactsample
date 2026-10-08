@@ -9,7 +9,7 @@ import { useAktiverAbschnitt } from '../hooks/useActiveSection'
 import { KapitelIdProvider } from '../context/ChapterContext'
 import { useSprache, useTexte } from '../i18n/LanguageContext'
 import { alleKapitel, aufbauendAuf, type KapitelMitTeil } from '../course/course'
-import { UebungenBereich } from '../learning/Exercises'
+import { ExercisesSection } from '../learning/Exercises'
 
 /**
  * Rahmen für jedes Kapitel - immer derselbe Aufbau:
@@ -147,7 +147,7 @@ export function KapitelSeite({
           <ErrorBoundary>
             {/* Übungen laden unabhängig vom Kapitel - ohne eigenen Platzhalter, sie stehen ja ganz unten. */}
             <Suspense fallback={<Platzhalter label={t.kapitelLaedt} bloecke={1} />}>
-              <UebungenBereich kapitelId={kapitel.id} />
+              <ExercisesSection chapterId={kapitel.id} />
             </Suspense>
           </ErrorBoundary>
 
@@ -191,7 +191,7 @@ export function KapitelSeite({
             {quizStand && (
               <p className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
                 <Icon name="frage" className="size-4" />
-                {t.quizStand(quizStand.richtig, quizStand.gesamt)}
+                {t.quizStand(quizStand.correct, quizStand.total)}
               </p>
             )}
             <div className="flex flex-wrap items-center gap-3">

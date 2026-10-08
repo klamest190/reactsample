@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Vergleich.code'
+import { examples, codeBloecke } from './Vergleich.code'
 
 /**
  * KAPITEL 7.10 - Java, JavaScript & React im Vergleich
@@ -19,8 +19,8 @@ export function Vergleich() {
           Dieselbe Aufgabe, zwei Sprachen: Summe und Durchschnitt einer Zahlenreihe. Beide Editoren
           laufen hier auf derselben Seite - achte auf das Abzeichen oben rechts.
         </P>
-        <TryIt modus="java" titel="Java" id="java-vergleich-java" {...beispiele['java-vergleich-java']} />
-        <TryIt titel="JavaScript" id="java-vergleich-js" {...beispiele['java-vergleich-js']} />
+        <TryIt mode="java" title="Java" id="java-vergleich-java" {...examples['java-vergleich-java']} />
+        <TryIt title="JavaScript" id="java-vergleich-js" {...examples['java-vergleich-js']} />
         <P>
           Zwei Dinge fallen auf: Java braucht deutlich mehr Rahmen - und der Cast{' '}
           <Code>(double)</Code> ist Pflicht, weil <Code>int / int</Code> sonst abschneiden würde (
@@ -59,9 +59,9 @@ export function Vergleich() {
           Eine Aufgabenliste, gefiltert nach „offen“. Erst Java, dann JavaScript, dann React - und im
           dritten Fall wird daraus eine Oberfläche, die man anklicken kann.
         </P>
-        <TryIt modus="java" titel="Java" id="java-vergleich-liste-java" {...beispiele['java-vergleich-liste-java']} />
-        <TryIt titel="JavaScript" id="java-vergleich-liste-js" {...beispiele['java-vergleich-liste-js']} />
-        <TryIt modus="react" titel="React" id="java-vergleich-liste-react" {...beispiele['java-vergleich-liste-react']} />
+        <TryIt mode="java" title="Java" id="java-vergleich-liste-java" {...examples['java-vergleich-liste-java']} />
+        <TryIt title="JavaScript" id="java-vergleich-liste-js" {...examples['java-vergleich-liste-js']} />
+        <TryIt mode="react" title="React" id="java-vergleich-liste-react" {...examples['java-vergleich-liste-react']} />
         <P>
           Die Kette <Code>stream().filter(…).toList()</Code> und{' '}
           <Code>{'tasks.filter(t => !t.done)'}</Code> sagen dasselbe. React fügt nur eines hinzu:
@@ -80,7 +80,7 @@ export function Vergleich() {
           Die App selbst ist zu 100 % React und TypeScript. Java kommt hier nur an zwei Stellen vor -
           und beide sind sauber getrennt vom Rest:
         </P>
-        <CodeBlock code={codeBloecke.struktur} titel="Projektstruktur" />
+        <CodeBlock code={codeBloecke.struktur} title="Projektstruktur" />
         <Liste>
           <li>
             <strong>☕ <Code>src/java/</Code></strong> - die Java-Laufzeit. Reines TypeScript, ohne
@@ -128,7 +128,7 @@ export function Vergleich() {
             <Code>double</Code>, lässt <Code>int</Code> überlaufen und wirft echte Exceptions.
           </li>
         </Liste>
-        <TryIt modus="java" id="java-vergleich-laufzeit" {...beispiele['java-vergleich-laufzeit']} />
+        <TryIt mode="java" id="java-vergleich-laufzeit" {...examples['java-vergleich-laufzeit']} />
         <Hinweis variante="warnung">
           Die Laufzeit deckt die Grundlagen ab, nicht ganz Java. Es fehlen unter anderem Threads,
           Dateizugriff, <Code>Scanner</Code> (es gibt keine Tastatureingabe), Pakete über mehrere
@@ -170,10 +170,10 @@ export function Vergleich() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-vergleich-uebung"
-          {...beispiele['java-vergleich-uebung']}
-          aufgabe={
+          {...examples['java-vergleich-uebung']}
+          task={
             <>
               <p>
                 Übersetze zwei JavaScript-Einzeiler nach Java. Die Vorlagen stehen als Kommentar im
@@ -195,34 +195,34 @@ export function Vergleich() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was stimmt über Java und JavaScript?',
-            antworten: [
+            question: 'Was stimmt über Java und JavaScript?',
+            answers: [
               'JavaScript ist eine vereinfachte Version von Java.',
               'Beide sind unabhängige Sprachen - der ähnliche Name war Marketing.',
               'Java läuft im Browser, JavaScript auf dem Server.',
               'Beide werden von derselben Laufzeit ausgeführt.',
             ],
-            richtig: 1,
-            erklaerung: 'JavaScript hieß 1995 aus Marketinggründen so, weil Java damals populär war. Verwandt sind die Sprachen nicht.',
+            correct: 1,
+            explanation: 'JavaScript hieß 1995 aus Marketinggründen so, weil Java damals populär war. Verwandt sind die Sprachen nicht.',
           },
           {
-            frage: 'Welcher Ordner in diesem Projekt enthält ausschließlich Java-Logik?',
-            antworten: ['src/learning/', 'src/java/', 'src/course/', 'src/components/'],
-            richtig: 1,
-            erklaerung: 'src/java/ ist die Java-Laufzeit: Lexer, Parser, Prüfer, Interpreter - reines TypeScript ohne React.',
+            question: 'Welcher Ordner in diesem Projekt enthält ausschließlich Java-Logik?',
+            answers: ['src/learning/', 'src/java/', 'src/course/', 'src/components/'],
+            correct: 1,
+            explanation: 'src/java/ ist die Java-Laufzeit: Lexer, Parser, Prüfer, Interpreter - reines TypeScript ohne React.',
           },
           {
-            frage: 'Wo würdest du eine Oberfläche mit Klickzustand bauen?',
-            antworten: [
+            question: 'Wo würdest du eine Oberfläche mit Klickzustand bauen?',
+            answers: [
               'in Java, weil es typsicher ist',
               'in React, weil sich die Anzeige automatisch aus dem State ergibt',
               'das ist gleichwertig',
               'in reinem JavaScript ohne Bibliothek',
             ],
-            richtig: 1,
-            erklaerung: 'Genau dafür gibt es React: Du beschreibst das Ergebnis, React kümmert sich um die Änderungen am DOM.',
+            correct: 1,
+            explanation: 'Genau dafür gibt es React: Du beschreibst das Ergebnis, React kümmert sich um die Änderungen am DOM.',
           },
         ]}
       />

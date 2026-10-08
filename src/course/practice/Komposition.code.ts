@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'praxis-komposition-einstieg': {
     code: js`
       function Card({ children }) {
@@ -120,7 +120,7 @@ export const beispiele = {
     `,
   },
   'praxis-komposition-uebung': {
-    tipps: {
+    hints: {
       de: [
         '`Tabs` bekommt ein Array `tabs` mit `{ title, content }` und hält den aktiven Index selbst.',
         'Der Inhalt ist JSX - rendere einfach `tabs[active].content`.',
@@ -145,7 +145,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       function Tabs({ tabs, extra }) {
         const [active, setActive] = useState(0)
 
@@ -189,7 +189,7 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Tabs ist eine Komponente und wird zweimal benutzt', en: 'Tabs is a component and used twice' },
-        pruefung: js`
+        script: js`
           expect(code).toMatch(/function Tabs\s*\(/)
           expect((code.match(/<Tabs[\s>]/g) ?? []).length).toBeGreaterThan(1)
           expect(code).toMatch(/extra=\{/)
@@ -197,7 +197,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Ein Klick auf einen Tab wechselt den Inhalt', en: 'Clicking a tab switches the content' },
-        pruefung: js`
+        script: js`
           await render()
           const [erster, zweiter] = findAll('button')
           const vorher = text()
@@ -209,7 +209,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Der aktive Tab ist fett', en: 'The active tab is bold' },
-        pruefung: js`
+        script: js`
           await render()
           const knopf = findAll('button')[1]
           await click(knopf)
@@ -218,4 +218,4 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>

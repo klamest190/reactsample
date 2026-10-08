@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Referenzen.code'
+import { examples, codeBloecke } from './Referenzen.code'
 
 /**
  * KAPITEL 1.6 - Referenzen & Immutability
@@ -15,7 +15,7 @@ export function Referenzen() {
         <P>Zwei Variablen, aber nur ein Array: Zuweisen kopiert nicht.</P>
         <TryIt
           id="js-referenzen-einstieg"
-          {...beispiele['js-referenzen-einstieg']}
+          {...examples['js-referenzen-einstieg']}
         />
       </Abschnitt>
 
@@ -28,10 +28,10 @@ export function Referenzen() {
         </P>
         <TryIt
           id="js-referenzen-1"
-          {...beispiele['js-referenzen-1']}
+          {...examples['js-referenzen-1']}
         />
         <CodeBlock
-          titel="Vorstellung im Speicher"
+          title="Vorstellung im Speicher"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -48,7 +48,7 @@ export function Referenzen() {
         />
         <TryIt
           id="js-referenzen-2"
-          {...beispiele['js-referenzen-2']}
+          {...examples['js-referenzen-2']}
         />
         <Hinweis variante="info">
           Unveränderlichkeit (<strong>Immutability</strong>) hat noch mehr Vorteile: Alte Zustände
@@ -61,7 +61,7 @@ export function Referenzen() {
         <P>Diese Muster wirst du in React immer wieder schreiben:</P>
         <TryIt
           id="js-referenzen-3"
-          {...beispiele['js-referenzen-3']}
+          {...examples['js-referenzen-3']}
         />
       </Abschnitt>
 
@@ -73,7 +73,7 @@ export function Referenzen() {
         </P>
         <TryIt
           id="js-referenzen-4"
-          {...beispiele['js-referenzen-4']}
+          {...examples['js-referenzen-4']}
         />
         <Liste>
           <li>Tief verschachtelten State möglichst vermeiden - flache Strukturen sind leichter zu aktualisieren.</li>
@@ -87,8 +87,8 @@ export function Referenzen() {
       <Abschnitt titel="Übung">
         <TryIt
           id="js-referenzen-uebung"
-          {...beispiele['js-referenzen-uebung']}
-          aufgabe={
+          {...examples['js-referenzen-uebung']}
+          task={
             <>
               <p>
                 Schreibe drei Funktionen, die ein Array von Todos <strong>nicht verändern</strong>,
@@ -113,28 +113,28 @@ export function Referenzen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was ergibt [1] === [1] ?',
-            antworten: ['true', 'false'],
-            richtig: 1,
-            erklaerung: 'Zwei Array-Literale sind zwei verschiedene Objekte mit verschiedenen Referenzen.',
+            question: 'Was ergibt [1] === [1] ?',
+            answers: ['true', 'false'],
+            correct: 1,
+            explanation: 'Zwei Array-Literale sind zwei verschiedene Objekte mit verschiedenen Referenzen.',
           },
           {
-            frage: 'Warum rendert React nach list.push(x); setList(list) nicht neu?',
-            antworten: [
+            question: 'Warum rendert React nach list.push(x); setList(list) nicht neu?',
+            answers: [
               'push ist in React verboten',
               'Die Referenz ist dieselbe - React sieht keine Änderung',
               'setListe braucht eine Funktion',
             ],
-            richtig: 1,
-            erklaerung: 'React vergleicht alt und neu mit Object.is. Gleiche Referenz = keine Änderung.',
+            correct: 1,
+            explanation: 'React vergleicht alt und neu mit Object.is. Gleiche Referenz = keine Änderung.',
           },
           {
-            frage: 'Was kopiert { ...user } ?',
-            antworten: ['Alle Ebenen', 'Nur die oberste Ebene', 'Nichts, es ist eine Referenz'],
-            richtig: 1,
-            erklaerung: 'Spread ist eine flache Kopie - verschachtelte Objekte werden weiter geteilt.',
+            question: 'Was kopiert { ...user } ?',
+            answers: ['Alle Ebenen', 'Nur die oberste Ebene', 'Nichts, es ist eine Referenz'],
+            correct: 1,
+            explanation: 'Spread ist eine flache Kopie - verschachtelte Objekte werden weiter geteilt.',
           },
         ]}
       />

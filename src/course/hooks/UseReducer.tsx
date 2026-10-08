@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './UseReducer.code'
+import { examples, codeBloecke } from './UseReducer.code'
 import { AufgabenDemo } from '../demos/AufgabenDemo'
 
 /**
@@ -16,8 +16,8 @@ export function UseReducer() {
         <P><Code>useReducer</Code>: Die Komponente schickt nur Actions, der Reducer entscheidet über den neuen State.</P>
         <TryIt
           id="hooks-usereducer-einstieg"
-          {...beispiele['hooks-usereducer-einstieg']}
-          modus="react"
+          {...examples['hooks-usereducer-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -46,7 +46,7 @@ export function UseReducer() {
         </P>
         <TryIt
           id="hooks-usereducer-js"
-          {...beispiele['hooks-usereducer-js']}
+          {...examples['hooks-usereducer-js']}
         />
         <Hinweis variante="warnung">
           Ein Reducer muss <strong>rein</strong> sein: gleiche Eingabe → gleiche Ausgabe, keine
@@ -59,8 +59,8 @@ export function UseReducer() {
       <Abschnitt titel="useReducer in einer Komponente">
         <TryIt
           id="hooks-usereducer-react"
-          {...beispiele['hooks-usereducer-react']}
-          modus="react"
+          {...examples['hooks-usereducer-react']}
+          mode="react"
         />
         <AufgabenDemo />
       </Abschnitt>
@@ -90,8 +90,8 @@ export function UseReducer() {
       <Abschnitt titel="Übung">
         <TryIt
           id="hooks-usereducer-uebung"
-          {...beispiele['hooks-usereducer-uebung']}
-          aufgabe={
+          {...examples['hooks-usereducer-uebung']}
+          task={
             <>
               <p>
                 Schreibe den Reducer für einen Warenkorb. Der State ist ein Array{' '}
@@ -122,28 +122,28 @@ export function UseReducer() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was darf ein Reducer NICHT tun?',
-            antworten: [
+            question: 'Was darf ein Reducer NICHT tun?',
+            answers: [
               'Ein neues Objekt zurückgeben',
               'Eine Anfrage an den Server schicken',
               'Einen switch verwenden',
             ],
-            richtig: 1,
-            erklaerung: 'Reducer sind rein. Nebenwirkungen gehören in Event-Handler oder Effekte.',
+            correct: 1,
+            explanation: 'Reducer sind rein. Nebenwirkungen gehören in Event-Handler oder Effekte.',
           },
           {
-            frage: 'Was gibt useReducer zurück?',
-            antworten: ['[state, setState]', '[state, dispatch]', '{ state, reducer }'],
-            richtig: 1,
-            erklaerung: 'dispatch(action) schickt eine Action an den Reducer.',
+            question: 'Was gibt useReducer zurück?',
+            answers: ['[state, setState]', '[state, dispatch]', '{ state, reducer }'],
+            correct: 1,
+            explanation: 'dispatch(action) schickt eine Action an den Reducer.',
           },
           {
-            frage: 'Wie benennt man Actions am besten?',
-            antworten: ["Nach dem Ereignis: 'added'", "Nach dem Setter: 'setList'"],
-            richtig: 0,
-            erklaerung: 'Die Action beschreibt, was passiert ist - der Reducer entscheidet über die Folgen.',
+            question: 'Wie benennt man Actions am besten?',
+            answers: ["Nach dem Ereignis: 'added'", "Nach dem Setter: 'setList'"],
+            correct: 0,
+            explanation: 'Die Action beschreibt, was passiert ist - der Reducer entscheidet über die Folgen.',
           },
         ]}
       />

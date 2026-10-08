@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Fehlerbehandlung.code'
+import { examples, codeBloecke } from './Fehlerbehandlung.code'
 import { FehlerDemo } from '../demos/FehlerDemo'
 
 /**
@@ -15,8 +15,8 @@ export function Fehlerbehandlung() {
         <P>Eine Error Boundary fängt den Absturz einer Kind-Komponente ab - der Rest der Seite läuft weiter.</P>
         <TryIt
           id="praxis-fehler-einstieg"
-          {...beispiele['praxis-fehler-einstieg']}
-          modus="react"
+          {...examples['praxis-fehler-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -38,7 +38,7 @@ export function Fehlerbehandlung() {
           Bereiche.
         </P>
         <CodeBlock
-          titel="Minimal"
+          title="Minimal"
           code={codeBloecke.beispiel1}
         />
         <P>
@@ -58,16 +58,16 @@ export function Fehlerbehandlung() {
         </P>
         <TryIt
           id="praxis-fehler-boundary"
-          {...beispiele['praxis-fehler-boundary']}
-          modus="react"
+          {...examples['praxis-fehler-boundary']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Fehler in Handlern und asynchronem Code">
         <TryIt
           id="praxis-fehler-async"
-          {...beispiele['praxis-fehler-async']}
-          modus="react"
+          {...examples['praxis-fehler-async']}
+          mode="react"
         />
         <Hinweis variante="info">
           In der Entwicklung zeigt der Browser trotz Boundary Fehler in der Konsole, und manche
@@ -79,9 +79,9 @@ export function Fehlerbehandlung() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-fehler-uebung"
-          {...beispiele['praxis-fehler-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-fehler-uebung']}
+          mode="react"
+          task={
             <>
               <p>Das Dashboard stürzt komplett ab, sobald ein Widget kaputte Daten bekommt.</p>
               <ul className="mt-1 list-disc pl-5">
@@ -103,32 +103,32 @@ export function Fehlerbehandlung() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welchen Fehler fängt eine Error Boundary?',
-            antworten: ['Einen Fehler in onClick', 'Einen Fehler beim Rendern eines Kindes', 'Einen abgelehnten fetch'],
-            richtig: 1,
-            erklaerung: 'Nur Fehler während Rendern, Lifecycle und Effekten der Kinder.',
+            question: 'Welchen Fehler fängt eine Error Boundary?',
+            answers: ['Einen Fehler in onClick', 'Einen Fehler beim Rendern eines Kindes', 'Einen abgelehnten fetch'],
+            correct: 1,
+            explanation: 'Nur Fehler während Rendern, Lifecycle und Effekten der Kinder.',
           },
           {
-            frage: 'Warum ist ErrorBoundary eine Klasse?',
-            antworten: [
+            question: 'Warum ist ErrorBoundary eine Klasse?',
+            answers: [
               'Weil es für getDerivedStateFromError keinen Hook gibt',
               'Weil Klassen schneller sind',
               'Das muss sie nicht sein',
             ],
-            richtig: 0,
-            erklaerung: 'Alternativ nimmt man das Paket react-error-boundary, das die Klasse kapselt.',
+            correct: 0,
+            explanation: 'Alternativ nimmt man das Paket react-error-boundary, das die Klasse kapselt.',
           },
           {
-            frage: 'Wo setzt man Boundaries am besten?',
-            antworten: [
+            question: 'Wo setzt man Boundaries am besten?',
+            answers: [
               'Nur einmal ganz außen',
               'Um einzelne, unabhängige Bereiche - plus eine ganz außen',
               'Um jedes einzelne Element',
             ],
-            richtig: 1,
-            erklaerung: 'So fällt nur der betroffene Bereich aus, und nichts endet in einer weißen Seite.',
+            correct: 1,
+            explanation: 'So fällt nur der betroffene Bereich aus, und nichts endet in einer weißen Seite.',
           },
         ]}
       />

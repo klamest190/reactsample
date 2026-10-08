@@ -7,10 +7,10 @@
  */
 import { describe, expect, it } from 'vitest'
 
-import { javaLaufzeitPruefen } from '../java/selftest'
-import { javaBeispielPruefen } from '../java/contents'
-import { uebungen } from '../course/exercises/java'
-import type { CodeBeispiel } from '../learning/jsSandbox'
+import { checkJavaRuntime } from '../java/selftest'
+import { checkJavaExample } from '../java/contents'
+import { exercises } from '../course/exercises/java'
+import type { CodeExample } from '../learning/jsSandbox'
 import { tryItUsages } from './tryItUsages'
 
 const chapterSources = import.meta.glob<string>(['../course/java/*.tsx', '!../course/java/*.en.tsx'], {
@@ -18,11 +18,11 @@ const chapterSources = import.meta.glob<string>(['../course/java/*.tsx', '!../co
   import: 'default',
   eager: true,
 })
-const codeModules = import.meta.glob<{ beispiele?: Record<string, CodeBeispiel> }>('../course/java/*.code.ts', { eager: true })
+const codeModules = import.meta.glob<{ examples?: Record<string, CodeExample> }>('../course/java/*.code.ts', { eager: true })
 
 const usages = tryItUsages(Object.values(chapterSources))
 const examples = Object.entries(codeModules).flatMap(([path, module]) =>
-  Object.entries(module.beispiele ?? {}).map(([id, example]) => ({ id, example, file: path.split('/').pop()! })),
+  Object.entries(module.examples ?? {}).map(([id, example]) => ({ id, example, file: path.split('/').pop()! })),
 )
 
 it('finds the chapters', () => {
@@ -31,7 +31,7 @@ it('finds the chapters', () => {
 })
 
 describe('runtime', () => {
-  it.each(javaLaufzeitPruefen())('$name', ({ ok, message }) => {
+  it.each(checkJavaRuntime())('$name', ({ ok, message }) => {
     expect(ok, message).toBe(true)
   })
 })
@@ -43,18 +43,18 @@ describe('chapter contents', () => {
 
   // Chapter 7.10 shows the same task in Java, JavaScript and React - only the Java part is checked here,
   // the others run in the browser self-test.
-  const javaExamples = examples.filter(({ id }) => usages.get(id)?.modus === 'java')
+  const javaExamples = examples.filter(({ id }) => usages.get(id)?.mode === 'java')
   it.each(javaExamples)('$id ($file)', ({ id, example }) => {
-    const result = javaBeispielPruefen(id, example)
+    const result = checkJavaExample(id, example)
     expect(result.ok, result.message).toBe(true)
   })
 })
 
 describe('extra exercises', () => {
   // Predictions are multiple choice - nothing to run.
-  const runnable = Object.values(uebungen).flatMap((list) => list.filter((u) => u.stufe !== 'vorhersage'))
+  const runnable = Object.values(exercises).flatMap((list) => list.filter((u) => u.stufe !== 'vorhersage'))
   it.each(runnable)('$id', (exercise) => {
-    const result = javaBeispielPruefen(exercise.id, exercise)
+    const result = checkJavaExample(exercise.id, exercise)
     expect(result.ok, result.message).toBe(true)
   })
 })

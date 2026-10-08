@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './DatenLaden.code'
+import { examples, codeBloecke } from './DatenLaden.code'
 import { LadeDemo } from '../demos/LadeDemo'
 
 /**
@@ -16,8 +16,8 @@ export function DatenLaden() {
         <P>Fetching data means: call <Code>fetch</Code> in an effect and put the result into state.</P>
         <TryIt
           id="praxis-daten-einstieg"
-          {...beispiele['praxis-daten-einstieg']}
-          modus="react"
+          {...examples['praxis-daten-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -39,8 +39,8 @@ export function DatenLaden() {
         </Liste>
         <TryIt
           id="praxis-daten-grundmuster"
-          {...beispiele['praxis-daten-grundmuster']}
-          modus="react"
+          {...examples['praxis-daten-grundmuster']}
+          mode="react"
         />
         <Hinweis variante="info">
           This example needs internet (JSONPlaceholder is a free test API). Offline you will see the error
@@ -56,11 +56,11 @@ export function DatenLaden() {
         </P>
         <TryIt
           id="praxis-daten-race"
-          {...beispiele['praxis-daten-race']}
-          modus="react"
+          {...examples['praxis-daten-race']}
+          mode="react"
         />
         <CodeBlock
-          titel="With a real fetch"
+          title="With a real fetch"
           code={codeBloecke.beispiel1}
         />
       </Abschnitt>
@@ -94,9 +94,9 @@ export function DatenLaden() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-daten-uebung"
-          {...beispiele['praxis-daten-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-daten-uebung']}
+          mode="react"
+          task={
             <>
               <p>
                 Write the custom hook <Code>useFetch(url)</Code> that returns{' '}
@@ -118,28 +118,28 @@ export function DatenLaden() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Why can’t the effect function itself be async?',
-            antworten: [
+            question: 'Why can’t the effect function itself be async?',
+            answers: [
               'async is forbidden in React',
               'It would return a promise instead of a cleanup function',
               'Because fetch is synchronous',
             ],
-            richtig: 1,
-            erklaerung: 'That’s why you define an async function inside the effect and call it.',
+            correct: 1,
+            explanation: 'That’s why you define an async function inside the effect and call it.',
           },
           {
-            frage: 'What prevents a stale response from overwriting newer data?',
-            antworten: ['useMemo', 'Aborting/ignoring in the effect’s cleanup', 'A key on the list'],
-            richtig: 1,
-            erklaerung: 'The cleanup runs before the effect starts with the new ID.',
+            question: 'What prevents a stale response from overwriting newer data?',
+            answers: ['useMemo', 'Aborting/ignoring in the effect’s cleanup', 'A key on the list'],
+            correct: 1,
+            explanation: 'The cleanup runs before the effect starts with the new ID.',
           },
           {
-            frage: 'Which three states should every request cover in the UI?',
-            antworten: ['Loading, error, data', 'Start, middle, end', 'Online, offline, cache'],
-            richtig: 0,
-            erklaerung: 'Plus the special case “data, but empty”.',
+            question: 'Which three states should every request cover in the UI?',
+            answers: ['Loading, error, data', 'Start, middle, end', 'Online, offline, cache'],
+            correct: 0,
+            explanation: 'Plus the special case “data, but empty”.',
           },
         ]}
       />

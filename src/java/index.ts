@@ -11,49 +11,49 @@
  * die Komponenten wissen nichts von Syntaxbäumen.
  */
 
-import { JavaSyntaxFehler } from './lexer'
-import { parsen } from './parser'
-import { pruefen } from './typeChecker'
-import { Interpreter, JavaAbbruch, JavaAusnahme, type AusgabeZeile } from './interpreter'
-import { alsZahl, doubleText, type Wert } from './values'
+import { JavaSyntaxError } from './lexer'
+import { parse } from './parser'
+import { checkProgram } from './typeChecker'
+import { Interpreter, JavaAbort, JavaException, type OutputLine } from './interpreter'
+import { toNumber, doubleText, type Value } from './values'
 
-export type JavaSprache = 'de' | 'en'
+export type JavaLanguage = 'de' | 'en'
 
 export type JavaTest = {
   name: string
   /** Ein Java-Ausdruck, der nach `main` ausgewertet wird - z. B. `add(2, 3)`. */
-  ausdruck: string
+  expression: string
   /** Erwartetes Ergebnis. Fehlt es, muss der Ausdruck `true` ergeben. */
-  erwartet?: unknown
+  expected?: unknown
 }
 
-export type JavaTestErgebnis = { name: string; ok: boolean; meldung: string }
+export type JavaTestResult = { name: string; ok: boolean; message: string }
 
-export type JavaZeile = { typ: 'log' | 'info' | 'warn' | 'error' | 'fehler'; text: string }
+export type JavaLine = { type: 'log' | 'info' | 'warn' | 'error' | 'exception'; text: string }
 
-export type JavaLauf = {
-  zeilen: JavaZeile[]
-  ergebnisse: JavaTestErgebnis[] | null
+export type JavaRun = {
+  lines: JavaLine[]
+  results: JavaTestResult[] | null
   /** true, wenn das Programm nicht (vollständig) gelaufen ist. */
-  fehler: boolean
+  failed: boolean
 }
 
-const TEXTE = {
+const MESSAGES = {
   de: {
-    kompilierfehler: (anzahl: number) => `${anzahl} Fehler - das Programm wurde nicht gestartet.`,
-    zeile: (n: number) => `Zeile ${n}`,
-    ausnahme: 'Das Programm wurde durch eine Exception beendet:',
-    testFehler: (erwartet: string, bekommen: string) => `erwartet: ${erwartet}, bekommen: ${bekommen}`,
-    testAbsturz: (meldung: string) => `Fehler beim Prüfen: ${meldung}`,
-    keinLauf: 'Das Programm ist abgestürzt - die Tests konnten nicht geprüft werden.',
+    compileErrors: (count: number) => `${count} Fehler - das Programm wurde nicht gestartet.`,
+    line: (n: number) => `Zeile ${n}`,
+    exception: 'Das Programm wurde durch eine Exception beendet:',
+    testFailure: (expected: string, actual: string) => `erwartet: ${expected}, bekommen: ${actual}`,
+    testCrash: (message: string) => `Fehler beim Prüfen: ${message}`,
+    noRun: 'Das Programm ist abgestürzt - die Tests konnten nicht geprüft werden.',
   },
   en: {
-    kompilierfehler: (anzahl: number) => `${anzahl} error(s) - the program was not started.`,
-    zeile: (n: number) => `line ${n}`,
-    ausnahme: 'The program was terminated by an exception:',
-    testFehler: (erwartet: string, bekommen: string) => `expected: ${erwartet}, got: ${bekommen}`,
-    testAbsturz: (meldung: string) => `error while checking: ${meldung}`,
-    keinLauf: 'The program crashed - the tests could not be checked.',
+    compileErrors: (count: number) => `${count} error(s) - the program was not started.`,
+    line: (n: number) => `line ${n}`,
+    exception: 'The program was terminated by an exception:',
+    testFailure: (expected: string, actual: string) => `expected: ${expected}, got: ${actual}`,
+    testCrash: (message: string) => `error while checking: ${message}`,
+    noRun: 'The program crashed - the tests could not be checked.',
   },
 }
 
@@ -61,11 +61,11 @@ const TEXTE = {
  * Nur prüfen, nicht ausführen - für die roten Schlangenlinien im Editor.
  * Das ist genau das, was eine Java-IDE beim Tippen im Hintergrund tut.
  */
-export function javaPruefen(quelltext: string, sprache: JavaSprache = 'de'): { zeile: number; text: string }[] {
+export function checkJava(sourceCode: string, language: JavaLanguage = 'de'): { line: number; text: string }[] {
   try {
-    return pruefen(parsen(quelltext)).map((m) => ({ zeile: m.zeile, text: sprache === 'de' ? m.deutsch : m.englisch }))
-  } catch (fehler) {
-    if (fehler instanceof JavaSyntaxFehler) return [{ zeile: fehler.zeile, text: fehler.meldung }]
+    return checkProgram(parse(sourceCode)).map((m) => ({ line: m.line, text: language === 'de' ? m.de : m.en }))
+  } catch (error) {
+    if (error instanceof JavaSyntaxError) return [{ line: error.line, text: error.message }]
     return []
   }
 }
@@ -74,192 +74,192 @@ export function javaPruefen(quelltext: string, sprache: JavaSprache = 'de'): { z
  * Führt ein Java-Programm aus. Läuft komplett synchron im Browser-Tab; der
  * Interpreter bricht selbst ab, wenn eine Schleife nicht endet.
  */
-export function javaAusfuehren(
-  quelltext: string,
-  optionen: { sprache?: JavaSprache; tests?: JavaTest[]; vorbereitung?: string } = {},
-): JavaLauf {
-  const sprache = optionen.sprache ?? 'de'
-  const t = TEXTE[sprache]
-  const zeilen: JavaZeile[] = []
+export function runJava(
+  sourceCode: string,
+  options: { language?: JavaLanguage; tests?: JavaTest[]; setup?: string } = {},
+): JavaRun {
+  const language = options.language ?? 'de'
+  const t = MESSAGES[language]
+  const lines: JavaLine[] = []
 
   // --- 1. Lesen (Lexer + Parser) ------------------------------------------
   // `vorbereitung` sind unsichtbare Hilfsklassen für Übungstests. Sie stehen
   // HINTER dem Code der Lernenden, damit alle Zeilennummern stimmen.
-  const quelle = optionen.vorbereitung ? quelltext + '\n\n' + optionen.vorbereitung : quelltext
-  let programm
+  const source = options.setup ? sourceCode + '\n\n' + options.setup : sourceCode
+  let program
   try {
-    programm = parsen(quelle)
-  } catch (fehler) {
-    if (fehler instanceof JavaSyntaxFehler) {
+    program = parse(source)
+  } catch (error) {
+    if (error instanceof JavaSyntaxError) {
       return {
-        zeilen: [{ typ: 'fehler', text: `Main.java:${fehler.zeile}: error: ${fehler.meldung}` }],
-        ergebnisse: optionen.tests ? alleTestsRot(optionen.tests, t.keinLauf) : null,
-        fehler: true,
+        lines: [{ type: 'exception', text: `Main.java:${error.line}: error: ${error.message}` }],
+        results: options.tests ? allTestsFailed(options.tests, t.noRun) : null,
+        failed: true,
       }
     }
-    throw fehler
+    throw error
   }
 
   // --- 2. Prüfen (das, was javac macht) -----------------------------------
-  const meldungen = pruefen(programm)
-  if (meldungen.length) {
-    for (const m of meldungen) {
-      zeilen.push({ typ: 'fehler', text: `Main.java:${m.zeile}: error: ${m.englisch}` })
-      if (sprache === 'de') zeilen.push({ typ: 'info', text: '   ' + m.deutsch })
-      else if (m.englisch !== m.deutsch) zeilen.push({ typ: 'info', text: '   ' + m.englisch })
+  const messages = checkProgram(program)
+  if (messages.length) {
+    for (const m of messages) {
+      lines.push({ type: 'exception', text: `Main.java:${m.line}: error: ${m.en}` })
+      if (language === 'de') lines.push({ type: 'info', text: '   ' + m.de })
+      else if (m.en !== m.de) lines.push({ type: 'info', text: '   ' + m.en })
     }
-    zeilen.push({ typ: 'warn', text: t.kompilierfehler(meldungen.length) })
-    return { zeilen, ergebnisse: optionen.tests ? alleTestsRot(optionen.tests, t.keinLauf) : null, fehler: true }
+    lines.push({ type: 'warn', text: t.compileErrors(messages.length) })
+    return { lines, results: options.tests ? allTestsFailed(options.tests, t.noRun) : null, failed: true }
   }
 
   // --- 3. Ausführen --------------------------------------------------------
   let interpreter: Interpreter
   try {
-    interpreter = new Interpreter(programm)
-  } catch (fehler) {
+    interpreter = new Interpreter(program)
+  } catch (error) {
     return {
-      zeilen: [{ typ: 'fehler', text: fehlerText(fehler, sprache) }],
-      ergebnisse: optionen.tests ? alleTestsRot(optionen.tests, t.keinLauf) : null,
-      fehler: true,
+      lines: [{ type: 'exception', text: errorText(error, language) }],
+      results: options.tests ? allTestsFailed(options.tests, t.noRun) : null,
+      failed: true,
     }
   }
 
-  let abgestuerzt = false
+  let crashed = false
   try {
-    interpreter.starten()
-  } catch (fehler) {
-    abgestuerzt = true
-    interpreter.abschliessen()
-    zeilen.push(...uebernehmen(interpreter.zeilen))
-    if (fehler instanceof JavaAusnahme) {
-      zeilen.push({ typ: 'fehler', text: `Exception in thread "main" ${interpreter.ausnahmeText(fehler.wert)}` })
+    interpreter.start()
+  } catch (error) {
+    crashed = true
+    interpreter.finish()
+    lines.push(...adopt(interpreter.lines))
+    if (error instanceof JavaException) {
+      lines.push({ type: 'exception', text: `Exception in thread "main" ${interpreter.exceptionText(error.value)}` })
       // Echtes Java listet hier die ganze Aufrufkette. Wir kennen sicher nur die
       // Zeile, in der es passiert ist - die ist beim Suchen ohnehin die wichtigste.
-      if (fehler.zeile) zeilen.push({ typ: 'info', text: `   at Main.java:${fehler.zeile}` })
+      if (error.line) lines.push({ type: 'info', text: `   at Main.java:${error.line}` })
     } else {
-      zeilen.push({ typ: 'fehler', text: fehlerText(fehler, sprache) })
+      lines.push({ type: 'exception', text: errorText(error, language) })
     }
-    return { zeilen, ergebnisse: optionen.tests ? alleTestsRot(optionen.tests, t.keinLauf) : null, fehler: true }
+    return { lines, results: options.tests ? allTestsFailed(options.tests, t.noRun) : null, failed: true }
   }
 
-  zeilen.push(...uebernehmen(interpreter.zeilen))
+  lines.push(...adopt(interpreter.lines))
 
   // --- 4. Übungstests ------------------------------------------------------
-  let ergebnisse: JavaTestErgebnis[] | null = null
-  if (optionen.tests?.length) {
+  let results: JavaTestResult[] | null = null
+  if (options.tests?.length) {
     // `output` macht die gesammelte Ausgabe im Test prüfbar.
-    const ausgabe = interpreter.zeilen.map((z) => z.text).join('\n')
-    interpreter.hauptUmgebung?.deklarieren('output', { art: 'string', wert: ausgabe }, { name: 'String', dimensionen: 0, argumente: [] })
+    const output = interpreter.lines.map((z) => z.text).join('\n')
+    interpreter.globalScope?.declare('output', { kind: 'string', value: output }, { name: 'String', dimensions: 0, args: [] })
 
-    ergebnisse = optionen.tests.map((test) => {
+    results = options.tests.map((test) => {
       try {
-        const wert = interpreter.ausdruckAuswerten(test.ausdruck)
-        const bekommen = alsJs(wert, interpreter)
-        const ok = test.erwartet === undefined ? bekommen === true : tiefGleich(bekommen, test.erwartet)
+        const value = interpreter.evaluateExpression(test.expression)
+        const actual = toJs(value, interpreter)
+        const ok = test.expected === undefined ? actual === true : deepEqual(actual, test.expected)
         return {
           name: test.name,
           ok,
-          meldung: ok ? '' : t.testFehler(zeigen(test.erwartet === undefined ? true : test.erwartet), zeigen(bekommen)),
+          message: ok ? '' : t.testFailure(show(test.expected === undefined ? true : test.expected), show(actual)),
         }
-      } catch (fehler) {
+      } catch (error) {
         const text =
-          fehler instanceof JavaAusnahme
-            ? interpreter.ausnahmeText(fehler.wert)
-            : fehlerText(fehler, sprache)
-        return { name: test.name, ok: false, meldung: t.testAbsturz(text) }
+          error instanceof JavaException
+            ? interpreter.exceptionText(error.value)
+            : errorText(error, language)
+        return { name: test.name, ok: false, message: t.testCrash(text) }
       }
     })
   }
 
-  return { zeilen, ergebnisse, fehler: abgestuerzt }
+  return { lines, results, failed: crashed }
 }
 
 // ---------------------------------------------------------------------------
 // Hilfsfunktionen
 // ---------------------------------------------------------------------------
 
-const uebernehmen = (zeilen: AusgabeZeile[]): JavaZeile[] =>
-  zeilen.map((z) => ({ typ: z.strom === 'err' ? 'error' : 'log', text: z.text }))
+const adopt = (lines: OutputLine[]): JavaLine[] =>
+  lines.map((z) => ({ type: z.stream === 'err' ? 'error' : 'log', text: z.text }))
 
-const alleTestsRot = (tests: JavaTest[], meldung: string): JavaTestErgebnis[] =>
-  tests.map((test) => ({ name: test.name, ok: false, meldung }))
+const allTestsFailed = (tests: JavaTest[], message: string): JavaTestResult[] =>
+  tests.map((test) => ({ name: test.name, ok: false, message }))
 
-function fehlerText(fehler: unknown, sprache: JavaSprache): string {
-  if (fehler instanceof JavaAbbruch) {
-    const zeile = fehler.zeile
-    const text = sprache === 'de' ? fehler.deutsch : fehler.englisch
-    return zeile ? `Main.java:${zeile}: error: ${text}` : text
+function errorText(error: unknown, language: JavaLanguage): string {
+  if (error instanceof JavaAbort) {
+    const line = error.line
+    const text = language === 'de' ? error.de : error.en
+    return line ? `Main.java:${line}: error: ${text}` : text
   }
-  if (fehler instanceof JavaSyntaxFehler) return `Main.java:${fehler.zeile}: error: ${fehler.meldung}`
-  if (fehler instanceof RangeError) {
-    return sprache === 'de'
+  if (error instanceof JavaSyntaxError) return `Main.java:${error.line}: error: ${error.message}`
+  if (error instanceof RangeError) {
+    return language === 'de'
       ? 'StackOverflowError: Eine Methode ruft sich endlos selbst auf.'
       : 'StackOverflowError: a method calls itself endlessly.'
   }
-  return String(fehler instanceof Error ? fehler.message : fehler)
+  return String(error instanceof Error ? error.message : error)
 }
 
 /** Java-Wert → JavaScript-Wert, damit Tests einfache Literale vergleichen können. */
-function alsJs(wert: Wert, interpreter: Interpreter): unknown {
-  switch (wert.art) {
+function toJs(value: Value, interpreter: Interpreter): unknown {
+  switch (value.kind) {
     case 'null':
       return null
     case 'boolean':
-      return wert.wert
+      return value.value
     case 'int':
     case 'long':
-      return wert.wert
+      return value.value
     case 'double':
-      return wert.wert
+      return value.value
     case 'char':
-      return String.fromCharCode(wert.wert)
+      return String.fromCharCode(value.value)
     case 'string':
-      return wert.wert
+      return value.value
     case 'array':
-      return wert.werte.map((w) => alsJs(w, interpreter))
-    case 'nativ': {
-      if (wert.daten.liste) return wert.daten.liste.map((w) => alsJs(w, interpreter))
-      if (wert.daten.map) {
-        const objekt: Record<string, unknown> = {}
-        for (const eintrag of wert.daten.map.values()) {
-          objekt[interpreter.alsText(eintrag.schluessel)] = alsJs(eintrag.wert, interpreter)
+      return value.values.map((w) => toJs(w, interpreter))
+    case 'native': {
+      if (value.data.list) return value.data.list.map((w) => toJs(w, interpreter))
+      if (value.data.map) {
+        const object: Record<string, unknown> = {}
+        for (const entry of value.data.map.values()) {
+          object[interpreter.toText(entry.key)] = toJs(entry.value, interpreter)
         }
-        return objekt
+        return object
       }
-      return interpreter.alsText(wert)
+      return interpreter.toText(value)
     }
     default:
-      return interpreter.alsText(wert)
+      return interpreter.toText(value)
   }
 }
 
-function tiefGleich(a: unknown, b: unknown): boolean {
+function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
   if (typeof a === 'number' && typeof b === 'number') {
     // 0.1 + 0.2 soll gegen 0.3 grün sein.
     return Math.abs(a - b) < 1e-9 || (Number.isNaN(a) && Number.isNaN(b))
   }
-  if (Array.isArray(a) && Array.isArray(b)) return a.length === b.length && a.every((w, i) => tiefGleich(w, b[i]))
+  if (Array.isArray(a) && Array.isArray(b)) return a.length === b.length && a.every((w, i) => deepEqual(w, b[i]))
   if (a && b && typeof a === 'object' && typeof b === 'object') {
     const x = a as Record<string, unknown>
     const y = b as Record<string, unknown>
-    const schluessel = Object.keys(x)
-    return schluessel.length === Object.keys(y).length && schluessel.every((k) => tiefGleich(x[k], y[k]))
+    const key = Object.keys(x)
+    return key.length === Object.keys(y).length && key.every((k) => deepEqual(x[k], y[k]))
   }
   return false
 }
 
 /** Werte so anzeigen, wie sie im Java-Code stehen würden. */
-function zeigen(wert: unknown): string {
-  if (typeof wert === 'string') return `"${wert}"`
-  if (Array.isArray(wert)) return `[${wert.map(zeigen).join(', ')}]`
-  if (typeof wert === 'number') return Number.isInteger(wert) ? String(wert) : doubleText(wert)
-  if (wert && typeof wert === 'object') {
-    return `{${Object.entries(wert).map(([k, v]) => `${k}=${zeigen(v)}`).join(', ')}}`
+function show(value: unknown): string {
+  if (typeof value === 'string') return `"${value}"`
+  if (Array.isArray(value)) return `[${value.map(show).join(', ')}]`
+  if (typeof value === 'number') return Number.isInteger(value) ? String(value) : doubleText(value)
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value).map(([k, v]) => `${k}=${show(v)}`).join(', ')}}`
   }
-  return String(wert)
+  return String(value)
 }
 
 // Also used by the Spring part (src/spring/), which evaluates Java test expressions the same way.
-export { alsZahl, alsJs, tiefGleich, zeigen }
-export type { Wert }
+export { toNumber as alsZahl, toJs as alsJs, deepEqual as tiefGleich, show as zeigen }
+export type { Value as Wert }

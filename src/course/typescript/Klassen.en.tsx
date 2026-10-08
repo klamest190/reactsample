@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Klassen.code'
+import { examples, codeBloecke } from './Klassen.code'
 
 /**
  * KAPITEL 2.7 (English) - Classes, Enums & Modules
@@ -17,7 +17,7 @@ export function Klassen() {
           modifiers like <Code>private</Code> and <Code>readonly</Code> that decide who may read and change
           what.
         </P>
-        <TryIt id="ts-klassen-einstieg" modus="ts" {...beispiele['ts-klassen-einstieg']} />
+        <TryIt id="ts-klassen-einstieg" mode="ts" {...examples['ts-klassen-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Access modifiers and parameter properties">
@@ -27,7 +27,7 @@ export function Klassen() {
           constructor parameter automatically turns it into a field - which saves the lines{' '}
           <Code>this.name = name</Code>.
         </P>
-        <TryIt id="ts-klassen-modifikatoren" modus="ts" {...beispiele['ts-klassen-modifikatoren']} />
+        <TryIt id="ts-klassen-modifikatoren" mode="ts" {...examples['ts-klassen-modifikatoren']} />
         <Hinweis variante="info">
           <Code>private</Code> only exists while checking - at runtime the field is perfectly reachable.
           JavaScript's <Code>#</Code> fields, on the other hand, are private at runtime too. Both are fine,
@@ -41,7 +41,7 @@ export function Klassen() {
           members are there. An <Code>abstract</Code> class is an unfinished base class: it can't be created
           itself, and the subclasses must write its <Code>abstract</Code> methods.
         </P>
-        <TryIt id="ts-klassen-implements" modus="ts" {...beispiele['ts-klassen-implements']} />
+        <TryIt id="ts-klassen-implements" mode="ts" {...examples['ts-klassen-implements']} />
         <Liste>
           <li>
             <Code>override</Code> marks that a method replaces the one of the base class - so typos in the name
@@ -61,7 +61,7 @@ export function Klassen() {
           <Code>as const</Code>): they disappear completely when translating, and you can simply write{' '}
           <Code>'active'</Code>.
         </P>
-        <TryIt id="ts-klassen-enums" modus="ts" {...beispiele['ts-klassen-enums']} />
+        <TryIt id="ts-klassen-enums" mode="ts" {...examples['ts-klassen-enums']} />
       </Abschnitt>
 
       <Abschnitt titel="Modules: exporting and importing types">
@@ -70,7 +70,7 @@ export function Klassen() {
           <Code>import type</Code> says explicitly: this is only a type - the line disappears completely when
           translating.
         </P>
-        <CodeBlock titel="Types between files" code={codeBloecke.module} />
+        <CodeBlock title="Types between files" code={codeBloecke.module} />
         <Hinweis variante="tipp">
           With the tsconfig option <Code>verbatimModuleSyntax</Code> (the default in Vite projects),{' '}
           <Code>import type</Code> is even required when you only import types.
@@ -83,16 +83,16 @@ export function Klassen() {
           it. Files ending in <Code>.d.ts</Code> contain only such descriptions - that is how JavaScript
           libraries get their types.
         </P>
-        <TryIt id="ts-klassen-declare" modus="ts" {...beispiele['ts-klassen-declare']} />
+        <TryIt id="ts-klassen-declare" mode="ts" {...examples['ts-klassen-declare']} />
         <CodeBlock code={codeBloecke.dts} />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
           id="ts-klassen-uebung"
-          modus="ts"
-          {...beispiele['ts-klassen-uebung']}
-          aufgabe={
+          mode="ts"
+          {...examples['ts-klassen-uebung']}
+          task={
             <>
               <p>
                 Write the class <Code>ShoppingCart</Code>:
@@ -122,24 +122,24 @@ export function Klassen() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'constructor(private name: string) {} - what happens?',
-            antworten: ['Nothing, the parameter is only visible in the constructor', 'A private field name is created and set automatically', 'A syntax error'],
-            richtig: 1,
-            erklaerung: 'A parameter property: the modifier in front of the parameter declares the field and assigns the value.',
+            question: 'constructor(private name: string) {} - what happens?',
+            answers: ['Nothing, the parameter is only visible in the constructor', 'A private field name is created and set automatically', 'A syntax error'],
+            correct: 1,
+            explanation: 'A parameter property: the modifier in front of the parameter declares the field and assigns the value.',
           },
           {
-            frage: 'What does class Circle implements Shape check?',
-            antworten: ['That Circle has all members of Shape', 'That Circle inherits from Shape', 'Nothing - implements is just documentation'],
-            richtig: 0,
-            erklaerung: 'implements inherits nothing, it lets the compiler check that the class fulfills the interface.',
+            question: 'What does class Circle implements Shape check?',
+            answers: ['That Circle has all members of Shape', 'That Circle inherits from Shape', 'Nothing - implements is just documentation'],
+            correct: 0,
+            explanation: 'implements inherits nothing, it lets the compiler check that the class fulfills the interface.',
           },
           {
-            frage: 'What is the difference between an enum and a union of literal types?',
-            antworten: ['None', 'An enum produces real JavaScript code, the union disappears when translating', 'Unions only work with numbers'],
-            richtig: 1,
-            erklaerung: 'Enums are one of the few TypeScript features with runtime code. Unions are pure types.',
+            question: 'What is the difference between an enum and a union of literal types?',
+            answers: ['None', 'An enum produces real JavaScript code, the union disappears when translating', 'Unions only work with numbers'],
+            correct: 1,
+            explanation: 'Enums are one of the few TypeScript features with runtime code. Unions are pure types.',
           },
         ]}
       />

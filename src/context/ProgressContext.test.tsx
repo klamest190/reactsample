@@ -27,7 +27,7 @@ describe('FortschrittContext', () => {
 
   it('stores progress under the keys existing users already have', () => {
     const { result } = renderProgress()
-    const quiz: QuizStand = { gesamt: 3, richtig: 2, antworten: [0, 1, null] }
+    const quiz: QuizStand = { total: 3, correct: 2, answers: [0, 1, null] }
     act(() => {
       result.current.kapitelSetzen('react-props', true)
       result.current.quizSetzen('react-props', quiz)
@@ -58,7 +58,7 @@ describe('FortschrittContext', () => {
 })
 
 describe('gueltigerQuizStand', () => {
-  const stand: QuizStand = { gesamt: 2, richtig: 1, antworten: [0, null] }
+  const stand: QuizStand = { total: 2, correct: 1, answers: [0, null] }
 
   it('returns the stored state while the number of questions matches', () => {
     expect(gueltigerQuizStand(stand, 2)).toBe(stand)

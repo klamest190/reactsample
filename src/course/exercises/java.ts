@@ -11,7 +11,7 @@ import type { UebungsSammlung } from './types'
 
 const t = (de: string, en: string) => ({ de, en })
 
-export const uebungen: UebungsSammlung = {
+export const exercises: UebungsSammlung = {
   'java-start': [
     {
       id: 'java-start-println',
@@ -55,11 +55,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-variablen-cast',
       stufe: 'fehler',
       titel: t('Der Durchschnitt stimmt nicht', 'The average is wrong'),
-      aufgabe: t(
+      task: t(
         '`average` soll `2.5` ergeben, liefert aber `2.0`. Finde und behebe den Fehler - ohne die Typen der Variablen zu ändern.',
         '`average` should be `2.5` but is `2.0`. Find and fix the bug - without changing the types of the variables.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           public static void main(String[] args) {
@@ -71,7 +71,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           public static void main(String[] args) {
             int sum = 5;
@@ -82,7 +82,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Die Division passiert, **bevor** das Ergebnis in `average` landet - da sind beide Seiten noch `int`.',
           'Mach eine der beiden Seiten zu `double`: `(double) sum / count`.',
@@ -92,7 +92,7 @@ export const uebungen: UebungsSammlung = {
           'Make one of the two sides a `double`: `(double) sum / count`.',
         ],
       },
-      tests: [{ name: t('average ist 2.5', 'average is 2.5'), ausdruck: 'average', erwartet: 2.5 }],
+      tests: [{ name: t('average ist 2.5', 'average is 2.5'), expression: 'average', expected: 2.5 }],
     },
   ],
 
@@ -127,11 +127,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-kontrollfluss-summe',
       stufe: 'ergaenzen',
       titel: t('Nur die geraden Zahlen', 'Only the even numbers'),
-      aufgabe: t(
+      task: t(
         'Zähle in `sum` alle geraden Zahlen von 1 bis 10 zusammen (2 + 4 + 6 + 8 + 10 = 30). Nutze `continue` für die ungeraden.',
         'Add up all even numbers from 1 to 10 in `sum` (2 + 4 + 6 + 8 + 10 = 30). Use `continue` for the odd ones.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           public static void main(String[] args) {
@@ -145,7 +145,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           public static void main(String[] args) {
             int sum = 0;
@@ -159,11 +159,11 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: ['Ungerade erkennst du mit `i % 2 != 0`.', '`continue` springt sofort zum nächsten Durchlauf.'],
         en: ['You detect odd numbers with `i % 2 != 0`.', '`continue` jumps straight to the next round.'],
       },
-      tests: [{ name: t('sum ist 30', 'sum is 30'), ausdruck: 'sum', erwartet: 30 }],
+      tests: [{ name: t('sum ist 30', 'sum is 30'), expression: 'sum', expected: 30 }],
     },
   ],
 
@@ -197,11 +197,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-methoden-return',
       stufe: 'fehler',
       titel: t('Der Compiler meckert', 'The compiler complains'),
-      aufgabe: t(
+      task: t(
         'Dieser Code startet gar nicht. Lies die Fehlermeldung und repariere `grade` so, dass es auf **jedem** Weg etwas zurückgibt.',
         'This code does not even start. Read the error message and fix `grade` so it returns something on **every** path.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           static String grade(int points) {
@@ -217,7 +217,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           static String grade(int points) {
             if (points >= 90) {
@@ -233,7 +233,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Was passiert bei `grade(50)`? Dort endet die Methode, ohne etwas zurückzugeben.',
           'Ein `return "C";` am Ende der Methode genügt.',
@@ -244,9 +244,9 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: t('grade(95) ist "A"', 'grade(95) is "A"'), ausdruck: 'grade(95)', erwartet: 'A' },
-        { name: t('grade(85) ist "B"', 'grade(85) is "B"'), ausdruck: 'grade(85)', erwartet: 'B' },
-        { name: t('grade(10) ist "C"', 'grade(10) is "C"'), ausdruck: 'grade(10)', erwartet: 'C' },
+        { name: t('grade(95) ist "A"', 'grade(95) is "A"'), expression: 'grade(95)', expected: 'A' },
+        { name: t('grade(85) ist "B"', 'grade(85) is "B"'), expression: 'grade(85)', expected: 'B' },
+        { name: t('grade(10) ist "C"', 'grade(10) is "C"'), expression: 'grade(10)', expected: 'C' },
       ],
     },
   ],
@@ -274,11 +274,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-arrays-umdrehen',
       stufe: 'frei',
       titel: t('Text rückwärts', 'Text backwards'),
-      aufgabe: t(
+      task: t(
         'Schreibe `reverse(String text)`, das den Text rückwärts zurückgibt - ohne `StringBuilder.reverse()`. Laufe dafür von hinten nach vorn durch die Zeichen.',
         'Write `reverse(String text)` returning the text backwards - without `StringBuilder.reverse()`. Walk through the characters from back to front.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           static String reverse(String text) {
@@ -291,7 +291,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           static String reverse(String text) {
             StringBuilder result = new StringBuilder();
@@ -306,7 +306,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Das letzte Zeichen hat den Index `text.length() - 1`.',
           'Zähle rückwärts: `for (int i = text.length() - 1; i >= 0; i--)`.',
@@ -319,9 +319,9 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: t('reverse("Java") ist "avaJ"', 'reverse("Java") is "avaJ"'), ausdruck: 'reverse("Java")', erwartet: 'avaJ' },
-        { name: t('reverse("") ist ""', 'reverse("") is ""'), ausdruck: 'reverse("")', erwartet: '' },
-        { name: t('reverse("a") ist "a"', 'reverse("a") is "a"'), ausdruck: 'reverse("a")', erwartet: 'a' },
+        { name: t('reverse("Java") ist "avaJ"', 'reverse("Java") is "avaJ"'), expression: 'reverse("Java")', expected: 'avaJ' },
+        { name: t('reverse("") ist ""', 'reverse("") is ""'), expression: 'reverse("")', expected: '' },
+        { name: t('reverse("a") ist "a"', 'reverse("a") is "a"'), expression: 'reverse("a")', expected: 'a' },
       ],
     },
   ],
@@ -331,11 +331,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-klassen-this',
       stufe: 'fehler',
       titel: t('Der Name bleibt leer', 'The name stays empty'),
-      aufgabe: t(
+      task: t(
         'Der Konstruktor sieht richtig aus, aber `getName()` liefert `null`. Finde den Grund und behebe ihn.',
         'The constructor looks right, but `getName()` returns `null`. Find the reason and fix it.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           public static void main(String[] args) {
@@ -356,7 +356,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           public static void main(String[] args) {
             Person person = new Person("Ada");
@@ -376,7 +376,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Im Konstruktor gibt es zwei Dinge namens `name`: das Feld und den Parameter.',
           '`name = name;` weist den Parameter sich selbst zu. Das Feld erreichst du mit `this.name`.',
@@ -387,11 +387,11 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: t('getName() ist "Ada"', 'getName() is "Ada"'), ausdruck: 'person.getName()', erwartet: 'Ada' },
+        { name: t('getName() ist "Ada"', 'getName() is "Ada"'), expression: 'person.getName()', expected: 'Ada' },
         {
           name: t('Auch für andere Namen', 'Works for other names too'),
-          ausdruck: 'new Person("Grace").getName()',
-          erwartet: 'Grace',
+          expression: 'new Person("Grace").getName()',
+          expected: 'Grace',
         },
       ],
     },
@@ -448,11 +448,11 @@ export const uebungen: UebungsSammlung = {
       id: 'java-collections-filter',
       stufe: 'ergaenzen',
       titel: t('Lange Wörter sammeln', 'Collecting long words'),
-      aufgabe: t(
+      task: t(
         'Fülle `longWords` mit allen Wörtern aus `words`, die mehr als 4 Zeichen haben - einmal mit einer Schleife, wenn du magst auch mit `stream()`.',
         'Fill `longWords` with all words from `words` that have more than 4 characters - with a loop, or with `stream()` if you prefer.',
       ),
-      modus: 'java',
+      mode: 'java',
       code: java`
         public class Main {
           public static void main(String[] args) {
@@ -465,7 +465,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      loesung: java`
+      solution: java`
         public class Main {
           public static void main(String[] args) {
             List<String> words = List.of("java", "class", "int", "object");
@@ -481,7 +481,7 @@ export const uebungen: UebungsSammlung = {
           }
         }
       `,
-      tipps: {
+      hints: {
         de: [
           'Laufe mit `for (String word : words)` über die Liste.',
           'Die Länge eines Strings ist `word.length()` - mit Klammern.',
@@ -494,13 +494,13 @@ export const uebungen: UebungsSammlung = {
         ],
       },
       tests: [
-        { name: t('longWords hat 2 Einträge', 'longWords has 2 entries'), ausdruck: 'longWords.size()', erwartet: 2 },
+        { name: t('longWords hat 2 Einträge', 'longWords has 2 entries'), expression: 'longWords.size()', expected: 2 },
         {
           name: t('„class“ und „object“ sind drin', '“class” and “object” are in it'),
-          ausdruck: 'longWords.contains("class") && longWords.contains("object")',
-          erwartet: true,
+          expression: 'longWords.contains("class") && longWords.contains("object")',
+          expected: true,
         },
-        { name: t('„java“ ist nicht drin', '“java” is not in it'), ausdruck: 'longWords.contains("java")', erwartet: false },
+        { name: t('„java“ ist nicht drin', '“java” is not in it'), expression: 'longWords.contains("java")', expected: false },
       ],
     },
   ],

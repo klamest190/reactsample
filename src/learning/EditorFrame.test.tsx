@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderInApp } from '../test/render'
-import { Rahmen } from './EditorFrame'
+import { EditorFrame } from './EditorFrame'
 
 const START = 'const x = 1'
 const SOLUTION = 'const x = 2'
@@ -13,19 +13,19 @@ const SOLUTION = 'const x = 2'
 function Frame({ run }: { run: (code?: string) => void }) {
   const [code, setCode] = useState(START)
   return (
-    <Rahmen
-      art="JavaScript"
-      titel="Variables"
-      aufgabe="Change x to 2."
+    <EditorFrame
+      kind="JavaScript"
+      title="Variables"
+      task="Change x to 2."
       code={code}
       setCode={setCode}
       startCode={START}
-      loesung={SOLUTION}
-      tipps={{ de: ['Erster', 'Zweiter'], en: ['First hint', 'Second hint'] }}
-      ausfuehren={run}
+      solution={SOLUTION}
+      hints={{ de: ['Erster', 'Zweiter'], en: ['First hint', 'Second hint'] }}
+      run={run}
     >
       <output>{code}</output>
-    </Rahmen>
+    </EditorFrame>
   )
 }
 

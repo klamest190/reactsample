@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './SpringBeans.code'
+import { examples, codeBloecke } from './SpringBeans.code'
 
 /**
  * CHAPTER 8.2 - Beans & dependency injection
@@ -18,7 +18,7 @@ export function SpringBeans() {
           <Code>new GreetingService()</Code>. Spring legt das Objekt an und reicht es in den
           Konstruktor. Klapp oben „2 Beans · 1 Endpunkte“ auf: Dort steht, wer wen bekommt.
         </P>
-        <TryIt modus="spring" id="spring-beans-einstieg" {...beispiele['spring-beans-einstieg']} />
+        <TryIt mode="spring" id="spring-beans-einstieg" {...examples['spring-beans-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Das Problem mit new">
@@ -27,7 +27,7 @@ export function SpringBeans() {
           Service, der Service ein Repository, das Repository eine Datenbankverbindung. Baut jede
           Klasse selbst, was sie braucht, entsteht so etwas:
         </P>
-        <CodeBlock code={codeBloecke.ohneSpring} titel="TodoController.java - ohne Spring" />
+        <CodeBlock code={codeBloecke.ohneSpring} title="TodoController.java - ohne Spring" />
         <P>
           Der Controller muss plötzlich wissen, wie man eine Datenbank anschließt. Tauschen kann man
           nichts - auch nicht für einen Test. Spring dreht das um: Jede Klasse <em>sagt</em> nur, was
@@ -35,7 +35,7 @@ export function SpringBeans() {
           <strong>Dependency Injection</strong> (Abhängigkeiten werden „eingespritzt“), und der
           „jemand“ ist der <strong>Spring-Container</strong>.
         </P>
-        <CodeBlock code={codeBloecke.mitSpring} titel="TodoController.java - mit Spring" />
+        <CodeBlock code={codeBloecke.mitSpring} title="TodoController.java - mit Spring" />
       </Abschnitt>
 
       <Abschnitt titel="Beans: Objekte, die Spring verwaltet">
@@ -72,7 +72,7 @@ export function SpringBeans() {
           sind standardmäßig <strong>Singletons</strong>: ein Objekt für die ganze Anwendung. Schick
           die Anfragen ruhig öfter und beobachte den Zähler.
         </P>
-        <TryIt modus="spring" id="spring-beans-singleton" {...beispiele['spring-beans-singleton']} />
+        <TryIt mode="spring" id="spring-beans-singleton" {...examples['spring-beans-singleton']} />
         <Hinweis variante="warnung">
           Weil alle Anfragen dieselbe Bean benutzen - in einem echten Server sogar gleichzeitig aus
           mehreren Threads -, sollten Beans möglichst <strong>keinen veränderlichen Zustand</strong>{' '}
@@ -87,13 +87,13 @@ export function SpringBeans() {
           Annotation - also ist es keine Bean. Spring bricht den Start ab und erklärt ziemlich genau,
           was fehlt. Diese Meldung wirst du in echten Projekten oft sehen:
         </P>
-        <TryIt modus="spring" id="spring-beans-fehlt" {...beispiele['spring-beans-fehlt']} />
+        <TryIt mode="spring" id="spring-beans-fehlt" {...examples['spring-beans-fehlt']} />
         <P>Die Lösung: <Code>@Component</Code> über <Code>FriendlyGreeter</Code>.</P>
       </Abschnitt>
 
       <Abschnitt titel="Wenn Spring zu viel findet">
         <P>Jetzt gibt es zwei Beans vom Typ <Code>Greeter</Code>. Welche soll der Controller bekommen?</P>
-        <TryIt modus="spring" id="spring-beans-zwei" {...beispiele['spring-beans-zwei']} />
+        <TryIt mode="spring" id="spring-beans-zwei" {...examples['spring-beans-zwei']} />
         <P>Spring schlägt selbst drei Lösungen vor - hier sind alle drei auf einmal:</P>
         <Liste>
           <li>
@@ -106,7 +106,7 @@ export function SpringBeans() {
             <Code>{'List<Greeter>'}</Code> als Parameter: alle Beans des Typs auf einmal.
           </li>
         </Liste>
-        <TryIt modus="spring" id="spring-beans-primary" {...beispiele['spring-beans-primary']} />
+        <TryIt mode="spring" id="spring-beans-primary" {...examples['spring-beans-primary']} />
       </Abschnitt>
 
       <Abschnitt titel="@Bean: fremde Klassen zu Beans machen">
@@ -121,7 +121,7 @@ export function SpringBeans() {
           einmal <em>nach</em> dem Start aus - ideal für Testdaten. Die Ausgabe steht in der Konsole
           nach „Started …“.
         </P>
-        <TryIt modus="spring" id="spring-beans-bean" {...beispiele['spring-beans-bean']} />
+        <TryIt mode="spring" id="spring-beans-bean" {...examples['spring-beans-bean']} />
       </Abschnitt>
 
       <Abschnitt titel="Konstruktor statt @Autowired">
@@ -129,18 +129,18 @@ export function SpringBeans() {
           In älteren Projekten siehst du oft Feld-Injektion mit <Code>@Autowired</Code>. Sie
           funktioniert, hat aber Nachteile:
         </P>
-        <CodeBlock code={codeBloecke.feld} titel="nicht empfohlen" />
+        <CodeBlock code={codeBloecke.feld} title="nicht empfohlen" />
         <P>
           Mit einem Konstruktor ist das Feld <Code>final</Code>, jede Abhängigkeit ist in der
           Signatur sichtbar - und ein Test braucht gar kein Spring:
         </P>
-        <CodeBlock code={codeBloecke.test} titel="TodoControllerTest.java" />
+        <CodeBlock code={codeBloecke.test} title="TodoControllerTest.java" />
         <P>
           Und ein Kreis ist sofort sichtbar: Brauchen sich zwei Beans gegenseitig im Konstruktor,
           kann keine zuerst entstehen. Spring bricht ab:
         </P>
-        <TryIt modus="spring" id="spring-beans-kreis" {...beispiele['spring-beans-kreis']} />
-        <CodeBlock code={codeBloecke.reactVergleich} titel="Vergleich mit React Context" />
+        <TryIt mode="spring" id="spring-beans-kreis" {...examples['spring-beans-kreis']} />
+        <CodeBlock code={codeBloecke.reactVergleich} title="Vergleich mit React Context" />
         <P>
           Die Idee kennst du aus <Verweis nr="4.6" />: Etwas wird an einer Stelle bereitgestellt und
           dort benutzt, wo es gebraucht wird - ohne es durch alle Ebenen durchzureichen.
@@ -149,10 +149,10 @@ export function SpringBeans() {
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="spring"
+          mode="spring"
           id="spring-beans-uebung"
-          {...beispiele['spring-beans-uebung']}
-          aufgabe={
+          {...examples['spring-beans-uebung']}
+          task={
             <>
               <p>
                 Der Controller baut sich seinen <Code>PriceService</Code> selbst - mit dem falschen
@@ -174,29 +174,29 @@ export function SpringBeans() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was ist eine Bean?',
-            antworten: [
+            question: 'Was ist eine Bean?',
+            answers: [
               'Jedes Java-Objekt',
               'Ein Objekt, das Spring anlegt und verwaltet',
               'Eine Klasse mit Gettern und Settern',
               'Eine Datenbanktabelle',
             ],
-            richtig: 1,
-            erklaerung: 'Beans entstehen aus Klassen mit @Component/@Service/… oder aus @Bean-Methoden - Spring legt sie an und reicht sie weiter.',
+            correct: 1,
+            explanation: 'Beans entstehen aus Klassen mit @Component/@Service/… oder aus @Bean-Methoden - Spring legt sie an und reicht sie weiter.',
           },
           {
-            frage: 'Zwei Controller verlangen im Konstruktor einen CounterService. Wie viele CounterService-Objekte gibt es?',
-            antworten: ['keins', 'eins', 'zwei', 'eins pro Anfrage'],
-            richtig: 1,
-            erklaerung: 'Beans sind standardmäßig Singletons: beide bekommen dasselbe Objekt.',
+            question: 'Zwei Controller verlangen im Konstruktor einen CounterService. Wie viele CounterService-Objekte gibt es?',
+            answers: ['keins', 'eins', 'zwei', 'eins pro Anfrage'],
+            correct: 1,
+            explanation: 'Beans sind standardmäßig Singletons: beide bekommen dasselbe Objekt.',
           },
           {
-            frage: 'Zwei Beans implementieren dasselbe Interface, ein Konstruktor verlangt es. Was hilft NICHT?',
-            antworten: ['@Primary an einer der Beans', '@Qualifier("name") am Parameter', 'List<Interface> als Parameter', '@Autowired am Konstruktor'],
-            richtig: 3,
-            erklaerung: '@Autowired sagt nur „bitte injizieren“ - welche der beiden gemeint ist, weiß Spring dann immer noch nicht.',
+            question: 'Zwei Beans implementieren dasselbe Interface, ein Konstruktor verlangt es. Was hilft NICHT?',
+            answers: ['@Primary an einer der Beans', '@Qualifier("name") am Parameter', 'List<Interface> als Parameter', '@Autowired am Konstruktor'],
+            correct: 3,
+            explanation: '@Autowired sagt nur „bitte injizieren“ - welche der beiden gemeint ist, weiß Spring dann immer noch nicht.',
           },
         ]}
       />

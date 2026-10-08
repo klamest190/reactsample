@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'js-referenzen-einstieg': {
     code: js`
       const a = [1, 2]
@@ -102,7 +102,7 @@ export const beispiele = {
     `,
   },
   'js-referenzen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Keine Methode, die das Array verändert (`push`, direkte Zuweisung) - immer ein neues Array zurückgeben.',
         '`addTodo`: `[...todos, neuesTodo]`.',
@@ -130,7 +130,7 @@ export const beispiele = {
       const start = [{ id: 1, text: 'Go shopping', done: false }]
       console.log(toggleTodo(start, 1), start)
     `,
-    loesung: js`
+    solution: js`
       function addTodo(todos, text) {
         return [...todos, { id: todos.length + 1, text, done: false }]
       }
@@ -146,22 +146,22 @@ export const beispiele = {
       const start = [{ id: 1, text: 'Go shopping', done: false }]
       console.log(toggleTodo(start, 1), start)
     `,
-    vorbereitung: js`
+    setup: js`
       const __start = () => [
         { id: 1, text: 'A', done: false },
         { id: 2, text: 'B', done: true },
       ]
     `,
     tests: [
-      { name: { de: 'addTodo hängt ein neues Todo an', en: 'addTodo appends a new todo' }, ausdruck: 'addTodo(__start(), \'C\')[2]', erwartet: { id: 3, text: 'C', done: false } },
-      { name: { de: 'addTodo verändert das Original nicht', en: 'addTodo does not change the original' }, ausdruck: '(() => { const t = __start(); addTodo(t, \'C\'); return t.length === 2 })()' },
-      { name: { de: 'toggleTodo kehrt done um', en: 'toggleTodo flips done' }, ausdruck: 'toggleTodo(__start(), 2).map((t) => t.done)', erwartet: [false, false] },
-      { name: { de: 'toggleTodo mutiert das Todo-Objekt nicht', en: 'toggleTodo does not mutate the todo object' }, ausdruck: '(() => { const t = __start(); toggleTodo(t, 1); return t[0].done === false })()' },
-      { name: { de: 'Unveränderte Todos behalten ihre Referenz', en: 'Unchanged todos keep their reference' }, ausdruck: '(() => { const t = __start(); return toggleTodo(t, 1)[1] === t[1] })()' },
-      { name: { de: 'renameTodo ändert nur den Text', en: 'renameTodo only changes the text' }, ausdruck: 'renameTodo(__start(), 1, \'New\')[0]', erwartet: { id: 1, text: 'New', done: false } },
+      { name: { de: 'addTodo hängt ein neues Todo an', en: 'addTodo appends a new todo' }, expression: 'addTodo(__start(), \'C\')[2]', expected: { id: 3, text: 'C', done: false } },
+      { name: { de: 'addTodo verändert das Original nicht', en: 'addTodo does not change the original' }, expression: '(() => { const t = __start(); addTodo(t, \'C\'); return t.length === 2 })()' },
+      { name: { de: 'toggleTodo kehrt done um', en: 'toggleTodo flips done' }, expression: 'toggleTodo(__start(), 2).map((t) => t.done)', expected: [false, false] },
+      { name: { de: 'toggleTodo mutiert das Todo-Objekt nicht', en: 'toggleTodo does not mutate the todo object' }, expression: '(() => { const t = __start(); toggleTodo(t, 1); return t[0].done === false })()' },
+      { name: { de: 'Unveränderte Todos behalten ihre Referenz', en: 'Unchanged todos keep their reference' }, expression: '(() => { const t = __start(); return toggleTodo(t, 1)[1] === t[1] })()' },
+      { name: { de: 'renameTodo ändert nur den Text', en: 'renameTodo only changes the text' }, expression: 'renameTodo(__start(), 1, \'New\')[0]', expected: { id: 1, text: 'New', done: false } },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

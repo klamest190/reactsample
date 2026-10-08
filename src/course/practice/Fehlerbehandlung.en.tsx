@@ -2,7 +2,7 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P } from '../../components/Ui'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Fehlerbehandlung.code'
+import { examples, codeBloecke } from './Fehlerbehandlung.code'
 import { FehlerDemo } from '../demos/FehlerDemo'
 
 /**
@@ -15,8 +15,8 @@ export function Fehlerbehandlung() {
         <P>An error boundary catches the crash of a child component - the rest of the page keeps running.</P>
         <TryIt
           id="praxis-fehler-einstieg"
-          {...beispiele['praxis-fehler-einstieg']}
-          modus="react"
+          {...examples['praxis-fehler-einstieg']}
+          mode="react"
         />
       </Abschnitt>
 
@@ -36,7 +36,7 @@ export function Fehlerbehandlung() {
           place it around risky areas.
         </P>
         <CodeBlock
-          titel="Minimal"
+          title="Minimal"
           code={codeBloecke.beispiel1}
         />
         <P>
@@ -56,16 +56,16 @@ export function Fehlerbehandlung() {
         </P>
         <TryIt
           id="praxis-fehler-boundary"
-          {...beispiele['praxis-fehler-boundary']}
-          modus="react"
+          {...examples['praxis-fehler-boundary']}
+          mode="react"
         />
       </Abschnitt>
 
       <Abschnitt titel="Errors in handlers and asynchronous code">
         <TryIt
           id="praxis-fehler-async"
-          {...beispiele['praxis-fehler-async']}
-          modus="react"
+          {...examples['praxis-fehler-async']}
+          mode="react"
         />
         <Hinweis variante="info">
           During development the browser still logs errors to the console despite the boundary, and some dev
@@ -77,9 +77,9 @@ export function Fehlerbehandlung() {
       <Abschnitt titel="Exercise">
         <TryIt
           id="praxis-fehler-uebung"
-          {...beispiele['praxis-fehler-uebung']}
-          modus="react"
-          aufgabe={
+          {...examples['praxis-fehler-uebung']}
+          mode="react"
+          task={
             <>
               <p>The dashboard crashes completely as soon as one widget receives broken data.</p>
               <ul className="mt-1 list-disc pl-5">
@@ -101,32 +101,32 @@ export function Fehlerbehandlung() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Which error does an error boundary catch?',
-            antworten: ['An error in onClick', 'An error while rendering a child', 'A rejected fetch'],
-            richtig: 1,
-            erklaerung: 'Only errors during rendering, lifecycle and effects of its children.',
+            question: 'Which error does an error boundary catch?',
+            answers: ['An error in onClick', 'An error while rendering a child', 'A rejected fetch'],
+            correct: 1,
+            explanation: 'Only errors during rendering, lifecycle and effects of its children.',
           },
           {
-            frage: 'Why is ErrorBoundary a class?',
-            antworten: [
+            question: 'Why is ErrorBoundary a class?',
+            answers: [
               'Because there is no hook for getDerivedStateFromError',
               'Because classes are faster',
               'It doesn’t have to be',
             ],
-            richtig: 0,
-            erklaerung: 'Alternatively use the react-error-boundary package, which wraps the class.',
+            correct: 0,
+            explanation: 'Alternatively use the react-error-boundary package, which wraps the class.',
           },
           {
-            frage: 'Where are boundaries best placed?',
-            antworten: [
+            question: 'Where are boundaries best placed?',
+            answers: [
               'Only once at the very top',
               'Around individual, independent areas - plus one at the very top',
               'Around every single element',
             ],
-            richtig: 1,
-            erklaerung: 'That way only the affected area fails, and nothing ends in a blank page.',
+            correct: 1,
+            explanation: 'That way only the affected area fails, and nothing ends in a blank page.',
           },
         ]}
       />

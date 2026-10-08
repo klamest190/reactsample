@@ -1,9 +1,9 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /** Codebeispiele für Kapitel 2.3 - Funktionen typisieren. */
 
-export const beispiele = {
+export const examples = {
   'ts-funktionen-einstieg': {
     code: js`
       // Parameters need types, the return type is optional (it is inferred)
@@ -137,7 +137,7 @@ export const beispiele = {
     `,
   },
   'ts-funktionen-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Ein Funktionstyp sieht so aus: `(value: string) => string | null`.',
         '`minLength` bekommt eine Zahl und gibt einen `Validator` zurück: `function minLength(length: number): Validator`.',
@@ -166,7 +166,7 @@ export const beispiele = {
       console.log(validate('', [required, minLength(3)]))
       console.log(validate('Ada', [required, minLength(3)]))
     `,
-    loesung: js`
+    solution: js`
       // A validator gets a value and returns an error message - or null if everything is fine
       type Validator = (value: string) => string | null
 
@@ -184,18 +184,18 @@ export const beispiele = {
       console.log(validate('Ada', [required, minLength(3)]))
     `,
     tests: [
-      { name: "validate('', …)", ausdruck: "validate('', [required, minLength(3)])", erwartet: ['Required', 'At least 3 characters'] },
-      { name: "validate('Ada', …)", ausdruck: "validate('Ada', [required, minLength(3)])", erwartet: [] },
-      { name: "minLength(5)('abc')", ausdruck: "minLength(5)('abc')", erwartet: 'At least 5 characters' },
+      { name: "validate('', …)", expression: "validate('', [required, minLength(3)])", expected: ['Required', 'At least 3 characters'] },
+      { name: "validate('Ada', …)", expression: "validate('Ada', [required, minLength(3)])", expected: [] },
+      { name: "minLength(5)('abc')", expression: "minLength(5)('abc')", expected: 'At least 5 characters' },
     ],
-    typTests: [
+    typeTests: [
       { name: { de: 'Validator ist ein Funktionstyp', en: 'Validator is a function type' }, code: "const shortCheck: Validator = (value) => (value.length > 3 ? null : 'short')" },
       { name: { de: 'Ein Validator liefert string oder null', en: 'A validator returns string or null' }, code: '// @ts-expect-error\nconst brokenCheck: Validator = (value: string) => value.length' },
       { name: { de: 'minLength verlangt eine Zahl', en: 'minLength requires a number' }, code: "// @ts-expect-error\nminLength('3')" },
       { name: { de: 'validate liefert string[]', en: 'validate returns string[]' }, code: "const messages: string[] = validate('x', [required])" },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 export const codeBloecke = {
   eventHandler: js`

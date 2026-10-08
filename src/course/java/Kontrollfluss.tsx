@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Kontrollfluss.code'
+import { examples, codeBloecke } from './Kontrollfluss.code'
 
 /**
  * KAPITEL 7.3 - Bedingungen & Schleifen
@@ -17,7 +17,7 @@ export function Kontrollfluss() {
           <Code>if</Code>, <Code>else if</Code>, <Code>else</Code> sehen aus wie in JavaScript. Ändere
           die Temperatur und schau, welcher Zweig läuft.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-einstieg" {...beispiele['java-kontrollfluss-einstieg']} />
+        <TryIt mode="java" id="java-kontrollfluss-einstieg" {...examples['java-kontrollfluss-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Eine Bedingung ist ein boolean - sonst nichts">
@@ -27,7 +27,7 @@ export function Kontrollfluss() {
           <Code>boolean</Code> sein - sonst kompiliert es nicht.
         </P>
         <CodeBlock code={codeBloecke.keinTruthy} />
-        <TryIt modus="java" id="java-kontrollfluss-boolean" {...beispiele['java-kontrollfluss-boolean']} />
+        <TryIt mode="java" id="java-kontrollfluss-boolean" {...examples['java-kontrollfluss-boolean']} />
         <Hinweis variante="tipp">
           Das nervt am Anfang und rettet später: <Code>if (name)</Code> ist in JavaScript eine
           häufige Fehlerquelle (ist <Code>0</Code> jetzt leer oder nicht?). In Java musst du dich
@@ -48,7 +48,7 @@ export function Kontrollfluss() {
           („fall-through“, dieselbe Falle wie in JavaScript). Die neue mit <Code>-&gt;</Code> tut das
           nicht und kann sogar einen Wert liefern.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-switch" {...beispiele['java-kontrollfluss-switch']} />
+        <TryIt mode="java" id="java-kontrollfluss-switch" {...examples['java-kontrollfluss-switch']} />
         <Hinweis variante="info">
           Nimm im Zweifel die Pfeil-Variante. Sie ist kürzer, kann nichts vergessen und macht aus
           dem <Code>switch</Code> einen Ausdruck - so wie <Code>useReducer</Code> in React eine
@@ -58,7 +58,7 @@ export function Kontrollfluss() {
 
       <Abschnitt titel="Vier Schleifen für vier Situationen">
         <CodeBlock code={codeBloecke.schleifenWahl} />
-        <TryIt modus="java" id="java-kontrollfluss-schleifen" {...beispiele['java-kontrollfluss-schleifen']} />
+        <TryIt mode="java" id="java-kontrollfluss-schleifen" {...examples['java-kontrollfluss-schleifen']} />
         <P>
           Die zweite Form (<Code>for (int score : scores)</Code>) heißt <em>enhanced for</em> oder
           for-each. Sie ist Javas Gegenstück zu <Code>for…of</Code> und funktioniert über Arrays,
@@ -78,15 +78,15 @@ export function Kontrollfluss() {
           verlässt die Schleife ganz. Bei verschachtelten Schleifen betrifft beides immer nur die{' '}
           <strong>innerste</strong> Schleife.
         </P>
-        <TryIt modus="java" id="java-kontrollfluss-break" {...beispiele['java-kontrollfluss-break']} />
+        <TryIt mode="java" id="java-kontrollfluss-break" {...examples['java-kontrollfluss-break']} />
       </Abschnitt>
 
       <Abschnitt titel="Übung">
         <TryIt
-          modus="java"
+          mode="java"
           id="java-kontrollfluss-uebung"
-          {...beispiele['java-kontrollfluss-uebung']}
-          aufgabe={
+          {...examples['java-kontrollfluss-uebung']}
+          task={
             <>
               <p>
                 FizzBuzz - der Klassiker. Gib die Zahlen von 1 bis 20 aus, dabei aber:
@@ -112,34 +112,34 @@ export function Kontrollfluss() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Welche Bedingung kompiliert in Java?',
-            antworten: ['if (list.size())', 'if (name)', 'if (count > 0)', 'if (1)'],
-            richtig: 2,
-            erklaerung: 'Nur ein Ausdruck vom Typ boolean ist erlaubt. Zahlen und Objekte sind keine Bedingungen.',
+            question: 'Welche Bedingung kompiliert in Java?',
+            answers: ['if (list.size())', 'if (name)', 'if (count > 0)', 'if (1)'],
+            correct: 2,
+            explanation: 'Nur ein Ausdruck vom Typ boolean ist erlaubt. Zahlen und Objekte sind keine Bedingungen.',
           },
           {
-            frage: 'Was passiert bei einem klassischen switch ohne break?',
-            antworten: [
+            question: 'Was passiert bei einem klassischen switch ohne break?',
+            answers: [
               'Nichts, break ist optional.',
               'Die Ausführung läuft in den nächsten case weiter.',
               'Es gibt einen Kompilierfehler.',
               'Der default-Zweig wird übersprungen.',
             ],
-            richtig: 1,
-            erklaerung: 'Das ist der berüchtigte fall-through. Die Pfeil-Schreibweise switch (…) { case x -> … } hat ihn nicht.',
+            correct: 1,
+            explanation: 'Das ist der berüchtigte fall-through. Die Pfeil-Schreibweise switch (…) { case x -> … } hat ihn nicht.',
           },
           {
-            frage: 'Wann nimmst du do-while statt while?',
-            antworten: [
+            question: 'Wann nimmst du do-while statt while?',
+            answers: [
               'Wenn die Schleife mindestens einmal laufen soll.',
               'Wenn du einen Zähler brauchst.',
               'Wenn du über ein Array läufst.',
               'Wenn die Bedingung kompliziert ist.',
             ],
-            richtig: 0,
-            erklaerung: 'Bei do-while steht die Prüfung am Ende - der Rumpf läuft also garantiert einmal.',
+            correct: 0,
+            explanation: 'Bei do-while steht die Prüfung am Ende - der Rumpf läuft also garantiert einmal.',
           },
         ]}
       />

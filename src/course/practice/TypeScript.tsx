@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './TypeScript.code'
+import { examples, codeBloecke } from './TypeScript.code'
 
 /**
  * KAPITEL 5.6 - TypeScript mit React
@@ -41,7 +41,7 @@ export function TypeScriptKapitel() {
           Eine Komponente mit typisierten Props. Ändere <Code>count={'{3}'}</Code> in <Code>count="3"</Code> - die
           Typprüfung unter dem Editor meldet den Fehler, bevor irgendjemand die App benutzt.
         </P>
-        <TryIt id="praxis-typescript-einstieg" {...beispiele['praxis-typescript-einstieg']} modus="react" typen />
+        <TryIt id="praxis-typescript-einstieg" {...examples['praxis-typescript-einstieg']} mode="react" typed />
         <Hinweis variante="tipp">
           Dieses Kapitel zeigt TypeScript <strong>in React</strong>. Die Sprache selbst - Objekttypen, Unions,
           Generics, Utility Types - lernst du ausführlich in Teil 2, beginnend mit <Verweis id="ts-start" />.
@@ -85,7 +85,7 @@ export function TypeScriptKapitel() {
           <Code>type</Code> und <strong>Union-Typen</strong> mit <Code>|</Code> - „das eine oder das andere“.
           Besonders nützlich sind Unions aus festen Werten wie <Code>'all' | 'open' | 'done'</Code>.
         </P>
-        <TryIt id="praxis-typescript-grundlagen" {...beispiele['praxis-typescript-grundlagen']} modus="react" typen />
+        <TryIt id="praxis-typescript-grundlagen" {...examples['praxis-typescript-grundlagen']} mode="react" typed />
         <P>
           Du musst nicht alles annotieren. TypeScript <strong>leitet Typen ab</strong> (Inferenz):{' '}
           <Code>let attempts = 0</Code> ist automatisch eine <Code>number</Code>. Typen schreibst du vor allem an
@@ -100,7 +100,7 @@ export function TypeScriptKapitel() {
           <Code>?</Code> und einen Standardwert beim Destructuring. Für <Code>children</Code> nimmst du{' '}
           <Code>ReactNode</Code>: alles, was React rendern kann (<Verweis id="react-props" />).
         </P>
-        <TryIt id="praxis-typescript-props" {...beispiele['praxis-typescript-props']} modus="react" typen />
+        <TryIt id="praxis-typescript-props" {...examples['praxis-typescript-props']} mode="react" typed />
         <Liste>
           <li>
             <Code>ComponentProps&lt;'button'&gt;</Code> liefert alle Props eines echten <Code>{'<button>'}</Code>{' '}
@@ -121,7 +121,7 @@ export function TypeScriptKapitel() {
           du den Typ in spitzen Klammern an: <Code>useState&lt;User | null&gt;(null)</Code>. Refs auf DOM-Elemente
           bekommen den Elementtyp (<Verweis id="hooks-useref" />).
         </P>
-        <TryIt id="praxis-typescript-state" {...beispiele['praxis-typescript-state']} modus="react" typen />
+        <TryIt id="praxis-typescript-state" {...examples['praxis-typescript-state']} mode="react" typed />
         <P>
           Nach <Code>if (user)</Code> oder <Code>user ? … : …</Code> weiß TypeScript, dass <Code>user</Code> nicht{' '}
           <Code>null</Code> ist. Das heißt <strong>Narrowing</strong> - und genau diese vergessenen Prüfungen sind in
@@ -144,7 +144,7 @@ export function TypeScriptKapitel() {
           ein eigener Objekttyp mit einem festen <Code>type</Code>, alle zusammen eine Union. Im <Code>switch</Code>{' '}
           weiß TypeScript dann in jedem <Code>case</Code>, welche Felder die Action hat.
         </P>
-        <TryIt id="praxis-typescript-reducer" {...beispiele['praxis-typescript-reducer']} modus="react" typen />
+        <TryIt id="praxis-typescript-reducer" {...examples['praxis-typescript-reducer']} mode="react" typed />
         <P>
           Der <Code>default</Code>-Zweig mit <Code>never</Code> ist eine Absicherung: Ergänze oben die Action{' '}
           <Code>{"| { type: 'removed'; id: number }"}</Code> - sofort meldet die Typprüfung, dass der Reducer sie
@@ -158,7 +158,7 @@ export function TypeScriptKapitel() {
           Profi-Muster aus <Verweis id="hooks-usecontext" /> wird mit TypeScript noch besser: Der eigene Hook prüft
           einmal auf <Code>null</Code> - alle Aufrufer bekommen danach einen sauberen Typ ohne <Code>null</Code>.
         </P>
-        <TryIt id="praxis-typescript-context" {...beispiele['praxis-typescript-context']} modus="react" typen />
+        <TryIt id="praxis-typescript-context" {...examples['praxis-typescript-context']} mode="react" typed />
       </Abschnitt>
 
       <Abschnitt titel="Generische Komponenten">
@@ -167,7 +167,7 @@ export function TypeScriptKapitel() {
           <strong>Typparameter</strong> <Code>&lt;T&gt;</Code> bleibt trotzdem alles typsicher: TypeScript setzt{' '}
           <Code>T</Code> bei jeder Verwendung aus den übergebenen <Code>items</Code> ein.
         </P>
-        <TryIt id="praxis-typescript-generisch" {...beispiele['praxis-typescript-generisch']} modus="react" typen />
+        <TryIt id="praxis-typescript-generisch" {...examples['praxis-typescript-generisch']} mode="react" typed />
       </Abschnitt>
 
       <Abschnitt titel="Typen aus Typen und Daten von außen">
@@ -181,7 +181,7 @@ export function TypeScriptKapitel() {
           Funktion mit dem Rückgabetyp <Code>value is Customer</Code> (ein <strong>Type Guard</strong>) teilt
           TypeScript das Ergebnis der Prüfung mit.
         </P>
-        <TryIt id="praxis-typescript-typen" {...beispiele['praxis-typescript-typen']} modus="react" typen />
+        <TryIt id="praxis-typescript-typen" {...examples['praxis-typescript-typen']} mode="react" typed />
         <Hinweis variante="warnung">
           <Code>any</Code> schaltet die Prüfung ab - ein <Code>any</Code> steckt still alles an, was damit in Berührung
           kommt. <Code>unknown</Code> ist die sichere Variante: erlaubt alles, benutzt werden darf es erst nach
@@ -198,13 +198,13 @@ export function TypeScriptKapitel() {
         <P>
           Vite bringt eine fertige Vorlage mit (mehr dazu in <Verweis id="praxis-lokal" />):
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
+        <CodeBlock title="Terminal" code={codeBloecke.anlegen} />
         <P>
           Die Einstellungen stehen in der <Code>tsconfig.json</Code>. Die wichtigste ist <Code>strict</Code> - ohne
           sie fehlen genau die Prüfungen, die am meisten Fehler finden:
         </P>
-        <CodeBlock titel="tsconfig.json (Auszug)" code={codeBloecke.tsconfig} />
-        <CodeBlock titel="Terminal" code={codeBloecke.pruefen} />
+        <CodeBlock title="tsconfig.json (Auszug)" code={codeBloecke.tsconfig} />
+        <CodeBlock title="Terminal" code={codeBloecke.pruefen} />
         <Hinweis variante="tipp">
           Aus JavaScript umsteigen geht schrittweise: Datei für Datei von <Code>.jsx</Code> in <Code>.tsx</Code>{' '}
           umbenennen und die Fehler beheben, die der Compiler meldet. Genau das übst du jetzt.
@@ -214,10 +214,10 @@ export function TypeScriptKapitel() {
       <Abschnitt titel="Übung">
         <TryIt
           id="praxis-typescript-uebung"
-          {...beispiele['praxis-typescript-uebung']}
-          modus="react"
-          typen
-          aufgabe={
+          {...examples['praxis-typescript-uebung']}
+          mode="react"
+          typed
+          task={
             <>
               <p>Der Warenkorb funktioniert, ist aber noch reines JavaScript. Mach die Typprüfung grün:</p>
               <ul className="mt-1 list-disc pl-5">
@@ -236,42 +236,42 @@ export function TypeScriptKapitel() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Was passiert mit den Typen, wenn Vite die App baut?',
-            antworten: [
+            question: 'Was passiert mit den Typen, wenn Vite die App baut?',
+            answers: [
               'Sie werden in Laufzeit-Prüfungen übersetzt',
               'Sie werden entfernt - geprüft wird separat von tsc bzw. dem Editor',
               'Der Browser prüft sie beim Laden',
             ],
-            richtig: 1,
-            erklaerung: 'Im Browser kommt reines JavaScript an. Deshalb gehört tsc -b in den Build.',
+            correct: 1,
+            explanation: 'Im Browser kommt reines JavaScript an. Deshalb gehört tsc -b in den Build.',
           },
           {
-            frage: 'Wann brauchst du bei useState einen Typ in spitzen Klammern?',
-            antworten: [
+            question: 'Wann brauchst du bei useState einen Typ in spitzen Klammern?',
+            answers: [
               'Immer',
               'Wenn sich der Typ nicht aus dem Startwert ablesen lässt, z. B. bei null oder []',
               'Nur bei Objekten',
             ],
-            richtig: 1,
-            erklaerung: "useState('') ist automatisch string - useState<User | null>(null) muss man angeben.",
+            correct: 1,
+            explanation: "useState('') ist automatisch string - useState<User | null>(null) muss man angeben.",
           },
           {
-            frage: 'Wozu dient der never-Zweig im Reducer?',
-            antworten: [
+            question: 'Wozu dient der never-Zweig im Reducer?',
+            answers: [
               'Er fängt Laufzeitfehler ab',
               'Er meldet zur Übersetzungszeit, wenn eine Action im switch fehlt',
               'Er macht den Reducer schneller',
             ],
-            richtig: 1,
-            erklaerung: 'Sind alle Fälle behandelt, bleibt für action nur never übrig - sonst gibt es einen Typfehler.',
+            correct: 1,
+            explanation: 'Sind alle Fälle behandelt, bleibt für action nur never übrig - sonst gibt es einen Typfehler.',
           },
           {
-            frage: 'Welchen Typ gibst du Daten aus JSON.parse, bevor du sie geprüft hast?',
-            antworten: ['any', 'unknown', 'object'],
-            richtig: 1,
-            erklaerung: 'unknown zwingt zur Prüfung. any würde jede Prüfung abschalten.',
+            question: 'Welchen Typ gibst du Daten aus JSON.parse, bevor du sie geprüft hast?',
+            answers: ['any', 'unknown', 'object'],
+            correct: 1,
+            explanation: 'unknown zwingt zur Prüfung. any würde jede Prüfung abschalten.',
           },
         ]}
       />

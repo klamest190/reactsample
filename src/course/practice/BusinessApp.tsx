@@ -2,8 +2,8 @@ import { Abschnitt, Code, Hinweis, Liste, Merke, P, Tabelle } from '../../compon
 import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
-import { Werkstatt } from '../../learning/Workbench'
-import { codeBloecke, dateien } from './BusinessApp.code'
+import { Workbench } from '../../learning/Workbench'
+import { codeBloecke, files } from './BusinessApp.code'
 
 const aufbau: [string, string][] = [
   ['App.tsx', 'Einstieg: Store, Layout und die Seite zum gewählten Menüpunkt'],
@@ -28,7 +28,7 @@ export function BusinessApp() {
           Auftragsverwaltung mit Dashboard, Kundentabelle und Auftragsliste.
         </P>
         <P>
-          Die App besteht aus {dateien.length} Dateien in TypeScript, aufgeteilt wie in einem echten
+          Die App besteht aus {files.length} Dateien in TypeScript, aufgeteilt wie in einem echten
           Projekt. Wähle links eine Datei aus und ändere sie - die laufende App darunter übernimmt deine
           Änderung nach einer kurzen Pause, und die Typprüfung meldet Fehler über alle Dateien hinweg
           (<Verweis id="praxis-typescript" />). Mit <strong>⛶ Vollbild</strong> liegen Dateien, Editor und
@@ -38,14 +38,14 @@ export function BusinessApp() {
           Benutze die App erst einmal: Kunden suchen und sortieren, einen Kunden anklicken und bearbeiten,
           einen Auftrag anlegen, den Status ändern - und schau, wie sich das Dashboard mitverändert.
         </Hinweis>
-        <Werkstatt id="praxis-business" titel="BrightDesk" dateien={dateien} einstieg="App.tsx" typen />
+        <Workbench id="praxis-business" title="BrightDesk" files={files} entry="App.tsx" typed />
       </Abschnitt>
 
       <Abschnitt titel="So ist die App aufgebaut">
         <Tabelle
           kopf={['Datei / Ordner', 'Aufgabe']}
           spalten={['whitespace-nowrap']}
-          zeilen={aufbau.map(([datei, aufgabe]) => [<Code key={datei}>{datei}</Code>, aufgabe])}
+          zeilen={aufbau.map(([datei, task]) => [<Code key={datei}>{datei}</Code>, task])}
         />
         <P>Die Daten fließen immer im selben Kreis:</P>
         <Liste>
@@ -126,8 +126,8 @@ export function BusinessApp() {
           Leg ein Projekt an, kopiere die Dateien nach <Code>src/</Code> - es fehlt nur noch{' '}
           <Code>main.tsx</Code>, das die App in die Seite hängt:
         </P>
-        <CodeBlock titel="Terminal" code={codeBloecke.anlegen} />
-        <CodeBlock titel="src/main.tsx" code={codeBloecke.main} />
+        <CodeBlock title="Terminal" code={codeBloecke.anlegen} />
+        <CodeBlock title="src/main.tsx" code={codeBloecke.main} />
         <P>
           In <Code>index.css</Code> steht dann <Code>@import "tailwindcss";</Code> und die Farben{' '}
           <Code>brand-…</Code> als <Code>@theme</Code>, oder du ersetzt sie durch eine Tailwind-Farbe wie{' '}
@@ -136,38 +136,38 @@ export function BusinessApp() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: 'Eine Seite braucht die Kundenliste. Woher bekommt sie die Daten?',
-            antworten: [
+            question: 'Eine Seite braucht die Kundenliste. Woher bekommt sie die Daten?',
+            answers: [
               'Über Props, die App.tsx durch alle Ebenen reicht',
               'Über useStore() - dahinter steckt useContext',
               'Sie lädt sie selbst aus data.ts',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Der Store stellt Daten und dispatch per Context bereit. Ein eigener Hook verpackt das, damit keine Seite useContext selbst aufrufen muss.',
           },
           {
-            frage: 'Warum passen sich Filter, Auswahlliste und Etikett von selbst an, wenn du in data.ts einen Status ergänzt?',
-            antworten: [
+            question: 'Warum passen sich Filter, Auswahlliste und Etikett von selbst an, wenn du in data.ts einen Status ergänzt?',
+            answers: [
               'React erkennt neue Werte automatisch',
               'Weil alle drei aus derselben Liste ORDER_STATUSES erzeugt werden',
               'Weil der Reducer sie neu berechnet',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Eine Quelle, drei Verwendungen: Wer die Liste erweitert, ändert alles mit. Kopien müsste man einzeln pflegen.',
           },
           {
-            frage: 'Der Umsatz im Dashboard - wie kommt er zustande?',
-            antworten: [
+            question: 'Der Umsatz im Dashboard - wie kommt er zustande?',
+            answers: [
               'Er steht als Feld im State und wird bei jeder Änderung mitgeschrieben',
               'Er wird bei jedem Rendern aus den Aufträgen berechnet',
               'Er wird in localStorage zwischengespeichert',
             ],
-            richtig: 1,
-            erklaerung:
+            correct: 1,
+            explanation:
               'Abgeleitete Werte gehören nicht in den State - sonst kann die Kennzahl von den Aufträgen abweichen.',
           },
         ]}

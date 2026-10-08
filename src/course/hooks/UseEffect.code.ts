@@ -1,12 +1,12 @@
 import { js } from '../../learning/source'
-import type { CodeBeispiel } from '../../learning/jsSandbox'
+import type { CodeExample } from '../../learning/jsSandbox'
 
 /**
  * Codebeispiele für dieses Kapitel - für die deutsche UND die englische Fassung.
  * Code ist immer Englisch; nur Testnamen (Anzeige) gibt es in beiden Sprachen.
  */
 
-export const beispiele = {
+export const examples = {
   'hooks-useeffect-einstieg': {
     code: js`
       function App() {
@@ -111,7 +111,7 @@ export const beispiele = {
     `,
   },
   'hooks-useeffect-uebung': {
-    tipps: {
+    hints: {
       de: [
         'Ein Effekt startet das Intervall nur, solange der Countdown läuft - und räumt es im Cleanup ab.',
         'Im Intervall die Updater-Funktion nutzen: `setRemaining((r) => r - 1)`.',
@@ -139,7 +139,7 @@ export const beispiele = {
         )
       }
     `,
-    loesung: js`
+    solution: js`
       const START = 10
 
       function App() {
@@ -179,14 +179,14 @@ export const beispiele = {
     tests: [
       {
         name: { de: 'Startet bei „0:10“', en: 'Starts at “0:10”' },
-        pruefung: js`
+        script: js`
           await render()
           expect(find('h1').textContent).toBe('0:10')
         `,
       },
       {
         name: { de: 'Start zählt jede Sekunde herunter', en: 'Start counts down every second' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(1150)
@@ -195,7 +195,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Pause hält den Countdown an', en: 'Pause stops the countdown' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(1100)
@@ -207,7 +207,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Reset setzt auf 0:10 zurück und stoppt', en: 'Reset goes back to 0:10 and stops' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await wait(1100)
@@ -219,7 +219,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Der Tab-Titel zeigt die Restzeit', en: 'The tab title shows the remaining time' },
-        pruefung: js`
+        script: js`
           await render()
           expect(title()).toBe('0:10')
           await click(button('Start'))
@@ -229,7 +229,7 @@ export const beispiele = {
       },
       {
         name: { de: 'Bei 0 stoppt er und zeigt „⏰ Take a break!“ (dauert 10 s)', en: 'At 0 it stops and shows “⏰ Take a break!” (takes 10 s)' },
-        pruefung: js`
+        script: js`
           await render()
           await click(button('Start'))
           await waitFor(() => expect(text()).toContain('⏰ Take a break!'), 12000)
@@ -240,7 +240,7 @@ export const beispiele = {
       },
     ],
   },
-} satisfies Record<string, CodeBeispiel>
+} satisfies Record<string, CodeExample>
 
 /** Statische Codebeispiele (CodeBlock) in Reihenfolge ihres Auftretens. */
 export const codeBloecke = {

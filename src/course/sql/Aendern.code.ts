@@ -3,7 +3,7 @@ import type { SqlBeispiel } from '../../sql/check'
 
 /** Code for chapter 9.5 - Changing data & transactions. */
 
-export const beispiele: Record<string, SqlBeispiel> = {
+export const examples: Record<string, SqlBeispiel> = {
   'sql-aendern-einstieg': {
     code: sql`
       -- A new customer. id and joined are filled in by the database (DEFAULT).
@@ -103,7 +103,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
       -- 2. Then the new book, at the full price
 
     `,
-    loesung: sql`
+    solution: sql`
       UPDATE products
       SET price = price * 0.9
       WHERE category = 'books';
@@ -121,7 +121,7 @@ export const beispiele: Record<string, SqlBeispiel> = {
         abfrage: `SELECT name, price, stock FROM products WHERE category <> 'books' ORDER BY id`,
       },
     ],
-    tipps: {
+    hints: {
       de: [
         '10 % günstiger heißt `price * 0.9` - nur für `WHERE category = \'books\'`.',
         'Die Reihenfolge zählt: Erst das UPDATE, dann das INSERT - sonst wird das neue Buch mit reduziert.',

@@ -22,10 +22,10 @@ export function ProjektSchritt({ id }: { id: string }) {
 
   const gemeinsam = {
     id: 'projekt:' + id,
-    code: inhalt.start ?? schrittInhalte[projektSchritte[index - 1].id].loesung,
-    loesung: inhalt.loesung,
-    tipps: inhalt.tipps,
-    aufgabe: <p className="text-xs text-slate-600 dark:text-slate-400">{startHinweis}</p>,
+    code: inhalt.start ?? schrittInhalte[projektSchritte[index - 1].id].solution,
+    solution: inhalt.solution,
+    hints: inhalt.hints,
+    task: <p className="text-xs text-slate-600 dark:text-slate-400">{startHinweis}</p>,
   }
 
   return (
@@ -56,12 +56,12 @@ export function ProjektSchritt({ id }: { id: string }) {
           </ul>
         </div>
 
-        {inhalt.modus === 'test' ? (
-          <TryIt modus="test" titel={t.schrittAufgabe} {...gemeinsam} dateien={inhalt.dateien} varianten={inhalt.varianten} />
-        ) : inhalt.modus === 'react' ? (
-          <TryIt modus="react" titel={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} typen={inhalt.typen} />
+        {inhalt.mode === 'test' ? (
+          <TryIt mode="test" title={t.schrittAufgabe} {...gemeinsam} files={inhalt.files} variants={inhalt.variants} />
+        ) : inhalt.mode === 'react' ? (
+          <TryIt mode="react" title={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} typed={inhalt.typed} />
         ) : (
-          <TryIt titel={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} vorschau={inhalt.vorschau} />
+          <TryIt title={t.schrittAufgabe} {...gemeinsam} tests={inhalt.tests} preview={inhalt.preview} />
         )}
       </section>
     </>

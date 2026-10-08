@@ -3,7 +3,7 @@ import { Verweis } from '../../components/ChapterLink'
 import { CodeBlock } from '../../learning/CodeBlock'
 import { Quiz } from '../../learning/Quiz'
 import { TryIt } from '../../learning/TryIt'
-import { beispiele, codeBloecke } from './Profi.code'
+import { examples, codeBloecke } from './Profi.code'
 
 /**
  * CHAPTER 9.7 - Subqueries, CTEs & window functions (English version)
@@ -16,7 +16,7 @@ export function Profi() {
           The result of a query is a table again - and can be used in another query. Here the inner
           query returns the average price, the outer one compares every product with it:
         </P>
-        <TryIt modus="sql" id="sql-profi-einstieg" {...beispiele['sql-profi-einstieg']} />
+        <TryIt mode="sql" id="sql-profi-einstieg" {...examples['sql-profi-einstieg']} />
       </Abschnitt>
 
       <Abschnitt titel="Subqueries">
@@ -34,7 +34,7 @@ export function Profi() {
             in a moment.
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-profi-in-exists" {...beispiele['sql-profi-in-exists']} />
+        <TryIt mode="sql" id="sql-profi-in-exists" {...examples['sql-profi-in-exists']} />
         <P>
           <Code>EXISTS (…)</Code> only asks whether the subquery finds <em>any</em> row. The subquery may
           refer to the outer row (<Code>o.customer_id = c.id</Code>) - conceptually it runs once per
@@ -50,7 +50,7 @@ export function Profi() {
           <Code>WITH name AS (…)</Code>. The query then reads from top to bottom, like variables in a
           program:
         </P>
-        <TryIt modus="sql" id="sql-profi-cte" {...beispiele['sql-profi-cte']} />
+        <TryIt mode="sql" id="sql-profi-cte" {...examples['sql-profi-cte']} />
         <Hinweis variante="tipp">
           Several steps are separated by commas: <Code>WITH a AS (…), b AS (SELECT … FROM a) SELECT …</Code>.
           Every step may use the previous ones. That is how even long reports stay understandable.
@@ -64,8 +64,8 @@ export function Profi() {
           <strong>keeps every row</strong> and writes the result next to it. You recognise it by{' '}
           <Code>OVER</Code>:
         </P>
-        <CodeBlock code={codeBloecke.window} titel="SQL" />
-        <TryIt modus="sql" id="sql-profi-window" {...beispiele['sql-profi-window']} />
+        <CodeBlock code={codeBloecke.window} title="SQL" />
+        <TryIt mode="sql" id="sql-profi-window" {...examples['sql-profi-window']} />
         <Liste>
           <li>
             <Code>rank()</Code>, <Code>dense_rank()</Code>, <Code>row_number()</Code> number rows -
@@ -81,7 +81,7 @@ export function Profi() {
             <Code>lag()</Code> looks at the previous row:
           </li>
         </Liste>
-        <TryIt modus="sql" id="sql-profi-laufend" {...beispiele['sql-profi-laufend']} />
+        <TryIt mode="sql" id="sql-profi-laufend" {...examples['sql-profi-laufend']} />
       </Abschnitt>
 
       <Abschnitt titel="Views and UNION">
@@ -89,20 +89,20 @@ export function Profi() {
           A query you need again and again is saved as a <strong>view</strong>. It behaves like a table
           but computes anew on every read - the data still only lives in the real tables:
         </P>
-        <TryIt modus="sql" id="sql-profi-view" {...beispiele['sql-profi-view']} />
+        <TryIt mode="sql" id="sql-profi-view" {...examples['sql-profi-view']} />
         <P>
           And if two results with the same columns should go <em>below each other</em>,{' '}
           <Code>UNION ALL</Code> helps:
         </P>
-        <CodeBlock code={codeBloecke.union} titel="SQL" />
+        <CodeBlock code={codeBloecke.union} title="SQL" />
       </Abschnitt>
 
       <Abschnitt titel="Exercise">
         <TryIt
-          modus="sql"
+          mode="sql"
           id="sql-profi-uebung"
-          {...beispiele['sql-profi-uebung']}
-          aufgabe={
+          {...examples['sql-profi-uebung']}
+          task={
             <p>
               The CTE <Code>revenue</Code> already computes every customer’s revenue. Show only the{' '}
               <strong>customer with the highest revenue</strong> per country: <Code>country</Code>,{' '}
@@ -113,39 +113,39 @@ export function Profi() {
       </Abschnitt>
 
       <Quiz
-        fragen={[
+        questions={[
           {
-            frage: "WHERE price = (SELECT price FROM products WHERE category = 'books') - what happens?",
-            antworten: [
+            question: "WHERE price = (SELECT price FROM products WHERE category = 'books') - what happens?",
+            answers: [
               'All products that cost as much as any book',
               'An error: the subquery returns more than one row',
               'Only the first book is compared',
               'An empty result',
             ],
-            richtig: 1,
-            erklaerung: 'With = the subquery must return exactly one value. A list needs IN.',
+            correct: 1,
+            explanation: 'With = the subquery must return exactly one value. A list needs IN.',
           },
           {
-            frage: 'What is the difference between sum(revenue) with GROUP BY and sum(revenue) OVER ()?',
-            antworten: [
+            question: 'What is the difference between sum(revenue) with GROUP BY and sum(revenue) OVER ()?',
+            answers: [
               'None',
               'GROUP BY collapses the rows, OVER () keeps every row and writes the sum next to it',
               'OVER () is faster',
               'OVER () only works with ORDER BY',
             ],
-            richtig: 1,
-            erklaerung: 'Window functions compute over other rows without collapsing them.',
+            correct: 1,
+            explanation: 'Window functions compute over other rows without collapsing them.',
           },
           {
-            frage: 'What is WITH for?',
-            antworten: [
+            question: 'What is WITH for?',
+            answers: [
               'It creates a permanent table',
               'It names an intermediate query, so the query is built in readable steps',
               'It starts a transaction',
               'It joins two tables',
             ],
-            richtig: 1,
-            erklaerung: 'A CTE only applies to the one query. To keep a query permanently, use CREATE VIEW.',
+            correct: 1,
+            explanation: 'A CTE only applies to the one query. To keep a query permanently, use CREATE VIEW.',
           },
         ]}
       />
