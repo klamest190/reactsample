@@ -156,6 +156,41 @@ export function TryItJs(props: JsProps) {
     return () => window.removeEventListener('message', onMessage)
   }, [currentRun, t])
 
+  // Build the output blocks once and use them twice: as `children` stacked (chapters) and
+  // as `areas` in tabs (playground, see EditorWorkspace.tsx).
+  const problems = ts ? <TypeDiagnosticList error={typeErrors} /> : null
+  const previewBlock = currentRun ? (
+    // Das iframe bleibt immer eingehängt (der Code läuft darin), nur ohne Inhalt eben unsichtbar.
+    <div className={showPreview ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
+      {showPreview && (
+        <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.vorschau}</div>
+      )}
+      <iframe
+        key={currentRun.number}
+        ref={iframeRef}
+        srcDoc={dokument ?? ''}
+        sandbox="allow-scripts allow-forms"
+        title={t.ausgabe}
+        className={showPreview ? 'h-48 w-full' : 'h-px w-px'}
+      />
+      {testDocument && (
+        <iframe
+          key={'tests' + currentRun.number}
+          ref={testIframeRef}
+          srcDoc={testDocument}
+          sandbox="allow-scripts allow-forms"
+          aria-hidden
+          tabIndex={-1}
+          className="absolute h-px w-px opacity-0"
+        />
+      )}
+    </div>
+  ) : null
+  const testBlock = <TestResults id={id} results={allResults} />
+  const consoleBlock = (
+    <Console lines={lines} emptyText={isExercise && !currentRun ? t.uebungStart : showPreview ? undefined : t.keineAusgabe} />
+  )
+
   return (
     <EditorFrame
       {...frame}
@@ -163,48 +198,17 @@ export function TryItJs(props: JsProps) {
       running={running}
       run={(c) => run(c ?? code)}
       markers={typeErrors ?? undefined}
+      areas={[
+        { id: 'output', title: t.konsole, icon: 'kolben', content: consoleBlock },
+        { id: 'preview', title: t.vorschau, icon: 'auge', content: previewBlock, empty: !showPreview || !currentRun },
+        { id: 'tests', title: t.reiterTests, icon: 'kreisHaken', content: testBlock, empty: !allResults },
+        { id: 'problems', title: t.probleme, icon: 'warnung', content: problems, empty: !ts, count: typeErrors?.length },
+      ]}
     >
-      {ts && <TypeDiagnosticList error={typeErrors} />}
-      {currentRun && (
-        // Das iframe bleibt immer eingehängt (der Code läuft darin), nur ohne Inhalt eben unsichtbar.
-        <div className={showPreview ? 'border-b border-slate-200 dark:border-slate-800' : 'h-px overflow-hidden opacity-0'}>
-          {showPreview && (
-            <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">
-              {t.vorschau}
-            </div>
-          )}
-          <iframe
-            key={currentRun.number}
-            ref={iframeRef}
-            srcDoc={dokument ?? ''}
-            sandbox="allow-scripts allow-forms"
-            title={t.ausgabe}
-            className={showPreview ? 'h-48 w-full' : 'h-px w-px'}
-          />
-          {testDocument && (
-            <iframe
-              key={'tests' + currentRun.number}
-              ref={testIframeRef}
-              srcDoc={testDocument}
-              sandbox="allow-scripts allow-forms"
-              aria-hidden
-              tabIndex={-1}
-              className="absolute h-px w-px opacity-0"
-            />
-          )}
-        </div>
-      )}
-      <TestResults id={id} results={allResults} />
-      <Console
-        lines={lines}
-        emptyText={
-          isExercise && !currentRun
-            ? t.uebungStart
-            : showPreview
-              ? undefined
-              : t.keineAusgabe
-        }
-      />
+      {problems}
+      {previewBlock}
+      {testBlock}
+      {consoleBlock}
     </EditorFrame>
   )
 }

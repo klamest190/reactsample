@@ -11,13 +11,14 @@ import { useSavedCode } from './useSavedCode'
  *   const { code, setCode, frame } = useEditor(props)
  *   return <EditorFrame {...frame} kind="SQL" run={(c) => start(c ?? code)}>…</EditorFrame>
  */
-export function useEditor({ id, code: startCode, title, task, solution, hints, editorRef, heading, maxLines }: CommonProps) {
+export function useEditor({ id, code: startCode, title, task, solution, hints, editorRef, heading, maxLines, workspace }: CommonProps) {
   const [code, setCode] = useSavedCode(id, startCode)
   return {
     code,
     setCode,
     // `satisfies`: a misspelled prop would otherwise vanish silently when spread into <EditorFrame>.
-    frame: { title, task, code, setCode, startCode, solution, hints, editorRef, heading, maxLines } satisfies Partial<ComponentProps<typeof EditorFrame>>,
+    // workspaceId: unique per editor - the Monaco model and the stored split hang off it.
+    frame: { title, task, code, setCode, startCode, solution, hints, editorRef, heading, maxLines, workspace, workspaceId: id } satisfies Partial<ComponentProps<typeof EditorFrame>>,
   }
 }
 

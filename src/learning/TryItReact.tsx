@@ -147,6 +147,29 @@ export function TryItReact(props: ReactProps) {
     }
   }, [log])
 
+  // Built once, used twice: stacked in the chapters, in tabs in the playground. The
+  // preview stays mounted either way - it holds the React root of the learner's code.
+  const problems = typed ? <TypeDiagnosticList error={typeErrors} /> : null
+  const previewBlock = (
+    <>
+      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.vorschau}</div>
+      <div ref={containerRef} data-preview className="preview min-h-16 px-4 pt-1 pb-4" />
+    </>
+  )
+  const testBlock = tests?.length ? (
+    <div className="border-t border-slate-200 dark:border-slate-800">
+      {results ? (
+        <TestResults id={id} results={results} />
+      ) : (
+        <p className="flex items-center gap-1.5 px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+          {testsRunning && <Icon name="uhr" className="size-3.5" />}
+          {testsRunning ? t.testsLaufen : t.reactUebungStart}
+        </p>
+      )}
+    </div>
+  ) : null
+  const consoleBlock = <Console lines={lines} />
+
   return (
     <EditorFrame
       {...frame}
@@ -154,23 +177,17 @@ export function TryItReact(props: ReactProps) {
       running={testsRunning}
       run={(c) => run(c ?? code)}
       markers={typeErrors ?? undefined}
+      areas={[
+        { id: 'preview', title: t.vorschau, icon: 'auge', content: previewBlock },
+        { id: 'output', title: t.konsole, icon: 'kolben', content: consoleBlock },
+        { id: 'tests', title: t.reiterTests, icon: 'kreisHaken', content: testBlock, empty: !tests?.length },
+        { id: 'problems', title: t.probleme, icon: 'warnung', content: problems, empty: !typed, count: typeErrors?.length },
+      ]}
     >
-      {typed && <TypeDiagnosticList error={typeErrors} />}
-      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.vorschau}</div>
-      <div ref={containerRef} data-preview className="preview min-h-16 px-4 pt-1 pb-4" />
-      {tests?.length ? (
-        <div className="border-t border-slate-200 dark:border-slate-800">
-          {results ? (
-            <TestResults id={id} results={results} />
-          ) : (
-            <p className="flex items-center gap-1.5 px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-              {testsRunning && <Icon name="uhr" className="size-3.5" />}
-              {testsRunning ? t.testsLaufen : t.reactUebungStart}
-            </p>
-          )}
-        </div>
-      ) : null}
-      <Console lines={lines} />
+      {problems}
+      {previewBlock}
+      {testBlock}
+      {consoleBlock}
     </EditorFrame>
   )
 }

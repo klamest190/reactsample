@@ -1,11 +1,14 @@
-import { useEffect, useState, type ReactNode, type Ref } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type ReactNode, type Ref } from 'react'
 import { Icon } from '../components/Icon'
 import { useFortschritt } from '../context/ProgressContext'
 import { useSprache, useTexte } from '../i18n/LanguageContext'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { CodeBlock } from './CodeBlock'
 import { CodeEditor, type EditorControl } from './CodeEditor'
 import { KINDS, EDITOR_LANGUAGES, type Kind } from './modes'
 import { Text } from './Text'
+import { EditorWorkspace, type Area } from './EditorWorkspace'
+import { createCursorStore } from './cursorStore'
 import type { TestResult } from './jsSandbox'
 import type { TypeDiagnostic } from './typeCheck'
 
@@ -17,7 +20,15 @@ import type { TypeDiagnostic } from './typeCheck'
 
 export type Line = { type: 'log' | 'info' | 'warn' | 'error' | 'exception'; text: string }
 
-// Abzeichen und Editorsprache je Art stehen in modi.ts (ARTEN).
+// Abzeichen und Editorsprache je Art stehen in modes.ts (KINDS).
+
+/**
+ * Monaco only in the playground - and only loaded there.
+ *
+ * `EditorFrame` sits in every chapter page. A static import would carry Monaco (a good
+ * megabyte) everywhere, so it hangs off `lazy` (CLAUDE.md: "Erster Download klein halten").
+ */
+const MonacoEditor = lazy(() => import('./MonacoEditor').then((module) => ({ default: module.MonacoEditor })))
 
 export function EditorFrame({
   kind,
@@ -36,6 +47,9 @@ export function EditorFrame({
   editorRef,
   heading,
   maxLines,
+  workspace,
+  workspaceId,
+  areas,
   children,
 }: {
   editorRef?: Ref<EditorControl>
@@ -56,7 +70,20 @@ export function EditorFrame({
   hints?: { de: string[]; en: string[] }
   run: (code?: string) => void
   running?: boolean
-  children: ReactNode
+  /**
+   * Workspace layout: Monaco on top, output in tabs below, status bar at the bottom.
+   * Only the playground sets this - the chapters keep the own editor in the text flow.
+   */
+  workspace?: boolean
+  /** Unique per workspace - name of the Monaco model and key of the stored split. */
+  workspaceId?: string
+  /**
+   * The same output blocks as `children`, only named and in tab order. Applies in the
+   * workspace layout only; otherwise `children` counts - there they sit stacked, in the
+   * order that suits the reading flow of the chapters.
+   */
+  areas?: Area[]
+  children?: ReactNode
 }) {
   const t = useTexte()
   const { sprache: language } = useSprache()
@@ -66,6 +93,122 @@ export function EditorFrame({
   const hintList = hints?.[language] ?? []
   const isExercise = Boolean(task)
 
+  // Status bar of the workspace. The cursor position goes through a store, not through
+  // state: it changes on every keystroke and would otherwise re-render the whole frame.
+  const cursor = useMemo(() => createCursorStore(), [])
+  const [duration, setDuration] = useState<number | null>(null)
+  const [minimap, setMinimap] = useLocalStorage('lernpfad-minimap', false)
+
+  // Measure the run time: start the clock on start, read it after the run. Synchronous
+  // runtimes (Java, Spring, Docker) never set `running`, so the measurement also hangs off
+  // a counter that goes up on every start.
+  const startedAt = useRef<number | null>(null)
+  const [runNo, setRunNo] = useState(0)
+  useEffect(() => {
+    if (startedAt.current === null || running) return
+    setDuration(Math.round(performance.now() - startedAt.current))
+    startedAt.current = null
+  }, [running, runNo])
+
+  function start(nextCode?: string) {
+    startedAt.current = performance.now()
+    setRunNo((n) => n + 1)
+    // Forward the arity unchanged: `run()` means "take the current state", `run(code)`
+    // passes an explicit text. An explicit `undefined` is not the same thing.
+    if (nextCode === undefined) run()
+    else run(nextCode)
+  }
+
+  const buttonRow = (
+        <div className="flex flex-wrap items-center gap-2 border-y border-slate-200 px-4 py-2 dark:border-slate-800">
+          <button
+            onClick={() => start()}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800"
+          >
+            <Icon name="abspielen" className="size-3.5" />
+            {runLabel ?? t.ausfuehren}
+          </button>
+          <button
+            onClick={() => {
+              setCode(startCode)
+              run(startCode)
+            }}
+            disabled={code === startCode}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800"
+          >
+            <Icon name="zuruecksetzen" className="size-3.5" />
+            {t.zuruecksetzen}
+          </button>
+          {hintList.length > 0 && (
+            <button
+              onClick={() => setHintCount((n) => Math.min(n + 1, hintList.length))}
+              disabled={hintCount >= hintList.length}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm text-amber-900 transition hover:bg-amber-100 disabled:opacity-40 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
+            >
+              <Icon name="gluehbirne" className="size-3.5" />
+              {t.tipp(Math.min(hintCount + 1, hintList.length), hintList.length)}
+            </button>
+          )}
+          {solution && (
+            <button
+              onClick={() => setShowSolution((z) => !z)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+            >
+              <Icon name="schluessel" className="size-3.5" />
+              {showSolution ? t.loesungVerbergen : t.loesungZeigen}
+            </button>
+          )}
+          <span className="ml-auto hidden text-xs text-slate-500 sm:inline dark:text-slate-400">
+            {running ? t.laeuft : t.tastenHinweis}
+          </span>
+        </div>
+  )
+
+  const extras = (
+    <>
+          {hintCount > 0 && (
+            <ol className="space-y-1 border-b border-slate-200 bg-amber-50/60 px-4 py-3 text-sm dark:border-slate-800 dark:bg-amber-950/30">
+              {hintList.slice(0, hintCount).map((hint, i) => (
+                <li key={i} className="flex gap-2">
+                  <span className="flex shrink-0 items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
+                    <Icon name="gluehbirne" className="size-3.5" />
+                    {i + 1}.
+                  </span>
+                  <span>
+                    <Text text={hint} />
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {showSolution && solution && (
+            <div className="space-y-2 border-b border-slate-200 p-4 dark:border-slate-800">
+              <CodeBlock code={solution} title={t.musterloesung} language={EDITOR_LANGUAGES[KINDS[kind].language].highlight} />
+              <button
+                onClick={() => {
+                  setCode(solution)
+                  run(solution)
+                }}
+                className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+              >
+                {t.loesungUebernehmen}
+              </button>
+            </div>
+          )}
+    </>
+  )
+
+  const editorProps = {
+    value: code,
+    onChange: setCode,
+    onRun: (c: string) => start(c),
+    label: `${t.codeEditor}${title ? ': ' + title : ''}`,
+    language: KINDS[kind].language,
+    markers,
+    control: editorRef,
+    maxLines,
+  }
   return (
     // data-running: lets the page test (scripts/e2e-pages.mjs) wait for running editors.
     <div data-running={running || undefined} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -93,92 +236,33 @@ export function EditorFrame({
 
       {above}
 
-      <CodeEditor
-        value={code}
-        onChange={setCode}
-        onRun={(c) => run(c)}
-        label={`${t.codeEditor}${title ? ': ' + title : ''}`}
-        language={KINDS[kind].language}
-        markers={markers}
-        control={editorRef}
-        maxLines={maxLines}
-      />
-
-      <div className="flex flex-wrap items-center gap-2 border-y border-slate-200 px-4 py-2 dark:border-slate-800">
-        <button
-          onClick={() => run()}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800"
-        >
-          <Icon name="abspielen" className="size-3.5" />
-          {runLabel ?? t.ausfuehren}
-        </button>
-        <button
-          onClick={() => {
-            setCode(startCode)
-            run(startCode)
-          }}
-          disabled={code === startCode}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 disabled:opacity-40 dark:border-slate-700 dark:hover:bg-slate-800"
-        >
-          <Icon name="zuruecksetzen" className="size-3.5" />
-          {t.zuruecksetzen}
-        </button>
-        {hintList.length > 0 && (
-          <button
-            onClick={() => setHintCount((n) => Math.min(n + 1, hintList.length))}
-            disabled={hintCount >= hintList.length}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-sm text-amber-900 transition hover:bg-amber-100 disabled:opacity-40 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
-          >
-            <Icon name="gluehbirne" className="size-3.5" />
-            {t.tipp(Math.min(hintCount + 1, hintList.length), hintList.length)}
-          </button>
-        )}
-        {solution && (
-          <button
-            onClick={() => setShowSolution((z) => !z)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-          >
-            <Icon name="schluessel" className="size-3.5" />
-            {showSolution ? t.loesungVerbergen : t.loesungZeigen}
-          </button>
-        )}
-        <span className="ml-auto hidden text-xs text-slate-500 sm:inline dark:text-slate-400">
-          {running ? t.laeuft : t.tastenHinweis}
-        </span>
-      </div>
-
-      {hintCount > 0 && (
-        <ol className="space-y-1 border-b border-slate-200 bg-amber-50/60 px-4 py-3 text-sm dark:border-slate-800 dark:bg-amber-950/30">
-          {hintList.slice(0, hintCount).map((hint, i) => (
-            <li key={i} className="flex gap-2">
-              <span className="flex shrink-0 items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
-                <Icon name="gluehbirne" className="size-3.5" />
-                {i + 1}.
-              </span>
-              <span>
-                <Text text={hint} />
-              </span>
-            </li>
-          ))}
-        </ol>
+      {workspace && areas ? (
+        <>
+          {buttonRow}
+          <EditorWorkspace
+            storageId={workspaceId ?? 'workspace'}
+            kindLabel={KINDS[kind].text}
+            cursor={cursor}
+            duration={duration}
+            minimap={minimap}
+            onToggleMinimap={() => setMinimap((m) => !m)}
+            areas={areas}
+            editor={
+              <Suspense fallback={<div className="p-3 text-sm text-slate-500 dark:text-slate-400">{t.laeuft}</div>}>
+                <MonacoEditor {...editorProps} id={workspaceId ?? 'workspace'} fill minimap={minimap} onCursor={cursor.set} />
+              </Suspense>
+            }
+          />
+          {extras}
+        </>
+      ) : (
+        <>
+          <CodeEditor {...editorProps} />
+          {buttonRow}
+          {extras}
+          {children}
+        </>
       )}
-
-      {showSolution && solution && (
-        <div className="space-y-2 border-b border-slate-200 p-4 dark:border-slate-800">
-          <CodeBlock code={solution} title={t.musterloesung} language={EDITOR_LANGUAGES[KINDS[kind].language].highlight} />
-          <button
-            onClick={() => {
-              setCode(solution)
-              run(solution)
-            }}
-            className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
-          >
-            {t.loesungUebernehmen}
-          </button>
-        </div>
-      )}
-
-      {children}
     </div>
   )
 }

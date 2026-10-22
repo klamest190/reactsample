@@ -62,12 +62,17 @@ export function Seitenleiste({
   offen,
   schliessen,
   sucheOeffnen,
+  collapsed,
+  onToggle,
 }: {
   route: string
   erledigt: string[]
   offen: boolean
   schliessen: () => void
   sucheOeffnen: () => void
+  /** From md up: show only a narrow icon bar (the default in the playground). */
+  collapsed: boolean
+  onToggle: () => void
 }) {
   const { sprache } = useSprache()
   const t = useTexte()
@@ -91,6 +96,53 @@ export function Seitenleiste({
         : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-100'
     }`
 
+  // Collapsed (desktop): just a narrow bar of icons - in the playground the space should
+  // belong to the editor. On mobile this does not exist, there only `offen` counts.
+  if (collapsed && !offen) {
+    return (
+      <nav
+        id="kursnavigation"
+        aria-label={t.kapitelMenue}
+        className={`hidden ${KLEBT_MD} md:flex md:w-10 md:shrink-0 md:flex-col md:items-center md:gap-1 md:pr-2`}
+      >
+        <button
+          onClick={onToggle}
+          aria-label={t.navAusklappen}
+          title={t.navAusklappen}
+          aria-expanded={false}
+          aria-controls="kursnavigation"
+          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
+        >
+          <Icon name="pfeilRechts" className="size-4" />
+        </button>
+        <button
+          onClick={sucheOeffnen}
+          aria-label={t.sucheOeffnen}
+          title={t.sucheOeffnen}
+          className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
+        >
+          <Icon name="suche" className="size-4" />
+        </button>
+        {seiten.map((seite) => (
+          <a
+            key={seite.href}
+            href={seite.href}
+            aria-current={seite.aktiv ? 'page' : undefined}
+            aria-label={seite.label}
+            title={seite.label}
+            className={`rounded-lg p-1.5 transition ${
+              seite.aktiv
+                ? 'bg-white text-slate-900 shadow-xs ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-800'
+                : 'text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100'
+            }`}
+          >
+            <Icon name={seite.icon} className="size-4" />
+          </a>
+        ))}
+      </nav>
+    )
+  }
+
   return (
     <nav
       id="kursnavigation"
@@ -103,6 +155,19 @@ export function Seitenleiste({
       // top-14.25 ist deren gemessene Höhe). Ab md: immer sichtbar, klebt beim Scrollen.
       className={`${offen ? 'fixed inset-x-0 top-14.25 bottom-0 z-30 block overflow-y-auto bg-slate-50 px-4 py-4 dark:bg-slate-950' : 'hidden'} ${KLEBT_MD} md:block md:w-60 md:shrink-0 md:bg-transparent md:p-0 md:pr-2`}
     >
+      <div className="mb-3 hidden justify-end md:flex">
+        <button
+          onClick={onToggle}
+          aria-label={t.navEinklappen}
+          title={t.navEinklappen}
+          aria-expanded
+          aria-controls="kursnavigation"
+          className="rounded-lg p-1 text-slate-500 transition hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-100"
+        >
+          <Icon name="pfeilLinks" className="size-4" />
+        </button>
+      </div>
+
       <button
         onClick={() => {
           schliessen()

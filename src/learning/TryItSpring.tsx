@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Icon, type IconName } from '../components/Icon'
 import { localized } from '../i18n/localized'
-import { useSprache } from '../i18n/LanguageContext'
+import { useSprache, useTexte } from '../i18n/LanguageContext'
 import {
   formatJson,
   springCheck,
@@ -114,6 +114,8 @@ export function TryItSpring(props: SpringProps) {
   const { id, tests, properties: startProperties, requests } = props
   const { sprache: language } = useSprache()
   const t = TEXTS[language]
+  // Tab labels come from the interface texts, not from TEXTS.
+  const ui = useTexte()
   const { code, frame } = useEditor(props)
   const [properties, setProperties] = useSavedCode(id + ':properties', startProperties ?? '')
   const springTests = useMemo(
@@ -159,6 +161,14 @@ export function TryItSpring(props: SpringProps) {
       </details>
     ) : null
 
+  const testBlock = <TestResults id={id} results={run?.results?.map((r) => ({ name: r.name, ok: r.ok, message: r.message })) ?? null} />
+  const serverBlock = run ? <ServerBar server={run.server} /> : null
+  const consoleBlock = run ? <Console lines={run.lines} /> : <Console lines={[]} emptyText={tests ? t.exerciseStart : '…'} />
+  const httpBlock =
+    run && run.server ? (
+      <HttpPanel server={run.server} exchanges={run.exchanges} onSend={send} onClear={() => setRun({ ...run, exchanges: [] })} />
+    ) : null
+
   return (
     <EditorFrame
       {...frame}
@@ -167,17 +177,17 @@ export function TryItSpring(props: SpringProps) {
       runLabel={t.start}
       above={propertiesEditor}
       run={(c) => start(c ?? code, true)}
+      areas={[
+        { id: 'output', title: ui.konsole, icon: 'kolben', content: consoleBlock },
+        { id: 'http', title: 'HTTP', icon: 'globus', content: httpBlock, empty: !httpBlock },
+        { id: 'beans', title: 'Beans', icon: 'server', content: serverBlock, empty: !serverBlock },
+        { id: 'tests', title: ui.reiterTests, icon: 'kreisHaken', content: testBlock, empty: !run?.results },
+      ]}
     >
-      <TestResults id={id} results={run?.results?.map((r) => ({ name: r.name, ok: r.ok, message: r.message })) ?? null} />
-      {run ? (
-        <>
-          <ServerBar server={run.server} />
-          <Console lines={run.lines} />
-          {run.server && <HttpPanel server={run.server} exchanges={run.exchanges} onSend={send} onClear={() => setRun({ ...run, exchanges: [] })} />}
-        </>
-      ) : (
-        <Console lines={[]} emptyText={tests ? t.exerciseStart : '…'} />
-      )}
+      {testBlock}
+      {serverBlock}
+      {consoleBlock}
+      {httpBlock}
     </EditorFrame>
   )
 }

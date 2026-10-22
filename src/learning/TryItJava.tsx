@@ -49,15 +49,22 @@ export function TryItJava(props: JavaProps) {
   )
   const markers = useDelayedCheck(code, check) ?? undefined
 
+  const testBlock = <TestResults id={id} results={runId?.results ?? null} />
+  const consoleBlock = <Console lines={runId?.lines ?? []} emptyText={runId ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
+
   return (
     <EditorFrame
       {...frame}
       kind="Java"
       markers={markers}
       run={(c) => starten(c ?? code, true)}
+      areas={[
+        { id: 'output', title: t.konsole, icon: 'kolben', content: consoleBlock },
+        { id: 'tests', title: t.reiterTests, icon: 'kreisHaken', content: testBlock, empty: !runId?.results },
+      ]}
     >
-      <TestResults id={id} results={runId?.results ?? null} />
-      <Console lines={runId?.lines ?? []} emptyText={runId ? t.keineAusgabe : tests ? t.uebungStart : t.laeuft} />
+      {testBlock}
+      {consoleBlock}
     </EditorFrame>
   )
 }

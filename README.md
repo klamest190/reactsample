@@ -330,6 +330,17 @@ Erklärung. ↑/↓ wählen, Enter/Tab fügen ein (`$0` in der Vorlage bestimmt 
 schließt, Strg+Leertaste öffnet die Liste von Hand. Nach einem Punkt erscheinen Methoden wie `map` oder `filter`.
 Für Java gibt es eine eigene Liste (`System.out.println`, `int`, `ArrayList` …) statt der JavaScript-Vorschläge.
 
+**Im Playground: Monaco.** Dort läuft derselbe Editor wie in VS Code (`@monaco-editor/react`) - mit
+echtem IntelliSense aus den Typen (Hover, Signaturhilfe, Member nach dem Punkt), Mehrfachcursor,
+Klammern-Paaren und Suchen & Ersetzen. Die Vorschläge des Kurses kommen zusätzlich: dieselben rund
+420 Einträge aus `suggestions.ts` samt Erklärung, als Monaco-Provider angemeldet. In den Kapiteln
+bleibt der eigene Editor - Monaco wiegt gut ein Megabyte und würde sonst auf jeder Kapitelseite
+mitkommen. Beide bieten nach außen dasselbe an, `EditorFrame` tauscht sie gegeneinander.
+
+Die verbindliche Typprüfung bleibt auch im Playground der echte `tsc` im Web Worker; Monacos eigene
+Diagnostics sind aus, seine Fehlerliste würde sonst neben einer zweiten Meinung stehen. Die Fehler
+erscheinen als Marker im Editor und im Reiter „Probleme“.
+
 ## Der Playground
 
 Für jeden Teil gibt es einen Editor zum freien Programmieren - ohne Aufgabe und ohne Tests
@@ -344,8 +355,20 @@ jedes Kapitels. Damit man nicht vor einem leeren Blatt sitzt:
   Komponenten, Methoden und Klassen bringen ihren Aufruf gleich mit (`<Counter />`, `add(2, 3)`), fehlende
   Java- und React-Imports werden oben ergänzt.
 
-Beides läuft über das Textfeld des Editors, **Strg + Z** macht also jeden Klick rückgängig. Der Code wird
-wie bei jedem Editor im `localStorage` gespeichert (einmal pro Teil).
+Beides läuft über den Editor selbst, **Strg + Z** macht also jeden Klick rückgängig - jeder Baustein
+ist ein eigener Schritt. Der Code wird wie bei jedem Editor im `localStorage` gespeichert (einmal pro Teil).
+
+**Das Layout** ist eine kleine Entwicklungsumgebung:
+
+- **Editor und Ausgabe sind teilbar** - der Griff dazwischen verschiebt sie, die Aufteilung wird gemerkt.
+- **Die Ausgabe liegt in Reitern**: Konsole, Vorschau, Tests, Probleme - je nach Teil auch HTTP und Beans
+  (Spring) oder das Abfrageergebnis (SQL). Der erste Reiter ist der wichtigste des jeweiligen Teils:
+  bei JavaScript die Konsole, bei React die Vorschau.
+- **Die Bausteine lassen sich einklappen**, dann bleibt nur eine schmale Leiste - mehr Platz für den Code.
+- **Die Navigation ist im Playground standardmäßig eingeklappt** (eine Symbolleiste statt der vollen
+  Seitenleiste) und lässt sich mit einem Klick wieder ausklappen.
+- **Unten eine Statusleiste**: Sprache, Zeile und Spalte des Cursors, Dauer des letzten Laufs, Minimap-Schalter.
+- **Tasten**: Strg + Enter führt aus, F1 öffnet Monacos Befehlsliste, Strg + K bleibt die Suche der Seite.
 
 | Datei | Aufgabe |
 |-------|---------|
@@ -353,6 +376,9 @@ wie bei jedem Editor im `localStorage` gespeichert (einmal pro Teil).
 | `src/course/playground/locations.ts` | Wohin ein Baustein ohne Cursor kommt (`ende`, `oben`, `komponente`, `jsx`, `main`, `methode`, `klasse`) |
 | `src/learning/insertion.ts` | Einfügen mit passender Einrückung - von Editor und Selbsttest gemeinsam genutzt |
 | `src/pages/Playground.tsx` | Die Seite: Teil-Auswahl, Vorlagen, Bausteinleiste, Editor |
+| `src/learning/EditorWorkspace.tsx` | Das Layout: teilbare Bereiche, Reiter für die Ausgabe, Statusleiste |
+| `src/learning/MonacoEditor.tsx` | Monaco mit demselben Vertrag wie der eigene Editor |
+| `src/learning/monaco/` | Monaco einrichten: Themes, Sprachen, Vorschläge |
 
 `npm run e2e:content -- playground-` prüft jede Vorlage, jeden Baustein an seiner automatischen Stelle
 und alle Bausteine eines Teils zusammen (findet doppelte Variablennamen und falsche Einfügestellen).

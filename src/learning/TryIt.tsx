@@ -51,6 +51,11 @@ export type CommonProps = {
   editorRef?: Ref<EditorControl>
   heading?: string
   maxLines?: number
+  /**
+   * Playground: workspace layout with Monaco, output in tabs and a status bar.
+   * Off in the chapters - there the editor sits in the text flow and Monaco would be too heavy.
+   */
+  workspace?: boolean
 }
 
 export type JsProps = CommonProps & {

@@ -13,6 +13,8 @@ passt die Struktur unten im selben Commit an. Ebenso neue Konventionen und Stolp
 React 19, TypeScript 6, Vite 8 (rolldown), Tailwind v4, oxlint, Vitest. Kein Router-Framework (Hash-Routing
 über `useHashRoute`), keine i18n-Bibliothek - Eigenbau im Projekt. Die Browser-Tests (`e2e:content`,
 `e2e:pages`) laufen über playwright-core und axe-core.
+Im Playground zusätzlich Monaco (`monaco-editor`, `@monaco-editor/react`), `react-resizable-panels`
+und `@fontsource/jetbrains-mono` - alle drei nur dort und nachgeladen, siehe „Die zwei Editoren“.
 
 ```bash
 npm run dev            # Dev-Server (http://localhost:5173)
@@ -114,7 +116,16 @@ src/
     modes.ts                 Register: Modi, Editorsprachen, Abzeichen, Hervorhebung nach Titel
     useEditor.ts             useEditor(props): gespeicherter Code + Props für den Rahmen; useOnMount (erster Lauf)
     editorChecks.ts          useDelayedCheck (Prüfen nach Tipp-Pause), lineMarkers (rote Linie je Zeile)
-    CodeEditor.tsx           Textarea über eingefärbtem <pre>, Autovervollständigung
+    CodeEditor.tsx           Textarea über eingefärbtem <pre>, Autovervollständigung (Kapitel)
+    MonacoEditor.tsx         derselbe Vertrag in Monaco (nur Playground, lazy aus EditorFrame.tsx)
+    EditorWorkspace.tsx      Playground-Layout: Editor/Ausgabe teilbar, Ausgabe in Reitern, Statusleiste
+    cursorStore.ts           Cursorposition als Store - sonst rendert jeder Tastendruck den ganzen Rahmen
+    editorGlobals.ts         Hooks ohne Import als .d.ts - gemeinsam für tsc-Worker und Monaco
+    monaco/
+      setup.ts               Monaco einrichten (lokale Fassung statt CDN, Worker, TS-Optionen, extraLibs)
+      themes.ts              die zwei Themes - Farben wie highlight.tsx, auf WCAG AA gerechnet
+      languages.ts           EditorLanguage -> Monaco-Sprache/Dateiendung + Register je Modell
+      completion.ts          die Vorschläge des Kurses als Monaco-Provider (nutzt search())
     highlight.tsx            Syntax-Highlighter (code, konfig, sql)
     suggestions.ts backendSuggestions.ts sqlSuggestions.ts   Vorschläge im Editor
     reactCompile.ts          sucrase → Komponente, mit eigenen Globalen für Tests
@@ -136,6 +147,30 @@ src/
 Laufzeiten (`java/`, `spring/`, `docker/`, `sql/`) kennen kein React und kein DOM, damit sie auch in
 Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.ts` bzw.
 `client.ts`; `contents.ts`/`check.ts` prüfen die Kapitelbeispiele.
+
+## Die zwei Editoren
+
+Der Kurs hat zwei Editor-Oberflächen mit **demselben Vertrag** (gleiche Props, gleiche
+`EditorControl` mit `stand/insert/replace/run`) - `EditorFrame` tauscht sie gegeneinander:
+
+| | `CodeEditor.tsx` | `MonacoEditor.tsx` |
+|---|---|---|
+| wo | Kapitel, Übungen, Werkstatt | nur Playground (`workspace`) |
+| Gewicht | im ersten Download | ~1 MB, `lazy()` in `EditorFrame.tsx` |
+| Vorschläge | `suggestions.ts` + Tailwind-Engine | dieselben + Monacos IntelliSense aus den Typen |
+
+Warum nicht überall Monaco: `EditorFrame` steckt in jeder der ~60 Kapitelseiten. Ein fester Import
+würde Monaco überallhin mitnehmen - der erste Download soll klein bleiben (siehe Stolperfallen).
+
+Die Laufzeiten bleiben unangetastet: Java läuft weiter im echten Interpreter unter `src/java/`,
+SQL in echtem PostgreSQL (PGlite) unter `src/sql/`, React über sucrase. Monaco ist nur die
+Oberfläche - er übersetzt und führt nichts aus.
+
+**Ausgabe in Reitern:** Im Workspace-Layout liefern die Editoren ihre Ausgabeblöcke zusätzlich als
+`areas` (benannt, in Reiter-Reihenfolge); ohne Workspace zählt wie bisher `children`. Beide
+beschreiben dieselben Elemente - gerendert wird immer nur eins von beidem. Die Inhalte aller Reiter
+bleiben im DOM (nur `hidden`), weil darin laufende Dinge stecken: das Sandbox-iframe, die
+React-Wurzel der Vorschau, die PGlite-Verbindung.
 
 ## Konventionen
 
@@ -193,6 +228,32 @@ Node laufen (Vitest-Projekt `content`). Die Tür nach außen ist jeweils `index.
 - Playground-IDs (`teil: '…'`) stehen in den Dateien unter `course/playground/`, nicht in `index.ts`.
 - Kapitel-Imports in `course/parts/*.ts` müssen existieren, sonst bricht Vite ab (beim Anlegen zuerst die Dateien).
 - PGlite ist in `optimizeDeps.exclude` - nicht entfernen, sonst lädt die WASM-Datei nicht.
+- **axe misst auch Monacos DOM.** `e2e:pages` nimmt nur `[data-preview]` und iframes aus - die
+  Token-Farben im Editor müssen also 4,5:1 schaffen. Gerechnet wird gegen den *ungünstigsten*
+  Hintergrund, die hervorgehobene aktive Zeile, nicht gegen die normale Fläche. Sonst fällt
+  ausgerechnet die Zeile unter dem Cursor durch. Auch die Zeilennummern zählen als Text.
+  `monaco/themes.test.ts` prüft das ohne Browser.
+- **Nichts pro Tastendruck in den State des Rahmens.** Die Cursorposition lief erst über
+  `useState` in `EditorFrame` - damit rendert jeder Tastendruck Editor, Reiter und Konsole neu,
+  und Monaco verliert Zeichen (gemessen: bei 20 ms Tippabstand fehlte schon eins). Sie läuft
+  deshalb über `cursorStore.ts`; nur die Statusleiste hängt daran.
+- **Monaco nicht über das `value`-Prop steuern.** `@monaco-editor/react` schreibt dann bei jedem
+  Unterschied das ganze Modell neu - und der React-State hinkt beim Tippen ein Zeichen hinterher.
+  `MonacoEditor` nutzt `defaultValue` und spielt Änderungen von außen selbst ein.
+- **Monacos Worker ohne `esm/vs/` importieren** (`monaco-editor/editor/editor.worker.js?worker`):
+  die `exports`-Karte des Pakets hängt `esm/vs/` selbst davor, mit Präfix bricht der Build ab.
+- **Monaco 0.57** hat die Sprachdienste verschoben: `monaco.typescript` statt
+  `monaco.languages.typescript` (Letzteres ist nur noch ein Platzhalter mit `{ deprecated: true }`).
+- `@monaco-editor/react` lädt Monaco sonst **von einem CDN**. `monaco/setup.ts` übergibt per
+  `loader.config({ monaco })` die lokale Fassung und der Editor rendert erst danach.
+- **react-resizable-panels v4**: Größen als *Zahl* sind Pixel, als *String* Prozent
+  (`defaultSize="62%"`). Die Komponenten heißen `Group`/`Panel`/`Separator`.
+- **Strg+K gehört der Suche.** Monaco belegt es als Akkord-Präfix und verschluckt es; `MonacoEditor`
+  gibt es deshalb per `KeyboardEvent` ans Fenster zurück (`e2e:pages` prüft die Suche).
+  Monacos eigene Befehlsliste liegt auf F1.
+- Der Funktionstest des Playgrounds liest `page.innerText('main')` - **versteckte Reiter zählen
+  nicht**. Der Reiter mit der Konsole muss nach einem Lauf sichtbar sein (erster Eintrag in
+  `areas`, siehe `EditorWorkspace.tsx`).
 - Git Bash wandelt Argumente wie `/sql-start` in Windows-Pfade um - Routen ohne führenden `/` übergeben.
 - Shell-Heredocs verschlucken Backslashes - Dateien mit `\` über Editor-Tools oder Node-Skripte schreiben.
 - **Namen, die der Compiler nicht sieht.** Das iframe-Protokoll (`BRIDGE`/`TEST_RUNNER` in `jsSandbox.ts`,

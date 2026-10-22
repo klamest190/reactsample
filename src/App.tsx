@@ -5,6 +5,7 @@ import { Platzhalter } from './components/Ui'
 import { useFortschritt } from './context/ProgressContext'
 import { useTheme } from './context/ThemeContext'
 import { useHashRoute } from './hooks/useHashRoute'
+import { useLocalStorage } from './hooks/useLocalStorage'
 import { useSprache, useTexte, type Sprache } from './i18n/LanguageContext'
 import { alleKapitel } from './course/course'
 import { Startseite } from './pages/HomePage'
@@ -44,6 +45,10 @@ export default function App() {
   const [route, navigieren] = useHashRoute()
   const { erledigt, kapitelSetzen } = useFortschritt()
   const [menueOffen, setMenueOffen] = useState(false)
+  // Navigation collapsible from md up. In the playground collapsed is the default - there
+  // the space belongs to the editor. An explicit choice only holds while you stay in the
+  // same area (same pattern as the parts inside the sidebar).
+  const [navChoice, setNavChoice] = useLocalStorage<{ open: boolean; inPlayground: boolean } | null>('lernpfad-nav', null)
   // Die Suche merkt sich, auf welcher Seite sie geöffnet wurde. Wechselt die Seite
   // (z. B. per Zurück-Knopf), ist sie dadurch automatisch zu - ganz ohne Effekt.
   const [sucheBeiRoute, setSucheBeiRoute] = useState<string | null>(null)
@@ -55,6 +60,8 @@ export default function App() {
   // "hooks-usestate/abschnitt-3" oder "glossar/closure". Keine Kapitel-ID enthält ein "/".
   const [seite, unterseite] = route.split('/')
   const kapitel = alleKapitel.find((k) => k.id === seite)
+  const inPlayground = seite === 'playground'
+  const navCollapsed = navChoice && navChoice.inPlayground === inPlayground ? !navChoice.open : inPlayground
   const prozent = Math.round((erledigt.length / alleKapitel.length) * 100)
 
   const glossarZiel = seite === 'glossar' ? unterseite : undefined
@@ -190,6 +197,8 @@ export default function App() {
           offen={menueOffen}
           schliessen={() => setMenueOffen(false)}
           sucheOeffnen={sucheOeffnen}
+          collapsed={navCollapsed}
+          onToggle={() => setNavChoice({ open: navCollapsed, inPlayground })}
         />
 
         <main id="inhalt" tabIndex={-1} className="min-w-0 flex-1 outline-none">

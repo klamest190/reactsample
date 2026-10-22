@@ -1,4 +1,5 @@
 import ts from 'typescript'
+import { EDITOR_GLOBALS } from './editorGlobals'
 import type { TypeDiagnostic } from './typeCheck'
 
 /**
@@ -34,42 +35,7 @@ const FILE = '/app.tsx'
 // Reines TypeScript (Teil 2): ohne JSX, damit z. B. <T>(x: T) => x eine generische Funktion ist.
 const FILE_TS = '/app.ts'
 
-// Im Editor gibt es Hooks & Co. ohne Import (siehe GLOBALE in reactKompilieren.ts) - das muss der Compiler wissen.
-const GLOBALS = `
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-declare global {
-  const useState: typeof React.useState
-  const useEffect: typeof React.useEffect
-  const useLayoutEffect: typeof React.useLayoutEffect
-  const useEffectEvent: typeof React.useEffectEvent
-  const useRef: typeof React.useRef
-  const useMemo: typeof React.useMemo
-  const useCallback: typeof React.useCallback
-  const useReducer: typeof React.useReducer
-  const useContext: typeof React.useContext
-  const useId: typeof React.useId
-  const useTransition: typeof React.useTransition
-  const useDeferredValue: typeof React.useDeferredValue
-  const useSyncExternalStore: typeof React.useSyncExternalStore
-  const useImperativeHandle: typeof React.useImperativeHandle
-  const useActionState: typeof React.useActionState
-  const useOptimistic: typeof React.useOptimistic
-  const use: typeof React.use
-  const createContext: typeof React.createContext
-  const memo: typeof React.memo
-  const lazy: typeof React.lazy
-  const forwardRef: typeof React.forwardRef
-  const startTransition: typeof React.startTransition
-  const Fragment: typeof React.Fragment
-  const Suspense: typeof React.Suspense
-  const createPortal: typeof ReactDOM.createPortal
-  const useFormStatus: typeof ReactDOM.useFormStatus
-}
-export {}
-`
-
-const files = new Map<string, string>([...Object.entries(TYPES), ['/globale.d.ts', GLOBALS]])
+const files = new Map<string, string>([...Object.entries(TYPES), ['/globals.d.ts', EDITOR_GLOBALS]])
 for (const [pfad, content] of Object.entries(LIB)) {
   files.set(LIB_FOLDER + pfad.split('/').pop(), content)
 }
@@ -117,7 +83,7 @@ function setProject(files: { pfad: string; code: string }[]) {
 }
 
 const host: ts.LanguageServiceHost = {
-  getScriptFileNames: () => [activeFile, '/globale.d.ts', ...projekt.keys()],
+  getScriptFileNames: () => [activeFile, '/globals.d.ts', ...projekt.keys()],
   getScriptVersion: (pfad) => {
     if (pfad === activeFile) return String(version)
     return String(projekt.get(pfad)?.version ?? 1)

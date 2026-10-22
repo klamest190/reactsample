@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { Icon } from '../components/Icon'
-import { useSprache } from '../i18n/LanguageContext'
+import { useSprache, useTexte } from '../i18n/LanguageContext'
 import { checkQueries, evaluate, lastTable } from '../sql/check'
 import { onSqlReady, runSql, SqlTimeout, sqlReady, startSql } from '../sql/client'
 import type { SqlError, SqlRun, SqlTable } from '../sql/engine'
@@ -75,6 +75,8 @@ export function TryItSql(props: SqlProps) {
   const { id, solution, tests } = props
   const { sprache: language } = useSprache()
   const t = TEXTS[language]
+  // Tab labels come from the interface texts, not from TEXTS.
+  const ui = useTexte()
   const { code, frame } = useEditor(props)
   const [outcome, setOutcome] = useState<Outcome | null>(null)
   // Examples start running right away (see useOnMount below), exercises wait for the button.
@@ -121,19 +123,9 @@ export function TryItSql(props: SqlProps) {
     return error ? [{ line: error.line, column: error.column, length: error.length, text: error.message, code: 0 }] : undefined
   }, [outcome])
 
-  return (
-    <EditorFrame
-      {...frame}
-      kind="SQL"
-      markers={markers}
-      running={running}
-      above={<SqlDataPanel code={code} />}
-      run={(c) => {
-        setRunning(true)
-        void start(c ?? code, true)
-      }}
-    >
-      <TestResults id={id} results={outcome?.results ?? null} />
+  const testBlock = <TestResults id={id} results={outcome?.results ?? null} />
+  const outputBlock = (
+    <>
       {outcome?.failure ? (
         <p className="flex gap-2 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
           <Icon name="warnung" className="mt-0.5 size-4 shrink-0" />
@@ -152,6 +144,27 @@ export function TryItSql(props: SqlProps) {
           </div>
         </details>
       )}
+    </>
+  )
+
+  return (
+    <EditorFrame
+      {...frame}
+      kind="SQL"
+      markers={markers}
+      running={running}
+      above={<SqlDataPanel code={code} />}
+      run={(c) => {
+        setRunning(true)
+        void start(c ?? code, true)
+      }}
+      areas={[
+        { id: 'output', title: ui.ausgabe, icon: 'datenbank', content: outputBlock },
+        { id: 'tests', title: ui.reiterTests, icon: 'kreisHaken', content: testBlock, empty: !outcome?.results },
+      ]}
+    >
+      {testBlock}
+      {outputBlock}
     </EditorFrame>
   )
 }

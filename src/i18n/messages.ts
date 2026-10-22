@@ -179,6 +179,20 @@ const de = {
   vorschlagHinweis: '↑↓ auswählen · Enter/Tab einfügen · Esc schließen',
   imCode: 'Steht bereits in deinem Code.',
 
+  // --- Werkbank: Playground-Layout ---------------------------------------------------------
+  probleme: 'Probleme',
+  keineProbleme: 'Keine Probleme gefunden.',
+  reiterTests: 'Tests',
+  stelle: (zeile: number, spalte: number) => `Zeile ${zeile}, Spalte ${spalte}`,
+  laufzeit: (ms: number) => `${ms} ms`,
+  minimapZeigen: 'Minimap zeigen',
+  minimapVerbergen: 'Minimap verbergen',
+  bereichTeilen: 'Größe der Bereiche ändern',
+  bausteineEinklappen: 'Bausteine einklappen',
+  bausteineAusklappen: 'Bausteine ausklappen',
+  navEinklappen: 'Navigation einklappen',
+  navAusklappen: 'Navigation ausklappen',
+
   // --- Wissensdatenbank: Verweise, Übungen, Suche, Glossar, Projekt ---------------------
   kapitelKlein: 'Kapitel',
   bautAuf: 'Baut auf:',
@@ -388,6 +402,20 @@ const en: Texte = {
   vorschlaege: 'Suggestions',
   vorschlagHinweis: '↑↓ select · Enter/Tab insert · Esc close',
   imCode: 'Already in your code.',
+
+  // --- Werkbank: Playground-Layout ---------------------------------------------------------
+  probleme: 'Problems',
+  keineProbleme: 'No problems found.',
+  reiterTests: 'Tests',
+  stelle: (zeile: number, spalte: number) => `Line ${zeile}, column ${spalte}`,
+  laufzeit: (ms: number) => `${ms} ms`,
+  minimapZeigen: 'Show minimap',
+  minimapVerbergen: 'Hide minimap',
+  bereichTeilen: 'Resize areas',
+  bausteineEinklappen: 'Collapse building blocks',
+  bausteineAusklappen: 'Expand building blocks',
+  navEinklappen: 'Collapse navigation',
+  navAusklappen: 'Expand navigation',
 
   kapitelKlein: 'chapter',
   bautAuf: 'Builds on:',

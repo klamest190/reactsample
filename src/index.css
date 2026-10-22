@@ -6,6 +6,12 @@
 /* Tailwind v4: ein einziger Import zieht Preflight (CSS-Reset) + alle Utilities rein. */
 @import "tailwindcss";
 
+/* JetBrains Mono for editor, console and code blocks - self-hosted via @fontsource, so
+   without a request to a CDN (the project should build offline and in CI without a
+   third-party service). Only the two weights we actually use: regular and bold. */
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
 /* Dark Mode über eine CSS-Klasse statt über die System-Einstellung.
    Damit kann unser ThemeContext die Klasse "dark" auf <html> setzen und
    alle "dark:"-Utilities schalten mit. */
@@ -29,7 +35,7 @@
   /* Schriftstapel festschreiben. Ohne das wählt jedes System selbst -
      besonders beim Monospace, und die halbe App ist ein Code-Editor. */
   --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
 
   /* Kleine Stufen unterhalb von text-xs. Standen vorher als feste Pixelwerte im Code. */
   --text-3xs: 0.625rem; /* Tastenkappen */

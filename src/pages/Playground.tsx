@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Icon, TeilSymbol } from '../components/Icon'
 import { KARTE, KLEBT_LG } from '../components/Ui'
+import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/LanguageContext'
 import { kurs } from '../course/course'
 import { playgrounds } from '../course/playground'
@@ -67,6 +68,8 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
   const { sprache } = useSprache()
   const editorRef = useRef<EditorControl>(null)
   const [filter, setFilter] = useState('')
+  // Building blocks collapsed or expanded - remembered so the choice survives a part switch.
+  const [blocksOpen, setBlocksOpen] = useLocalStorage('lernpfad-bausteine-offen', true)
   const kursTeil = kurs.find((k) => k.id === daten.teil)!
 
   function bausteinEinfuegen(baustein: Baustein) {
@@ -100,10 +103,12 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
   const gemeinsam = {
     id: 'playground-' + daten.teil,
     code: start,
-    kopf: t.playgroundKopf,
-    titel: kursTeil.kurztitel[sprache],
+    heading: t.playgroundKopf,
+    title: kursTeil.kurztitel[sprache],
     editorRef,
-    maxZeilen: 34,
+    maxLines: 34,
+    // Workspace: Monaco, output in tabs, status bar (see EditorFrame / EditorWorkspace).
+    workspace: true,
   }
 
   return (
@@ -138,76 +143,104 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
         </p>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start">
+      <div
+        className={`grid gap-4 lg:items-start ${blocksOpen ? 'lg:grid-cols-[17rem_minmax(0,1fr)]' : 'lg:grid-cols-[2.5rem_minmax(0,1fr)]'}`}
+      >
+        {/* Collapsed, only a narrow bar with the toggle is left. */}
+        {!blocksOpen && (
+          <aside className={`${KARTE} ${KLEBT_LG} flex items-center justify-center p-1 lg:flex-col lg:py-3`}>
+            <button
+              onClick={() => setBlocksOpen(true)}
+              aria-label={t.bausteineAusklappen}
+              title={t.bausteineAusklappen}
+              className="flex items-center gap-2 rounded-lg p-1.5 text-slate-600 transition hover:bg-slate-100 hover:text-brand-700 dark:text-slate-300 dark:hover:bg-slate-800"
+            >
+              <Icon name="puzzle" className="size-4" />
+              <span className="lg:hidden">{t.bausteine}</span>
+            </button>
+          </aside>
+        )}
         {/* Bausteine */}
-        <aside
-          aria-labelledby="bausteine-titel"
-          className={`${KARTE} ${KLEBT_LG} lg:flex lg:flex-col`}
-        >
-          <div className="space-y-2 border-b border-slate-200 p-3 dark:border-slate-800">
-            <h2 id="bausteine-titel" className="flex items-center gap-2 text-sm font-semibold">
-              <Icon name="puzzle" className="size-4 text-brand-600 dark:text-brand-400" />
-              {t.bausteine}
-            </h2>
-            <input
-              type="search"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder={t.bausteinFilter}
-              aria-label={t.bausteinFilter}
-              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-brand-500 dark:border-slate-700 dark:bg-slate-950"
-            />
-            <p className="text-xs leading-snug text-slate-500 dark:text-slate-400">{t.bausteinHinweis}</p>
-          </div>
+        {blocksOpen && (
+          <aside
+            aria-labelledby="bausteine-titel"
+            className={`${KARTE} ${KLEBT_LG} lg:flex lg:flex-col`}
+          >
+            <div className="space-y-2 border-b border-slate-200 p-3 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <h2 id="bausteine-titel" className="flex flex-1 items-center gap-2 text-sm font-semibold">
+                  <Icon name="puzzle" className="size-4 text-brand-600 dark:text-brand-400" />
+                  {t.bausteine}
+                </h2>
+                <button
+                  onClick={() => setBlocksOpen(false)}
+                  aria-label={t.bausteineEinklappen}
+                  title={t.bausteineEinklappen}
+                  className="rounded p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                >
+                  <Icon name="pfeilLinks" className="size-4" />
+                </button>
+              </div>
+              <input
+                type="search"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder={t.bausteinFilter}
+                aria-label={t.bausteinFilter}
+                className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-brand-500 dark:border-slate-700 dark:bg-slate-950"
+              />
+              <p className="text-xs leading-snug text-slate-500 dark:text-slate-400">{t.bausteinHinweis}</p>
+            </div>
 
-          <div className="max-h-96 overflow-y-auto p-2 lg:max-h-none lg:flex-1">
-            {gruppen.length === 0 && <p className="p-2 text-sm text-slate-500 dark:text-slate-400">{t.keineBausteine}</p>}
-            {gruppen.map((g, i) => (
-              // Beim Filtern alle Treffer zeigen, sonst nur die erste Gruppe offen.
-              <details key={g.titel.en + (suche ? ':suche' : '')} open={Boolean(suche) || i === 0} className="group mb-1">
-                <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">
-                  <span className="text-slate-400 transition group-open:rotate-90" aria-hidden>
-                    ▸
-                  </span>
-                  <span className="flex-1">{g.titel[sprache]}</span>
-                  <span className="text-xs text-slate-500 tabular-nums dark:text-slate-400">{g.bausteine.length}</span>
-                </summary>
-                <ul className="mt-1 space-y-1 pl-1">
-                  {g.bausteine.map((b) => (
-                    <li key={b.titel.en} className="flex items-start gap-1">
-                      <button
-                        onClick={() => bausteinEinfuegen(b)}
-                        aria-label={t.bausteinEinfuegen(b.titel[sprache])}
-                        className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-left transition hover:border-brand-400 hover:bg-brand-50 dark:border-slate-800 dark:hover:border-brand-600 dark:hover:bg-brand-500/10"
-                      >
-                        <span className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-mono text-code font-semibold">{b.titel[sprache]}</span>
-                          {t.orte[b.ort] && (
-                            <span className="rounded bg-slate-100 px-1 text-3xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                              {t.orte[b.ort]}
-                              {b.nutzung ? ' ' + t.mitNutzung : ''}
-                            </span>
-                          )}
-                        </span>
-                        <span className="mt-0.5 block text-xs leading-snug text-slate-500 dark:text-slate-400">{b.info[sprache]}</span>
-                      </button>
-                      {b.kapitel && (
-                        <a
-                          href={'#/' + b.kapitel}
-                          title={t.bausteinKapitel}
-                          aria-label={`${t.bausteinKapitel}: ${b.titel[sprache]}`}
-                          className="mt-1 rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800"
+            <div className="max-h-96 overflow-y-auto p-2 lg:max-h-none lg:flex-1">
+              {gruppen.length === 0 && <p className="p-2 text-sm text-slate-500 dark:text-slate-400">{t.keineBausteine}</p>}
+              {gruppen.map((g, i) => (
+                // Beim Filtern alle Treffer zeigen, sonst nur die erste Gruppe offen.
+                <details key={g.titel.en + (suche ? ':suche' : '')} open={Boolean(suche) || i === 0} className="group mb-1">
+                  <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">
+                    <span className="text-slate-400 transition group-open:rotate-90" aria-hidden>
+                      ▸
+                    </span>
+                    <span className="flex-1">{g.titel[sprache]}</span>
+                    <span className="text-xs text-slate-500 tabular-nums dark:text-slate-400">{g.bausteine.length}</span>
+                  </summary>
+                  <ul className="mt-1 space-y-1 pl-1">
+                    {g.bausteine.map((b) => (
+                      <li key={b.titel.en} className="flex items-start gap-1">
+                        <button
+                          onClick={() => bausteinEinfuegen(b)}
+                          aria-label={t.bausteinEinfuegen(b.titel[sprache])}
+                          className="min-w-0 flex-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-left transition hover:border-brand-400 hover:bg-brand-50 dark:border-slate-800 dark:hover:border-brand-600 dark:hover:bg-brand-500/10"
                         >
-                          <Icon name="buch" className="size-3.5" />
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ))}
-          </div>
-        </aside>
+                          <span className="flex flex-wrap items-center gap-1.5">
+                            <span className="font-mono text-code font-semibold">{b.titel[sprache]}</span>
+                            {t.orte[b.ort] && (
+                              <span className="rounded bg-slate-100 px-1 text-3xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                {t.orte[b.ort]}
+                                {b.nutzung ? ' ' + t.mitNutzung : ''}
+                              </span>
+                            )}
+                          </span>
+                          <span className="mt-0.5 block text-xs leading-snug text-slate-500 dark:text-slate-400">{b.info[sprache]}</span>
+                        </button>
+                        {b.kapitel && (
+                          <a
+                            href={'#/' + b.kapitel}
+                            title={t.bausteinKapitel}
+                            aria-label={`${t.bausteinKapitel}: ${b.titel[sprache]}`}
+                            className="mt-1 rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800"
+                          >
+                            <Icon name="buch" className="size-3.5" />
+                          </a>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ))}
+            </div>
+          </aside>
+        )}
 
         {/* Editor mit Ausgabe */}
         <div className="min-w-0">
