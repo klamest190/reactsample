@@ -100,7 +100,12 @@ src/
     playground/              Vorlagen + Bausteine je Teil, locations.ts, types.ts
     project/                 ToDo-Projekt: meta.ts (Titel, Vorwissen), ProjectStep.tsx, steps/ (Inhalte:
                              code.ts, tests.ts, basics.ts 1-5, hooks.ts 6-11, advanced.ts 12-14, challenge.ts 15)
-    demos/                   interaktive Demo-Komponenten der Kapitel (Diagramme, Terminal, FullStack …)
+    claude/                  Lernpfad "Claude Code Engineer" als DATEN (noch nicht in `kurs` eingehängt):
+                             types.ts (Track, Lesson, LessonBlock, LessonTask), curriculum.ts (claudeTrack,
+                             lessonCompleted), je Lektion eine Datei (setup, commands, context, agentLoop, skills);
+                             curriculum.test.ts spielt jede Lektion in der Simulation durch
+    demos/                   interaktive Demo-Komponenten der Kapitel (Diagramme, Terminal, FullStack …);
+                             ClaudeTerminalMock.tsx: simuliertes Claude Code + ClaudeTaskList (über src/claude)
   learning/                  LERNBAUSTEINE (Editoren und ihre Laufzeiten im Browser)
     TryIt.tsx                Props aller Modi + Auswahl des Editors nach Modus (Spring/Docker/SQL lazy)
     EditorFrame.tsx          gemeinsam: Rahmen (Kopf, Aufgabe, Editor, Knöpfe, Tipps, Lösung),
@@ -137,6 +142,9 @@ src/
   spring/                    Spring Boot auf der Java-Laufzeit - kein React
   docker/                    Docker-Simulator (build, compose, cli, yaml) - kein React
   sql/                       PostgreSQL via PGlite im Worker (engine, client, check, dataset) - kein React
+  claude/                    Claude-Code-Simulator: session.ts (Zustandsmaschine shell/login/repl/permission),
+                             commands.ts (Slash-Commands), agent.ts (Prompt -> Tool-Schritte), workspace.ts
+                             (ToDo-App, Skills), tasks.ts (Aufgaben gegen Events prüfen), types.ts - kein React
   test/                      render.tsx (renderInApp: Komponenten mit Providern, Englisch), setup.ts (jest-dom, Cleanup)
   selftest/                  main.ts (Seite für e2e:content), checks.ts (Prüfung je Modus),
                              results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten),
@@ -182,6 +190,11 @@ React-Wurzel der Vorschau, die PGlite-Verbindung.
   Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `course/parts/<teil>.ts`,
   Voraussetzungen in `GRUNDLAGEN` (`kurs.ts`).
   Ablauf: README → "Ein Kapitel hinzufügen".
+  Ausnahme: die Lektionen des Claude-Code-Pfads (`course/claude/`) sind Daten (Blöcke + Aufgaben), weil
+  alle dieselbe geteilte Ansicht haben (links Text, rechts Terminal). Aufgaben prüfen Events der Sitzung
+  (`TaskCheck`), keine Funktionen; gelöste Aufgaben landen per `uebungGeloest` in `lernpfad-uebungen`.
+  Fakten zu Claude Code gegen code.claude.com/docs prüfen - Befehle und Aliase ändern sich oft
+  (Stand 2026-10: `/cost` ist Alias von `/usage`, „gebündelte Skills“ statt „System-Skills“).
 - **`TryIt`-IDs** sind kursweit eindeutig (Schlüssel für gespeicherten Code und Fortschritt).
 - **Neuer Editor-Modus**: in `learning/modes.ts` eintragen, Props in `TryIt.tsx`, Editor als
   `TryIt<Name>.tsx` - `const { code, frame } = useEditor(props)`, dann `<EditorFrame {...frame} kind=… run=…>`;
