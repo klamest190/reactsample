@@ -2,18 +2,6 @@ import type { Lesson } from './types'
 
 export const setupLesson: Lesson = {
   id: 'claude-setup',
-  title: { de: 'Setup & Grundlagen', en: 'Setup & Basics' },
-  summary: {
-    de: 'Claude Code installieren, anmelden und die ersten Befehle im Terminal.',
-    en: 'Install Claude Code, sign in and run the first commands in the terminal.',
-  },
-  minutes: 25,
-  goals: {
-    de: ['Claude Code nativ oder per npm installieren', 'Die Installation prüfen und aktualisieren', 'Sich mit Abo oder Console-Konto anmelden', 'Interaktiven Modus und Print-Modus unterscheiden'],
-    en: ['Install Claude Code natively or with npm', 'Check and update the installation', 'Sign in with a subscription or a Console account', 'Tell interactive mode and print mode apart'],
-  },
-  keywords: ['Claude Code', 'install', 'Installation', 'npm', 'claude --version', 'claude doctor', 'login', 'Anmeldung', 'ANTHROPIC_API_KEY', 'claude -p', 'print mode', 'CLI', 'REPL'],
-  basics: ['praxis-lokal'],
   setup: { installed: false, loggedIn: false, inRepl: false },
   blocks: [
     { type: 'heading', text: { de: 'Was ist Claude Code?', en: 'What is Claude Code?' } },
@@ -48,8 +36,8 @@ export const setupLesson: Lesson = {
     {
       type: 'text',
       text: {
-        de: 'Wer ohnehin mit Node arbeitet, kann auch npm nehmen (ab Node.js 22). Wichtig: **ohne `sudo`** - sonst gehören die Dateien dem Administrator, und spätere Updates scheitern.',
-        en: 'If you work with Node anyway, npm works too (Node.js 22 or newer). Important: **without `sudo`** - otherwise the administrator owns the files and later updates fail.',
+        de: 'Wer ohnehin mit Node arbeitet, kann auch npm nehmen (ab Node.js 22). Wichtig: **ohne** `sudo` - sonst gehören die Dateien dem Administrator, und spätere Updates scheitern.',
+        en: 'If you work with Node anyway, npm works too (Node.js 22 or newer). Important: **without** `sudo` - otherwise the administrator owns the files and later updates fail.',
       },
     },
     { type: 'code', language: 'bash', code: 'npm install -g @anthropic-ai/claude-code\n\nclaude --version   # e.g. 2.1.300 (Claude Code)\nclaude doctor      # checks the installation, changes nothing\nclaude update      # update by hand' },
@@ -151,4 +139,67 @@ export const setupLesson: Lesson = {
       check: { type: 'headless' },
     },
   ],
+  quiz: [
+    {
+      question: { de: 'Was unterscheidet Claude Code von einem Chat-Fenster?', en: 'What sets Claude Code apart from a chat window?' },
+      answers: {
+        de: ['Es antwortet schneller', 'Es handelt selbst: liest Dateien, führt Befehle aus, ändert Code', 'Es braucht kein Konto', 'Es läuft nur in VS Code'],
+        en: ['It answers faster', 'It acts on its own: reads files, runs commands, changes code', 'It needs no account', 'It only runs in VS Code'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Claude Code ist ein Agent im Terminal. Er entscheidet selbst über den nächsten Schritt - und fragt vor allem, was etwas verändert.',
+        en: 'Claude Code is an agent in the terminal. It decides on the next step itself - and asks before anything that changes something.',
+      },
+    },
+    {
+      question: { de: 'Warum installiert man Claude Code per npm nicht mit `sudo`?', en: 'Why not install Claude Code with npm and `sudo`?' },
+      answers: {
+        de: ['sudo ist unter macOS verboten', 'Die Dateien gehören dann root - spätere Updates scheitern', 'npm kennt kein sudo', 'Dann fehlt der Login'],
+        en: ['sudo is forbidden on macOS', 'root then owns the files - later updates fail', 'npm does not know sudo', 'Then the login is missing'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Mit sudo landen die Dateien beim Administrator. Der native Installer umgeht das Problem ganz und aktualisiert sich selbst.',
+        en: 'With sudo the files end up owned by the administrator. The native installer avoids the problem entirely and updates itself.',
+      },
+    },
+    {
+      question: { de: 'Ein CI-Job soll eine Frage an Claude stellen und danach weiterlaufen. Welcher Aufruf passt?', en: 'A CI job should ask Claude one question and then carry on. Which call fits?' },
+      answers: { de: ['claude', 'claude -c', 'claude -p "…"', 'claude doctor'], en: ['claude', 'claude -c', 'claude -p "…"', 'claude doctor'] },
+      correct: 2,
+      explanation: {
+        de: 'Der Print-Modus antwortet und beendet sich. `claude` würde eine interaktive Sitzung öffnen und auf Eingaben warten.',
+        en: 'Print mode answers and exits. `claude` would open an interactive session and wait for input.',
+      },
+    },
+    {
+      question: { de: 'Was ist im Print-Modus anders, wenn Claude eine Datei ändern will?', en: 'What is different in print mode when Claude wants to change a file?' },
+      answers: {
+        de: ['Nichts - es fragt wie sonst', 'Es kann nicht fragen, also wird das Werkzeug verweigert, wenn du es nicht vorab erlaubst', 'Es ändert ohne zu fragen', 'Es wechselt in den interaktiven Modus'],
+        en: ['Nothing - it asks as usual', 'It cannot ask, so the tool is denied unless you allow it up front', 'It changes without asking', 'It switches to interactive mode'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Ohne Dialog keine Rückfrage. Was der Job darf, gibst du mit `--allowedTools` oder Regeln in den Einstellungen frei.',
+        en: 'No dialog, no question. You grant what the job may do with `--allowedTools` or rules in the settings.',
+      },
+    },
+  ],
+  keyPoints: {
+    de: [
+      'Claude Code ist ein Agent im Terminal: Er liest, führt aus und ändert - im Ordner, in dem du ihn startest.',
+      'Installieren nativ (empfohlen, aktualisiert sich selbst) oder per `npm install -g @anthropic-ai/claude-code` ohne sudo.',
+      '`claude --version` und `claude doctor` prüfen die Installation.',
+      'Anmelden mit Claude-Abo, Console-Konto oder über einen Cloud-Anbieter.',
+      '`claude` ist interaktiv, `claude -p` antwortet einmal und beendet sich - für Skripte und CI.',
+    ],
+    en: [
+      'Claude Code is an agent in the terminal: it reads, runs and changes things - in the folder you start it in.',
+      'Install natively (recommended, updates itself) or with `npm install -g @anthropic-ai/claude-code` without sudo.',
+      '`claude --version` and `claude doctor` check the installation.',
+      'Sign in with a Claude subscription, a Console account or through a cloud provider.',
+      '`claude` is interactive, `claude -p` answers once and exits - for scripts and CI.',
+    ],
+  },
 }

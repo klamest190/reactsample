@@ -100,7 +100,10 @@ function Line({ line, hintLabel }: { line: TerminalLine; hintLabel: string }) {
     case 'assistant':
       return (
         <div className={`${base} flex gap-2 text-slate-100`}>
-          <span aria-hidden="true">⏺</span>
+          {/* Like the real CLI: one dot per answer - list items and steps continue it without a dot. */}
+          <span aria-hidden="true" className={/^(\s|- |\d+\. )/.test(line.text) ? 'invisible' : ''}>
+            ⏺
+          </span>
           <span className="min-w-0 flex-1">
             <InlineCode text={line.text} />
           </span>
@@ -187,10 +190,10 @@ export function ClaudeTaskList({ tasks, onInsert }: { tasks: LessonTask[]; onIns
   const states = tasks.map((task) => ({ ...task, isCompleted: uebungen.includes(task.id) }))
   return (
     <div>
-      <h4 className="mb-1.5 flex items-center justify-between text-sm font-semibold">
+      <h3 className="mb-1.5 flex items-center justify-between text-sm font-semibold">
         {t.tasks}
         <span className="text-xs font-normal text-slate-500 tabular-nums dark:text-slate-400">{t.progress(states.filter((s) => s.isCompleted).length, tasks.length)}</span>
-      </h4>
+      </h3>
       <ol className="space-y-1.5">
         {states.map((task, i) => (
           <li key={task.id} className="flex items-start gap-2 text-sm">
@@ -228,6 +231,7 @@ export function ClaudeTerminalMock({
   tasks = [],
   showTasks = true,
   thinkingMs = 700,
+  onAllSolved,
   ref,
 }: {
   setup: SessionSetup
@@ -236,10 +240,12 @@ export function ClaudeTerminalMock({
   showTasks?: boolean
   /** Pause before Claude answers a prompt - 0 in tests. */
   thinkingMs?: number
+  /** Called when a step solves the last open task. */
+  onAllSolved?: () => void
   ref?: Ref<ClaudeTerminalHandle>
 }) {
   const { sprache } = useSprache()
-  const { uebungGeloest } = useFortschritt()
+  const { uebungen, uebungGeloest } = useFortschritt()
   const t = TEXTS[sprache]
   const [session, setSession] = useState<ClaudeSession>(() => newSession(setup))
   const [lines, setLines] = useState<TerminalLine[]>(() => welcome(newSession(setup)))
@@ -274,8 +280,11 @@ export function ClaudeTerminalMock({
     setSession(step.session)
     setLines((old) => appendLines(old, step.lines))
     const solved = tasks.filter((task) => isSolved(task.check, step.session.events) && !isSolved(task.check, session.events))
+    if (!solved.length) return
     for (const task of solved) uebungGeloest(task.id)
-    if (solved.length) setAnnouncement(solved.map((task) => t.solved(task.text[sprache].replace(/[`*]/g, ''))).join(' · '))
+    setAnnouncement(solved.map((task) => t.solved(task.text[sprache].replace(/[`*]/g, ''))).join(' · '))
+    const done = new Set([...uebungen, ...solved.map((task) => task.id)])
+    if (tasks.every((task) => done.has(task.id))) onAllSolved?.()
   }
 
   function submit(text: string) {

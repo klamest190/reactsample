@@ -31,7 +31,7 @@ export type Kapitel = {
   stichworte?: string[]
 }
 
-export type Bereich = 'frontend' | 'backend'
+export type Bereich = 'frontend' | 'backend' | 'tools'
 
 
 export type Teil = {
@@ -41,6 +41,8 @@ export type Teil = {
   kurztitel: Zweisprachig
   /** Frontend (Browser) oder Backend (Server) - danach gliedern Seitenleiste und Startseite. */
   bereich: Bereich
+  /** false: the part has no playground (Claude Code practises in its own terminal) - the chapter page links none. */
+  playground?: false
   beschreibung: Zweisprachig
   kapitel: Kapitel[]
 }

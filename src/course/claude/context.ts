@@ -2,18 +2,6 @@ import type { Lesson } from './types'
 
 export const contextLesson: Lesson = {
   id: 'claude-context',
-  title: { de: 'Kontext & Dateien', en: 'Context & Files' },
-  summary: {
-    de: 'Wie Claude Code dein Projekt liest, was CLAUDE.md bewirkt und wie du gezielt Dateien in den Kontext holst.',
-    en: 'How Claude Code reads your project, what CLAUDE.md does and how you bring files into the context on purpose.',
-  },
-  minutes: 30,
-  goals: {
-    de: ['Erklären, wie Claude ein Projekt erkundet', 'Den Kontext mit /context sichtbar machen', 'Dateien mit @ gezielt in den Kontext holen', 'Mit /init und CLAUDE.md dauerhaftes Projektwissen anlegen', 'Git-Informationen von Claude auswerten lassen'],
-    en: ['Explain how Claude explores a project', 'Make the context visible with /context', 'Bring files into the context with @', 'Create lasting project knowledge with /init and CLAUDE.md', 'Let Claude work with git information'],
-  },
-  keywords: ['context', 'Kontext', '/context', '@', 'mention', 'CLAUDE.md', '/init', '/memory', 'memory', 'git', 'git status', 'git diff', '/add-dir', '--add-dir', 'CLAUDE.local.md', 'AGENTS.md'],
-  basics: ['claude-commands'],
   setup: { installed: true, loggedIn: true, inRepl: true },
   blocks: [
     { type: 'heading', text: { de: 'Kein Index - Claude liest wie du', en: 'No index - Claude reads like you do' } },
@@ -126,4 +114,67 @@ export const contextLesson: Lesson = {
       check: { type: 'gitInspected' },
     },
   ],
+  quiz: [
+    {
+      question: { de: 'Wie lernt Claude Code ein Projekt kennen?', en: 'How does Claude Code get to know a project?' },
+      answers: {
+        de: ['Es lädt beim Start alle Dateien', 'Es erkundet mit Werkzeugen und liest gezielt, was es braucht', 'Es fragt dich nach jeder Datei', 'Über einen Index in der Cloud'],
+        en: ['It loads every file on start', 'It explores with tools and reads what it needs', 'It asks you for every file', 'Through an index in the cloud'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Claude sucht und liest wie du im Terminal. Jede gelesene Datei landet im Kontext.',
+        en: 'Claude searches and reads like you would in the terminal. Every file it reads lands in the context.',
+      },
+    },
+    {
+      question: { de: 'Was bewirkt `@src/App.tsx` in einem Prompt?', en: 'What does `@src/App.tsx` do in a prompt?' },
+      answers: {
+        de: ['Die Datei wird sofort in den Kontext gelesen', 'Die Datei wird gesperrt', 'Claude darf die Datei nicht ändern', 'Die Datei wird an Anthropic gemeldet'],
+        en: ['The file is read into the context right away', 'The file gets locked', 'Claude may not change the file', 'The file is reported to Anthropic'],
+      },
+      correct: 0,
+      explanation: {
+        de: 'Mit `@` sagst du genau, worum es geht - Claude spart sich die Suche.',
+        en: 'With `@` you say exactly what it is about - Claude saves itself the search.',
+      },
+    },
+    {
+      question: { de: 'Wohin gehört eine Regel, die nur für dich in diesem Projekt gilt?', en: 'Where does a rule go that applies only to you in this project?' },
+      answers: { de: ['./CLAUDE.md', '~/.claude/CLAUDE.md', './CLAUDE.local.md', 'README.md'], en: ['./CLAUDE.md', '~/.claude/CLAUDE.md', './CLAUDE.local.md', 'README.md'] },
+      correct: 2,
+      explanation: {
+        de: '`CLAUDE.local.md` gilt nur in diesem Projekt und gehört in `.gitignore`. `~/.claude/CLAUDE.md` gälte für alle deine Projekte.',
+        en: '`CLAUDE.local.md` applies only to this project and belongs in `.gitignore`. `~/.claude/CLAUDE.md` would apply to all your projects.',
+      },
+    },
+    {
+      question: { de: 'Was gehört **nicht** in eine CLAUDE.md?', en: 'What does **not** belong in a CLAUDE.md?' },
+      answers: {
+        de: ['Wie man die Tests startet', 'Code-Konventionen des Teams', 'Eine Kopie aller Komponenten, damit Claude sie kennt', 'Stolperfallen, die Claude sonst falsch machen würde'],
+        en: ['How to run the tests', 'The team’s code conventions', 'A copy of every component so Claude knows them', 'Pitfalls Claude would otherwise get wrong'],
+      },
+      correct: 2,
+      explanation: {
+        de: 'CLAUDE.md lädt bei jeder Anfrage. Was Claude ohnehin im Code sieht, kostet dort nur Kontext.',
+        en: 'CLAUDE.md loads on every request. What Claude sees in the code anyway only costs context there.',
+      },
+    },
+  ],
+  keyPoints: {
+    de: [
+      'Claude erkundet das Projekt mit Werkzeugen; jede gelesene Datei bleibt im Kontext. `/context` zeigt die Aufteilung.',
+      '`@pfad` holt eine Datei gezielt in den Kontext - genaue Prompts sparen Suche und Tokens.',
+      'CLAUDE.md ist das Gedächtnis des Projekts: kurz, konkret, im Git. `/init` schreibt einen Entwurf, `/memory` öffnet die Dateien.',
+      'Persönlich: `~/.claude/CLAUDE.md` (alle Projekte) und `CLAUDE.local.md` (dieses Projekt, nicht im Git).',
+      'Für git nutzt Claude `git status`, `git diff` und `git log` - Ordner außerhalb gibst du mit `/add-dir` frei.',
+    ],
+    en: [
+      'Claude explores the project with tools; every file it reads stays in the context. `/context` shows the split.',
+      '`@path` brings a file into the context on purpose - precise prompts save searching and tokens.',
+      'CLAUDE.md is the project memory: short, concrete, in git. `/init` writes a draft, `/memory` opens the files.',
+      'Personal: `~/.claude/CLAUDE.md` (all projects) and `CLAUDE.local.md` (this project, not in git).',
+      'For git Claude uses `git status`, `git diff` and `git log` - grant folders outside with `/add-dir`.',
+    ],
+  },
 }

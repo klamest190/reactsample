@@ -298,6 +298,12 @@ const PFADE = {
       <path d="M2 21c0-3 1.9-5.4 5.2-6.1 2.4-.5 4.9-2 5.8-3.9" />
     </>
   ),
+  terminal: (
+    <>
+      <path d="m4 17 6-6-6-6" />
+      <path d="M12 19h8" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof PFADE

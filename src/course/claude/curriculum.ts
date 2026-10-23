@@ -3,22 +3,21 @@ import { commandsLesson } from './commands'
 import { contextLesson } from './context'
 import { setupLesson } from './setup'
 import { skillsLesson } from './skills'
-import type { Lesson, Track } from './types'
+import type { Lesson } from './types'
 
 /**
- * The "Claude Code Engineer" track: from installing to writing team skills. The lessons build
- * on each other (`basics`), but every one is open - the terminal of each lesson starts in the
- * state it needs, so nobody has to do lesson 1 to try lesson 5.
+ * The lesson content of part 10, "Claude Code Engineer" - in course order. The part itself
+ * (titles, goals, keywords) is course/parts/claude.ts; this file is only loaded with a lesson.
+ *
+ * The lessons build on each other (GRUNDLAGEN in course.ts), but every one is open: the terminal
+ * of each lesson starts in the state it needs, so nobody has to do lesson 1 to try lesson 5.
  */
-export const claudeTrack: Track = {
-  id: 'claude',
-  title: { de: 'Claude Code Engineer', en: 'Claude Code Engineer' },
-  shortTitle: { de: 'Claude Code', en: 'Claude Code' },
-  description: {
-    de: 'Mit einem KI-Agenten im Terminal arbeiten: installieren, steuern, Kontext verwalten, den Agentic Loop kontrollieren und eigene Skills für das Team schreiben - geübt in einem simulierten Claude-Code-Terminal.',
-    en: 'Work with an AI agent in the terminal: install, steer, manage context, control the agentic loop and write your own skills for the team - practised in a simulated Claude Code terminal.',
-  },
-  lessons: [setupLesson, commandsLesson, contextLesson, agentLoopLesson, skillsLesson],
+export const lessons: Lesson[] = [setupLesson, commandsLesson, contextLesson, agentLoopLesson, skillsLesson]
+
+export function lessonById(id: string) {
+  const lesson = lessons.find((l) => l.id === id)
+  if (!lesson) throw new Error(`No Claude Code lesson with the id "${id}"`)
+  return lesson
 }
 
 /** A lesson counts as done once all of its tasks are in the solved exercises. */

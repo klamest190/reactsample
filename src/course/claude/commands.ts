@@ -2,18 +2,6 @@ import type { Lesson } from './types'
 
 export const commandsLesson: Lesson = {
   id: 'claude-commands',
-  title: { de: 'Slash-Commands', en: 'Slash Commands' },
-  summary: {
-    de: 'Claude Code steuern statt nur fragen: Hilfe, Kosten, Kontext verdichten und neu anfangen.',
-    en: 'Steer Claude Code instead of just asking: help, cost, compacting context and starting over.',
-  },
-  minutes: 20,
-  goals: {
-    de: ['Slash-Commands von Prompts unterscheiden', 'Kosten und Limits mit /usage im Blick behalten', 'Mit /compact und /clear den Kontext bewusst verwalten', 'Fehler mit /bug melden'],
-    en: ['Tell slash commands from prompts', 'Keep an eye on cost and limits with /usage', 'Manage the context on purpose with /compact and /clear', 'Report problems with /bug'],
-  },
-  keywords: ['slash command', 'Slash-Command', '/help', '/compact', '/clear', '/cost', '/usage', '/bug', '/feedback', '/model', '/status', 'context window', 'Kontextfenster'],
-  basics: ['claude-setup'],
   setup: { installed: true, loggedIn: true, inRepl: true, priorMessages: 14 },
   blocks: [
     { type: 'heading', text: { de: 'Prompt oder Befehl?', en: 'Prompt or command?' } },
@@ -120,4 +108,70 @@ export const commandsLesson: Lesson = {
       check: { type: 'command', name: '/bug' },
     },
   ],
+  quiz: [
+    {
+      question: { de: 'Was passiert mit einer Eingabe, die mit `/` beginnt?', en: 'What happens to input that starts with `/`?' },
+      answers: {
+        de: ['Sie geht als Prompt ans Modell', 'Claude Code führt sie selbst als Befehl aus', 'Sie wird ignoriert', 'Sie startet eine Shell'],
+        en: ['It goes to the model as a prompt', 'Claude Code runs it itself as a command', 'It is ignored', 'It starts a shell'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Slash-Commands steuern Claude Code selbst - sofort und ohne Tokens. Alles andere geht als Prompt ans Modell.',
+        en: 'Slash commands control Claude Code itself - instantly and without tokens. Everything else goes to the model as a prompt.',
+      },
+    },
+    {
+      question: {
+        de: 'Du bist mitten in einer langen Fehlersuche, der Kontext ist voll. Was hilft, ohne den Faden zu verlieren?',
+        en: 'You are in the middle of a long debugging session and the context is full. What helps without losing the thread?',
+      },
+      answers: { de: ['/clear', '/compact focus on the failing test', '/exit und neu starten', '/bug'], en: ['/clear', '/compact focus on the failing test', '/exit and start again', '/bug'] },
+      correct: 1,
+      explanation: {
+        de: '`/compact` behält eine Zusammenfassung - mit Fokus-Anweisung genau das, was du noch brauchst. `/clear` würde alles verwerfen.',
+        en: '`/compact` keeps a summary - with focus instructions exactly what you still need. `/clear` would throw everything away.',
+      },
+    },
+    {
+      question: { de: 'Wann ist `/clear` die bessere Wahl als `/compact`?', en: 'When is `/clear` the better choice than `/compact`?' },
+      answers: {
+        de: ['Wenn eine neue, unabhängige Aufgabe beginnt', 'Wenn ein Test fehlschlägt', 'Wenn du die Kosten sehen willst', 'Nie - /compact ist immer besser'],
+        en: ['When a new, unrelated task begins', 'When a test fails', 'When you want to see the cost', 'Never - /compact is always better'],
+      },
+      correct: 0,
+      explanation: {
+        de: 'Alter Kontext einer erledigten Aufgabe lenkt nur ab und kostet Tokens. Für Neues: leeres Gespräch.',
+        en: 'Old context of a finished task only distracts and costs tokens. For something new: an empty conversation.',
+      },
+    },
+    {
+      question: { de: 'Was zeigt `/cost` heute?', en: 'What does `/cost` show today?' },
+      answers: {
+        de: ['Die Preise aller Modelle', 'Dasselbe wie `/usage`: Kosten, Dauer, Änderungen und Plan-Limits', 'Nur die Tokens der letzten Antwort', 'Eine Rechnung zum Herunterladen'],
+        en: ['The prices of all models', 'The same as `/usage`: cost, duration, changes and plan limits', 'Only the tokens of the last answer', 'An invoice to download'],
+      },
+      correct: 1,
+      explanation: {
+        de: '`/cost` ist ein Alias von `/usage`. Mit Abo zählen vor allem die Plan-Limits.',
+        en: '`/cost` is an alias of `/usage`. On a subscription the plan limits matter most.',
+      },
+    },
+  ],
+  keyPoints: {
+    de: [
+      'Was mit `/` beginnt, führt Claude Code selbst aus - alles andere ist ein Prompt.',
+      '`/help` listet alle Befehle, `/usage` (Alias `/cost`) zeigt Kosten und Limits.',
+      'Jede Antwort sieht das ganze Gespräch - ein voller Kontext macht Claude teurer, langsamer und unaufmerksamer.',
+      'Gleiche Aufgabe, weiter geht’s: `/compact` mit Fokus. Neue Aufgabe: `/clear`.',
+      '`/bug` meldet Probleme mit Claude Code samt Verlauf an Anthropic.',
+    ],
+    en: [
+      'Anything starting with `/` is run by Claude Code itself - everything else is a prompt.',
+      '`/help` lists all commands, `/usage` (alias `/cost`) shows cost and limits.',
+      'Every answer sees the whole conversation - a full context makes Claude more expensive, slower and less attentive.',
+      'Same task, carrying on: `/compact` with a focus. New task: `/clear`.',
+      '`/bug` reports problems with Claude Code to Anthropic, including the transcript.',
+    ],
+  },
 }

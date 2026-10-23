@@ -1,7 +1,7 @@
 import { createRef } from 'react'
 import { act, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderInApp } from '../../test/render'
 import { agentLoopLesson } from '../claude/agentLoop'
@@ -85,6 +85,17 @@ describe('ClaudeTerminalMock', () => {
     expect(screen.queryByText(/Thinking…/)).not.toBeInTheDocument()
     expect(screen.getByRole('log')).toHaveTextContent('Interrupted')
     expect(screen.getByRole('log')).not.toHaveTextContent('Read(package.json)')
+  })
+
+  it('reports when the last open task is solved', async () => {
+    const user = userEvent.setup()
+    const solvedAll = vi.fn()
+    const tasks = commandsLesson.tasks.slice(0, 2)
+    renderInApp(<ClaudeTerminalMock setup={commandsLesson.setup} tasks={tasks} thinkingMs={0} onAllSolved={solvedAll} />)
+    await user.type(input(), '/help{Enter}')
+    expect(solvedAll).not.toHaveBeenCalled()
+    await user.type(input(), '/cost{Enter}/cost{Enter}')
+    expect(solvedAll).toHaveBeenCalledTimes(1)
   })
 
   it('takes commands from a task list outside the terminal', async () => {

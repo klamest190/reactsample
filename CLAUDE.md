@@ -100,10 +100,12 @@ src/
     playground/              Vorlagen + Bausteine je Teil, locations.ts, types.ts
     project/                 ToDo-Projekt: meta.ts (Titel, Vorwissen), ProjectStep.tsx, steps/ (Inhalte:
                              code.ts, tests.ts, basics.ts 1-5, hooks.ts 6-11, advanced.ts 12-14, challenge.ts 15)
-    claude/                  Lernpfad "Claude Code Engineer" als DATEN (noch nicht in `kurs` eingehängt):
-                             types.ts (Track, Lesson, LessonBlock, LessonTask), curriculum.ts (claudeTrack,
-                             lessonCompleted), je Lektion eine Datei (setup, commands, context, agentLoop, skills);
-                             curriculum.test.ts spielt jede Lektion in der Simulation durch
+    claude/                  Teil 10 "Claude Code Engineer": Lektionsinhalte als DATEN (Metadaten in parts/claude.ts):
+                             types.ts (Lesson, LessonBlock, LessonTask, LessonQuestion), curriculum.ts (lessons,
+                             lessonById, lessonCompleted), je Lektion eine Datei (setup, commands, context,
+                             agentLoop, skills: Blöcke, Aufgaben, Quiz, keyPoints); ClaudeLesson.tsx: geteilte
+                             Ansicht (links Text/Aufgaben/Quiz, rechts Terminal, ab xl sticky), ein Export pro
+                             Kapitel; curriculum.test.ts spielt jede Lektion in der Simulation durch
     demos/                   interaktive Demo-Komponenten der Kapitel (Diagramme, Terminal, FullStack …);
                              ClaudeTerminalMock.tsx: simuliertes Claude Code + ClaudeTaskList (über src/claude)
   learning/                  LERNBAUSTEINE (Editoren und ihre Laufzeiten im Browser)
@@ -190,9 +192,13 @@ React-Wurzel der Vorschau, die PGlite-Verbindung.
   Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `course/parts/<teil>.ts`,
   Voraussetzungen in `GRUNDLAGEN` (`kurs.ts`).
   Ablauf: README → "Ein Kapitel hinzufügen".
-  Ausnahme: die Lektionen des Claude-Code-Pfads (`course/claude/`) sind Daten (Blöcke + Aufgaben), weil
-  alle dieselbe geteilte Ansicht haben (links Text, rechts Terminal). Aufgaben prüfen Events der Sitzung
-  (`TaskCheck`), keine Funktionen; gelöste Aufgaben landen per `uebungGeloest` in `lernpfad-uebungen`.
+  Ausnahme: die Lektionen von Teil 10 (`course/claude/`) sind Daten (Blöcke, Aufgaben, Quiz), weil
+  alle dieselbe geteilte Ansicht haben (links Text, rechts Terminal). Kapiteleintrag trotzdem normal in
+  `parts/claude.ts` (die IDs mit 6 Leerzeichen Einrückung - `e2e:pages` liest sie per Regex), Voraussetzungen
+  in `GRUNDLAGEN`. `integrity.test.ts` nimmt `claude/` aus der DE/EN-Dateiprüfung aus.
+  Aufgaben prüfen Events der Sitzung (`TaskCheck`), keine Funktionen; gelöste Aufgaben landen per
+  `uebungGeloest` in `lernpfad-uebungen`, sind alle gelöst, setzt die Ansicht das Kapitel auf erledigt.
+  Teil 10 steht im Bereich `tools` und hat keinen Playground (`playground: false` am Teil).
   Fakten zu Claude Code gegen code.claude.com/docs prüfen - Befehle und Aliase ändern sich oft
   (Stand 2026-10: `/cost` ist Alias von `/usage`, „gebündelte Skills“ statt „System-Skills“).
 - **`TryIt`-IDs** sind kursweit eindeutig (Schlüssel für gespeicherten Code und Fortschritt).

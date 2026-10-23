@@ -11,7 +11,7 @@ import type { IconName } from '../components/Icon'
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot, Docker und PostgreSQL',
+  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot, Docker, PostgreSQL und Claude Code',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -22,13 +22,14 @@ const de = {
   bereiche: {
     frontend: { titel: 'Frontend', text: 'Browser & Oberfläche' },
     backend: { titel: 'Backend', text: 'Server & Container' },
+    tools: { titel: 'Werkzeuge', text: 'KI-Agenten im Terminal' },
   },
 
   // --- Startseite ------------------------------------------------------------------
   heroTitel: 'Von JavaScript zu React - ',
   heroTitelBetont: 'Schritt für Schritt',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container. Dazu SQL mit einer echten PostgreSQL-Datenbank im Browser.',
+    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container. Dazu SQL mit einer echten PostgreSQL-Datenbank im Browser. Und als Werkzeug zum Schluss: Claude Code, der KI-Agent im Terminal - geübt in einer Simulation.',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: 'Du hast alle Kapitel abgeschlossen!',
@@ -242,7 +243,7 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot, Docker and PostgreSQL',
+  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot, Docker, PostgreSQL and Claude Code',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -253,12 +254,13 @@ const en: Texte = {
   bereiche: {
     frontend: { titel: 'Frontend', text: 'Browser & UI' },
     backend: { titel: 'Backend', text: 'Server & containers' },
+    tools: { titel: 'Tools', text: 'AI agents in the terminal' },
   },
 
   heroTitel: 'From JavaScript to React - ',
   heroTitelBetont: 'step by step',
   heroText:
-    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers. Plus SQL with a real PostgreSQL database in the browser.',
+    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers. Plus SQL with a real PostgreSQL database in the browser. And as a tool at the end: Claude Code, the AI agent in the terminal - practised in a simulation.',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: 'You have completed all chapters!',

@@ -2,40 +2,14 @@ import type { Lesson } from './types'
 
 export const skillsLesson: Lesson = {
   id: 'claude-skills',
-  title: { de: 'Skills: wiederverwendbare Workflows', en: 'Skills: Reusable Workflows' },
-  summary: {
-    de: 'Wissen und Abläufe einmal aufschreiben, überall nutzen: Aufbau, Arten, Namensräume, Erstellen per Prompt und Best Practices.',
-    en: 'Write knowledge and workflows down once, use them everywhere: structure, kinds, namespaces, creating by prompt and best practices.',
-  },
-  minutes: 50,
-  goals: {
-    de: [
-      'Erklären, was ein Skill ist und wie er sich von CLAUDE.md unterscheidet',
-      'Gebündelte, persönliche, Projekt- und Plugin-Skills unterscheiden',
-      'Eine SKILL.md mit Frontmatter schreiben',
-      'Skills per Prompt erstellen und das Ergebnis prüfen',
-      'Steuern, wer einen Skill aufrufen darf',
-      'Skills mit Namensraum aufrufen und verwalten',
-    ],
-    en: [
-      'Explain what a skill is and how it differs from CLAUDE.md',
-      'Tell bundled, personal, project and plugin skills apart',
-      'Write a SKILL.md with frontmatter',
-      'Create skills by prompting and check the result',
-      'Control who may invoke a skill',
-      'Call skills with a namespace and manage them',
-    ],
-  },
-  keywords: ['skill', 'Skill', 'SKILL.md', 'frontmatter', 'description', '/skills', 'bundled skills', 'gebündelte Skills', 'plugin', 'Plugin', 'namespace', 'Namensraum', '$ARGUMENTS', 'disable-model-invocation', 'user-invocable', 'allowed-tools', 'progressive disclosure', 'workflow'],
-  basics: ['claude-agent', 'claude-context'],
   setup: { installed: true, loggedIn: true, inRepl: true, withMemory: true, withProjectSkills: true },
   blocks: [
     { type: 'heading', text: { de: 'Was ist ein Skill?', en: 'What is a skill?' } },
     {
       type: 'text',
       text: {
-        de: 'Ein Skill ist ein **Ordner mit einer `SKILL.md`**: eine Anleitung für eine bestimmte Aufgabe - „so reviewen wir Komponenten“, „so schreiben wir Release Notes“. Claude Code kennt von jedem Skill zunächst nur Name und Beschreibung. Die eigentliche Anleitung lädt es erst, wenn der Skill gebraucht wird.',
-        en: 'A skill is a **folder with a `SKILL.md`**: instructions for one particular task - "this is how we review components", "this is how we write release notes". At first Claude Code only knows each skill\'s name and description. It loads the actual instructions only when the skill is needed.',
+        de: 'Ein Skill ist ein **Ordner** mit einer `SKILL.md`: eine Anleitung für eine bestimmte Aufgabe - „so reviewen wir Komponenten“, „so schreiben wir Release Notes“. Claude Code kennt von jedem Skill zunächst nur Name und Beschreibung. Die eigentliche Anleitung lädt es erst, wenn der Skill gebraucht wird.',
+        en: 'A skill is a **folder** with a `SKILL.md`: instructions for one particular task - "this is how we review components", "this is how we write release notes". At first Claude Code only knows each skill\'s name and description. It loads the actual instructions only when the skill is needed.',
       },
     },
     {
@@ -251,4 +225,79 @@ export const skillsLesson: Lesson = {
       check: { type: 'skillCreated', scope: 'personal' },
     },
   ],
+  quiz: [
+    {
+      question: { de: 'Was lädt Claude Code von einem Skill, solange er nicht gebraucht wird?', en: 'What does Claude Code load of a skill while it is not needed?' },
+      answers: {
+        de: ['Die ganze SKILL.md', 'Nur Name und Beschreibung', 'Nichts', 'Alle Dateien im Skill-Ordner'],
+        en: ['The whole SKILL.md', 'Only name and description', 'Nothing', 'Every file in the skill folder'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Progressive Disclosure: Die Beschreibung reicht, um zu entscheiden. Der Rest kommt erst, wenn der Skill läuft.',
+        en: 'Progressive disclosure: the description is enough to decide. The rest comes only when the skill runs.',
+      },
+    },
+    {
+      question: { de: 'Wie ruft man den Skill `deploy` aus dem Plugin `ops` auf?', en: 'How do you call the skill `deploy` from the plugin `ops`?' },
+      answers: { de: ['/deploy', '/ops:deploy', '/ops/deploy', '@ops deploy'], en: ['/deploy', '/ops:deploy', '/ops/deploy', '@ops deploy'] },
+      correct: 1,
+      explanation: {
+        de: 'Plugin-Skills tragen den Plugin-Namen als Namensraum - so kollidieren sie nie mit eigenen Skills.',
+        en: 'Plugin skills carry the plugin name as their namespace - that way they never collide with your own skills.',
+      },
+    },
+    {
+      question: { de: 'Ein Skill deployt in die Produktion. Welche Einstellung gehört ins Frontmatter?', en: 'A skill deploys to production. Which setting belongs in the frontmatter?' },
+      answers: {
+        de: ['`user-invocable: false`', '`disable-model-invocation: true`', '`allowed-tools: Bash`', 'Keine - Claude fragt ja ohnehin'],
+        en: ['`user-invocable: false`', '`disable-model-invocation: true`', '`allowed-tools: Bash`', 'None - Claude asks anyway'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Dann startet nur ein Mensch den Deploy mit `/name` - Claude lädt ihn nie von selbst.',
+        en: 'Then only a human starts the deploy with `/name` - Claude never loads it on its own.',
+      },
+    },
+    {
+      question: { de: 'Claude lädt deinen Skill nie von selbst. Woran liegt es am ehesten?', en: 'Claude never loads your skill on its own. What is the most likely cause?' },
+      answers: {
+        de: ['Der Skill ist zu kurz', 'Die `description` ist zu vage und nennt nicht, wann er passt', 'Der Ordner heißt anders als der Skill', 'Skills werden nie automatisch geladen'],
+        en: ['The skill is too short', 'The `description` is too vague and does not say when it fits', 'The folder is named differently from the skill', 'Skills are never loaded automatically'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Claude entscheidet allein anhand der Beschreibung. „Use when …“ mit konkreten Auslösern hilft.',
+        en: 'Claude decides from the description alone. "Use when …" with concrete triggers helps.',
+      },
+    },
+    {
+      question: { de: 'Wo liegt ein Skill, den dein ganzes Team im Repo nutzen soll?', en: 'Where does a skill live that your whole team should use in the repo?' },
+      answers: {
+        de: ['`~/.claude/skills/<name>/SKILL.md`', '`.claude/skills/<name>/SKILL.md`, committet', 'In der CLAUDE.md', '`.claude/settings.json`'],
+        en: ['`~/.claude/skills/<name>/SKILL.md`', '`.claude/skills/<name>/SKILL.md`, committed', 'In CLAUDE.md', '`.claude/settings.json`'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Projekt-Skills liegen im Repo und laufen durchs Review. Unter `~/.claude/skills/` wären sie nur bei dir.',
+        en: 'Project skills live in the repo and go through review. Under `~/.claude/skills/` they would only be on your machine.',
+      },
+    },
+  ],
+  keyPoints: {
+    de: [
+      'Ein Skill ist ein Ordner mit `SKILL.md`: Frontmatter (`name`, `description` …) plus Anleitung, optional mit Zusatzdateien.',
+      'Nur die Beschreibung ist immer im Kontext; den Rest lädt Claude, wenn ein Prompt passt oder du `/name` tippst.',
+      'Gebündelte Skills kommen mit Claude Code; eigene sind persönlich, Projekt-, Plugin- oder Enterprise-Skills. Plugin-Skills heißen `/plugin:skill`.',
+      '`disable-model-invocation: true` für Aktionen mit Folgen, `user-invocable: false` für reines Hintergrundwissen.',
+      'Per Prompt erstellen geht schnell - dann lesen, nachschärfen, testen und Projekt-Skills committen.',
+    ],
+    en: [
+      'A skill is a folder with a `SKILL.md`: frontmatter (`name`, `description` …) plus instructions, optionally with extra files.',
+      'Only the description is always in the context; Claude loads the rest when a prompt matches or you type `/name`.',
+      'Bundled skills ship with Claude Code; your own are personal, project, plugin or enterprise skills. Plugin skills are called `/plugin:skill`.',
+      '`disable-model-invocation: true` for actions with consequences, `user-invocable: false` for pure background knowledge.',
+      'Creating by prompt is quick - then read, sharpen, test and commit project skills.',
+    ],
+  },
 }

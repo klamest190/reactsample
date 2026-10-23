@@ -8,7 +8,8 @@ import { alleKapitel } from './course'
 import { glossar } from './glossary'
 import type { UebungsSammlung } from './exercises/types'
 
-const chapterSourcesDe = import.meta.glob<string>(['./**/*.tsx', '!./**/*.en.tsx', '!./demos/**', '!./practice/businessApp/**', '!./project/**'], {
+// claude/: the lessons of part 10 are data with both languages in one file (curriculum.test.ts checks them).
+const chapterSourcesDe = import.meta.glob<string>(['./**/*.tsx', '!./**/*.en.tsx', '!./demos/**', '!./practice/businessApp/**', '!./project/**', '!./claude/**'], {
   query: '?raw',
   import: 'default',
   eager: true,

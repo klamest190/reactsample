@@ -4,7 +4,8 @@ import { answerPermission, cycleMode, execute, newSession } from '../../claude/s
 import { isSolved } from '../../claude/tasks'
 import type { PermissionAnswer } from '../../claude/types'
 import { alleKapitel } from '../course'
-import { claudeTrack, lessonCompleted } from './curriculum'
+import { claudeTeil } from '../parts/claude'
+import { lessonCompleted, lessons } from './curriculum'
 
 /** What a learner does: type a line, answer a permission dialog or press Shift+Tab. */
 type Action = string | { answer: PermissionAnswer } | 'shift+tab'
@@ -31,7 +32,7 @@ const WALKTHROUGHS: Record<string, Action[]> = {
 }
 
 function play(lessonId: string) {
-  const lesson = claudeTrack.lessons.find((l) => l.id === lessonId)!
+  const lesson = lessons.find((l) => l.id === lessonId)!
   let session = newSession(lesson.setup)
   for (const action of WALKTHROUGHS[lessonId]) {
     if (action === 'shift+tab') session = cycleMode(session)
@@ -41,9 +42,12 @@ function play(lessonId: string) {
   return { lesson, session }
 }
 
-describe('Claude Code track', () => {
-  const lessons = claudeTrack.lessons
+describe('Claude Code lessons', () => {
   const lessonIds = lessons.map((l) => l.id)
+  const chapterIds = new Set(alleKapitel.map((k) => k.id))
+  /** Every bilingual text of a lesson, for checks that look at all of them. */
+  const texts = (lesson: (typeof lessons)[number]) =>
+    JSON.stringify([lesson.blocks, lesson.tasks.map((t) => t.text), lesson.quiz, lesson.keyPoints])
 
   it.each(lessonIds)('%s can be solved in the simulation', (id) => {
     const { lesson, session } = play(id)
@@ -52,21 +56,21 @@ describe('Claude Code track', () => {
     expect(lessonCompleted(lesson, lesson.tasks.map((t) => t.id))).toBe(true)
   })
 
-  it('has unique lesson and task ids that do not clash with the course', () => {
+  it('have one lesson per chapter of part 10, in the same order', () => {
+    expect(lessonIds).toEqual(claudeTeil.kapitel.map((k) => k.id))
+  })
+
+  it('have task ids that are unique and do not clash with chapter ids', () => {
     const taskIds = lessons.flatMap((l) => l.tasks.map((t) => t.id))
-    const all = [...lessonIds, ...taskIds, ...alleKapitel.map((k) => k.id)]
-    expect(new Set(all).size).toBe(all.length)
-    for (const id of taskIds) expect(id).toMatch(/^claude-[a-z-]+$/)
+    expect(new Set(taskIds).size).toBe(taskIds.length)
+    for (const id of taskIds) {
+      expect(id).toMatch(/^claude-[a-z-]+$/)
+      expect(chapterIds.has(id), id).toBe(false)
+    }
   })
 
-  it('only builds on chapters and lessons that exist', () => {
-    const known = new Set([...lessonIds, ...alleKapitel.map((k) => k.id)])
-    for (const lesson of lessons) for (const basic of lesson.basics) expect(known, `${lesson.id} -> ${basic}`).toContain(basic)
-  })
-
-  it('has every text in both languages', () => {
+  it('have every list, table and quiz in both languages with the same shape', () => {
     for (const lesson of lessons) {
-      expect(lesson.goals.de).toHaveLength(lesson.goals.en.length)
       for (const task of lesson.tasks) expect(task.text.de && task.text.en, task.id).toBeTruthy()
       for (const block of lesson.blocks) {
         if (block.type === 'list') expect(block.items.de, lesson.id).toHaveLength(block.items.en.length)
@@ -75,7 +79,25 @@ describe('Claude Code track', () => {
           for (const row of [...block.rows.de, ...block.rows.en]) expect(row, lesson.id).toHaveLength(block.head.en.length)
         }
       }
+      expect(lesson.keyPoints.de, lesson.id).toHaveLength(lesson.keyPoints.en.length)
     }
+  })
+
+  it('have quizzes whose right answer exists in both languages', () => {
+    for (const lesson of lessons) {
+      expect(lesson.quiz.length, lesson.id).toBeGreaterThanOrEqual(3)
+      for (const q of lesson.quiz) {
+        // The quiz stores answer indexes - both languages need the same answers in the same order.
+        expect(q.answers.de, q.question.en).toHaveLength(q.answers.en.length)
+        expect(q.correct, q.question.en).toBeLessThan(q.answers.en.length)
+        expect(q.explanation.de && q.explanation.en, q.question.en).toBeTruthy()
+      }
+    }
+  })
+
+  it('only link to chapters that exist', () => {
+    const broken = lessons.flatMap((l) => [...texts(l).matchAll(/\[\[([\w-]+)\]\]/g)].map((m) => m[1]).filter((id) => !chapterIds.has(id)))
+    expect(broken).toEqual([])
   })
 
   it('counts a lesson as done only with all tasks solved', () => {

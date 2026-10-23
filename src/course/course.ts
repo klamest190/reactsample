@@ -7,6 +7,7 @@ import { projektTeil } from './parts/project'
 import { javaTeil } from './parts/java'
 import { backendTeil } from './parts/backend'
 import { sqlTeil } from './parts/sql'
+import { claudeTeil } from './parts/claude'
 import type { Bereich, Kapitel, Teil } from './parts/types'
 
 export type { Bereich, Kapitel, Teil } from './parts/types'
@@ -26,10 +27,10 @@ export type { Bereich, Kapitel, Teil } from './parts/types'
  */
 
 /** Reihenfolge der Bereiche in Seitenleiste und Startseite. */
-export const BEREICHE: Bereich[] = ['frontend', 'backend']
+export const BEREICHE: Bereich[] = ['frontend', 'backend', 'tools']
 
 /** The parts in course order - numbering and navigation follow this list. */
-export const kurs: Teil[] = [javascriptTeil, typescriptTeil, reactTeil, hooksTeil, praxisTeil, projektTeil, javaTeil, backendTeil, sqlTeil]
+export const kurs: Teil[] = [javascriptTeil, typescriptTeil, reactTeil, hooksTeil, praxisTeil, projektTeil, javaTeil, backendTeil, sqlTeil, claudeTeil]
 
 /**
  * Der rote Faden: was ein Kapitel voraussetzt. Steht hier gesammelt statt in jedem
@@ -107,6 +108,12 @@ const GRUNDLAGEN: Record<string, string[]> = {
   'sql-aendern': ['sql-where'],
   'sql-tabellen': ['sql-joins', 'sql-aendern'],
   'sql-profi': ['sql-joins', 'sql-gruppieren'],
+  // Part 10: a tool, not a language. Only the setup needs the terminal basics from part 5.
+  'claude-setup': ['praxis-lokal'],
+  'claude-commands': ['claude-setup'],
+  'claude-context': ['claude-commands'],
+  'claude-agent': ['claude-context'],
+  'claude-skills': ['claude-agent', 'claude-context'],
 }
 
 export type KapitelMitTeil = Kapitel & { teil: Teil; nummer: string; grundlagen: string[]; stichworte: string[] }

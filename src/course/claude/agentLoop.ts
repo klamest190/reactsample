@@ -2,18 +2,6 @@ import type { Lesson } from './types'
 
 export const agentLoopLesson: Lesson = {
   id: 'claude-agent',
-  title: { de: 'Agentic Loop & Tools', en: 'Agentic Loop & Tools' },
-  summary: {
-    de: 'Wie Claude selbstständig liest, ausführt und ändert - und wie du mit Ja, Nein und Regeln die Kontrolle behältst.',
-    en: 'How Claude reads, runs and changes things on its own - and how you stay in control with yes, no and rules.',
-  },
-  minutes: 35,
-  goals: {
-    de: ['Den Agentic Loop (planen, handeln, prüfen) beschreiben', 'Die eingebauten Werkzeuge und ihr Risiko kennen', 'Erlaubnisanfragen bewusst bestätigen oder ablehnen', 'Berechtigungsmodi mit Shift+Tab wechseln', 'Dauerhafte Regeln in den Einstellungen anlegen'],
-    en: ['Describe the agentic loop (plan, act, check)', 'Know the built-in tools and their risk', 'Approve or reject permission requests on purpose', 'Switch permission modes with Shift+Tab', 'Create lasting rules in the settings'],
-  },
-  keywords: ['agent', 'Agent', 'agentic loop', 'tool', 'Werkzeug', 'Bash', 'Read', 'Edit', 'Write', 'permission', 'Berechtigung', 'approve', 'reject', 'plan mode', 'Plan-Modus', 'acceptEdits', 'auto mode', 'shift+tab', '/permissions', 'settings.json', '!'],
-  basics: ['claude-context'],
   setup: { installed: true, loggedIn: true, inRepl: true, withMemory: true },
   blocks: [
     { type: 'heading', text: { de: 'Der Loop: planen, handeln, prüfen', en: 'The loop: plan, act, check' } },
@@ -145,4 +133,69 @@ export const agentLoopLesson: Lesson = {
     { id: 'claude-agent-plan', text: { de: 'Wechsle mit Shift+Tab in den Plan-Modus.', en: 'Switch to plan mode with Shift+Tab.' }, check: { type: 'modeChanged', mode: 'plan' } },
     { id: 'claude-agent-shell', text: { de: 'Führe die Tests selbst im Shell-Modus aus.', en: 'Run the tests yourself in shell mode.' }, command: '!npm test', check: { type: 'bashMode' } },
   ],
+  quiz: [
+    {
+      question: { de: 'Was ist der Agentic Loop?', en: 'What is the agentic loop?' },
+      answers: {
+        de: [
+          'Claude wiederholt dieselbe Antwort, bis du zustimmst',
+          'Werkzeug aufrufen, Ergebnis ansehen, nächsten Schritt wählen - bis die Aufgabe erledigt ist',
+          'Eine Endlosschleife, die man mit Strg+C beendet',
+          'Ein Test, der immer wieder läuft',
+        ],
+        en: ['Claude repeats the same answer until you agree', 'Call a tool, look at the result, pick the next step - until the task is done', 'An endless loop you end with Ctrl+C', 'A test that runs again and again'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Jedes Ergebnis fließt in die nächste Entscheidung ein - so findet Claude den Fehler, behebt ihn und prüft die Lösung.',
+        en: 'Every result feeds the next decision - that is how Claude finds the bug, fixes it and checks the fix.',
+      },
+    },
+    {
+      question: { de: 'Du wählst bei `npm test` „Yes, and don’t ask again“. Was entsteht?', en: 'You pick "Yes, and don’t ask again" for `npm test`. What is created?' },
+      answers: {
+        de: ['Nichts - es gilt nur einmal', 'Die Regel `Bash(npm test *)` in `.claude/settings.local.json`', 'Claude darf ab jetzt jeden Befehl ausführen', 'Ein Eintrag in CLAUDE.md'],
+        en: ['Nothing - it only applies once', 'The rule `Bash(npm test *)` in `.claude/settings.local.json`', 'Claude may run any command from now on', 'An entry in CLAUDE.md'],
+      },
+      correct: 1,
+      explanation: {
+        de: 'Die Regel erlaubt nur Befehle, die mit `npm test` beginnen - und nur für dich, weil die lokale Datei nicht ins Git gehört.',
+        en: 'The rule only allows commands starting with `npm test` - and only for you, because the local file stays out of git.',
+      },
+    },
+    {
+      question: { de: 'Eine große Umbauaufgabe steht an. Welcher Modus ist der beste Start?', en: 'A big refactoring is ahead. Which mode is the best start?' },
+      answers: { de: ['acceptEdits', 'plan', 'bypassPermissions', 'Print-Modus'], en: ['acceptEdits', 'plan', 'bypassPermissions', 'print mode'] },
+      correct: 1,
+      explanation: {
+        de: 'Im Plan-Modus liest Claude nur und legt einen Plan vor. Erst wenn der stimmt, lässt du ihn umsetzen.',
+        en: 'In plan mode Claude only reads and presents a plan. Only once it is right do you let it carry it out.',
+      },
+    },
+    {
+      question: {
+        de: '`allow` enthält `Read(./**)`, `deny` enthält `Read(./.env)`. Darf Claude `.env` lesen?',
+        en: '`allow` contains `Read(./**)`, `deny` contains `Read(./.env)`. May Claude read `.env`?',
+      },
+      answers: { de: ['Ja, allow kommt zuerst', 'Nein, deny schlägt allow', 'Nur nach Rückfrage', 'Nur im Plan-Modus'], en: ['Yes, allow comes first', 'No, deny beats allow', 'Only after asking', 'Only in plan mode'] },
+      correct: 1,
+      explanation: { de: 'Die Reihenfolge ist fest: deny vor ask vor allow.', en: 'The order is fixed: deny before ask before allow.' },
+    },
+  ],
+  keyPoints: {
+    de: [
+      'Claude arbeitet in einer Schleife: Werkzeug aufrufen, Ergebnis prüfen, weiter - bis die Aufgabe erledigt ist.',
+      'Lesen läuft ohne Rückfrage; Dateien ändern, Befehle und Web-Zugriffe fragen vorher.',
+      'Yes erlaubt einmal, „don’t ask again“ legt eine Regel an, No hält den Loop an - und ist Steuerung, kein Fehler.',
+      'Shift+Tab wechselt den Modus: default, acceptEdits, plan (und auto, wo verfügbar).',
+      'Teamregeln stehen in `.claude/settings.json`; deny schlägt ask schlägt allow. `!befehl` führst du selbst aus.',
+    ],
+    en: [
+      'Claude works in a loop: call a tool, check the result, go on - until the task is done.',
+      'Reading runs without asking; changing files, commands and web access ask first.',
+      'Yes allows once, "don’t ask again" creates a rule, No stops the loop - and is steering, not failure.',
+      'Shift+Tab switches the mode: default, acceptEdits, plan (and auto where available).',
+      'Team rules live in `.claude/settings.json`; deny beats ask beats allow. `!command` you run yourself.',
+    ],
+  },
 }

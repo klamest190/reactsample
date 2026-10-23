@@ -2,7 +2,7 @@
   "name": "reactsample",
   "private": true,
   "version": "1.0.0",
-  "description": "Interactive, bilingual (EN/DE) learning path for JavaScript, TypeScript, React, Java, Spring Boot, Docker and SQL - every example runs in the browser.",
+  "description": "Interactive, bilingual (EN/DE) learning path for JavaScript, TypeScript, React, Java, Spring Boot, Docker, SQL and Claude Code - every example runs in the browser.",
   "license": "MIT",
   "author": "klamest190 (https://github.com/klamest190)",
   "repository": {
@@ -19,6 +19,7 @@
     "interpreter",
     "java",
     "postgresql",
+    "claude-code",
     "pglite",
     "accessibility"
   ],
