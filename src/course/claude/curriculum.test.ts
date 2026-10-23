@@ -5,6 +5,7 @@ import { isSolved } from '../../claude/tasks'
 import type { PermissionAnswer } from '../../claude/types'
 import { alleKapitel } from '../course'
 import { claudeTeil } from '../parts/claude'
+import { claudeAdvancedTeil } from '../parts/claudeAdvanced'
 import { lessonCompleted, lessons } from './curriculum'
 
 /** What a learner does: type a line, answer a permission dialog or press Shift+Tab. */
@@ -29,6 +30,55 @@ const WALKTHROUGHS: Record<string, Action[]> = {
     '!npm test',
   ],
   'claude-skills': ['/skills', 'Please review the TodoList component', 'Create a skill for commit messages', yes, '/commit-messages', '/team-tools:release-notes', yes, 'Create a personal skill for explaining regex', yes],
+  'claude-basics': ['What is a token?', 'What is the context window?', '/context', '/model', '/model haiku', 'What are hallucinations?'],
+  'claude-prompting': ['make it better', 'Explain what toggle does in @src/hooks/useTodos.ts, step by step', 'shift+tab', 'shift+tab', 'Run the tests and fix the bug', 'shift+tab', 'go ahead', yes, yes, yes, '/clear'],
+  'claude-git': ['What changed in git?', yes, yes, 'Create a branch for the todo filter', yes, 'Run the tests and fix the bug', yes, yes, yes, '/rewind', 'Commit and open a pull request', yes, yes, '!git log --oneline'],
+  'claude-settings': ['/config', '/status', '/model sonnet', 'Add a rule to the settings that allows npm run lint for the team', yes, '/permissions'],
+  'claude-hooks': ['/hooks', 'show me the .env file', 'Run the tests and fix the bug', yes, yes, yes, 'Add a hook that sends a notification when Claude needs input', yes],
+  'claude-subagents': ['Find all places where todos are changed', '/context', 'Create a subagent for security reviews', yes, 'Use the security-reviews agent to check the app', '/agents'],
+  'claude-mcp': [
+    'claude mcp add --transport http tracker https://mcp.example.com/tracker',
+    'claude mcp add --transport http --scope project tracker https://mcp.example.com/tracker',
+    'claude mcp list',
+    'claude',
+    'Which issues are open?',
+    yes,
+    'Which issues are open?',
+    { answer: 'always' },
+    '/mcp',
+  ],
+  'claude-plugins': ['/plugin', '/plugin marketplace add acme/company-plugins', '/plugin install team-tools@company-plugins', '/skills', '/team-tools:release-notes', yes],
+  'claude-headless': [
+    'claude -p "explain this project"',
+    'claude -p "explain this project" --output-format json',
+    'cat package.json | claude -p "explain this project"',
+    'claude -p "fix the failing test"',
+    'claude -p "fix the failing test" --allowedTools "Edit,Bash(npm test *)"',
+    'claude -p "fix the failing test" --allowedTools "Edit,Bash(npm test *)" --output-format json',
+  ],
+  'claude-security': ['/permissions', 'show me the .env file', 'Add a deny rule for .env to the settings', yes, 'show me the .env file', 'Summarize docs/vendor-notes.md', { answer: 'no' }],
+  'claude-project': [
+    'Explain this project',
+    'Run the tests and fix the bug',
+    yes,
+    yes,
+    yes,
+    'Create a branch for the todo filter',
+    yes,
+    'shift+tab',
+    'shift+tab',
+    'Add a filter feature to the todo list',
+    'shift+tab',
+    'go ahead',
+    yes,
+    yes,
+    yes,
+    'Commit and open a pull request',
+    yes,
+    yes,
+    'Create a skill for new features',
+    yes,
+  ],
 }
 
 function play(lessonId: string) {
@@ -56,8 +106,9 @@ describe('Claude Code lessons', () => {
     expect(lessonCompleted(lesson, lesson.tasks.map((t) => t.id))).toBe(true)
   })
 
-  it('have one lesson per chapter of part 10, in the same order', () => {
-    expect(lessonIds).toEqual(claudeTeil.kapitel.map((k) => k.id))
+  it('have one lesson per chapter of parts 10 and 11, in the same order', () => {
+    expect(lessonIds).toEqual([...claudeTeil.kapitel, ...claudeAdvancedTeil.kapitel].map((k) => k.id))
+    expect(Object.keys(WALKTHROUGHS).sort()).toEqual([...lessonIds].sort())
   })
 
   it('have task ids that are unique and do not clash with chapter ids', () => {
@@ -98,6 +149,11 @@ describe('Claude Code lessons', () => {
   it('only link to chapters that exist', () => {
     const broken = lessons.flatMap((l) => [...texts(l).matchAll(/\[\[([\w-]+)\]\]/g)].map((m) => m[1]).filter((id) => !chapterIds.has(id)))
     expect(broken).toEqual([])
+  })
+
+  it('have JSON examples that parse - learners copy them into their settings', () => {
+    for (const lesson of lessons)
+      for (const block of lesson.blocks) if (block.type === 'code' && block.language === 'json') expect(() => JSON.parse(block.code), `${lesson.id}: ${block.code.slice(0, 40)}`).not.toThrow()
   })
 
   it('counts a lesson as done only with all tasks solved', () => {

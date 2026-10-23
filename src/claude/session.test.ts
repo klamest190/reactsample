@@ -61,14 +61,14 @@ describe('setup and login', () => {
 
   it('runs the prompt of `claude "query"` once the login is through', () => {
     const step = type(newSession({ ...FRESH, installed: true }), 'claude "explain this project"', '2')
-    expect(step.session.events).toContainEqual({ type: 'prompted' })
+    expect(step.session.events).toContainEqual(expect.objectContaining({ type: 'prompted' }))
     expect(text(step)).toContain('Read(package.json)')
   })
 
   it('answers in print mode without a REPL and exits', () => {
     const step = type(newSession({ ...READY, inRepl: false }), 'claude -p "explain this project"')
     expect(step.session.phase).toBe('shell')
-    expect(step.session.events).toContainEqual({ type: 'headless' })
+    expect(step.session.events).toContainEqual({ type: 'headless', outputFormat: 'text', allowedTools: false })
     expect(text(step)).toContain('todo app')
   })
 

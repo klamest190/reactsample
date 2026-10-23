@@ -87,7 +87,8 @@ function Sections({ blocks }: { blocks: LessonBlock[] }) {
   })
 }
 
-function ClaudeLesson({ id }: { id: string }) {
+/** One lesson by its chapter id - course/parts/claude*.ts load it lazily for every chapter. */
+export function ClaudeLesson({ id }: { id: string }) {
   const lesson = lessonById(id)
   const { sprache } = useSprache()
   const { kapitelSetzen } = useFortschritt()
@@ -136,10 +137,3 @@ function ClaudeLesson({ id }: { id: string }) {
     </div>
   )
 }
-
-// One export per chapter - course/parts/claude.ts loads them with laden(…, name).
-export const ClaudeSetup = () => <ClaudeLesson id="claude-setup" />
-export const ClaudeCommands = () => <ClaudeLesson id="claude-commands" />
-export const ClaudeContext = () => <ClaudeLesson id="claude-context" />
-export const ClaudeAgent = () => <ClaudeLesson id="claude-agent" />
-export const ClaudeSkills = () => <ClaudeLesson id="claude-skills" />

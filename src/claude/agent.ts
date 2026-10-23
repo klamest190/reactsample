@@ -1,5 +1,8 @@
-import type { ClaudeSession, Language, Skill, SkillScope, TerminalLine, ToolStep } from './types'
-import { BUGGY_TOGGLE, FIXED_TOGGLE, GIT_CHANGES, skillCommand, skillFile, skillPath } from './workspace'
+import { hookEvents, hookFromPrompt, settingsJson } from './hooks'
+import { issuesPlan } from './mcp'
+import { createAgentPlan, customAgentPlan, explorePlan } from './subagents'
+import type { ClaudeSession, Language, SessionEvent, Skill, SkillScope, TerminalLine, ToolStep } from './types'
+import { BUGGY_TOGGLE, FIXED_TOGGLE, GIT_CHANGES, INJECTION_COMMAND, INJECTION_FILE, skillCommand, skillFile, skillPath } from './workspace'
 
 /**
  * What Claude does with a prompt. There is no model behind this: the prompt is matched against a
@@ -14,6 +17,8 @@ export type Plan = {
   steps: ToolStep[]
   /** Printed after the last step. */
   closing: TerminalLine[]
+  /** Left behind when the plan starts, e.g. `clarified` for a question back. */
+  events?: SessionEvent[]
 }
 
 const say = (text: string): TerminalLine => ({ text, kind: 'assistant' })
@@ -68,7 +73,7 @@ function fixStep(session: ClaudeSession): ToolStep {
     ],
     tokens: 300,
     writes: { [path]: session.files[path].replace(BUGGY_TOGGLE, FIXED_TOGGLE) },
-    events: [{ type: 'toolUsed', tool: 'Edit' }],
+    events: [{ type: 'toolUsed', tool: 'Edit' }, { type: 'bugFixed' }],
   }
 }
 
@@ -96,18 +101,6 @@ function testAndFix(session: ClaudeSession, language: Language): Plan {
       closing: [say(pick(language, 'Alle Tests sind grün.', 'All tests pass.'))],
     }
   }
-  if (session.mode === 'plan') {
-    return {
-      intro: [say(pick(language, 'Plan-Modus: Ich lese nur und ändere nichts.', 'Plan mode: I only read and change nothing.'))],
-      steps: [readStep(session, 'src/hooks/useTodos.ts'), readStep(session, 'src/hooks/useTodos.test.ts')],
-      closing: [
-        say(pick(language, 'Plan:', 'Plan:')),
-        say(pick(language, '1. `toggle` in useTodos.ts nur für die passende `id` umschalten', '1. In useTodos.ts, toggle only the todo with the matching `id`')),
-        say(pick(language, '2. `npm test` ausführen und prüfen, dass der Test grün ist', '2. Run `npm test` and check the test passes')),
-        say(pick(language, 'Mit Shift+Tab den Plan-Modus verlassen, dann setze ich das um.', 'Leave plan mode with Shift+Tab and I will carry it out.')),
-      ],
-    }
-  }
   return {
     intro: [say(pick(language, 'Ich lasse zuerst die Tests laufen, um den Fehler zu sehen.', "I'll run the tests first to see what fails."))],
     steps: [testStep(session, false), readStep(session, 'src/hooks/useTodos.ts'), fixStep(session), testStep(session, true)],
@@ -118,9 +111,61 @@ function testAndFix(session: ClaudeSession, language: Language): Plan {
   }
 }
 
-function git(language: Language, commit: boolean): Plan {
+function branchStep(name: string): ToolStep {
+  return {
+    tool: 'Bash',
+    target: `git switch -c ${name}`,
+    description: 'Create and switch to a new branch',
+    output: [result(`Switched to a new branch '${name}'`)],
+    tokens: 60,
+    branch: name,
+    events: [{ type: 'toolUsed', tool: 'Bash' }, { type: 'branchCreated', name }],
+  }
+}
+
+function commitStep(session: ClaudeSession, message: string): ToolStep {
+  return {
+    tool: 'Bash',
+    target: `git add -A && git commit -m "${message}"`,
+    description: 'Commit the changes',
+    output: [result(`[${session.branch} 3f2a1c9] ${message}`), result(' 2 files changed, 31 insertions(+), 2 deletions(-)')],
+    tokens: 150,
+    events: [{ type: 'toolUsed', tool: 'Bash' }, { type: 'committed' }],
+  }
+}
+
+/** "Create a branch for the filter" / "commit" / "open a pull request". */
+function gitWork(session: ClaudeSession, prompt: string, language: Language): Plan {
+  const p = prompt.toLowerCase()
+  const wantsPr = /pull request|pull-request|\bpr\b|merge request/.test(p)
+  const wantsBranch = /branch|zweig/.test(p) || (wantsPr && session.branch === 'main')
+  const topic = prompt.match(/\b(?:für|fuer|for|named|namens)\s+(?:den |die |das |the |a )?(.+)$/i)?.[1].split(/[.!?,;:\n]/)[0]
+  const name = `feature/${slug(topic ?? '') || 'todo-filter'}`
+  const steps: ToolStep[] = []
+  if (wantsBranch && session.branch === 'main') steps.push(branchStep(name))
+  if (/commit/.test(p) || wantsPr) steps.push(commitStep(session, 'Add todo filter'))
+  if (wantsPr) {
+    steps.push({
+      tool: 'Bash',
+      target: 'git push -u origin HEAD && gh pr create --fill',
+      description: 'Push the branch and open a pull request',
+      output: [result(`branch '${wantsBranch ? name : session.branch}' set up to track 'origin/${wantsBranch ? name : session.branch}'`), result('https://github.com/acme/todo-app/pull/17')],
+      tokens: 200,
+      events: [{ type: 'toolUsed', tool: 'Bash' }, { type: 'prCreated' }],
+    })
+  }
+  const closing = wantsPr
+    ? [say(pick(language, 'Pull Request #17 ist offen: https://github.com/acme/todo-app/pull/17', 'Pull request #17 is open: https://github.com/acme/todo-app/pull/17'))]
+    : steps.some((s) => s.branch)
+      ? [say(pick(language, `Du bist jetzt auf \`${name}\` - main bleibt unberührt.`, `You are on \`${name}\` now - main stays untouched.`))]
+      : [say(pick(language, 'Committet.', 'Committed.'))]
+  if (!steps.length) return git(session, language, false)
+  return { intro: [], steps, closing }
+}
+
+function git(session: ClaudeSession, language: Language, commit: boolean): Plan {
   const status = [
-    result('On branch main'),
+    result(`On branch ${session.branch}`),
     result('Changes not staged for commit:'),
     ...GIT_CHANGES.modified.map((f) => result(`  modified:   ${f}`)),
     result('Untracked files:'),
@@ -137,16 +182,7 @@ function git(language: Language, commit: boolean): Plan {
       events: [{ type: 'toolUsed', tool: 'Bash' }],
     },
   ]
-  if (commit) {
-    steps.push({
-      tool: 'Bash',
-      target: 'git add src/components && git commit -m "Add todo filter"',
-      description: 'Commit the todo filter',
-      output: [result('[main 3f2a1c9] Add todo filter'), result(' 2 files changed, 31 insertions(+), 2 deletions(-)')],
-      tokens: 150,
-      events: [{ type: 'toolUsed', tool: 'Bash' }],
-    })
-  }
+  if (commit) steps.push(commitStep(session, 'Add todo filter'))
   return {
     intro: [],
     steps,
@@ -300,33 +336,243 @@ function findSkillFor(session: ClaudeSession, prompt: string) {
   return session.skills.find((s) => s.triggers.some((t) => lower.includes(t)))
 }
 
+
+/** "What is a token?" - the basics lesson asks Claude itself. */
+function concept(topic: 'tokens' | 'context' | 'hallucination' | 'agent', language: Language): Plan {
+  const answers = {
+    tokens: [
+      pick(language, 'Ein Token ist ein Stück Text - oft ein Wortteil, manchmal ein ganzes Wort oder ein Satzzeichen.', 'A token is a piece of text - often part of a word, sometimes a whole word or a punctuation mark.'),
+      pick(language, 'Ich lese und schreibe in Tokens; Kontextfenster, Limits und Kosten werden in Tokens gemessen.', 'I read and write in tokens; context window, limits and cost are all measured in tokens.'),
+      pick(language, 'Code hat viele Sonderzeichen und wird dadurch oft in mehr Tokens zerlegt als Fließtext.', 'Code has many special characters and often splits into more tokens than prose.'),
+    ],
+    context: [
+      pick(language, 'Das Kontextfenster ist alles, was ich bei einer Antwort sehe: Systemanweisungen, CLAUDE.md, das Gespräch, gelesene Dateien, Werkzeugausgaben.', 'The context window is everything I see for one answer: system instructions, CLAUDE.md, the conversation, files read, tool output.'),
+      pick(language, 'Was nicht darin steht, weiß ich nicht - zwischen Sitzungen erinnere ich mich nur an das, was wieder geladen wird.', 'What is not in it, I do not know - between sessions I only remember what gets loaded again.'),
+      pick(language, '`/context` zeigt, wie voll es gerade ist.', '`/context` shows how full it is right now.'),
+    ],
+    hallucination: [
+      pick(language, 'Ich erzeuge wahrscheinliche Fortsetzungen - manchmal klingt etwas plausibel und ist trotzdem falsch, z. B. eine API, die es nicht gibt.', 'I generate likely continuations - sometimes something sounds plausible and is still wrong, e.g. an API that does not exist.'),
+      pick(language, 'Gegenmittel: mich Dateien lesen und Tests laufen lassen, statt aus dem Gedächtnis zu antworten - und das Ergebnis prüfen.', 'The remedy: let me read files and run tests instead of answering from memory - and check the result.'),
+    ],
+    agent: [
+      pick(language, 'Ein Agent ist ein Modell, das Werkzeuge benutzen darf und in einer Schleife arbeitet: handeln, Ergebnis ansehen, nächsten Schritt wählen.', 'An agent is a model that may use tools and works in a loop: act, look at the result, pick the next step.'),
+      pick(language, 'Ohne Werkzeuge könnte ich nur raten, was in deinem Projekt steht. Mit ihnen lese ich nach und prüfe selbst.', 'Without tools I could only guess what is in your project. With them I look it up and check for myself.'),
+    ],
+  }
+  return { intro: [], steps: [], closing: answers[topic].map(say), events: [{ type: 'conceptExplained', topic }] }
+}
+
+const FILTER_COMPONENT = `type Filter = 'all' | 'open' | 'done'
+
+type Props = { value: Filter; onChange: (filter: Filter) => void }
+
+export function TodoFilter({ value, onChange }: Props) {
+  return (
+    <div role="group" aria-label="Filter">
+      {(['all', 'open', 'done'] as const).map((filter) => (
+        <button key={filter} aria-pressed={value === filter} onClick={() => onChange(filter)}>
+          {filter}
+        </button>
+      ))}
+    </div>
+  )
+}`
+
+/** "Add a filter to the todo list" - the capstone feature. */
+function filterFeature(session: ClaudeSession, language: Language): Plan {
+  const path = 'src/components/TodoFilter.tsx'
+  const app = session.files['src/App.tsx']
+  const nextApp = app.includes('TodoFilter')
+    ? app
+    : app
+        .replace("import { TodoList } from './components/TodoList'", "import { useState } from 'react'\nimport { TodoFilter } from './components/TodoFilter'\nimport { TodoList } from './components/TodoList'")
+        .replace('  return <TodoList', "  const [filter, setFilter] = useState<'all' | 'open' | 'done'>('all')\n  const visible = todos.filter((t) => filter === 'all' || (filter === 'done') === t.done)\n  return (\n    <>\n      <TodoFilter value={filter} onChange={setFilter} />\n      <TodoList")
+        .replace('todos={todos} onAdd={add} onToggle={toggle} />', 'todos={visible} onAdd={add} onToggle={toggle} />\n    </>\n  )')
+  return {
+    intro: [say(pick(language, 'Ich sehe mir zuerst an, wie die Liste aufgebaut ist.', "I'll first look at how the list is built."))],
+    steps: [
+      readStep(session, 'src/App.tsx'),
+      readStep(session, 'src/components/TodoList.tsx'),
+      {
+        tool: 'Write',
+        target: path,
+        output: [result(`Wrote ${FILTER_COMPONENT.split('\n').length} lines to ${path}`), ...FILTER_COMPONENT.split('\n').map((text) => ({ text, kind: 'added' as const }))],
+        tokens: 500,
+        writes: { [path]: FILTER_COMPONENT },
+        events: [{ type: 'toolUsed', tool: 'Write' }],
+      },
+      {
+        tool: 'Edit',
+        target: 'src/App.tsx',
+        output: [
+          result('Updated src/App.tsx with 9 additions and 1 removal'),
+          { text: "+  const [filter, setFilter] = useState<'all' | 'open' | 'done'>('all')", kind: 'added' },
+          { text: '+  <TodoFilter value={filter} onChange={setFilter} />', kind: 'added' },
+        ],
+        tokens: 400,
+        writes: { 'src/App.tsx': nextApp },
+        events: [{ type: 'toolUsed', tool: 'Edit' }, { type: 'featureBuilt' }],
+      },
+      testStep(session, false),
+    ],
+    closing: [
+      say(pick(language, 'Der Filter ist eingebaut: `TodoFilter.tsx` mit drei Knöpfen, der Zustand liegt in `App.tsx`.', 'The filter is in: `TodoFilter.tsx` with three buttons, the state lives in `App.tsx`.')),
+      say(
+        session.files['src/hooks/useTodos.ts'].includes(BUGGY_TOGGLE)
+          ? pick(language, 'Achtung: Der alte Toggle-Test schlägt noch fehl - der Fehler liegt in `useTodos.ts`, nicht im Filter. Soll ich ihn auch beheben?', 'Heads-up: the old toggle test still fails - the bug is in `useTodos.ts`, not in the filter. Shall I fix it too?')
+          : pick(language, 'Alle Tests sind grün.', 'All tests pass.'),
+      ),
+    ],
+  }
+}
+
+/** "Show me the .env file" - stopped by a deny rule or a hook, or leaked if neither exists. */
+function readSecret(session: ClaudeSession, language: Language): Plan {
+  const content = session.files['.env'] ?? ''
+  return {
+    intro: [],
+    steps: [
+      {
+        tool: 'Read',
+        target: '.env',
+        output: [result(`Read ${lineCount(content)} lines`), { text: content, kind: 'output' }],
+        tokens: 40,
+        events: [{ type: 'toolUsed', tool: 'Read' }, { type: 'secretRead' }],
+      },
+    ],
+    closing: [
+      say(pick(language, 'Die Datei enthält einen API-Token. Den solltest du nirgends einfügen - auch nicht in einen Chat.', 'The file contains an API token. Do not paste it anywhere - not into a chat either.')),
+      { text: pick(language, 'Ein Geheimnis ist jetzt im Kontext gelandet. Eine Deny-Regel `Read(./.env)` hätte das verhindert.', 'A secret just landed in the context. A deny rule `Read(./.env)` would have prevented that.'), kind: 'hint' },
+    ],
+  }
+}
+
+/** "Add a deny rule for .env" / "allow npm run lint for the team" - Claude edits .claude/settings.json. */
+function settingsChange(session: ClaudeSession, prompt: string, language: Language): Plan {
+  const deny = /deny|verbiet|sperr|block|\.env|secret|geheim/.test(prompt.toLowerCase())
+  const rule = deny ? 'Read(./.env)' : 'Bash(npm run lint)'
+  const nextDeny = deny && !session.denyRules.includes(rule) ? [...session.denyRules, rule] : session.denyRules
+  const content = settingsJson({ hooks: session.hooks, denyRules: nextDeny }, deny ? [] : [rule])
+  return {
+    intro: [],
+    steps: [
+      {
+        tool: 'Edit',
+        target: '.claude/settings.json',
+        output: [result('Updated .claude/settings.json'), { text: `+      "${rule}"`, kind: 'added' }],
+        tokens: 200,
+        writes: { '.claude/settings.json': content },
+        denyRule: deny ? rule : undefined,
+        allowRule: deny ? undefined : rule,
+        events: [{ type: 'toolUsed', tool: 'Edit' }, { type: 'settingsChanged', file: 'settings.json' }],
+      },
+    ],
+    closing: [
+      say(
+        deny
+          ? pick(language, 'Ab jetzt ist das Lesen von `.env` gesperrt - Claude Code setzt die Regel durch, egal was ich entscheide. Für das ganze Team, sobald die Datei committet ist.', 'Reading `.env` is blocked from now on - Claude Code enforces the rule, whatever I decide. For the whole team once the file is committed.')
+          : pick(language, '`npm run lint` läuft ab jetzt ohne Rückfrage - für alle, sobald `.claude/settings.json` committet ist.', '`npm run lint` runs without asking from now on - for everyone once `.claude/settings.json` is committed.'),
+      ),
+    ],
+  }
+}
+
+/** "Add a hook that formats after every edit" */
+function createHook(session: ClaudeSession, prompt: string, language: Language): Plan {
+  const hook = hookFromPrompt(prompt)
+  const content = settingsJson({ hooks: [...session.hooks, hook], denyRules: session.denyRules })
+  return {
+    intro: [say(pick(language, `Ich trage einen ${hook.event}-Hook in \`.claude/settings.json\` ein.`, `I'll add a ${hook.event} hook to \`.claude/settings.json\`.`))],
+    steps: [
+      {
+        tool: 'Edit',
+        target: '.claude/settings.json',
+        output: [result('Updated .claude/settings.json'), ...content.split('\n').map((text) => ({ text, kind: 'added' as const }))],
+        tokens: 300,
+        writes: { '.claude/settings.json': content },
+        hook,
+        events: [{ type: 'toolUsed', tool: 'Edit' }, ...hookEvents(hook)],
+      },
+    ],
+    closing: [say(pick(language, 'Der Hook gilt ab dem nächsten Werkzeugaufruf. `/hooks` zeigt alle Hooks.', 'The hook applies from the next tool call. `/hooks` lists all hooks.'))],
+  }
+}
+
+/** "Summarize docs/vendor-notes.md" - the file carries hidden instructions. */
+function injection(session: ClaudeSession, language: Language): Plan {
+  return {
+    intro: [],
+    steps: [
+      readStep(session, INJECTION_FILE),
+      {
+        tool: 'Bash',
+        target: INJECTION_COMMAND,
+        description: 'Install the required helper',
+        output: [result('(script output)')],
+        tokens: 100,
+        suspicious: true,
+        events: [{ type: 'toolUsed', tool: 'Bash' }],
+      },
+    ],
+    closing: [say(pick(language, 'Zusammenfassung: Version 4 hat `onSelect` in `onChange` umbenannt.', 'Summary: version 4 renamed `onSelect` to `onChange`.'))],
+  }
+}
+
 function fallback(language: Language): Plan {
   return {
     intro: [],
     steps: [],
     closing: [
-      say(pick(language, 'Gern - was genau soll ich tun?', 'Sure - what exactly should I do?')),
+      say(pick(language, 'Gern - was genau soll ich tun? Welche Datei, welches Verhalten, woran erkennst du, dass es fertig ist?', 'Sure - what exactly should I do? Which file, which behaviour, how will you know it is done?')),
       {
         text: pick(
           language,
-          'Diese Simulation versteht z. B.: „Erkläre das Projekt“, „Lass die Tests laufen und behebe den Fehler“, „Was hat sich in git geändert?“, „Erstelle einen Skill für Code-Reviews“ oder Prompts mit @src/App.tsx.',
-          'This simulation understands e.g.: "Explain the project", "Run the tests and fix the bug", "What changed in git?", "Create a skill for code reviews" or prompts with @src/App.tsx.',
+          'Diese Simulation versteht z. B.: „Erkläre das Projekt“, „Lass die Tests laufen und behebe den Fehler“, „Leg einen Branch an“, „Erstelle einen Skill für Code-Reviews“, „Welche Issues sind offen?“ oder Prompts mit @src/App.tsx.',
+          'This simulation understands e.g.: "Explain the project", "Run the tests and fix the bug", "Create a branch", "Create a skill for code reviews", "Which issues are open?" or prompts with @src/App.tsx.',
         ),
         kind: 'hint',
       },
     ],
+    events: [{ type: 'clarified' }],
   }
 }
+
+/** A prompt is specific when it names a file and says enough to act on. */
+export function isSpecific(prompt: string) {
+  return /@[\w./-]+|\bsrc\/|\.(tsx?|json|md)\b/.test(prompt) && prompt.trim().split(/\s+/).length >= 6
+}
+
+const has = (p: string, pattern: RegExp) => pattern.test(p)
+const CREATE = /erstell|create|make|schreib|write|bau|build|leg .*an|anleg|neue|new|generat|\badd\b|hinzu|füg|fueg|einricht|set up/
 
 /** Plans what Claude does with a prompt. `@` mentions are handled by the session before this. */
 export function planPrompt(session: ClaudeSession, prompt: string, language: Language): Plan {
   const p = prompt.toLowerCase()
-  if (/skill/.test(p) && /erstell|create|make|schreib|write|bau|build|leg .*an|anleg|neue|new|generat/.test(p)) return createSkill(session, prompt, language)
+  // Questions about the basics come first - "token" must not end up at the .env intent.
+  if (has(p, /was (ist|sind|bedeutet)|what (is|are)|erklär mir|explain to me|wie funktioniert|how does/)) {
+    if (has(p, /token/)) return concept('tokens', language)
+    if (has(p, /kontext|context/)) return concept('context', language)
+    if (has(p, /halluzin|hallucinat/)) return concept('hallucination', language)
+    if (has(p, /\bagent/) && !has(p, /subagent/)) return concept('agent', language)
+  }
+  if (has(p, /skill/) && has(p, CREATE)) return createSkill(session, prompt, language)
+  if (has(p, /subagent|\bagent\b|agenten/) && has(p, CREATE)) return createAgentPlan(prompt, language)
+  if (has(p, /\bhook/) && has(p, CREATE)) return createHook(session, prompt, language)
+  if (has(p, /deny|regel|rule|settings|einstellung/) && has(p, CREATE)) return settingsChange(session, prompt, language)
+  if (has(p, /vendor-notes|zusammenfass|summari[sz]e/)) return injection(session, language)
+  const agent = session.agents.find((a) => p.includes(a.name))
+  if (agent) return customAgentPlan(agent, language)
   const skill = findSkillFor(session, prompt)
   if (skill) return runSkill(session, skill, 'model', language)
-  if (/test|fix|fehler|repar|kaputt|broken|bug/.test(p)) return testAndFix(session, language)
-  if (/commit/.test(p)) return git(language, true)
-  if (/git|geändert|geaendert|änderung|changed|changes|diff|status/.test(p)) return git(language, false)
-  if (/erklär|erklaer|explain|überblick|overview|beschreib|describe|struktur|structure|was macht|what does|what is|worum/.test(p)) return explain(session, language)
+  if (has(p, /\.env|secret|geheimnis|api.?key|passwort|password/)) return readSecret(session, language)
+  if (has(p, /issue|ticket/)) return issuesPlan(session, language)
+  if (has(p, /subagent|explore|durchsuch|search the (whole )?(codebase|project)|finde? alle|find (all|every)|überall|everywhere/)) return explorePlan(language)
+  // Branch and PR wishes first: "a branch for the todo filter" is about git, not about the filter.
+  if (has(p, /branch|zweig|pull request|pull-request|\bpr\b|merge request/)) return gitWork(session, prompt, language)
+  if (has(p, /filter|feature/)) return filterFeature(session, language)
+  if (has(p, /test|fix|fehler|repar|kaputt|broken|bug/)) return testAndFix(session, language)
+  if (has(p, /commit/)) return gitWork(session, prompt, language)
+  if (has(p, /git|geändert|geaendert|änderung|changed|changes|diff|status/)) return git(session, language, false)
+  if (has(p, /erklär|erklaer|explain|überblick|overview|beschreib|describe|struktur|structure|was macht|what does|worum/)) return explain(session, language)
   return fallback(language)
 }

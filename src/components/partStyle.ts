@@ -56,6 +56,11 @@ export const TEIL_STIL: Record<string, { icon: IconName; kuerzel?: string; farbe
     farbe:
       'bg-linear-to-br from-stone-100 to-orange-100/70 text-orange-800 ring-orange-700/25 dark:from-orange-300/20 dark:to-stone-500/10 dark:text-orange-200 dark:ring-orange-300/20',
   },
+  'claude-advanced': {
+    icon: 'puzzle',
+    farbe:
+      'bg-linear-to-br from-orange-100 to-amber-100/70 text-orange-800 ring-orange-700/25 dark:from-orange-400/25 dark:to-amber-500/10 dark:text-orange-200 dark:ring-orange-300/20',
+  },
   sql: {
     icon: 'datenbank',
     farbe:

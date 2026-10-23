@@ -1,4 +1,6 @@
 import { readStep, runSkill, type Plan } from './agent'
+import { mcpStatus } from './mcp'
+import { agentsOverview } from './subagents'
 import type { ClaudeSession, Language, TerminalLine } from './types'
 import { MEMORY_FILE, PROJECT_DIR, skillCommand, skillPath } from './workspace'
 
@@ -10,10 +12,19 @@ import { MEMORY_FILE, PROJECT_DIR, skillCommand, skillPath } from './workspace'
 
 /** Printed as the only line by /clear and `clear`: the terminal empties its output. */
 export const CLEAR = '\u0000clear'
-export const CONTEXT_WINDOW = 200_000
+/** Current models default to a 1M-token window (code.claude.com/docs/en/context-window, 2026-10). */
+export const CONTEXT_WINDOW = 1_000_000
 /** System prompt and tool definitions - in the context before the first prompt. */
 export const BASE_TOKENS = { system: 3_100, tools: 11_800 }
-export const MODEL = 'claude-sonnet-5-5'
+/** Model aliases of /model and --model, and what they stand for in this simulation. */
+export const MODELS: Record<string, string> = {
+  opus: 'claude-opus-5-5',
+  sonnet: 'claude-sonnet-5-5',
+  haiku: 'claude-haiku-5-5',
+  fable: 'claude-fable-5-1',
+  opusplan: 'claude-opus-5-5 (plan mode) / claude-sonnet-5-5',
+}
+export const modelId = (alias: string) => MODELS[alias] ?? alias
 
 type Command = { name: string; aliases?: string[]; args?: string; help: string }
 
@@ -28,6 +39,12 @@ export const COMMANDS: Command[] = [
   { name: '/init', help: 'Create a CLAUDE.md for this project' },
   { name: '/memory', help: 'Edit CLAUDE.md memory files' },
   { name: '/permissions', help: 'View and edit allow, ask and deny rules' },
+  { name: '/config', help: 'Open the settings' },
+  { name: '/hooks', help: 'View hook configurations' },
+  { name: '/agents', help: 'Manage subagents' },
+  { name: '/mcp', help: 'Manage MCP servers' },
+  { name: '/plugin', args: '[marketplace add|install …]', help: 'Manage plugins and marketplaces' },
+  { name: '/rewind', help: 'Restore code and/or conversation to an earlier point' },
   { name: '/skills', help: 'List available skills' },
   { name: '/model', args: '[model]', help: 'Set the AI model' },
   { name: '/status', help: 'Show version, model, account and connectivity' },
@@ -79,7 +96,7 @@ function contextGrid(session: ClaudeSession): TerminalLine[] {
   const cells = 20
   const filled = Math.max(1, Math.round((used / CONTEXT_WINDOW) * cells))
   return [
-    out(`Context Usage  ${MODEL} · ${k(used)}/${k(CONTEXT_WINDOW)} tokens (${Math.round((used / CONTEXT_WINDOW) * 100)}%)`),
+    out(`Context Usage  ${modelId(session.model)} · ${k(used)}/${k(CONTEXT_WINDOW)} tokens (${Math.round((used / CONTEXT_WINDOW) * 100)}%)`),
     out(`  ${'⛁ '.repeat(filled)}${'⛶ '.repeat(cells - filled)}`),
     ...parts.map(([label, n]) => out(`  ⛁ ${label}: ${k(n)} tokens (${((n / CONTEXT_WINDOW) * 100).toFixed(1)}%)`)),
     out(`  ⛶ Free space: ${k(CONTEXT_WINDOW - used)}`),
@@ -138,7 +155,7 @@ export function runCommand(session: ClaudeSession, input: string, language: Lang
         out(`Total duration (API):  ${minutes}m ${Math.round(session.apiSeconds % 60)}s`),
         out(`Total code changes:    ${session.linesAdded} lines added, ${session.linesRemoved} lines removed`),
         out(`Usage by model:`),
-        out(`  ${MODEL}:  ${k(session.contextTokens * 3 + 4_000)} input, ${k(session.messages * 450)} output`),
+        out(`  ${modelId(session.model)}:  ${k(session.contextTokens * 3 + 4_000)} input, ${k(session.messages * 450)} output`),
         muted(pick(language, 'Mit einem Pro- oder Max-Abo zählen die Plan-Limits, nicht die Dollar-Summe.', 'On a Pro or Max plan the plan limits count, not the dollar figure.')),
       )
       return
@@ -196,7 +213,37 @@ export function runCommand(session: ClaudeSession, input: string, language: Lang
       lines.push(out('Permissions'), out('  Allow:'))
       if (session.allowRules.length === 0) lines.push(muted('    (none yet - "Yes, and don\'t ask again" adds rules here)'))
       for (const rule of session.allowRules) lines.push(out(`    ${rule}`))
-      lines.push(out('  Deny:'), out('    Read(./.env)'), muted('  Rules are saved in .claude/settings.local.json'))
+      lines.push(out('  Deny:'))
+      if (session.denyRules.length === 0) lines.push(muted('    (none - secrets like .env are readable!)'))
+      for (const rule of session.denyRules) lines.push(out(`    ${rule}`))
+      lines.push(muted('  "Don\'t ask again" saves to .claude/settings.local.json; team rules live in .claude/settings.json'))
+      return
+    case '/config':
+      lines.push({ text: 'Settings', kind: 'title', boxed: true })
+      for (const [key, value] of [
+        ['Model', session.model],
+        ['Default permission mode', session.mode],
+        ['Theme', 'dark'],
+        ['Output style', 'Default'],
+        ['Auto-compact', 'on'],
+        ['Thinking', 'on'],
+      ])
+        lines.push({ text: `  ${key.padEnd(26)}${value}`, kind: 'output', boxed: true })
+      lines.push(muted('Saved to ~/.claude/settings.json - project settings: .claude/settings.json'))
+      return
+    case '/hooks':
+      if (!session.hooks.length) {
+        lines.push(out('No hooks configured. Add them to the "hooks" section of .claude/settings.json - or ask Claude to.'))
+        return
+      }
+      lines.push(out('Hooks (read-only - edit the settings file to change them)'))
+      for (const hook of session.hooks) lines.push(out(`  ${hook.event.padEnd(12)}${(hook.matcher ?? '*').padEnd(18)}${hook.command}`), muted('                source: project (.claude/settings.json)'))
+      return
+    case '/agents':
+      lines.push(...agentsOverview(session))
+      return
+    case '/mcp':
+      mcpStatus(session, lines)
       return
     case '/skills':
       lines.push(out(`Skills (${session.skills.length})`))
@@ -204,11 +251,26 @@ export function runCommand(session: ClaudeSession, input: string, language: Lang
       lines.push(muted('  Bundled skills such as /doctor, /code-review and /simplify ship with Claude Code.'))
       return
     case '/model':
-      if (args) session.model = args
-      lines.push(out(args ? `Set model to ${args}` : `Current model: ${session.model}  (aliases: opus, sonnet, haiku)`))
+      if (!args) {
+        lines.push(out(`Current model: ${session.model} (${modelId(session.model)})`), out(`Aliases: ${Object.keys(MODELS).join(', ')}`))
+        return
+      }
+      if (!(args in MODELS) && !args.startsWith('claude-')) {
+        lines.push({ text: `Unknown model: ${args}`, kind: 'error' })
+        return
+      }
+      session.model = args
+      session.events.push({ type: 'modelChanged', model: args })
+      lines.push(out(`Set model to ${args} (${modelId(args)})`))
       return
     case '/status':
-      lines.push(out('Version:  2.1.300 (simulated)'), out(`Model:    ${session.model}`), out('Account:  dev@example.com (Claude Pro)'), out(`cwd:      ${PROJECT_DIR}`))
+      lines.push(
+        out('Version:  2.1.300 (simulated)'),
+        out(`Model:    ${session.model} (${modelId(session.model)})`),
+        out('Account:  dev@example.com (Claude Pro)'),
+        out(`cwd:      ${PROJECT_DIR}`),
+        out('Setting sources: user (~/.claude/settings.json), project (.claude/settings.json), local (.claude/settings.local.json)'),
+      )
       return
     case '/add-dir':
       lines.push(args ? result(`Added ${args} as a working directory`) : { text: 'Usage: /add-dir <path>', kind: 'error' })

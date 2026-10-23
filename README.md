@@ -18,10 +18,12 @@ PostgreSQL 18**, als WebAssembly im Browser ([PGlite](https://pglite.dev)). Zum 
 eine fertige Shop-Datenbank, die bei jedem Lauf frisch startet. Mehr unter
 [Der Datenbank-Teil](#der-datenbank-teil).
 
-**Teil 10: Claude Code Engineer** ist ein Werkzeug statt einer Sprache: der KI-Agent Claude Code im
-Terminal - von der Installation über Slash-Commands, Kontext und den Agentic Loop bis zu eigenen Skills.
-Geübt wird in einem simulierten Claude-Code-Terminal (`src/claude/`), das Aufgaben selbst prüft. Mehr
-unter [Der Claude-Code-Teil](#der-claude-code-teil).
+**Teil 10 und 11: Claude Code** sind ein Werkzeug statt einer Sprache: der KI-Agent Claude Code im
+Terminal, von Grund auf - wie Sprachmodelle und Agenten arbeiten, Installation, Befehle, Kontext, gute
+Aufträge, der Agentic Loop und Git (Teil 10), dann Einstellungen, Hooks, Skills, Subagents, MCP, Plugins,
+Automatisierung in der CI, Sicherheit und ein Praxisprojekt (Teil 11). Geübt wird in einem simulierten
+Claude-Code-Terminal (`src/claude/`), das Aufgaben selbst prüft. Mehr unter
+[Der Claude-Code-Teil](#der-claude-code-teil).
 
 **Alles ist frei erreichbar** - es gibt keine Level und nichts wird freigeschaltet. Den roten Faden
 liefern Querverweise („Baut auf“, „Darauf bauen auf“) und ein durchgehendes **ToDo-App-Projekt**, das
@@ -113,15 +115,16 @@ Der Fortschritt („Kapitel abschließen“) und der Code in den Editoren werden
 | **7 · Java-Grundlagen** ☕ | Hallo Java · Typen & Variablen · Bedingungen & Schleifen · Methoden · Arrays & Strings · Klassen & Objekte · Vererbung & Interfaces · Collections & Generics · Exceptions · **Java, JavaScript & React im Vergleich** |
 | **8 · Backend: Spring Boot & Docker** 🍃 | Hallo Spring Boot · Beans & Dependency Injection · REST-APIs · Validierung & Fehlerbehandlung · Spring Data JPA · Konfiguration, Profile & Tests · **React trifft Spring Boot** (Full-Stack-Werkstatt) · Container & Images · Dockerfile · **Docker Compose** |
 | **9 · Datenbanken: SQL mit PostgreSQL** 🐘 | Tabellen & SELECT · Filtern mit WHERE · Zählen & Gruppieren · JOIN · Daten ändern & Transaktionen · Tabellen entwerfen (CREATE TABLE, Indizes) · Unterabfragen, CTEs & Window Functions |
-| **10 · Claude Code Engineer** 🤖 | Setup & Grundlagen · Slash-Commands · Kontext & Dateien (CLAUDE.md, `@`, git) · Agentic Loop & Tools (Erlaubnisse, Modi, Regeln) · **Skills: wiederverwendbare Workflows** |
+| **10 · Claude Code: Grundlagen** 🤖 | Wie KI-Agenten arbeiten · Setup & Grundlagen · Slash-Commands · Kontext & Dateien (CLAUDE.md, `@`) · Gute Aufträge formulieren · Agentic Loop & Tools (Erlaubnisse, Modi, Regeln) · Git-Workflows & Checkpoints |
+| **11 · Claude Code: Erweitern & Automatisieren** 🧩 | Einstellungen · Hooks · **Skills** · Subagents · MCP · Plugins & Marketplaces · Headless & CI · Sicher arbeiten · **Praxisprojekt: ein Feature von Anfang bis Ende** |
 
 Teil 7 ist **eigenständig**: Er setzt keinen der Teile 1-6 voraus und benutzt nichts daraus. Die
 Querverweise dorthin sind Vergleiche, keine Voraussetzungen. Teil 8 setzt Teil 7 voraus (Klassen,
 Records, Collections) und für das Kapitel „React trifft Spring Boot“ auch `fetch` aus Teil 5.
 Teil 9 steht wieder für sich: SQL braucht keine Programmiersprache. Die Verweise auf Spring Data und
 Docker zeigen nur, wo das Wissen im Backend gebraucht wird.
-Teil 10 steht im eigenen Bereich „Werkzeuge“ und setzt nur das Arbeiten im Terminal voraus
-(„Lokal entwickeln“ aus Teil 5).
+Die Teile 10 und 11 stehen im eigenen Bereich „Werkzeuge“ und setzen nur das Arbeiten im Terminal voraus
+(„Lokal entwickeln“ aus Teil 5); Teil 11 baut auf Teil 10 auf.
 
 Zum Nachschlagen gibt es außerdem:
 
@@ -179,11 +182,13 @@ src/
     engine.ts              Datenbank zurücksetzen, Anweisungen einzeln ausführen, \d und \dt, Fehler → Zeile
     worker.ts client.ts    PostgreSQL im Web Worker; Warteschlange und 10-s-Abbruch im Browser
     check.ts               Tests der Übungen (Vergleich mit der Musterlösung) und Prüfung der Kapitelbeispiele
-  claude/                🤖 Teil 10: Claude-Code-Simulator - kein React, kein DOM
-    session.ts             Zustandsmaschine: Shell → Login → Eingabe ⇄ Erlaubnisdialog
-    commands.ts            Slash-Commands (/help, /compact, /clear, /usage, /context, /init, /skills …)
-    agent.ts               Prompt → Tool-Schritte (erklären, testen & reparieren, git, Skills)
-    workspace.ts           das simulierte Projekt (die ToDo-App mit einem Fehler) und vorhandene Skills
+  claude/                🤖 Teile 10 + 11: Claude-Code-Simulator - kein React, kein DOM
+    session.ts             Zustandsmaschine: Shell → Login → Eingabe ⇄ Erlaubnisdialog; Checkpoints, Plan-Modus, -p
+    commands.ts            Slash-Commands (/help, /compact, /clear, /usage, /context, /init, /skills, /hooks, /mcp …)
+    agent.ts               Prompt → Absicht → Tool-Schritte (erklären, reparieren, git, Skills, Feature, Sicherheit …)
+    hooks.ts mcp.ts        Hooks (PreToolUse/PostToolUse) · MCP-Server (claude mcp add/list, /mcp, mcp__-Werkzeuge)
+    plugins.ts subagents.ts  /plugin mit Marketplace und Namensraum · Explore und eigene Subagents
+    workspace.ts           das simulierte Projekt (ToDo-App mit Fehler), Skills, Hooks, Plugins, Prompt-Injection-Datei
     tasks.ts               Aufgaben gegen die Ereignisse der Sitzung prüfen
   main.tsx                 Einstiegspunkt: createRoot, StrictMode, ThemeProvider
   App.tsx                  Layout, Routing über den URL-Hash, Lernfortschritt, Sprachumschalter
@@ -211,7 +216,7 @@ src/
     java/                ☕ Teil 7, gleicher Aufbau - der Code in den .code.ts ist Java
     backend/             🍃 Teil 8, gleicher Aufbau - Java mit Spring, Dockerfiles, compose.yaml
     sql/                 🐘 Teil 9, gleicher Aufbau - der Code in den .code.ts ist SQL
-    claude/              🤖 Teil 10 als Daten: eine Datei pro Lektion, ClaudeLesson.tsx (geteilte Ansicht)
+    claude/              🤖 Teile 10 + 11 als Daten: eine Datei pro Lektion, ClaudeLesson.tsx (geteilte Ansicht)
     demos/                 Interaktive TypeScript-Demos, von beiden Sprachfassungen genutzt
     playground/            Vorlagen und Bausteine der Playgrounds, eine Datei pro Teil (siehe unten)
   learning/                  Die Lern-Bausteine
@@ -544,19 +549,22 @@ tests: [
 
 ## Der Claude-Code-Teil
 
-Teil 10 lehrt ein Werkzeug: **Claude Code**, den KI-Agenten im Terminal. Echtes Claude Code braucht
+Die Teile 10 und 11 lehren ein Werkzeug: **Claude Code**, den KI-Agenten im Terminal. Echtes Claude Code braucht
 ein Konto und eine Shell - im Browser läuft deshalb ein **Simulator** (`src/claude/`), der sich wie das
 Original anfühlt: Willkommensbox, Eingabe mit `>`, Werkzeugaufrufe als `⏺ Bash(npm test)`, Diffs und
 der Erlaubnisdialog mit „Yes / Yes, and don't ask again / No“. Ein Modell steckt nicht dahinter: Prompts
-werden einer Handvoll Absichten zugeordnet (Projekt erklären, Tests reparieren, git, Skill anlegen oder
-benutzen), die jeweils einige Werkzeugschritte planen. Gearbeitet wird in der ToDo-App, in deren
-`useTodos.ts` ein Fehler steckt - so hat der Agentic Loop etwas zu tun.
+werden Absichten zugeordnet (Projekt erklären, Tests reparieren, Branch und Pull Request, Skill oder
+Subagent anlegen, Issues über MCP, `.env` lesen, eine Datei mit versteckter Anweisung zusammenfassen …),
+die jeweils einige Werkzeugschritte planen. Gearbeitet wird in der ToDo-App, in deren `useTodos.ts` ein
+Fehler steckt - so hat der Agentic Loop etwas zu tun. Der Simulator kennt außerdem Hooks, Deny-Regeln,
+Checkpoints (`/rewind`), den Plan-Modus mit „mach weiter“, MCP-Server (`claude mcp add`), Plugins aus
+einem Marketplace und den Print-Modus mit `--output-format json` und `--allowedTools`.
 
 **Lektionen sind Daten.** Jede Lektion hat dieselbe geteilte Ansicht - links Text, Aufgaben,
 Kontrollfragen und „Das Wichtigste“, rechts das Terminal, das beim Scrollen stehen bleibt. Statt drei
 Dateien pro Kapitel gibt es deshalb eine Datei pro Lektion in `src/course/claude/` (Blöcke, Aufgaben,
 Quiz, Kernpunkte, beide Sprachen); `ClaudeLesson.tsx` rendert sie. Titel und Lernziele stehen wie
-überall in `src/course/parts/claude.ts`.
+überall in `src/course/parts/claude.ts` (Teil 10) und `claudeAdvanced.ts` (Teil 11).
 
 **Aufgaben prüfen Ereignisse, keine Ausgaben.** Jeder Schritt der Sitzung hinterlässt Ereignisse
 (`{ type: 'compacted', withInstructions: true }`, `{ type: 'skillInvoked', via: 'model' }` …). Eine
@@ -567,8 +575,9 @@ Fortschritt (`lernpfad-uebungen`); sind alle gelöst, gilt die Lektion als abges
 durch, so wie Lernende sie bedienen würden, und prüft, dass am Ende alle Aufgaben gelöst sind.
 
 **Fakten veralten schnell.** Befehle und Begriffe folgen der Doku unter code.claude.com (Stand
-Oktober 2026: `/cost` ist ein Alias von `/usage`, gebündelte Skills statt „System-Skills“). Bei
-Änderungen an Claude Code zuerst dort nachsehen.
+Oktober 2026: `/cost` ist ein Alias von `/usage`, gebündelte Skills statt „System-Skills“,
+Kontextfenster 1 Mio. Tokens, für harte Verbote Deny-Regeln statt Hooks). Bei Änderungen an Claude Code
+zuerst dort nachsehen.
 
 ## Zweisprachigkeit
 

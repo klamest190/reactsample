@@ -100,12 +100,14 @@ src/
     playground/              Vorlagen + Bausteine je Teil, locations.ts, types.ts
     project/                 ToDo-Projekt: meta.ts (Titel, Vorwissen), ProjectStep.tsx, steps/ (Inhalte:
                              code.ts, tests.ts, basics.ts 1-5, hooks.ts 6-11, advanced.ts 12-14, challenge.ts 15)
-    claude/                  Teil 10 "Claude Code Engineer": Lektionsinhalte als DATEN (Metadaten in parts/claude.ts):
-                             types.ts (Lesson, LessonBlock, LessonTask, LessonQuestion), curriculum.ts (lessons,
-                             lessonById, lessonCompleted), je Lektion eine Datei (setup, commands, context,
-                             agentLoop, skills: Blöcke, Aufgaben, Quiz, keyPoints); ClaudeLesson.tsx: geteilte
-                             Ansicht (links Text/Aufgaben/Quiz, rechts Terminal, ab xl sticky), ein Export pro
-                             Kapitel; curriculum.test.ts spielt jede Lektion in der Simulation durch
+    claude/                  Teile 10 + 11 (Claude Code): Lektionsinhalte als DATEN (Metadaten in parts/claude.ts
+                             und parts/claudeAdvanced.ts): types.ts (Lesson, LessonBlock, LessonTask, LessonQuestion),
+                             curriculum.ts (lessons in Kursreihenfolge, lessonById, lessonCompleted), je Lektion eine
+                             Datei (Blöcke, Aufgaben, Quiz, keyPoints): basics setup commands context prompting
+                             agentLoop git | settings hooks skills subagents mcp plugins headless security project;
+                             ClaudeLesson.tsx: geteilte Ansicht (links Text/Aufgaben/Quiz, rechts Terminal, ab xl
+                             sticky), per claudeLesson(id) aus parts/claude.ts geladen; curriculum.test.ts spielt
+                             jede Lektion in der Simulation durch (WALKTHROUGHS) und prüft Quiz, Tabellen, JSON
     demos/                   interaktive Demo-Komponenten der Kapitel (Diagramme, Terminal, FullStack …);
                              ClaudeTerminalMock.tsx: simuliertes Claude Code + ClaudeTaskList (über src/claude)
   learning/                  LERNBAUSTEINE (Editoren und ihre Laufzeiten im Browser)
@@ -144,9 +146,12 @@ src/
   spring/                    Spring Boot auf der Java-Laufzeit - kein React
   docker/                    Docker-Simulator (build, compose, cli, yaml) - kein React
   sql/                       PostgreSQL via PGlite im Worker (engine, client, check, dataset) - kein React
-  claude/                    Claude-Code-Simulator: session.ts (Zustandsmaschine shell/login/repl/permission),
-                             commands.ts (Slash-Commands), agent.ts (Prompt -> Tool-Schritte), workspace.ts
-                             (ToDo-App, Skills), tasks.ts (Aufgaben gegen Events prüfen), types.ts - kein React
+  claude/                    Claude-Code-Simulator - kein React: session.ts (Zustandsmaschine shell/login/repl/
+                             permission, Checkpoints, Plan-Modus, Print-Modus mit Flags), commands.ts (Slash-Commands),
+                             agent.ts (Prompt -> Absicht -> Tool-Schritte; Reihenfolge in planPrompt zählt), hooks.ts,
+                             mcp.ts (claude mcp …, /mcp), plugins.ts (/plugin), subagents.ts, workspace.ts (ToDo-App,
+                             Skills, Hooks, Plugin-Katalog, Prompt-Injection-Datei), tasks.ts (Aufgaben gegen Events),
+                             types.ts; Tests: session.test.ts, extensions.test.ts
   test/                      render.tsx (renderInApp: Komponenten mit Providern, Englisch), setup.ts (jest-dom, Cleanup)
   selftest/                  main.ts (Seite für e2e:content), checks.ts (Prüfung je Modus),
                              results.ts (RuntimeResult, ContentResult, runCases - gemeinsam für alle Laufzeiten),
@@ -192,15 +197,19 @@ React-Wurzel der Vorschau, die PGlite-Verbindung.
   Code, Tests, Lösungen und Übungs-Tipps stehen nur in der `.code.ts`. Eintrag in `course/parts/<teil>.ts`,
   Voraussetzungen in `GRUNDLAGEN` (`kurs.ts`).
   Ablauf: README → "Ein Kapitel hinzufügen".
-  Ausnahme: die Lektionen von Teil 10 (`course/claude/`) sind Daten (Blöcke, Aufgaben, Quiz), weil
+  Ausnahme: die Lektionen der Teile 10 und 11 (`course/claude/`) sind Daten (Blöcke, Aufgaben, Quiz), weil
   alle dieselbe geteilte Ansicht haben (links Text, rechts Terminal). Kapiteleintrag trotzdem normal in
-  `parts/claude.ts` (die IDs mit 6 Leerzeichen Einrückung - `e2e:pages` liest sie per Regex), Voraussetzungen
+  `parts/claude.ts` bzw. `parts/claudeAdvanced.ts` (IDs mit 6 Leerzeichen Einrückung - `e2e:pages` liest sie per
+  Regex), Lektion in `curriculum.ts` und ein Durchspielweg in `curriculum.test.ts` (WALKTHROUGHS). Voraussetzungen
   in `GRUNDLAGEN`. `integrity.test.ts` nimmt `claude/` aus der DE/EN-Dateiprüfung aus.
   Aufgaben prüfen Events der Sitzung (`TaskCheck`), keine Funktionen; gelöste Aufgaben landen per
   `uebungGeloest` in `lernpfad-uebungen`, sind alle gelöst, setzt die Ansicht das Kapitel auf erledigt.
-  Teil 10 steht im Bereich `tools` und hat keinen Playground (`playground: false` am Teil).
+  Neue Fähigkeiten des Simulators bekommen ein eigenes Ereignis in `claude/types.ts` (SessionEvent) - Aufgaben
+  sollen nicht über Umwege wie "irgendein Edit lief" prüfen. Die Teile 10 und 11 stehen im Bereich `tools` und
+  haben keinen Playground (`playground: false` am Teil).
   Fakten zu Claude Code gegen code.claude.com/docs prüfen - Befehle und Aliase ändern sich oft
-  (Stand 2026-10: `/cost` ist Alias von `/usage`, „gebündelte Skills“ statt „System-Skills“).
+  (Stand 2026-10: `/cost` ist Alias von `/usage`, „gebündelte Skills“ statt „System-Skills“, Kontextfenster
+  aktueller Modelle 1 Mio. Tokens, für harte Verbote Deny-Regeln statt Hooks). Keine Zahl „Zeichen pro Token“ lehren.
 - **`TryIt`-IDs** sind kursweit eindeutig (Schlüssel für gespeicherten Code und Fortschritt).
 - **Neuer Editor-Modus**: in `learning/modes.ts` eintragen, Props in `TryIt.tsx`, Editor als
   `TryIt<Name>.tsx` - `const { code, frame } = useEditor(props)`, dann `<EditorFrame {...frame} kind=… run=…>`;

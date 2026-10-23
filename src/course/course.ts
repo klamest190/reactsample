@@ -8,6 +8,7 @@ import { javaTeil } from './parts/java'
 import { backendTeil } from './parts/backend'
 import { sqlTeil } from './parts/sql'
 import { claudeTeil } from './parts/claude'
+import { claudeAdvancedTeil } from './parts/claudeAdvanced'
 import type { Bereich, Kapitel, Teil } from './parts/types'
 
 export type { Bereich, Kapitel, Teil } from './parts/types'
@@ -30,7 +31,7 @@ export type { Bereich, Kapitel, Teil } from './parts/types'
 export const BEREICHE: Bereich[] = ['frontend', 'backend', 'tools']
 
 /** The parts in course order - numbering and navigation follow this list. */
-export const kurs: Teil[] = [javascriptTeil, typescriptTeil, reactTeil, hooksTeil, praxisTeil, projektTeil, javaTeil, backendTeil, sqlTeil, claudeTeil]
+export const kurs: Teil[] = [javascriptTeil, typescriptTeil, reactTeil, hooksTeil, praxisTeil, projektTeil, javaTeil, backendTeil, sqlTeil, claudeTeil, claudeAdvancedTeil]
 
 /**
  * Der rote Faden: was ein Kapitel voraussetzt. Steht hier gesammelt statt in jedem
@@ -108,12 +109,22 @@ const GRUNDLAGEN: Record<string, string[]> = {
   'sql-aendern': ['sql-where'],
   'sql-tabellen': ['sql-joins', 'sql-aendern'],
   'sql-profi': ['sql-joins', 'sql-gruppieren'],
-  // Part 10: a tool, not a language. Only the setup needs the terminal basics from part 5.
-  'claude-setup': ['praxis-lokal'],
+  // Parts 10 and 11: a tool, not a language. Only the setup needs the terminal basics from part 5.
+  'claude-setup': ['praxis-lokal', 'claude-basics'],
   'claude-commands': ['claude-setup'],
   'claude-context': ['claude-commands'],
+  'claude-prompting': ['claude-context', 'claude-basics'],
   'claude-agent': ['claude-context'],
+  'claude-git': ['claude-agent', 'claude-context'],
+  'claude-settings': ['claude-agent', 'claude-context'],
+  'claude-hooks': ['claude-settings', 'claude-agent'],
   'claude-skills': ['claude-agent', 'claude-context'],
+  'claude-subagents': ['claude-skills', 'claude-context'],
+  'claude-mcp': ['claude-agent', 'claude-settings'],
+  'claude-plugins': ['claude-skills', 'claude-subagents', 'claude-mcp'],
+  'claude-headless': ['claude-setup', 'claude-agent'],
+  'claude-security': ['claude-agent', 'claude-settings'],
+  'claude-project': ['claude-prompting', 'claude-git', 'claude-skills'],
 }
 
 export type KapitelMitTeil = Kapitel & { teil: Teil; nummer: string; grundlagen: string[]; stichworte: string[] }
