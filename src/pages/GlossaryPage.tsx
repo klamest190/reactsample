@@ -36,7 +36,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
   return (
     <div className="space-y-6">
       <header className="space-y-3">
-        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight sm:text-4xl">
           <span className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-500/10 dark:text-brand-400 dark:ring-brand-500/20">
             <Icon name="buch" className="size-5" />
           </span>
@@ -79,7 +79,7 @@ export function Glossar({ ziel }: { ziel?: string }) {
             }`}
           >
             <dt className="flex flex-wrap items-baseline gap-2">
-              <span className="text-lg font-semibold">{eintrag.begriff}</span>
+              <span className="text-xl font-semibold">{eintrag.begriff}</span>
               {eintrag.deutsch && sprache === 'de' && (
                 <span className="text-sm text-slate-500 dark:text-slate-400">· {eintrag.deutsch}</span>
               )}

@@ -120,7 +120,6 @@ export function Start() {
 
       <Abschnitt titel="The first differences to JavaScript">
         <Tabelle
-          breit
           kopf={['Topic', 'Java', 'JavaScript']}
           spalten={[
             'align-top font-medium',

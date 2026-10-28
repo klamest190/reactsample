@@ -33,7 +33,6 @@ export function Fehler() {
       <Abschnitt titel="Die drei, die du am häufigsten siehst">
         <TryIt mode="java" id="java-fehler-typen" {...examples['java-fehler-typen']} />
         <Tabelle
-          breit
           kopf={['Exception', 'Passiert, wenn …']}
           spalten={['align-top font-mono text-xs']}
           zeilen={[

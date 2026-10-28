@@ -220,7 +220,7 @@ export function EditorFrame({
           />
           <span className="min-w-0">
             {heading ?? (isExercise ? t.uebung : t.probierSelbst)}
-            {title && <span className="font-normal text-slate-500 dark:text-slate-400"> · {title}</span>}
+            {title && <span className="font-normal text-slate-500 dark:text-slate-400">: {title}</span>}
           </span>
         </h3>
         <span className={`rounded-full px-2 py-0.5 font-mono text-2xs font-semibold ${KINDS[kind].classes}`}>
@@ -281,7 +281,7 @@ export function Console({ lines, emptyText }: { lines: Line[]; emptyText?: strin
 
   return (
     <div className="bg-slate-900 px-4 py-3 font-mono text-code leading-5 dark:bg-black/40">
-      <div className="mb-1 text-2xs tracking-wider text-slate-400 uppercase">{t.konsole}</div>
+      <div className="mb-1 text-xs font-medium text-slate-400">{t.konsole}</div>
       {lines.length === 0 ? (
         <div className="text-slate-400 italic">{emptyText}</div>
       ) : (

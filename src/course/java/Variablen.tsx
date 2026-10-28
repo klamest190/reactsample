@@ -40,7 +40,6 @@ export function Variablen() {
           davon: <Code>int</Code>, <Code>double</Code>, <Code>boolean</Code> und <Code>char</Code>.
         </P>
         <Tabelle
-          breit
           kopf={['Typ', 'Wofür', 'Standardwert']}
           spalten={['align-top', undefined, 'font-mono text-xs']}
           zeilen={[

@@ -37,7 +37,7 @@ const TEXTS = {
     start: 'Starten',
     running: (port: number) => `läuft auf http://localhost:${port} (simuliert im Browser)`,
     notRunning: 'nicht gestartet',
-    beansAndRoutes: (beans: number, routes: number) => `${beans} Beans · ${routes} Endpunkte`,
+    beansAndRoutes: (beans: number, routes: number) => `${beans} Beans, ${routes} Endpunkte`,
     beans: 'Beans',
     routes: 'Endpunkte',
     noRoutes: 'Keine Endpunkte - es gibt keinen @RestController.',
@@ -66,7 +66,7 @@ const TEXTS = {
     start: 'Start',
     running: (port: number) => `running on http://localhost:${port} (simulated in the browser)`,
     notRunning: 'not started',
-    beansAndRoutes: (beans: number, routes: number) => `${beans} beans · ${routes} endpoints`,
+    beansAndRoutes: (beans: number, routes: number) => `${beans} beans, ${routes} endpoints`,
     beans: 'Beans',
     routes: 'Endpoints',
     noRoutes: 'No endpoints - there is no @RestController.',
@@ -294,7 +294,7 @@ function HttpPanel({ server, exchanges, onSend, onClear }: { server: SpringServe
   return (
     <div role="group" aria-label={t.http} className="space-y-3 border-t border-slate-200 bg-slate-50/60 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/40">
       <div className="flex items-center justify-between gap-2">
-        <h4 className="text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.http}</h4>
+        <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t.http}</h4>
         {exchanges.length > 0 && (
           <button onClick={onClear} className="text-xs text-slate-500 hover:underline dark:text-slate-400">
             {t.clear}

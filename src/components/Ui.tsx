@@ -87,13 +87,10 @@ export function Demo({ titel, children }: { titel?: string; children: ReactNode 
   const t = useTexte()
   return (
     <div className={`${KARTE} p-4 shadow-sm`}>
-      <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-        {/* Kleiner pulsierender Punkt: hier läuft echter Code, kein Bild. */}
-        <span aria-hidden className="relative flex size-2">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-        </span>
-        {t.liveDemo}{titel && ` · ${titel}`}
+      <h3 className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-slate-500 dark:text-slate-400">
+        {/* Grüner Punkt: hier läuft echter Code, kein Bild. Still - Dauerbewegung lenkt vom Lesen ab. */}
+        <span aria-hidden className="size-2 rounded-full bg-emerald-500" />
+        {t.liveDemo}{titel && `: ${titel}`}
       </h3>
       <div className="space-y-3">{children}</div>
     </div>
@@ -108,20 +105,17 @@ export function Demo({ titel, children }: { titel?: string; children: ReactNode 
  * nur noch Inhalte - `zeilen` ist eine Liste von Zeilen, jede Zeile eine Liste von Zellen.
  *
  * `spalten` setzt zusätzliche Klassen je Spalte, z.B. `font-mono` für eine Codespalte.
- * `breit` gibt die volle Spaltenbreite frei (sonst gilt die Lesebreite des Fließtexts),
- * `dicht` verkleinert die Zeilenhöhe für lange Listen.
+ * Sie hält die Lesebreite des Fließtexts. `dicht` verkleinert die Zeilenhöhe für lange Listen.
  */
 export function Tabelle({
   kopf,
   zeilen,
   spalten,
-  breit,
   dicht,
 }: {
   kopf?: ReactNode[]
   zeilen: ReactNode[][]
   spalten?: (string | undefined)[]
-  breit?: boolean
   dicht?: boolean
 }) {
   // Letzte Spalte ohne rechten Abstand - sonst steht die Tabelle rechts schief.
@@ -132,7 +126,7 @@ export function Tabelle({
 
   return (
     <div ref={focusableWhenScrolling} className="overflow-x-auto">
-      <table className={`w-full text-left text-sm ${breit ? '' : 'max-w-3xl'}`}>
+      <table className={"w-full max-w-3xl text-left text-sm"}>
         {kopf && (
           <thead className="border-b border-slate-300 dark:border-slate-700">
             <tr>

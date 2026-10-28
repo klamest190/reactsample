@@ -78,7 +78,7 @@ src/
     localized.ts             localized(text, language) für string | zweisprachig
   components/                App-Oberfläche
     Icon.tsx                 alle SVG-Icons (Strichstil) + Logo + Teil-Symbol - keine Emoji in der UI
-    partStyle.ts             Icon/Kürzel/Farbe je Kursteil
+    partStyle.ts             Icon/Kürzel je Kursteil, Farben je Bereich (BEREICH_STIL: eine Linie = eine Farbe)
     scrollFocus.ts           focusableWhenScrolling: Scroll-Container per Tastatur erreichbar, solange sie scrollen
     Ui.tsx                   Bausteine der Kapiteltexte (Abschnitt, Absatz, Hinweis, Merke, Button, Karte …)
     Sidebar.tsx Search.tsx Outline.tsx ChapterLink.tsx ErrorBoundary.tsx
@@ -89,6 +89,7 @@ src/
     course.ts                Reihenfolge der Teile, Voraussetzungen (roter Faden, bewusst zentral), Kapitelliste
     parts/                   ein Teil pro Datei: Kapitel (id, Titel, Lernziele, Stichworte, lazy Komponente de/en);
                              types.ts: Teil, Kapitel, Lader
+    routeMap.ts              Streckenkarte der Startseite: Linie je Bereich, Spalten und Umstiege aus GRUNDLAGEN (+ Test)
     glossary.ts              Glossar-Einträge
     integrity.test.ts        Kurs als Daten prüfen: IDs eindeutig, Verweise gültig, jedes Kapitel DE + EN
     js/ typescript/ react/ hooks/ practice/ java/ backend/ sql/
@@ -217,7 +218,19 @@ React-Wurzel der Vorschau, die PGlite-Verbindung.
 - **Keine Emoji in der Oberfläche** - Icons aus `components/Icon.tsx` (fehlende dort ergänzen).
   Kursinhalte (Kapiteltexte, Beispielcode, simulierte Terminalausgaben) dürfen Emoji haben.
 - Tailwind-Klassen als ganze Strings (der Scanner findet keine zusammengesetzten).
-- Farben/Theme: `brand-*` Tokens, jede Fläche mit `dark:`-Variante.
+- Farben/Theme: `brand-*` Tokens (Petrol), jede Fläche mit `dark:`-Variante. Bereiche haben eigene
+  Linienfarben `frontend-*` (= brand), `backend-*` (Ocker), `tools-*` (Beere) - über `BEREICH_STIL` in
+  `partStyle.ts`, nicht eine Farbe pro Teil. Schrift: Atkinson Hyperlegible Next (Text), JetBrains Mono
+  (Code), beide über `@fontsource` ohne CDN.
+- Beschriftungen in Satzschreibung: keine `uppercase`-Überschriften mit Sperrung, kein `→` an Knopftexten,
+  kein „·“ als Trenner (Komma, Klammer, Doppelpunkt oder Abstand zwischen zwei Elementen).
+  Kästen nur, wo sie etwas abgrenzen (Editor, Hinweis, gewählte Station) - keine Kartenwände.
+- **Schriftgrößen der Seiten: fünf Stufen** - `text-xs` (Meta), `text-sm` (Oberfläche), `text-base` (Fließtext),
+  `text-xl` (Vorspann, Abschnitte), `text-4xl` (Seitentitel, am Handy `text-3xl`). Die Editoren haben darunter
+  eigene Stufen (`text-3xs`/`2xs`/`code` in `index.css`). Kapitelinhalte (Demos) sind davon ausgenommen.
+- **Eine Breite in Kapiteln:** Die Kapitelspalte ist auf die Lesebreite begrenzt (`max-w-3xl`, Spalte in
+  `ChapterPage.tsx`) - Text, Editoren, Hinweise und Tabellen enden an derselben Kante. Ausnahme: die
+  Claude-Lektionen mit ihrer geteilten Ansicht.
 - **Kontrast (WCAG AA 4,5:1)**, von `e2e:pages` geprüft. Text auf Weiß/`slate-50`: mindestens
   `text-slate-500`, auf getönten Flächen (`slate-100`, `brand-50` …) `text-slate-600`; im Dunkeln
   `dark:text-slate-400` - also nie `text-slate-400` für Text im hellen Design und nie `slate-500`/`600`

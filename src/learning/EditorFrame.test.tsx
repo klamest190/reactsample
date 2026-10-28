@@ -34,7 +34,7 @@ beforeEach(() => localStorage.clear())
 describe('Rahmen', () => {
   it('shows an exercise with its task', () => {
     renderInApp(<Frame run={vi.fn()} />)
-    expect(screen.getByRole('heading', { name: /^Exercise\s*· Variables$/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^Exercise:\s*Variables$/ })).toBeInTheDocument()
     expect(screen.getByText('Change x to 2.')).toBeInTheDocument()
   })
 

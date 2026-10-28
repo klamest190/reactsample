@@ -100,7 +100,7 @@ function TestOutput({ report, running }: { report: TestReport; running: boolean 
 
   return (
     <div className={`bg-slate-900 px-4 py-3 font-mono text-code leading-5 text-slate-200 transition-opacity dark:bg-black/40 ${running ? 'opacity-60' : ''}`}>
-      <div className="mb-1 text-2xs tracking-wider text-slate-400 uppercase">{t.deineTests}</div>
+      <div className="mb-1 text-xs font-medium text-slate-400">{t.deineTests}</div>
       {report.error ? (
         <div className="text-rose-300">
           <Icon name="kreisKreuz" className="mr-1.5 inline size-3.5 align-[-2px]" />

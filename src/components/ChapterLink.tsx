@@ -20,7 +20,7 @@ export function Verweis({ id, nr, children }: { id?: string; nr?: string; childr
     >
       {children ??
         (kapitel.teil.id === 'projekt'
-          ? `${t.projekt} · ${t.schrittNr(kapitel.teil.kapitel.findIndex((k) => k.id === kapitel.id) + 1)}`
+          ? `${t.projekt}, ${t.schrittNr(kapitel.teil.kapitel.findIndex((k) => k.id === kapitel.id) + 1)}`
           : `${t.kapitelKlein} ${kapitel.nummer}`)}
     </a>
   )

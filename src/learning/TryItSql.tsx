@@ -208,7 +208,7 @@ function ErrorBox({ error }: { error: SqlError }) {
   return (
     <div className="space-y-1 rounded-lg border border-rose-200 bg-rose-50 p-3 font-mono text-code whitespace-pre-wrap text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">
       <p className="text-2xs text-rose-700 dark:text-rose-400/80">
-        {t.line(error.line)} · {error.label}
+        {t.line(error.line)}, {error.label}
       </p>
       <p>
         <strong>{t.error}:</strong> {error.message}

@@ -16,11 +16,11 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
   return (
     <div className="space-y-8">
       <header className="space-y-3">
-        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight sm:text-4xl">
           <TeilSymbol teil="projekt" groesse="gross" />
           {t.projektTitel}
         </h1>
-        <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-400">{t.projektText}</p>
+        <p className="max-w-3xl text-xl text-slate-600 dark:text-slate-400">{t.projektText}</p>
         <ButtonLink href={'#/' + schritte[0].id} groesse="gross">
           {t.projektStarten}
           <Icon name="pfeilRechts" className="size-4" />
@@ -47,7 +47,8 @@ export function ProjektUebersicht({ erledigt }: { erledigt: string[] }) {
               <div className={`${KARTE} p-4`}>
                 <a href={'#/' + schritt.id} className="group block">
                   <span className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                    {t.schrittNr(i + 1)} · <Icon name="uhr" className="size-3" /> {t.dauer(schritt.dauer)}
+                    <span className="mr-2">{t.schrittNr(i + 1)}</span>
+                    <Icon name="uhr" className="size-3" /> {t.dauer(schritt.dauer)}
                   </span>
                   <span className="block font-semibold group-hover:text-brand-600 dark:group-hover:text-brand-400">
                     {schritt.titel[sprache]}

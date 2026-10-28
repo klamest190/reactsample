@@ -12,6 +12,15 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/700.css";
 
+/* Atkinson Hyperlegible Next for all text: drawn for legibility (clearly distinct I/l/1,
+   0/O), which suits a course that is read for hours. Self-hosted like the mono font.
+   The weights the UI uses: regular, medium, semibold, bold, extrabold (part badges). */
+@import "@fontsource/atkinson-hyperlegible-next/400.css";
+@import "@fontsource/atkinson-hyperlegible-next/500.css";
+@import "@fontsource/atkinson-hyperlegible-next/600.css";
+@import "@fontsource/atkinson-hyperlegible-next/700.css";
+@import "@fontsource/atkinson-hyperlegible-next/800.css";
+
 /* Dark Mode über eine CSS-Klasse statt über die System-Einstellung.
    Damit kann unser ThemeContext die Klasse "dark" auf <html> setzen und
    alle "dark:"-Utilities schalten mit. */
@@ -20,27 +29,90 @@
 /* Design-Tokens. Alles unter @theme wird zu CSS-Variablen UND zu Utilities,
    z.B. --color-brand-500 -> bg-brand-500 / text-brand-500 / border-brand-500 */
 @theme {
-  --color-brand-50: oklch(0.97 0.02 255);
-  --color-brand-100: oklch(0.93 0.04 255);
-  --color-brand-200: oklch(0.87 0.07 255);
-  --color-brand-300: oklch(0.79 0.11 255);
-  --color-brand-400: oklch(0.68 0.16 255);
-  --color-brand-500: oklch(0.6 0.19 255);
-  --color-brand-600: oklch(0.52 0.19 255);
-  --color-brand-700: oklch(0.44 0.16 255);
-  --color-brand-800: oklch(0.37 0.13 255);
-  --color-brand-900: oklch(0.3 0.1 255);
-  --color-brand-950: oklch(0.22 0.07 255);
+  /* Petrol: the colour of the first line on the route map (frontend) and of the whole UI.
+     Text steps checked against WCAG AA: -600/-700 on white and slate-50/100, -300/-400 on
+     slate-900/950. White text from -600 upwards. */
+  --color-brand-50: oklch(0.97 0.015 215);
+  --color-brand-100: oklch(0.935 0.032 215);
+  --color-brand-200: oklch(0.875 0.055 215);
+  --color-brand-300: oklch(0.79 0.085 215);
+  --color-brand-400: oklch(0.69 0.105 215);
+  --color-brand-500: oklch(0.58 0.115 215);
+  --color-brand-600: oklch(0.5 0.105 215);
+  --color-brand-700: oklch(0.43 0.09 215);
+  --color-brand-800: oklch(0.36 0.075 215);
+  --color-brand-900: oklch(0.3 0.06 215);
+  --color-brand-950: oklch(0.22 0.045 215);
+
+  /* The three lines of the route map, one per area (BEREICHE in course.ts). Same
+     lightness steps as brand, so the contrast rules above hold for all three.
+     Frontend is the brand colour itself. */
+  --color-frontend-50: var(--color-brand-50);
+  --color-frontend-100: var(--color-brand-100);
+  --color-frontend-200: var(--color-brand-200);
+  --color-frontend-300: var(--color-brand-300);
+  --color-frontend-400: var(--color-brand-400);
+  --color-frontend-500: var(--color-brand-500);
+  --color-frontend-600: var(--color-brand-600);
+  --color-frontend-700: var(--color-brand-700);
+  --color-frontend-800: var(--color-brand-800);
+  --color-frontend-900: var(--color-brand-900);
+  --color-frontend-950: var(--color-brand-950);
+
+  /* Ochre: backend (Java, Spring & Docker, PostgreSQL). */
+  --color-backend-50: oklch(0.97 0.017 75);
+  --color-backend-100: oklch(0.935 0.037 75);
+  --color-backend-200: oklch(0.875 0.063 75);
+  --color-backend-300: oklch(0.79 0.098 75);
+  --color-backend-400: oklch(0.69 0.121 75);
+  --color-backend-500: oklch(0.58 0.132 75);
+  --color-backend-600: oklch(0.5 0.121 75);
+  --color-backend-700: oklch(0.43 0.103 75);
+  --color-backend-800: oklch(0.36 0.086 75);
+  --color-backend-900: oklch(0.3 0.069 75);
+  --color-backend-950: oklch(0.22 0.052 75);
+
+  /* Berry: tools (Claude Code). */
+  --color-tools-50: oklch(0.97 0.022 350);
+  --color-tools-100: oklch(0.935 0.046 350);
+  --color-tools-200: oklch(0.875 0.08 350);
+  --color-tools-300: oklch(0.79 0.123 350);
+  --color-tools-400: oklch(0.69 0.152 350);
+  --color-tools-500: oklch(0.58 0.167 350);
+  --color-tools-600: oklch(0.5 0.152 350);
+  --color-tools-700: oklch(0.43 0.131 350);
+  --color-tools-800: oklch(0.36 0.109 350);
+  --color-tools-900: oklch(0.3 0.087 350);
+  --color-tools-950: oklch(0.22 0.065 350);
 
   /* Schriftstapel festschreiben. Ohne das wählt jedes System selbst -
      besonders beim Monospace, und die halbe App ist ein Code-Editor. */
-  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
 
+  /* Type scale of the pages - five steps, nothing in between:
+     text-xs (meta, badges), text-sm (interface), text-base (body text), text-xl (lead text,
+     section headings), text-4xl (page title; text-3xl on phones).
+     The editor interface adds its own small steps below text-xs: */
   /* Kleine Stufen unterhalb von text-xs. Standen vorher als feste Pixelwerte im Code. */
   --text-3xs: 0.625rem; /* Tastenkappen */
   --text-2xs: 0.6875rem; /* Abzeichen, Nummern */
   --text-code: 0.8125rem; /* Editor, Konsole, Codeblöcke */
+
+  /* The one animation on the start page: the travelled part of each line draws itself
+     from its start. Switched off with reduced motion (base layer below). */
+  --animate-track: track 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+  @keyframes track {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  --animate-track-down: track-down 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+  @keyframes track-down {
+    from {
+      transform: scaleY(0);
+    }
+  }
 }
 
 /* Basis-Styles für die ganze Seite. */

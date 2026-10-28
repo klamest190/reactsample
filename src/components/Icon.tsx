@@ -1,4 +1,4 @@
-import { TEIL_STIL } from './partStyle'
+import { BEREICH_STIL, bereichVon, TEIL_STIL } from './partStyle'
 
 /**
  * Schlichte Linien-Icons als Inline-SVG (Stil wie Lucide), ohne Bibliothek.
@@ -328,14 +328,13 @@ export function Icon({ name, className = 'size-4' }: { name: IconName; className
 /**
  * Bildmarke der App: ein Weg von einem offenen Startpunkt zu einem erreichten Ziel -
  * der Lernpfad. Dieselbe Form steht im Favicon (public/favicon.svg).
- * Die Kachel hat einen leichten Verlauf und einen hellen Innenrand, damit sie
- * auf hellem und dunklem Grund gleich plastisch wirkt.
+ * A flat tile in brand-600: white on it has 5.6:1, on light and dark ground alike.
  */
 export function Logo({ className = 'size-8' }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={`relative flex shrink-0 items-center justify-center rounded-[28%] bg-linear-to-br from-brand-500 to-brand-700 text-white shadow-sm ring-1 ring-white/20 ring-inset ${className}`}
+      className={`relative flex shrink-0 items-center justify-center rounded-[28%] bg-brand-600 text-white ${className}`}
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" className="size-[62%]">
         <circle cx="6" cy="18.5" r="2.3" />
@@ -349,6 +348,7 @@ export function Logo({ className = 'size-8' }: { className?: string }) {
 /** Farbiges Symbol eines Kursteils - überall dieselbe Kachel (Seitenleiste, Startseite, Kapitelkopf, Playground). */
 export function TeilSymbol({ teil, groesse = 'normal' }: { teil: string; groesse?: 'klein' | 'normal' | 'gross' }) {
   const stil = TEIL_STIL[teil] ?? TEIL_STIL.javascript
+  const farbe = BEREICH_STIL[bereichVon(teil)].kachel
   // [Kachel, Icon, Kürzel]
   const masse = {
     klein: ['size-5 rounded-[5px]', 'size-3', 'text-[8.5px]'],
@@ -358,7 +358,7 @@ export function TeilSymbol({ teil, groesse = 'normal' }: { teil: string; groesse
   return (
     <span
       aria-hidden
-      className={`flex shrink-0 items-center justify-center shadow-xs ring-1 ring-inset ${masse[0]} ${stil.farbe}`}
+      className={`flex shrink-0 items-center justify-center ring-1 ring-inset ${masse[0]} ${farbe}`}
     >
       {stil.kuerzel ? (
         <span className={`leading-none font-extrabold tracking-tight ${masse[2]}`}>{stil.kuerzel}</span>

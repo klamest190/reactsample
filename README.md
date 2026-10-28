@@ -242,7 +242,7 @@ src/
     reactTests.ts          Mini-Testing-Library für React-Übungen
     quelltext.ts           js`…` / java`…` Tag für Codebeispiele (roh, automatisch ausgerückt)
   seiten/
-    Startseite.tsx         Übersicht, Nachschlagen, Lernpfad, roter Faden, "Weiter lernen"
+    Startseite.tsx         "Als Nächstes", Lernpfad als Streckenkarte (drei Linien), Nachschlagen
     KapitelSeite.tsx       Rahmen eines Kapitels: Kopf mit "Baut auf", Inhalt, Übungen, roter Faden
     Glossar.tsx            Alphabetisches Glossar mit Filter und Sprungmarken
     ProjektUebersicht.tsx  Zeitleiste der Projektschritte

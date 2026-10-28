@@ -173,7 +173,7 @@ function DataTable({ name, table, code }: { name: string; table: SqlTable; code:
   return (
     <figure className="max-w-full min-w-0">
       <figcaption className="mb-1 text-slate-500 dark:text-slate-400" title={info.info[language]}>
-        <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{name}</code> · {t.rows(table.rows.length)}
+        <code className="font-mono font-semibold text-slate-700 dark:text-slate-200">{name}</code> ({t.rows(table.rows.length)})
       </figcaption>
       <div ref={focusableWhenScrolling} className="max-h-44 overflow-auto rounded-md border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
         <table className="border-collapse font-mono text-2xs">

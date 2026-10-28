@@ -207,7 +207,7 @@ export function Workbench({ id, title, files, entry, typed }: Props) {
           <Icon name="werkzeug" className="size-4 text-brand-600 dark:text-brand-400" />
           <span>
             {t.werkstatt}
-            <span className="font-normal text-slate-500 dark:text-slate-400"> · {title}</span>
+            <span className="font-normal text-slate-500 dark:text-slate-400">: {title}</span>
           </span>
         </h3>
         <div className="ml-auto flex flex-wrap gap-2">
@@ -250,7 +250,7 @@ export function Workbench({ id, title, files, entry, typed }: Props) {
             </select>
           </label>
           <div className="hidden py-2 md:block">
-            <p className="px-3 pb-1 text-2xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.dateien}</p>
+            <p className="px-3 pb-1 text-xs font-semibold text-slate-500 dark:text-slate-400">{t.dateien}</p>
             {folder.map(([name, content]) => (
               <div key={name}>
                 {name && (
@@ -347,7 +347,7 @@ export function Workbench({ id, title, files, entry, typed }: Props) {
               <span className="size-2.5 rounded-full bg-emerald-400" />
             </span>
             <span className="flex-1 truncate rounded-md bg-white px-2 py-0.5 text-center text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-              {t.liveApp} · {title}
+              {t.liveApp}: {title}
             </span>
           </div>
           {compileError && (

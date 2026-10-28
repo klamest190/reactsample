@@ -2,6 +2,8 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { GliederungMelden, type Abschnittseintrag } from '../components/Outline'
 import { Icon, TeilSymbol } from '../components/Icon'
+import { BEREICH_STIL } from '../components/partStyle'
+import { focusableWhenScrolling } from '../components/scrollFocus'
 import { Button, KARTE, Platzhalter } from '../components/Ui'
 import { KapitelChip } from '../components/ChapterLink'
 import { useFortschritt } from '../context/ProgressContext'
@@ -63,26 +65,47 @@ export function KapitelSeite({
 
   // Erst ab drei Abschnitten lohnt ein Verzeichnis - darunter sieht man ohnehin alles.
   const mitGliederung = gliederung.length > 2
+  // Learning goals and outline move into a column on the right from xl - the chapter then
+  // starts with its text. The Claude lessons need the width for their terminal (split view
+  // from xl), so for them the column only comes at 2xl. Whole class strings for the scanner.
+  // Everything else shares one width: text, editors, hints and demos end on the same edge
+  // (the reading width of the body text, max-w-3xl).
+  const spaet = kapitel.teil.bereich === 'tools'
+  const raster = spaet
+    ? '2xl:grid 2xl:grid-cols-[minmax(0,1fr)_15rem] 2xl:gap-12'
+    : 'xl:grid xl:grid-cols-[minmax(0,48rem)_15rem] xl:gap-12'
+  const spalte = spaet ? 'min-w-0 space-y-10' : 'min-w-0 max-w-3xl space-y-10'
+  const ohneRand = spaet ? '2xl:hidden' : 'xl:hidden'
+  const mitRand = spaet ? 'hidden 2xl:block' : 'hidden xl:block'
+  const lernziele = kapitel.lernziele[sprache].map((ziel) => (
+    <li key={ziel} className="flex gap-2">
+      <Icon name="haken" className="mt-0.5 size-4 text-emerald-600 dark:text-emerald-400" />
+      {ziel}
+    </li>
+  ))
 
   return (
     <KapitelIdProvider id={kapitel.id}>
-      {/* Auf breiten Bildschirmen (ab 2xl) steht die Gliederung als eigene Spalte rechts
-          und läuft beim Scrollen mit. Darunter bleibt sie ein Kasten über dem Inhalt. */}
-      <div className={mitGliederung ? '2xl:grid 2xl:grid-cols-[minmax(0,1fr)_15rem] 2xl:gap-12' : ''}>
-        <article className="min-w-0 space-y-10">
+      {/* Auf breiten Bildschirmen stehen Lernziele und Gliederung als eigene Spalte rechts,
+          die Gliederung läuft beim Scrollen mit. Darunter ein Kasten über dem Inhalt. */}
+      <div className={raster}>
+        <article className={spalte}>
           <header className="space-y-4">
-            <p className="flex items-center gap-2 text-sm font-medium text-brand-600 dark:text-brand-400">
+            <p className={`flex items-center gap-2 text-sm font-semibold ${BEREICH_STIL[kapitel.teil.bereich].text}`}>
               <TeilSymbol teil={kapitel.teil.id} groesse="klein" />
-              {t.teil} {kapitel.teil.nummer} · {kapitel.teil.titel[sprache]}
+              {t.teil} {kapitel.teil.nummer}: {kapitel.teil.titel[sprache]}
             </p>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
               <span className="mr-2 text-slate-500 tabular-nums dark:text-slate-400">{kapitel.nummer}</span>
               {kapitel.titel[sprache]}
             </h1>
-            <p className="max-w-3xl text-lg text-slate-600 dark:text-slate-400">{kapitel.kurz[sprache]}</p>
-            <p className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-              <Icon name="uhr" className="size-3.5" />
-              {t.dauer(kapitel.dauer)} · {t.kapitelVon(index + 1, alleKapitel.length)}
+            <p className="max-w-3xl text-xl text-slate-600 dark:text-slate-400">{kapitel.kurz[sprache]}</p>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <Icon name="uhr" className="size-3.5" />
+                {t.dauer(kapitel.dauer)}
+              </span>
+              <span>{t.kapitelVon(index + 1, alleKapitel.length)}</span>
             </p>
             {kapitel.grundlagen.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 text-sm">
@@ -92,47 +115,43 @@ export function KapitelSeite({
                 ))}
               </div>
             )}
+          </header>
 
-            <div className={`${KARTE} p-4`}>
-              <h2 className="mb-3 flex items-center gap-2 font-semibold">
+          <div
+            className={`${KARTE} grid gap-x-8 gap-y-5 p-4 ${mitGliederung ? 'lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]' : ''} ${ohneRand}`}
+          >
+            <section aria-labelledby="lernziele-titel">
+              <h2 id="lernziele-titel" className="mb-3 flex items-center gap-2 font-semibold">
                 <Icon name="ziel" className="size-4.5 text-brand-600 dark:text-brand-400" />
                 {t.lernzieleTitel}
               </h2>
-              <ul className="grid gap-x-6 gap-y-1.5 text-sm text-slate-700 sm:grid-cols-2 dark:text-slate-300">
-                {kapitel.lernziele[sprache].map((ziel) => (
-                  <li key={ziel} className="flex gap-2">
-                    <Icon name="haken" className="mt-0.5 size-4 text-emerald-500" />
-                    {ziel}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </header>
-
-          {mitGliederung && (
-            <nav aria-labelledby="gliederung-titel" className={`${KARTE} px-4 py-3 text-sm 2xl:hidden`}>
-              <h2
-                id="gliederung-titel"
-                className="mb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400"
+              <ul className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300">{lernziele}</ul>
+            </section>
+            {mitGliederung && (
+              <nav
+                aria-labelledby="gliederung-titel"
+                className="border-slate-200 text-sm max-lg:border-t max-lg:pt-4 lg:border-l lg:pl-8 dark:border-slate-800"
               >
-                {t.aufDieserSeite}
-              </h2>
-              <ol className="space-y-1">
-                {gliederung.map((abschnitt, i) => (
-                  <li key={abschnitt.id} className="flex gap-2">
-                    <span className="w-4 shrink-0 text-right text-slate-500 tabular-nums dark:text-slate-400">{i + 1}</span>
-                    {/* Eine Route, kein nacktes #fragment - sonst denkt der Hash-Router, die Seite wechselt. */}
-                    <a
-                      href={`#/${kapitel.id}/${abschnitt.id}`}
-                      className="text-slate-700 hover:text-brand-600 hover:underline dark:text-slate-300 dark:hover:text-brand-400"
-                    >
-                      {abschnitt.titel}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
+                <h2 id="gliederung-titel" className="mb-3 font-semibold">
+                  {t.aufDieserSeite}
+                </h2>
+                <ol className="space-y-1">
+                  {gliederung.map((abschnitt, i) => (
+                    <li key={abschnitt.id} className="flex gap-2">
+                      <span className="w-4 shrink-0 text-right text-slate-500 tabular-nums dark:text-slate-400">{i + 1}</span>
+                      {/* Eine Route, kein nacktes #fragment - sonst denkt der Hash-Router, die Seite wechselt. */}
+                      <a
+                        href={`#/${kapitel.id}/${abschnitt.id}`}
+                        className="text-slate-700 hover:text-brand-700 hover:underline dark:text-slate-300 dark:hover:text-brand-300"
+                      >
+                        {abschnitt.titel}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+          </div>
 
           <ErrorBoundary>
             {/* Kapitel werden per lazy() nachgeladen - solange zeigt Suspense den Platzhalter. */}
@@ -255,38 +274,43 @@ export function KapitelSeite({
           </footer>
         </article>
 
-        {mitGliederung && (
-          <aside className="hidden 2xl:block">
-            <nav aria-labelledby="gliederung-rand-titel" className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto text-sm">
-              <h2
-                id="gliederung-rand-titel"
-                className="mb-3 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400"
-              >
-                {t.aufDieserSeite}
+        <aside className={mitRand}>
+          <div ref={focusableWhenScrolling} className="sticky top-20 max-h-[calc(100vh-6rem)] space-y-8 overflow-y-auto pb-4 text-sm">
+            <section aria-labelledby="lernziele-rand-titel">
+              <h2 id="lernziele-rand-titel" className="mb-3 font-semibold">
+                {t.lernzieleTitel}
               </h2>
-              <ol className="space-y-0.5 border-l border-slate-200 dark:border-slate-800">
-                {gliederung.map((abschnitt) => {
-                  const aktiv = abschnitt.id === aktiverAbschnitt
-                  return (
-                    <li key={abschnitt.id}>
-                      <a
-                        href={`#/${kapitel.id}/${abschnitt.id}`}
-                        aria-current={aktiv ? 'location' : undefined}
-                        className={`-ml-px block border-l-2 py-1 pl-3 leading-snug transition ${
-                          aktiv
-                            ? 'border-brand-500 font-medium text-brand-700 dark:text-brand-300'
-                            : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-100'
-                        }`}
-                      >
-                        {abschnitt.titel}
-                      </a>
-                    </li>
-                  )
-                })}
-              </ol>
-            </nav>
-          </aside>
-        )}
+              <ul className="space-y-2 text-slate-700 dark:text-slate-300">{lernziele}</ul>
+            </section>
+            {mitGliederung && (
+              <nav aria-labelledby="gliederung-rand-titel">
+                <h2 id="gliederung-rand-titel" className="mb-3 font-semibold">
+                  {t.aufDieserSeite}
+                </h2>
+                <ol className="space-y-0.5 border-l border-slate-200 dark:border-slate-800">
+                  {gliederung.map((abschnitt) => {
+                    const aktiv = abschnitt.id === aktiverAbschnitt
+                    return (
+                      <li key={abschnitt.id}>
+                        <a
+                          href={`#/${kapitel.id}/${abschnitt.id}`}
+                          aria-current={aktiv ? 'location' : undefined}
+                          className={`-ml-px block border-l-2 py-1 pl-3 leading-snug transition ${
+                            aktiv
+                              ? 'border-brand-500 font-medium text-brand-700 dark:text-brand-300'
+                              : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-100'
+                          }`}
+                        >
+                          {abschnitt.titel}
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ol>
+              </nav>
+            )}
+          </div>
+        </aside>
       </div>
     </KapitelIdProvider>
   )

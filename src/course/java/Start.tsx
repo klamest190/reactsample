@@ -129,7 +129,6 @@ export function Start() {
 
       <Abschnitt titel="Die ersten Unterschiede zu JavaScript">
         <Tabelle
-          breit
           kopf={['Thema', 'Java', 'JavaScript']}
           spalten={[
             'align-top font-medium',

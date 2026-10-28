@@ -27,7 +27,6 @@ export function Vergleich() {
 
       <Abschnitt titel="The differences on one page">
         <Tabelle
-          breit
           kopf={['Topic', 'Java', 'JavaScript']}
           spalten={['align-top font-medium', undefined, 'text-slate-600 dark:text-slate-400']}
           zeilen={[

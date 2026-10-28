@@ -2,6 +2,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useSprache, useTexte } from '../i18n/LanguageContext'
 import { BEREICHE, kurs } from '../course/course'
 import { Icon, TeilSymbol, type IconName } from './Icon'
+import { BEREICH_STIL } from './partStyle'
 import { Aufklapppfeil, KLEBT_MD, Taste } from './Ui'
 
 /**
@@ -202,11 +203,11 @@ export function Seitenleiste({
       {/* Zwei Bereiche statt einer langen Liste: erst alles im Browser, dann der Server. */}
       {BEREICHE.map((bereich) => (
         <div key={bereich} className="mb-4 border-t border-slate-200 pt-3 dark:border-slate-800">
-          <h2 className="mb-1.5 flex items-baseline justify-between gap-2 px-2.5">
-            <span className="text-2xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-              {t.bereiche[bereich].titel}
-            </span>
-            <span className="truncate text-2xs text-slate-500 dark:text-slate-400">{t.bereiche[bereich].text}</span>
+          {/* The stroke in the line colour links the area to its line on the start page. */}
+          <h2 className="mb-1.5 flex items-center gap-2 px-2.5">
+            <span aria-hidden className={`h-1 w-3 shrink-0 rounded-full ${BEREICH_STIL[bereich].linie}`} />
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{t.bereiche[bereich].titel}</span>
+            <span className="ml-auto truncate text-2xs text-slate-600 dark:text-slate-400">{t.bereiche[bereich].text}</span>
           </h2>
           {kurs.filter((teil) => teil.bereich === bereich).map((teil) => {
             const fertig = teil.kapitel.filter((k) => erledigt.includes(k.id)).length
@@ -222,7 +223,7 @@ export function Seitenleiste({
                   onClick={() => setUmgeschaltet((alt) => ({ ...alt, [teil.id]: { offen: !istOffen, route } }))}
                   aria-expanded={istOffen}
                   aria-controls={listenId}
-                  title={`${t.teil} ${teil.nummer} · ${teil.titel[sprache]} - ${fertig}/${teil.kapitel.length} ${t.erledigt}`}
+                  title={`${t.teil} ${teil.nummer}: ${teil.titel[sprache]}, ${fertig}/${teil.kapitel.length} ${t.erledigt}`}
                   className="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left transition hover:bg-slate-200/60 dark:hover:bg-slate-800/60"
                 >
                   <TeilSymbol teil={teil.id} />

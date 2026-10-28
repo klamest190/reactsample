@@ -136,10 +136,8 @@ export default function App() {
 
           <a href="#" className="group flex min-w-0 items-center gap-3 rounded-lg">
             <Logo className="size-8 transition group-hover:scale-105" />
-            <span className="min-w-0">
-              <h1 className="truncate text-base leading-tight font-semibold tracking-tight">{t.appTitel}</h1>
-              <p className="hidden truncate text-xs text-slate-600 lg:block dark:text-slate-400">{t.appUntertitel}</p>
-            </span>
+            {/* h1 bleibt: die Seitenleiste darunter beginnt mit h2 - ohne h1 davor wäre das ein Sprung. */}
+            <h1 className="min-w-0 truncate text-base leading-tight font-bold tracking-tight">{t.appTitel}</h1>
           </a>
 
           <button onClick={sucheOeffnen} className={`${KOPF_KNOPF} ml-auto md:hidden`} aria-label={t.suche}>
@@ -149,7 +147,7 @@ export default function App() {
           <div className="hidden items-center gap-2 sm:flex md:ml-auto" title={t.lernfortschritt}>
             <div className="h-1.5 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
               <div
-                className="h-full rounded-full bg-linear-to-r from-emerald-400 to-emerald-600 transition-all"
+                className="h-full rounded-full bg-emerald-600 transition-all"
                 style={{ width: prozent + '%' }}
               />
             </div>

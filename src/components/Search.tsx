@@ -57,7 +57,7 @@ function suchen(anfrage: string, sprache: Sprache, seiten: { ziel: string; titel
       treffer.push({
         art: 'glossar',
         ziel: 'glossar/' + e.id,
-        titel: e.begriff + (e.deutsch && sprache === 'de' ? ` · ${e.deutsch}` : ''),
+        titel: e.begriff + (e.deutsch && sprache === 'de' ? ` (${e.deutsch})` : ''),
         unter: e.erklaerung[sprache].replace(/[`*[\]]/g, ''),
         punkte,
       })
@@ -193,7 +193,7 @@ function SuchDialog({ schliessen, navigieren }: { schliessen: () => void; navigi
                 onClick={() => oeffnen(tr.ziel)}
                 className={`flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2 ${i === aktiv ? 'bg-brand-50 dark:bg-slate-800' : ''}`}
               >
-                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-3xs font-semibold uppercase ${artStil[tr.art]}`}>
+                <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-2xs font-semibold ${artStil[tr.art]}`}>
                   {t.sucheArten[tr.art]}
                 </span>
                 <span className="min-w-0">

@@ -238,15 +238,15 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
 
       {result.findings.length > 0 && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.hints}</h4>
+          <h4 className="mb-1 text-sm font-semibold text-slate-500 dark:text-slate-400">{t.hints}</h4>
           <ul className="space-y-1.5">
             {result.findings.map((f, i) => (
               <li key={i} className="flex gap-2 text-code">
                 <SeverityIcon severity={f.severity} />
                 <span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {t.severities[f.severity]} · {t.line(f.line)}
-                    {/^DL\d/.test(f.rule) ? ` · ${f.rule}` : ''}:
+                    {t.severities[f.severity]}, {t.line(f.line)}
+                    {/^DL\d/.test(f.rule) ? ` (${f.rule})` : ''}:
                   </span>{' '}
                   <InlineCode text={f[language]} />
                 </span>
@@ -258,7 +258,7 @@ function BuildView({ result, change }: { result: BuildResult; change: Change }) 
 
       {result.run && (
         <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-code leading-5 dark:bg-black/40">
-          <div className="border-b border-slate-700 px-3 py-1 text-2xs tracking-wider text-slate-400 uppercase">$ {t.run}</div>
+          <div className="border-b border-slate-700 px-3 py-1 text-xs font-medium text-slate-400">$ {t.run}</div>
           <div className="px-3 py-2">
             {result.run.lines.map((l, i) => (
               <div key={i} className={`whitespace-pre-wrap ${result.run!.ok ? 'text-slate-100' : 'text-rose-300'}`}>
@@ -277,7 +277,7 @@ function StepList({ title, run, highlight = false }: { title: string; run: Build
   const t = TEXTS[language]
   return (
     <div className="min-w-0">
-      <h4 className="mb-1 flex items-baseline justify-between gap-2 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+      <h4 className="mb-1 flex items-baseline justify-between gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
         <span>{title}</span>
         <span className="flex items-center gap-1 font-mono text-slate-700 normal-case dark:text-slate-200">
           <Icon name="uhr" className="size-3" />
@@ -326,7 +326,8 @@ function LayerBar({ image, title }: { image: NonNullable<BuildResult['image']>; 
         {parts.map((p, i) => (
           <li key={i} className="truncate font-mono">
             <span className={`mr-1 inline-block size-2 rounded-sm ${p.base ? 'bg-slate-300 dark:bg-slate-600' : 'bg-cyan-400 dark:bg-cyan-600'}`} />
-            {formatSize(p.sizeMb)} · {p.label}
+            <span className="mr-2">{formatSize(p.sizeMb)}</span>
+            {p.label}
           </li>
         ))}
       </ul>
@@ -475,7 +476,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
 
       {result.log.length > 0 && (
         <div className="overflow-hidden rounded-lg bg-slate-900 font-mono text-xs leading-5 dark:bg-black/40">
-          <div className="border-b border-slate-700 px-3 py-1 text-2xs tracking-wider text-slate-400 uppercase">$ docker compose up</div>
+          <div className="border-b border-slate-700 px-3 py-1 text-xs font-medium text-slate-400">$ docker compose up</div>
           <div ref={focusableWhenScrolling} className="max-h-96 overflow-auto px-3 py-2">
             {result.log.map((l, i) => (
               <div key={i} className={`whitespace-pre-wrap ${l.kind === 'error' ? 'text-rose-300' : l.kind === 'warn' ? 'text-amber-300' : l.kind === 'ok' && !l.service ? 'text-emerald-300' : 'text-slate-200'}`}>
@@ -489,7 +490,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
 
       {result.containers.length > 0 && (
         <div ref={focusableWhenScrolling} className="overflow-x-auto">
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">$ {t.containers}</h4>
+          <h4 className="mb-1 text-sm font-semibold text-slate-500 dark:text-slate-400">$ {t.containers}</h4>
           <table className="w-full min-w-md text-left font-mono text-xs">
             <thead className="text-slate-500 dark:text-slate-400">
               <tr>
@@ -515,7 +516,7 @@ function ComposeView({ result }: { result: ComposeResult }) {
 
       {result.urls.length > 0 && (
         <div>
-          <h4 className="mb-1 text-xs font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.browser}</h4>
+          <h4 className="mb-1 text-sm font-semibold text-slate-500 dark:text-slate-400">{t.browser}</h4>
           <ul className="space-y-0.5 font-mono text-xs">
             {result.urls.map((u) => (
               <li key={u.url} className={`flex gap-1.5 ${u.ok ? '' : 'text-rose-600 dark:text-rose-400'}`}>

@@ -11,7 +11,6 @@ import type { IconName } from '../components/Icon'
 const de = {
   // --- Kopfzeile & Navigation ---------------------------------------------------
   appTitel: 'Lernpfad JS & React',
-  appUntertitel: 'Von den JavaScript-Grundlagen über TypeScript und React bis zu Java, Spring Boot, Docker, PostgreSQL und Claude Code',
   kapitelMenue: 'Kapitel',
   lernfortschritt: 'Lernfortschritt',
   farbschemaUmschalten: 'Farbschema umschalten',
@@ -26,14 +25,14 @@ const de = {
   },
 
   // --- Startseite ------------------------------------------------------------------
-  heroTitel: 'Von JavaScript zu React - ',
-  heroTitelBetont: 'Schritt für Schritt',
+  heroTitel: 'Dein Weg von JavaScript bis Claude Code',
   heroText:
-    'Erst die JavaScript-Grundlagen, auf denen React aufbaut, und TypeScript für sichere Typen. Dann Komponenten und State. Und dann ausführlich die Hooks - mit Editoren, in denen du alles selbst ausprobierst. Als eigener Teil obendrauf: Java, die zweite Welt - und darauf ein Backend mit Spring Boot, verpackt in Docker-Container. Dazu SQL mit einer echten PostgreSQL-Datenbank im Browser. Und als Werkzeug zum Schluss: Claude Code, der KI-Agent im Terminal - geübt in einer Simulation.',
+    'Elf Kursteile auf drei Linien: Frontend im Browser, Backend auf dem Server und Claude Code als Werkzeug. In jedem Kapitel laufen Editoren, die deinen Code wirklich ausführen, dazu Übungen mit Tests und ein Quiz.',
+  alsNaechstes: 'Als Nächstes',
   jetztStarten: 'Jetzt starten',
   weiterLernen: 'Weiter lernen',
   allesGeschafft: 'Du hast alle Kapitel abgeschlossen!',
-  kursUmfang: (kapitel: number, stunden: number) => `${kapitel} Kapitel · ca. ${stunden} Stunden`,
+  kursUmfang: (kapitel: number, stunden: number) => `${kapitel} Kapitel, ca. ${stunden} Stunden`,
   soLernstDu: 'So lernst du hier',
   schritte: [
     { icon: 'buch' as IconName, titel: 'Verstehen', text: 'Kurze Erklärungen mit Codebeispielen.' },
@@ -42,6 +41,10 @@ const de = {
     { icon: 'kreisHaken' as IconName, titel: 'Prüfen', text: 'Ein kurzes Quiz am Ende jedes Kapitels.' },
   ],
   derLernpfad: 'Der Lernpfad',
+  kartenHinweis: 'Jede Station ist ein Kursteil. Wähle eine, um ihre Kapitel zu sehen.',
+  legende: { fertig: 'abgeschlossen', begonnen: 'begonnen', offen: 'noch offen' },
+  duBistHier: 'Du bist hier',
+  umstiegVon: (teile: string) => `Umstieg von ${teile}`,
   editorTippsTitel: 'Tipps für die Editoren',
   fortschrittTitel: 'Fortschritt zurücksetzen',
   fortschrittText:
@@ -99,7 +102,7 @@ const de = {
   loesungVerbergen: 'Lösung verbergen',
   musterloesung: 'Musterlösung',
   loesungUebernehmen: 'Lösung in den Editor übernehmen',
-  tastenHinweis: 'Strg + Enter führt aus · Strg + Leertaste zeigt Vorschläge',
+  tastenHinweis: 'Strg + Enter führt aus, Strg + Leertaste zeigt Vorschläge',
   laeuft: 'läuft …',
   codeEditor: 'Code-Editor',
   konsole: 'Konsole',
@@ -112,7 +115,7 @@ const de = {
   testsLaufen: 'Tests laufen …',
   deineTests: 'Deine Tests',
   testZusammenfassung: (bestanden: number, fehlgeschlagen: number) =>
-    fehlgeschlagen ? `${fehlgeschlagen} fehlgeschlagen · ${bestanden} bestanden` : `${bestanden} bestanden`,
+    fehlgeschlagen ? `${fehlgeschlagen} fehlgeschlagen, ${bestanden} bestanden` : `${bestanden} bestanden`,
   keineTests: 'Keine Tests gefunden - schreibe mindestens einen test(…).',
   testDateiFehler: 'Die Testdatei lässt sich nicht ausführen',
   testsGruen: 'Deine Tests sind mit der richtigen Komponente grün',
@@ -136,7 +139,7 @@ const de = {
   vollbild: 'Vollbild',
   vollbildBeenden: 'Vollbild beenden',
   liveApp: 'Live-App',
-  werkstattHinweis: 'Änderungen werden nach einer kurzen Pause übernommen · Strg + Enter sofort',
+  werkstattHinweis: 'Änderungen werden nach einer kurzen Pause übernommen, Strg + Enter sofort',
   typpruefung: 'Typprüfung',
   typpruefungLaeuft: 'Prüfe Typen …',
   keineTypfehler: 'Keine Typfehler',
@@ -173,11 +176,11 @@ const de = {
   mitNutzung: '+ Aufruf',
   kartenPlayground: 'Frei programmieren - mit Vorlagen und Bausteinen für jeden Teil.',
   playgroundHinweis: (teil: string) => `Lust, frei weiterzuprobieren? Im Playground „${teil}“ gibt es Vorlagen und Bausteine zu diesem Teil.`,
-  zumPlayground: 'Zum Playground →',
+  zumPlayground: 'Zum Playground',
 
   // --- Autovervollständigung --------------------------------------------------------------
   vorschlaege: 'Vorschläge',
-  vorschlagHinweis: '↑↓ auswählen · Enter/Tab einfügen · Esc schließen',
+  vorschlagHinweis: '↑↓ auswählen, Enter/Tab einfügen, Esc schließen',
   imCode: 'Steht bereits in deinem Code.',
 
   // --- Werkbank: Playground-Layout ---------------------------------------------------------
@@ -211,7 +214,7 @@ const de = {
   sucheOeffnen: 'Suchen …',
   suchePlatzhalter: 'Kapitel, Begriffe, Hooks suchen …',
   sucheKeineTreffer: 'Nichts gefunden. Versuch es mit einem anderen Begriff.',
-  sucheHinweis: '↑↓ auswählen · Enter öffnen · Esc schließen',
+  sucheHinweis: '↑↓ auswählen, Enter öffnen, Esc schließen',
   sucheArten: { kapitel: 'Kapitel', glossar: 'Glossar', projekt: 'Projekt', seite: 'Seite' },
   glossar: 'Glossar',
   glossarTitel: 'Glossar',
@@ -243,7 +246,6 @@ export type Texte = typeof de
 
 const en: Texte = {
   appTitel: 'JS & React Learning Path',
-  appUntertitel: 'From JavaScript basics through TypeScript and React to Java, Spring Boot, Docker, PostgreSQL and Claude Code',
   kapitelMenue: 'Chapters',
   lernfortschritt: 'Learning progress',
   farbschemaUmschalten: 'Toggle color scheme',
@@ -257,14 +259,14 @@ const en: Texte = {
     tools: { titel: 'Tools', text: 'AI agents in the terminal' },
   },
 
-  heroTitel: 'From JavaScript to React - ',
-  heroTitelBetont: 'step by step',
+  heroTitel: 'Your route from JavaScript to Claude Code',
   heroText:
-    'First the JavaScript fundamentals React is built on, and TypeScript for safe types. Then components and state. And then the hooks in depth - with editors where you try everything yourself. And on top, as a part of its own: Java, the other world - and on that a backend with Spring Boot, packed into Docker containers. Plus SQL with a real PostgreSQL database in the browser. And as a tool at the end: Claude Code, the AI agent in the terminal - practised in a simulation.',
+    'Eleven parts on three lines: frontend in the browser, backend on the server and Claude Code as a tool. Every chapter has editors that really run your code, plus exercises with tests and a quiz.',
+  alsNaechstes: 'Up next',
   jetztStarten: 'Start now',
   weiterLernen: 'Continue',
   allesGeschafft: 'You have completed all chapters!',
-  kursUmfang: (kapitel, stunden) => `${kapitel} chapters · about ${stunden} hours`,
+  kursUmfang: (kapitel, stunden) => `${kapitel} chapters, about ${stunden} hours`,
   soLernstDu: 'How you learn here',
   schritte: [
     { icon: 'buch' as IconName, titel: 'Understand', text: 'Short explanations with code examples.' },
@@ -273,6 +275,10 @@ const en: Texte = {
     { icon: 'kreisHaken' as IconName, titel: 'Check', text: 'A short quiz at the end of every chapter.' },
   ],
   derLernpfad: 'The learning path',
+  kartenHinweis: 'Every station is a part of the course. Pick one to see its chapters.',
+  legende: { fertig: 'completed', begonnen: 'started', offen: 'not started' },
+  duBistHier: 'You are here',
+  umstiegVon: (teile) => `Change from ${teile}`,
   editorTippsTitel: 'Editor tips',
   fortschrittTitel: 'Reset progress',
   fortschrittText:
@@ -326,7 +332,7 @@ const en: Texte = {
   loesungVerbergen: 'Hide solution',
   musterloesung: 'Sample solution',
   loesungUebernehmen: 'Copy solution into the editor',
-  tastenHinweis: 'Ctrl + Enter runs · Ctrl + Space shows suggestions',
+  tastenHinweis: 'Ctrl + Enter runs, Ctrl + Space shows suggestions',
   laeuft: 'running …',
   codeEditor: 'Code editor',
   konsole: 'Console',
@@ -339,7 +345,7 @@ const en: Texte = {
   testsLaufen: 'Running tests …',
   deineTests: 'Your tests',
   testZusammenfassung: (bestanden, fehlgeschlagen) =>
-    fehlgeschlagen ? `${fehlgeschlagen} failed · ${bestanden} passed` : `${bestanden} passed`,
+    fehlgeschlagen ? `${fehlgeschlagen} failed, ${bestanden} passed` : `${bestanden} passed`,
   keineTests: 'No tests found - write at least one test(…).',
   testDateiFehler: 'The test file cannot be run',
   testsGruen: 'Your tests pass with the correct component',
@@ -363,7 +369,7 @@ const en: Texte = {
   vollbild: 'Full screen',
   vollbildBeenden: 'Exit full screen',
   liveApp: 'Live app',
-  werkstattHinweis: 'Changes apply automatically after a short pause · Ctrl + Enter applies right away',
+  werkstattHinweis: 'Changes apply automatically after a short pause, Ctrl + Enter applies right away',
   typpruefung: 'Type check',
   typpruefungLaeuft: 'Checking types …',
   keineTypfehler: 'No type errors',
@@ -399,10 +405,10 @@ const en: Texte = {
   mitNutzung: '+ usage',
   kartenPlayground: 'Code freely - with templates and building blocks for every part.',
   playgroundHinweis: (teil) => `Want to keep experimenting freely? The ${teil} playground has templates and building blocks for this part.`,
-  zumPlayground: 'Open the playground →',
+  zumPlayground: 'Open the playground',
 
   vorschlaege: 'Suggestions',
-  vorschlagHinweis: '↑↓ select · Enter/Tab insert · Esc close',
+  vorschlagHinweis: '↑↓ select, Enter/Tab insert, Esc close',
   imCode: 'Already in your code.',
 
   // --- Werkbank: Playground-Layout ---------------------------------------------------------
@@ -435,7 +441,7 @@ const en: Texte = {
   sucheOeffnen: 'Search …',
   suchePlatzhalter: 'Search chapters, terms, hooks …',
   sucheKeineTreffer: 'Nothing found. Try a different term.',
-  sucheHinweis: '↑↓ select · Enter open · Esc close',
+  sucheHinweis: '↑↓ select, Enter open, Esc close',
   sucheArten: { kapitel: 'Chapter', glossar: 'Glossary', projekt: 'Project', seite: 'Page' },
   glossar: 'Glossary',
   glossarTitel: 'Glossary',

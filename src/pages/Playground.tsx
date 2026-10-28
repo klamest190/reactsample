@@ -27,7 +27,7 @@ export function Playground({ teil }: { teil?: string }) {
   return (
     <div className="space-y-6">
       <header className="space-y-3">
-        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight sm:text-4xl">
           <span className="flex size-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 ring-1 ring-brand-100 dark:bg-brand-500/10 dark:text-brand-400 dark:ring-brand-500/20">
             <Icon name="spielwiese" className="size-5" />
           </span>
@@ -116,7 +116,7 @@ function Arbeitsflaeche({ daten }: { daten: PlaygroundDaten }) {
       {/* Vorlagen */}
       <section aria-labelledby="vorlagen-titel" className="space-y-2">
         <div className="flex flex-wrap items-baseline gap-x-3">
-          <h2 id="vorlagen-titel" className="text-sm font-semibold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+          <h2 id="vorlagen-titel" className="text-sm font-semibold text-slate-500 dark:text-slate-400">
             {t.vorlagen}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t.vorlageHinweis}</p>

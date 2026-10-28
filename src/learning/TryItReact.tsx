@@ -152,7 +152,7 @@ export function TryItReact(props: ReactProps) {
   const problems = typed ? <TypeDiagnosticList error={typeErrors} /> : null
   const previewBlock = (
     <>
-      <div className="px-4 pt-2 text-2xs tracking-wider text-slate-500 uppercase dark:text-slate-400">{t.vorschau}</div>
+      <div className="px-4 pt-2 text-xs font-medium text-slate-500 dark:text-slate-400">{t.vorschau}</div>
       <div ref={containerRef} data-preview className="preview min-h-16 px-4 pt-1 pb-4" />
     </>
   )
